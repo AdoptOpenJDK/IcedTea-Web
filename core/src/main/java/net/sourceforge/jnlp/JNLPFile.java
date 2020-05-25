@@ -37,9 +37,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
@@ -85,7 +85,7 @@ import static net.sourceforge.jnlp.util.LocaleUtils.localeMatches;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
 
     public static final String JNLP_ROOT_ELEMENT = "jnlp";
 
@@ -645,7 +645,7 @@ public class JNLPFile {
             //  location = new URL(location, "."); // remove filename
 
             final XMLParser xmlParser = XmlParserFactory.getParser(parserSettings.getParserType());
-            final Node root = xmlParser.getRootNode(input);
+            final XmlNode root = xmlParser.getRootNode(input);
             final Parser parser = new Parser(this, location, root, parserSettings, forceCodebase); // true == allow extensions
 
             // JNLP tag information
@@ -764,4 +764,3 @@ public class JNLPFile {
         }
     }
 }
-

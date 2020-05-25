@@ -54,9 +54,9 @@ import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.LocaleUtils;
 
@@ -127,9 +127,9 @@ import static net.sourceforge.jnlp.JNLPFile.SPEC_VERSION_DEFAULT;
  */
 public final class Parser {
 
-    private final static Logger LOG = LoggerFactory.getLogger(Parser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
-    private static String MAINCLASS = "main-class";
+    private static final String MAINCLASS = "main-class";
     private static final Pattern anyWhiteSpace = Pattern.compile("\\s");
 
     // defines netx.jnlp.Node class if using Tiny XML or Nano XML
@@ -167,7 +167,7 @@ public final class Parser {
     /**
      * the root node
      */
-    private final Node root;
+    private final XmlNode root;
 
     /**
      * The versions of the specification that this JNLP file requires.
@@ -215,7 +215,7 @@ public final class Parser {
      * @param settings the parser settings to use when parsing the JNLP file
      * @throws ParseException if the JNLP file is invalid
      */
-    public Parser(final JNLPFile file, final URL base, final Node root, final ParserSettings settings) throws ParseException {
+    public Parser(final JNLPFile file, final URL base, final XmlNode root, final ParserSettings settings) throws ParseException {
         this(file, base, root, settings, null);
     }
 
@@ -235,14 +235,14 @@ public final class Parser {
      * @param codebase codebase to use if we did not parse one from JNLP file.
      * @throws ParseException if the JNLP file is invalid
      */
-    public Parser(final JNLPFile file, final URL base, final Node root, final ParserSettings settings, final URL codebase) throws ParseException {
+    public Parser(final JNLPFile file, final URL base, final XmlNode root, final ParserSettings settings, final URL codebase) throws ParseException {
         this.file = file;
         this.root = root;
         this.strict = settings.isStrict();
         this.allowExtensions = settings.isExtensionAllowed();
 
         // ensure it's a JNLP node
-        if (root == null || !root.getNodeName().getName().equals(JNLPFile.JNLP_ROOT_ELEMENT)) {
+        if (root == null || !root.getNodeName().equals(JNLPFile.JNLP_ROOT_ELEMENT)) {
             throw new ParseException("Root element is not a jnlp element.");
         }
 
@@ -321,16 +321,16 @@ public final class Parser {
         return spec;
     }
 
-    UpdateDesc getUpdate(final Node parent) throws ParseException {
+    UpdateDesc getUpdate(final XmlNode parent) throws ParseException {
         UpdateDesc updateDesc = null;
-        Node child = parent.getFirstChild();
+        XmlNode child = parent.getFirstChild();
         while (child != null) {
-            if (child.getNodeName().getName().equals(UPDATE_ELEMENT)) {
+            if (child.getNodeName().equals(UPDATE_ELEMENT)) {
                 if (strict && updateDesc != null) {
                     throw new ParseException("Only one update element is allowed");
                 }
 
-                final Node node = child;
+                final XmlNode node = child;
 
                 final UpdateCheck check;
                 final String checkValue = getAttribute(node, UpdateDesc.CHECK_ATTRIBUTE, UpdateCheck.TIMEOUT.getValue());
@@ -389,16 +389,16 @@ public final class Parser {
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    public List<ResourcesDesc> getResources(final Node parent, final boolean j2se)
+    public List<ResourcesDesc> getResources(final XmlNode parent, final boolean j2se)
             throws ParseException {
         final List<ResourcesDesc> result = new ArrayList<>();
-        final Node resources[] = getChildNodes(parent, RESOURCES_ELEMENT);
+        final XmlNode resources[] = getChildNodes(parent, RESOURCES_ELEMENT);
 
         // ensure that there are at least one information section present
         if (resources.length == 0 && !j2se) {
             throw new ParseException("No No resources element specified.");
         }
-        for (final Node resource : resources) {
+        for (final XmlNode resource : resources) {
             result.add(getResourcesDesc(resource, j2se));
         }
         return result;
@@ -411,7 +411,7 @@ public final class Parser {
      * @param j2se true if the resources are located under a j2se or java node
      * @throws ParseException if the JNLP file is invalid
      */
-    private ResourcesDesc getResourcesDesc(final Node node, final boolean j2se) throws ParseException {
+    private ResourcesDesc getResourcesDesc(final XmlNode node, final boolean j2se) throws ParseException {
         boolean mainFlag = false; // if found a main tag
 
         // create resources
@@ -422,9 +422,9 @@ public final class Parser {
                         splitString(getAttribute(node, ARCH_ATTRIBUTE, null)));
 
         // step through the elements
-        Node child = node.getFirstChild();
+        XmlNode child = node.getFirstChild();
         while (child != null) {
-            final String name = child.getNodeName().getName();
+            final String name = child.getNodeName();
 
             // check for nativelib but no trusted environment
             if (NATIVELIB_ELEMENT.equals(name)) {
@@ -486,7 +486,7 @@ public final class Parser {
      * @param node the j2se/java node
      * @throws ParseException if the JNLP file is invalid
      */
-    private JREDesc getJRE(final Node node) throws ParseException {
+    private JREDesc getJRE(final XmlNode node) throws ParseException {
 
         // require version attribute
         getRequiredAttribute(node, JREDesc.VERSION_ATTRIBUTE, null, strict);
@@ -539,8 +539,8 @@ public final class Parser {
      * @param node the jar or nativelib node
      * @throws ParseException if the JNLP file is invalid
      */
-    private JARDesc getJAR(final Node node) throws ParseException {
-        boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName().getName());
+    private JARDesc getJAR(final XmlNode node) throws ParseException {
+        boolean nativeJar = NATIVELIB_ELEMENT.equals(node.getNodeName());
         final URL location = getRequiredURL(node, JARDesc.HREF_ATTRIBUTE, base, strict);
         final VersionString versionString = getVersionString(node, JARDesc.VERSION_ATTRIBUTE, null);
         final String part = getAttribute(node, JARDesc.PART_ATTRIBUTE, null);
@@ -563,21 +563,21 @@ public final class Parser {
      * @param node the extension node
      * @throws ParseException if the JNLP file is invalid
      */
-    private ExtensionDesc getExtension(final Node node) throws ParseException {
+    private ExtensionDesc getExtension(final XmlNode node) throws ParseException {
         final String name = getAttribute(node, ExtensionDesc.NAME_ATTRIBUTE, null);
         final VersionString version = getVersionString(node, ExtensionDesc.VERSION_ATTRIBUTE, null);
         final URL location = getRequiredURL(node, ExtensionDesc.HREF_ATTRIBUTE, base, strict);
 
         final ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
-        for (Node downloadNode : getChildNodes(node, EXT_DOWNLOAD_ELEMENT)) {
+        for (XmlNode downloadNode : getChildNodes(node, EXT_DOWNLOAD_ELEMENT)) {
             ext.addDownload(getExtensionDownload(downloadNode));
         }
 
         return ext;
     }
 
-    private ExtensionDownloadDesc getExtensionDownload(Node node) throws ParseException {
+    private ExtensionDownloadDesc getExtensionDownload(XmlNode node) throws ParseException {
         final boolean lazy = LAZY.getValue().equals(getAttribute(node, ExtensionDownloadDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
         final String extPart = getRequiredAttribute(node, ExtensionDownloadDesc.EXT_PART_ATTRIBUTE, null, strict);
         final String part = getAttribute(node, ExtensionDownloadDesc.PART_ATTRIBUTE, null);
@@ -590,7 +590,7 @@ public final class Parser {
      * @param node the property node
      * @throws ParseException if the JNLP file is invalid
      */
-    private PropertyDesc getProperty(final Node node) throws ParseException {
+    private PropertyDesc getProperty(final XmlNode node) throws ParseException {
         final String name = getRequiredAttribute(node, PropertyDesc.NAME_ATTRIBUTE, null, strict);
         final String value = getRequiredAttribute(node, PropertyDesc.VALUE_ATTRIBUTE, "", strict);
 
@@ -603,7 +603,7 @@ public final class Parser {
      * @param node the package node
      * @throws ParseException if the JNLP file is invalid
      */
-    private PackageDesc getPackage(final Node node) throws ParseException {
+    private PackageDesc getPackage(final XmlNode node) throws ParseException {
         final String name = getRequiredAttribute(node, PackageDesc.NAME_ATTRIBUTE, null, strict);
         final String part = getRequiredAttribute(node, PackageDesc.PART_ATTRIBUTE, "", strict);
         final boolean recursive = getAttribute(node, PackageDesc.RECURSIVE_ATTRIBUTE, "false").equals("true");
@@ -647,9 +647,9 @@ public final class Parser {
      * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
      * for a detailed specification of this functionality.
      */
-    public List<InformationDesc> getInformationDescs(final Node parent) throws ParseException {
+    public List<InformationDesc> getInformationDescs(final XmlNode parent) throws ParseException {
         final List<InformationDesc> result = new ArrayList<>();
-        final Node[] informationElements = getChildNodes(parent, INFORMATION_ELEMENT);
+        final XmlNode[] informationElements = getChildNodes(parent, INFORMATION_ELEMENT);
 
         // ensure that there is at least one information element present in the JNLP file
         if (informationElements.length == 0) {
@@ -657,7 +657,7 @@ public final class Parser {
         }
 
         // create an information descriptor for each information element
-        for (final Node informationElement : informationElements) {
+        for (final XmlNode informationElement : informationElements) {
             result.add(getInformationDesc(informationElement));
         }
 
@@ -674,7 +674,7 @@ public final class Parser {
      * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
      * for a detailed specification of this functionality.
      */
-    private InformationDesc getInformationDesc(final Node node) throws ParseException {
+    private InformationDesc getInformationDesc(final XmlNode node) throws ParseException {
         final List<String> descriptionsUsed = new ArrayList<>();
 
         // create information
@@ -683,9 +683,9 @@ public final class Parser {
         final InformationDesc informationDesc = new InformationDesc(getLocales(node), os, arch, strict);
 
         // step through the elements
-        Node child = node.getFirstChild();
+        XmlNode child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName().getName();
+            String name = child.getNodeName();
 
             if (InformationDesc.TITLE_ELEMENT.equals(name)) {
                 addInfo(informationDesc, child, null, getSpanText(child, false));
@@ -742,14 +742,14 @@ public final class Parser {
      * @param mod key name appended with "-"+mod if not null
      * @param value the info object to add (icon or string)
      */
-    protected void addInfo(InformationDesc info, Node node, String mod, Object value) {
+    protected void addInfo(InformationDesc info, XmlNode node, String mod, Object value) {
         String modStr = (mod == null) ? "" : "-" + mod;
 
         if (node == null) {
             return;
         }
 
-        info.addItem(node.getNodeName().getName() + modStr, value);
+        info.addItem(node.getNodeName() + modStr, value);
     }
 
     /**
@@ -758,7 +758,7 @@ public final class Parser {
      * @param node the icon node
      * @throws ParseException if the JNLP file is invalid
      */
-    private IconDesc getIcon(Node node) throws ParseException {
+    private IconDesc getIcon(XmlNode node) throws ParseException {
         int width = Integer.parseInt(getAttribute(node, IconDesc.WIDTH_ATTRIBUTE, "-1"));
         int height = Integer.parseInt(getAttribute(node, IconDesc.HEIGHT_ATTRIBUTE, "-1"));
         int size = Integer.parseInt(getAttribute(node, IconDesc.SIZE_ATTRIBUTE, "-1"));
@@ -768,7 +768,7 @@ public final class Parser {
         return new IconDesc(location, getIconKind(node), width, height, depth, size);
     }
 
-    private static IconKind getIconKind(final Node node) {
+    private static IconKind getIconKind(final XmlNode node) {
         Assert.requireNonNull(node, "node");
         return IconKind.fromString(getAttribute(node, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue()));
     }
@@ -784,8 +784,8 @@ public final class Parser {
      * @param parent the parent node
      * @throws ParseException if the JNLP file is invalid
      */
-    public SecurityDesc getSecurity(final Node parent) throws ParseException {
-        final Node nodes[] = getChildNodes(parent, SECURITY_ELEMENT);
+    public SecurityDesc getSecurity(final XmlNode parent) throws ParseException {
+        final XmlNode nodes[] = getChildNodes(parent, SECURITY_ELEMENT);
 
         // test for too many security elements
         if (nodes.length > 1) {
@@ -812,7 +812,7 @@ public final class Parser {
      * Returns whether the JNLP file requests a trusted execution environment.
      */
     private boolean isTrustedEnvironment() {
-        final Node security = getChildNode(root, SECURITY_ELEMENT);
+        final XmlNode security = getChildNode(root, SECURITY_ELEMENT);
 
         if (security != null) {
             if (getChildNode(security, ApplicationEnvironment.ALL.getValue()) != null
@@ -833,8 +833,8 @@ public final class Parser {
      *
      * @see EntryPoint
      */
-    public EntryPoint getEntryPointDesc(final Node parent) throws ParseException {
-        final List<Node> candidates = new ArrayList<>();
+    public EntryPoint getEntryPointDesc(final XmlNode parent) throws ParseException {
+        final List<XmlNode> candidates = new ArrayList<>();
         candidates.addAll(asList(getChildNodes(parent, APPLET_DESC_ELEMENT)));
         candidates.addAll(asList(getChildNodes(parent, APPLICATION_DESC_ELEMENT)));
         candidates.addAll(asList(getChildNodes(parent, JAVAFX_DESC_ELEMENT)));
@@ -844,8 +844,8 @@ public final class Parser {
         if (candidates.size() > 1) {
             throw new ParseException("Only one application-desc element allowed per JNLP file.");
         } else if (candidates.size() == 1) {
-            final Node child = candidates.get(0);
-            final String name = child.getNodeName().getName();
+            final XmlNode child = candidates.get(0);
+            final String name = child.getNodeName();
 
             if (APPLET_DESC_ELEMENT.equals(name)) {
                 return getAppletDesc(child);
@@ -872,7 +872,7 @@ public final class Parser {
      *
      * @throws ParseException if the JNLP file is invalid
      */
-    AppletDesc getAppletDesc(final Node node) throws ParseException {
+    AppletDesc getAppletDesc(final XmlNode node) throws ParseException {
         final String name = getRequiredAttribute(node, AppletDesc.NAME_ATTRIBUTE, R("PUnknownApplet"), strict);
         final String main = getMainClass(node, true);
         final String progressClass = getAttribute(node, AppletDesc.PROGRESS_CLASS_ATTRIBUTE, null);
@@ -881,15 +881,15 @@ public final class Parser {
         int width = getAppletDescSize(AppletDesc.WIDTH_ATTRIBUTE, node);
         int height = getAppletDescSize(AppletDesc.HEIGHT_ATTRIBUTE, node);
         // read params
-        final Node params[] = getChildNodes(node, AppletDesc.PARAM_ELEMENT);
-        for (final Node param : params) {
+        final XmlNode params[] = getChildNodes(node, AppletDesc.PARAM_ELEMENT);
+        for (final XmlNode param : params) {
             paramMap.put(getRequiredAttribute(param, "name", null, strict), getRequiredAttribute(param, "value", "", strict));
         }
 
         return new AppletDesc(name, main, progressClass, docbase, width, height, paramMap);
     }
 
-    private int getAppletDescSize(final String wh, final Node node) throws ParseException {
+    private int getAppletDescSize(final String wh, final XmlNode node) throws ParseException {
         int numberValue = 0;
         try {
             String stringValue = getRequiredAttribute(node, wh, "100", strict);
@@ -927,15 +927,15 @@ public final class Parser {
      * @param node
      * @throws ParseException if the JNLP file is invalid
      */
-    ApplicationDesc getApplicationDesc(final ApplicationType applicationType, final Node node) throws ParseException {
+    ApplicationDesc getApplicationDesc(final ApplicationType applicationType, final XmlNode node) throws ParseException {
         String main = getMainClass(node, false);
         List<String> argsList = new ArrayList<>();
 
         // if (main == null)
         //   only ok if can be found in main jar file (can't check here but make a note)
         // read parameters
-        final Node args[] = getChildNodes(node, ApplicationDesc.ARGUMENT_ELEMENT);
-        for (Node arg : args) {
+        final XmlNode args[] = getChildNodes(node, ApplicationDesc.ARGUMENT_ELEMENT);
+        for (XmlNode arg : args) {
             //argsList.add( args[i].getNodeValue() );
             //This approach was not finding the argument text
             argsList.add(getSpanText(arg));
@@ -953,15 +953,15 @@ public final class Parser {
      * @return the component descriptor.
      * @throws ParseException
      */
-    ComponentDesc getComponent(final Node parent) throws ParseException {
+    ComponentDesc getComponent(final XmlNode parent) throws ParseException {
 
         if (1 < getChildNodes(parent, ComponentDesc.COMPONENT_DESC_ELEMENT).length) {
             throw new ParseException("Only one application-desc element allowed per JNLP file.");
         }
 
-        Node child = parent.getFirstChild();
+        XmlNode child = parent.getFirstChild();
         while (child != null) {
-            final String name = child.getNodeName().getName();
+            final String name = child.getNodeName();
 
             if (ComponentDesc.COMPONENT_DESC_ELEMENT.equals(name)) {
                 return new ComponentDesc();
@@ -977,7 +977,7 @@ public final class Parser {
      * @param node
      * @return the installer descriptor.
      */
-    InstallerDesc getInstallerDesc(final Node node) {
+    InstallerDesc getInstallerDesc(final XmlNode node) {
         final String main = getOptionalMainClass(node);
         final String progressClass = getAttribute(node, InstallerDesc.PROGRESS_CLASS_ATTRIBUTE, null);
 
@@ -989,7 +989,7 @@ public final class Parser {
      * @param node
      * @throws ParseException
      */
-    private AssociationDesc getAssociation(final Node node) throws ParseException {
+    private AssociationDesc getAssociation(final XmlNode node) throws ParseException {
         Assert.requireNonNull(node, "node");
 
         final String[] extensions = getRequiredAttribute(node, EXTENSIONS_ATTRIBUTE, null, strict).split(" ");
@@ -998,9 +998,9 @@ public final class Parser {
         IconDesc icon = null;
 
         // step through the elements
-        Node child = node.getFirstChild();
+        XmlNode child = node.getFirstChild();
         while (child != null) {
-            final String name = child.getNodeName().getName();
+            final String name = child.getNodeName();
             if (null != name) {
                 switch (name) {
                     case DESCRIPTION_ELEMENT:
@@ -1028,7 +1028,7 @@ public final class Parser {
     /**
      * @return the shortcut descriptor.
      */
-    private ShortcutDesc getShortcut(final Node node) throws ParseException {
+    private ShortcutDesc getShortcut(final XmlNode node) throws ParseException {
 
         final String online = getAttribute(node, ONLINE_ATTRIBUTE, "true");
         final boolean shortcutIsOnline = Boolean.valueOf(online);
@@ -1040,9 +1040,9 @@ public final class Parser {
         MenuDesc menu = null;
 
         // step through the elements
-        Node child = node.getFirstChild();
+        XmlNode child = node.getFirstChild();
         while (child != null) {
-            final String name = child.getNodeName().getName();
+            final String name = child.getNodeName();
 
             if (null != name) {
                 switch (name) {
@@ -1076,14 +1076,14 @@ public final class Parser {
      *
      * @return the menu element at the specified node
      */
-    private MenuDesc getMenu(final Node node) {
+    private MenuDesc getMenu(final XmlNode node) {
         return new MenuDesc(getAttribute(node, MenuDesc.SUBMENU_ATTRIBUTE, null));
     }
 
     /**
      * @return the related-content descriptor.
      */
-    private RelatedContentDesc getRelatedContent(final Node node) throws ParseException {
+    private RelatedContentDesc getRelatedContent(final XmlNode node) throws ParseException {
 
         getRequiredAttribute(node, RelatedContentDesc.HREF_ATTRIBUTE, null, strict);
         URL location = getURL(node, RelatedContentDesc.HREF_ATTRIBUTE, base, strict);
@@ -1093,9 +1093,9 @@ public final class Parser {
         IconDesc icon = null;
 
         // step through the elements
-        Node child = node.getFirstChild();
+        XmlNode child = node.getFirstChild();
         while (child != null) {
-            String name = child.getNodeName().getName();
+            String name = child.getNodeName();
 
             if (null != name) {
                 switch (name) {
@@ -1183,7 +1183,7 @@ public final class Parser {
      * @implSpec See <b>JSR-56, Section 3.5 Descriptor Information</b>
      * for a detailed specification of this functionality.
      */
-    private Locale[] getLocales(final Node node) throws ParseException {
+    private Locale[] getLocales(final XmlNode node) throws ParseException {
         final List<Locale> locales = new ArrayList<>();
         final String localeParts[] = splitString(getAttribute(node, LOCALE_ATTRIBUTE, ""));
 
@@ -1205,12 +1205,12 @@ public final class Parser {
      * @param defaultValue default if no such attribute
      * @return a version-string, or null if no such attribute and default is null
      */
-    private VersionString getVersionString(final Node node, final String attributeName, final String defaultValue) {
+    private VersionString getVersionString(final XmlNode node, final String attributeName, final String defaultValue) {
         final String version = getAttribute(node, attributeName, defaultValue);
         return (version == null) ? null : VersionString.fromString(version);
     }
 
-    private String getOptionalMainClass(Node node) {
+    private String getOptionalMainClass(XmlNode node) {
         try {
             return getMainClass(node, false);
         } catch (ParseException ex) {
@@ -1222,7 +1222,7 @@ public final class Parser {
         }
     }
 
-    private String getMainClass(Node node, boolean required) throws ParseException {
+    private String getMainClass(XmlNode node, boolean required) throws ParseException {
         String main;
         if (required) {
             main = getRequiredAttribute(node, MAINCLASS, null, strict);

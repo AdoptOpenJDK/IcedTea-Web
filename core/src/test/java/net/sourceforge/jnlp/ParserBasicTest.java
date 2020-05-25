@@ -53,9 +53,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import org.junit.Assert;
@@ -70,7 +70,7 @@ import java.util.List;
  */
 public class ParserBasicTest extends NoStdOutErrTest {
 
-    private static Node root;
+    private static XmlNode root;
     private static Parser parser;
 
     @BeforeClass
@@ -131,7 +131,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
     @Test
     public void testInformationOfflineAllowed() throws ParseException {
         InformationDesc info = parser.getInformationDescs(root).get(0);
-        Assert.assertEquals(true, info.isOfflineAllowed());
+        Assert.assertTrue(info.isOfflineAllowed());
 
     }
 
@@ -248,18 +248,18 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
         JARDesc[] jars = resources.getJARs();
         Assert.assertEquals(3, jars.length);
-        for (int i = 0; i < jars.length; i++) {
-            if (jars[i].isNative()) {
+        for (JARDesc jar : jars) {
+            if (jar.isNative()) {
                 foundNative = true;
-                Assert.assertEquals("http://localhost/native.jar", jars[i].getLocation().toString());
-            } else if (jars[i].isEager()) {
+                Assert.assertEquals("http://localhost/native.jar", jar.getLocation().toString());
+            } else if (jar.isEager()) {
                 foundEager = true;
-                Assert.assertEquals("http://localhost/eager.jar", jars[i].getLocation().toString());
-            } else if (jars[i].isLazy()) {
+                Assert.assertEquals("http://localhost/eager.jar", jar.getLocation().toString());
+            } else if (jar.isLazy()) {
                 foundLazy = true;
-                Assert.assertEquals("http://localhost/lazy.jar", jars[i].getLocation().toString());
+                Assert.assertEquals("http://localhost/lazy.jar", jar.getLocation().toString());
             } else {
-                Assert.assertFalse(true);
+                Assert.fail();
             }
         }
 

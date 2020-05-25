@@ -17,9 +17,6 @@
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 
 class XMLSanitizer {
 
@@ -30,14 +27,9 @@ class XMLSanitizer {
      * @param in  The reader of the containing the xml.
      * @return  A new reader for the sanitized xml
      */
-    static Reader sanitizeXml(final Reader in) {
-        final StringWriter out = new StringWriter();
-        sanitizeInput(in, out);
-        return new StringReader(out.toString());
-    }
-
-    private static void sanitizeInput(final Reader in, final Writer out) {
+    static String sanitizeXml(final Reader in) {
         try {
+            final StringBuilder result = new StringBuilder();
             final char[] buffer = new char[4];
             int charInBuffer = 0;
             boolean inComment = false;
@@ -51,11 +43,10 @@ class XMLSanitizer {
                         // write buffered content and flush
                         if (!inComment) {
                             for (int i = 0; i < charInBuffer; i++) {
-                                out.write(buffer[i]);
+                                result.append(buffer[i]);
                             }
                         }
-                        out.flush();
-                        return;
+                        return result.toString().trim();
                     }
                     buffer[charInBuffer] = (char) ch;
                 }
@@ -85,8 +76,7 @@ class XMLSanitizer {
                     } else {
                         // shift buffer content one to the left
                         // and write out buffer[0]
-                        out.write(buffer[0]);
-                        out.flush();
+                        result.append(buffer[0]);
                         buffer[0] = buffer[1];
                         buffer[1] = buffer[2];
                         buffer[2] = buffer[3];
