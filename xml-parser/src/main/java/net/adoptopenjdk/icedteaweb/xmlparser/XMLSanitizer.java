@@ -46,7 +46,7 @@ class XMLSanitizer {
                                 result.append(buffer[i]);
                             }
                         }
-                        return result.toString();
+                        return result.toString().trim();
                     }
                     buffer[charInBuffer] = (char) ch;
                 }
