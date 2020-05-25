@@ -38,9 +38,9 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
-import net.adoptopenjdk.icedteaweb.xmlparser.Node;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
+import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
@@ -85,7 +85,7 @@ import static net.sourceforge.jnlp.util.LocaleUtils.localeMatches;
  * @version $Revision: 1.21 $
  */
 public class JNLPFile {
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPFile.class);
 
     public static final String JNLP_ROOT_ELEMENT = "jnlp";
 
@@ -235,8 +235,6 @@ public class JNLPFile {
      * Create a JNLPFile from a URL and a version, checking for updates
      * using the specified policy.
      *
-     * @param version       the version of the JNLP file
-     * @param policy        the update policy
      * @param location      the location of the JNLP file
      * @param settings      the parser settings to use while parsing the file
      * @throws IOException    if an IO exception occurred
@@ -613,7 +611,7 @@ public class JNLPFile {
 
     private List<ResourcesDesc> getResourcesDescs(Locale locale, String os, String arch) {
         return resources.stream()
-                .filter(rescDesc ->  hasPrefixMatch(os, rescDesc.getOS()))
+                .filter(rescDesc -> hasPrefixMatch(os, rescDesc.getOS()))
                 .filter(rescDesc -> hasPrefixMatch(arch, rescDesc.getArch()))
                 .filter(rescDesc -> localeMatches(rescDesc.getLocales(), locale))
                 .collect(toList());
@@ -727,7 +725,7 @@ public class JNLPFile {
             //  location = new URL(location, "."); // remove filename
 
             final XMLParser xmlParser = XmlParserFactory.getParser(parserSettings.getParserType());
-            final Node root = xmlParser.getRootNode(input);
+            final XmlNode root = xmlParser.getRootNode(input);
             final Parser parser = new Parser(this, location, root, parserSettings, forceCodebase); // true == allow extensions
 
             // JNLP tag information
@@ -861,4 +859,3 @@ public class JNLPFile {
         }
     }
 }
-

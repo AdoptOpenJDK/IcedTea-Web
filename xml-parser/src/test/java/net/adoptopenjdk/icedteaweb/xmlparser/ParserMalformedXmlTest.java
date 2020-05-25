@@ -38,10 +38,8 @@ exception statement from your version.
 package net.adoptopenjdk.icedteaweb.xmlparser;
 
 import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
-import net.adoptopenjdk.icedteaweb.testing.annotations.KnownToFail;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -67,6 +65,7 @@ public class ParserMalformedXmlTest {
             cl = ClassLoader.getSystemClassLoader();
         }
         InputStream is = cl.getResourceAsStream("jnlps/basic.jnlp");
+        Assert.assertNotNull(is);
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder jnlpBuilder = new StringBuilder();
         String line;
@@ -84,8 +83,6 @@ public class ParserMalformedXmlTest {
     }
 
     @Test
-    @Ignore
-    @KnownToFail
     public void testMalformedArguments() throws ParseException {
         String malformedJnlp = originalJnlp.replace("arg2</argument", "arg2<argument");
         final XMLParser xmlParser = XmlParserFactory.getParser(MALFORMED);

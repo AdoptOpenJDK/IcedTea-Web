@@ -47,7 +47,6 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -64,7 +63,7 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
  */
 public class MalformedXMLParser extends XMLParser {
 
-    private final static Logger LOG = LoggerFactory.getLogger(MalformedXMLParser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MalformedXMLParser.class);
 
     /**
      * Reads malformed XML from the InputStream original and returns a new
@@ -75,7 +74,7 @@ public class MalformedXMLParser extends XMLParser {
      * version of the input XML
      * @throws ParseException if an exception occurs while parsing the input
      */
-    public Reader preprocessXml(final Reader original) throws ParseException {
+    public String preprocessXml(final String original) throws ParseException {
         LOG.info("Using MalformedXMLParser");
         ParseException.setUsed(MALFORMED);
         try {
@@ -83,7 +82,7 @@ public class MalformedXMLParser extends XMLParser {
             final XMLReader reader = new Parser();
 
             //TODO walk through the javadoc and tune more settings
-            //see tagsoup javadoc for details 
+            //see tagsoup javadoc for details
             reader.setProperty(Parser.schemaProperty, schema);
             reader.setFeature(Parser.bogonsEmptyFeature, false);
             reader.setFeature(Parser.ignorableWhitespaceFeature, true);
@@ -92,9 +91,9 @@ public class MalformedXMLParser extends XMLParser {
             final Writer writer = new StringWriter();
             final XMLWriter xmlWriter = new XMLWriter(writer);
             reader.setContentHandler(xmlWriter);
-            final InputSource s = new InputSource(original);
+            final InputSource s = new InputSource(new StringReader(original));
             reader.parse(s);
-            return new StringReader(writer.toString());
+            return writer.toString();
         } catch (final SAXException | IOException e1) {
             throw new ParseException("Invalid XML document syntax.", e1);
         }
