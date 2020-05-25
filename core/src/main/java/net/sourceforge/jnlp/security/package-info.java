@@ -29,7 +29,8 @@ conditions of the license of that module. An independent module is a module
 which is not derived from or based on this library. If you modify this library,
 you may extend this exception to your version of the library, but you are not
 obligated to do so. If you do not wish to do so, delete this exception
-statement from your version.*/
+statement from your version.
+*/
 /**
  *package generally about showing various security prompts
  *<h3>Following diagram shows how dialog is handled when some application/applet needs to show it</h3>
