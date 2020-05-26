@@ -1,0 +1,104 @@
+package net.adoptopenjdk.icedteaweb.proxy.firefox;
+
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.os.OperationSystem;
+import net.adoptopenjdk.icedteaweb.proxy.ProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.config.ConfigBasedProvider;
+import net.adoptopenjdk.icedteaweb.proxy.config.ProxyConfigurationImpl;
+import net.adoptopenjdk.icedteaweb.proxy.direct.DirectProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.linux.LinuxProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.mac.MacProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.pac.PacBasedProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.pac.PacProxyCache;
+import net.adoptopenjdk.icedteaweb.proxy.windows.WindowsProxyProvider;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+
+import java.net.Proxy;
+import java.net.URI;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.AUTO_CONFIG_URL_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.EXCLUSIONS_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.FTP_PORT_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.FTP_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.HIJACK_LOCALHOST_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.HTTP_PORT_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.HTTP_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.PROXY_TYPE_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.SHARE_SETTINGS_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.SOCKS_PORT_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.SOCKS_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.SSL_PORT_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxConstants.SSL_PROPERTY_NAME;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxProxyType.BROWSER_PROXY_TYPE_MANUAL;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxProxyType.BROWSER_PROXY_TYPE_NONE;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxProxyType.BROWSER_PROXY_TYPE_PAC;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxProxyType.BROWSER_PROXY_TYPE_SYSTEM;
+import static net.adoptopenjdk.icedteaweb.proxy.firefox.FirefoxProxyType.getForConfigValue;
+import static net.adoptopenjdk.icedteaweb.proxy.util.ProxyConstants.DEFAULT_PROTOCOL_PORT;
+
+public class FirefoxProxyProvider implements ProxyProvider {
+
+    private static final Logger LOG = LoggerFactory.getLogger(FirefoxProxyProvider.class);
+
+    private final ProxyProvider internalProvider;
+
+    public FirefoxProxyProvider(final DeploymentConfiguration config, final ExecutorService ioExecutor) throws Exception {
+        final FirefoxPreferences prefs = new FirefoxPreferences();
+        prefs.load();
+
+        final int type = prefs.getIntValue(PROXY_TYPE_PROPERTY_NAME, BROWSER_PROXY_TYPE_SYSTEM.getConfigValue());
+        final FirefoxProxyType proxyType = getForConfigValue(type);
+        LOG.debug("FireFoxProxyType : {}", proxyType);
+        if (proxyType == BROWSER_PROXY_TYPE_PAC) {
+            final URL autoConfigUrl = new URL(prefs.getStringValue(AUTO_CONFIG_URL_PROPERTY_NAME));
+            internalProvider = new PacBasedProxyProvider(autoConfigUrl, PacProxyCache.createFor(config));
+        } else if (proxyType == BROWSER_PROXY_TYPE_MANUAL) {
+            internalProvider = createForManualConfig(prefs);
+        } else if (proxyType == BROWSER_PROXY_TYPE_NONE) {
+            internalProvider = DirectProxyProvider.getInstance();
+        } else if (proxyType == BROWSER_PROXY_TYPE_SYSTEM) {
+            final OperationSystem localSystem = OperationSystem.getLocalSystem();
+            if (localSystem.isWindows()) {
+                internalProvider = new WindowsProxyProvider(config, ioExecutor);
+            } else if (localSystem.isMac()) {
+                internalProvider = new MacProxyProvider(config, ioExecutor);
+            } else if (localSystem.isLinux()) {
+                internalProvider = new LinuxProxyProvider(config, ioExecutor);
+            } else {
+                throw new IllegalStateException("Firefox Proxy Type '" + proxyType + "' is not supported for " + localSystem);
+            }
+        } else {
+            throw new IllegalStateException("Firefox Proxy Type '" + proxyType + "' is not supported");
+        }
+    }
+
+    private ProxyProvider createForManualConfig(final FirefoxPreferences prefs) {
+        final ProxyConfigurationImpl proxyConfiguration = new ProxyConfigurationImpl();
+        proxyConfiguration.setUseHttpForHttpsAndFtp(prefs.getBooleanValue(SHARE_SETTINGS_PROPERTY_NAME, false));
+        proxyConfiguration.setUseHttpForSocks(true);
+        proxyConfiguration.setHttpHost(prefs.getStringValue(HTTP_PROPERTY_NAME));
+        proxyConfiguration.setHttpPort(prefs.getIntValue(HTTP_PORT_PROPERTY_NAME, DEFAULT_PROTOCOL_PORT));
+        proxyConfiguration.setHttpsHost(prefs.getStringValue(SSL_PROPERTY_NAME));
+        proxyConfiguration.setHttpsPort(prefs.getIntValue(SSL_PORT_PROPERTY_NAME, DEFAULT_PROTOCOL_PORT));
+        proxyConfiguration.setFtpHost(prefs.getStringValue(FTP_PROPERTY_NAME));
+        proxyConfiguration.setFtpPort(prefs.getIntValue(FTP_PORT_PROPERTY_NAME, DEFAULT_PROTOCOL_PORT));
+        proxyConfiguration.setSocksHost(prefs.getStringValue(SOCKS_PROPERTY_NAME));
+        proxyConfiguration.setSocksPort(prefs.getIntValue(SOCKS_PORT_PROPERTY_NAME, DEFAULT_PROTOCOL_PORT));
+        proxyConfiguration.setBypassLocal(!prefs.getBooleanValue(HIJACK_LOCALHOST_PROPERTY_NAME, false));
+
+        Arrays.stream(prefs.getStringValue(EXCLUSIONS_PROPERTY_NAME).split("[, ]+"))
+                .forEach(proxyConfiguration::addToBypassList);
+
+        return new ConfigBasedProvider(proxyConfiguration);
+    }
+
+    @Override
+    public List<Proxy> select(final URI uri) throws Exception {
+        return internalProvider.select(uri);
+    }
+}

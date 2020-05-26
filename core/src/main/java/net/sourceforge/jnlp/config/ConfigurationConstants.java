@@ -176,6 +176,8 @@ public interface ConfigurationConstants {
 
     String KEY_PROXY_OVERRIDE_HOSTS = "deployment.proxy.override.hosts";
 
+    String PROXY_PAC_CACHE = "deployment.proxy.pac.cache";
+
     /*
      * Logging
      */
