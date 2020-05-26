@@ -1,5 +1,7 @@
 package net.adoptopenjdk.icedteaweb.proxy.mac;
 
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.proxy.ProxyProvider;
 import net.adoptopenjdk.icedteaweb.proxy.config.ConfigBasedProvider;
 import net.adoptopenjdk.icedteaweb.proxy.config.ProxyConfigurationImpl;
@@ -15,9 +17,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
-import static net.adoptopenjdk.icedteaweb.proxy.util.ProxyUtlis.showUnsupportedFeatureDialog;
-
 public class MacProxyProvider implements ProxyProvider {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MacProxyProvider.class);
 
     private static final Set<String> LOCALHOST_INDICATORS = new HashSet<>(Arrays.asList("localhost", "*.local"));
 
@@ -28,25 +30,25 @@ public class MacProxyProvider implements ProxyProvider {
         final MacProxySettings proxySettings = ScutilUtil.executeScutil(ioExecutor);
 
         if (proxySettings.isAutoDiscoveryEnabled()) {
-            showUnsupportedFeatureDialog("proxy.unsupportedFeature.autoDiscovery");
+            LOG.warn("Mac system proxy property 'autoDiscovery' is not supported.");
         }
         if (proxySettings.isExcludeSimpleHostnames()) {
-            showUnsupportedFeatureDialog("proxy.unsupportedFeature.excludeSimpleHostnames");
+            LOG.warn("Mac system proxy property 'excludeSimpleHostnames' is not supported.");
         }
         if (proxySettings.isFtpPassive()) {
-            showUnsupportedFeatureDialog("proxy.unsupportedFeature.ftpPassive");
+            LOG.warn("Mac system proxy property 'ftpPassive' is not supported.");
         }
         if (proxySettings.getHttpUser() != null) {
-            showUnsupportedFeatureDialog("proxy.unsupportedFeature.httpUser");
+            LOG.warn("Mac system proxy property 'httpUser' is not supported.");
         }
         if (proxySettings.getHttpsUser() != null) {
-            showUnsupportedFeatureDialog("proxy.unsupportedFeature.httpsUser");
+            LOG.warn("Mac system proxy property 'httpsUser' is not supported.");
         }
         if (proxySettings.getFtpUser() != null) {
-            showUnsupportedFeatureDialog("proxy.unsupportedFeature.ftpUser");
+            LOG.warn("Mac system proxy property 'ftpUser' is not supported.");
         }
         if (proxySettings.getSocksUser() != null) {
-            showUnsupportedFeatureDialog("proxy.unsupportedFeature.socksUser");
+            LOG.warn("Mac system proxy property 'socksUser' is not supported.");
         }
 
         if (proxySettings.isAutoConfigEnabled()) {

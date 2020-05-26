@@ -1,14 +1,14 @@
 package net.adoptopenjdk.icedteaweb.proxy.mac;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
-class ScutilParserTest {
+public class ScutilParserTest {
 
     @Test
     public void testParse() {
@@ -20,18 +20,18 @@ class ScutilParserTest {
         final MacProxySettings proxySettings = ScutilUtil.parse(lines);
 
         //then:
-        Assertions.assertNotNull(proxySettings);
-        Assertions.assertTrue(proxySettings.isHttpEnabled());
-        Assertions.assertEquals("example.proxy", proxySettings.getHttpHost());
-        Assertions.assertEquals(80, proxySettings.getHttpPort());
-        Assertions.assertTrue(proxySettings.isHttpsEnabled());
-        Assertions.assertEquals("example.https.proxy", proxySettings.getHttpsHost());
-        Assertions.assertEquals(88, proxySettings.getHttpsPort());
-        Assertions.assertFalse(proxySettings.isFtpEnabled());
-        Assertions.assertFalse(proxySettings.isSocksEnabled());
-        Assertions.assertFalse(proxySettings.isAutoDiscoveryEnabled());
-        Assertions.assertFalse(proxySettings.isAutoConfigEnabled());
-        Assertions.assertFalse(proxySettings.isExcludeSimpleHostnames());
+        Assert.assertNotNull(proxySettings);
+        Assert.assertTrue(proxySettings.isHttpEnabled());
+        Assert.assertEquals("example.proxy", proxySettings.getHttpHost());
+        Assert.assertEquals(80, proxySettings.getHttpPort());
+        Assert.assertTrue(proxySettings.isHttpsEnabled());
+        Assert.assertEquals("example.https.proxy", proxySettings.getHttpsHost());
+        Assert.assertEquals(88, proxySettings.getHttpsPort());
+        Assert.assertFalse(proxySettings.isFtpEnabled());
+        Assert.assertFalse(proxySettings.isSocksEnabled());
+        Assert.assertFalse(proxySettings.isAutoDiscoveryEnabled());
+        Assert.assertFalse(proxySettings.isAutoConfigEnabled());
+        Assert.assertFalse(proxySettings.isExcludeSimpleHostnames());
     }
 
     @Test
@@ -44,10 +44,10 @@ class ScutilParserTest {
         final MacProxySettings proxySettings = ScutilUtil.parse(lines);
 
         //then:
-        Assertions.assertNotNull(proxySettings);
-        Assertions.assertFalse(proxySettings.getExceptionList().isEmpty());
-        Assertions.assertTrue(proxySettings.getExceptionList().contains("*.local"));
-        Assertions.assertTrue(proxySettings.getExceptionList().contains("169.254/16"));
+        Assert.assertNotNull(proxySettings);
+        Assert.assertFalse(proxySettings.getExceptionList().isEmpty());
+        Assert.assertTrue(proxySettings.getExceptionList().contains("*.local"));
+        Assert.assertTrue(proxySettings.getExceptionList().contains("169.254/16"));
     }
 
     private List<String> readLines(final String file) {

@@ -1,13 +1,13 @@
 package net.adoptopenjdk.icedteaweb.proxy.windows;
 
-import com.openwebstart.proxy.ProxyProvider;
-import com.openwebstart.proxy.direct.DirectProxyProvider;
-import com.openwebstart.proxy.pac.PacBasedProxyProvider;
-import com.openwebstart.proxy.windows.registry.RegistryQueryResult;
-import com.openwebstart.proxy.windows.registry.RegistryValue;
+import net.adoptopenjdk.icedteaweb.proxy.ProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.direct.DirectProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.pac.PacBasedProxyProvider;
+import net.adoptopenjdk.icedteaweb.proxy.windows.registry.RegistryQueryResult;
+import net.adoptopenjdk.icedteaweb.proxy.windows.registry.RegistryValue;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.net.Proxy;
 import java.net.URI;
@@ -15,16 +15,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.openwebstart.proxy.windows.WindowsProxyConstants.AUTO_CONFIG_URL_VAL;
-import static com.openwebstart.proxy.windows.WindowsProxyConstants.PROXY_ENABLED_VAL;
-import static com.openwebstart.proxy.windows.WindowsProxyConstants.PROXY_SERVER_REGISTRY_VAL;
-import static com.openwebstart.proxy.windows.registry.RegistryValueType.REG_DWORD;
-import static com.openwebstart.proxy.windows.registry.RegistryValueType.REG_SZ;
+import static net.adoptopenjdk.icedteaweb.proxy.windows.WindowsProxyConstants.AUTO_CONFIG_URL_VAL;
+import static net.adoptopenjdk.icedteaweb.proxy.windows.WindowsProxyConstants.PROXY_ENABLED_VAL;
+import static net.adoptopenjdk.icedteaweb.proxy.windows.WindowsProxyConstants.PROXY_SERVER_REGISTRY_VAL;
+import static net.adoptopenjdk.icedteaweb.proxy.windows.registry.RegistryValueType.REG_DWORD;
+import static net.adoptopenjdk.icedteaweb.proxy.windows.registry.RegistryValueType.REG_SZ;
 
-class WindowsProxyUtilsTest {
+public class WindowsProxyUtilsTest {
 
     @Test
-    void createInternalProxyWithPac() throws Exception {
+    public void createInternalProxyWithPac() throws Exception {
         //given
         final DeploymentConfiguration config = new DeploymentConfiguration();
         final Map<String, RegistryValue> proxyRegistryEntries = new HashMap<>();
@@ -36,13 +36,13 @@ class WindowsProxyUtilsTest {
         final ProxyProvider proxyProvider = WindowsProxyUtils.createInternalProxy(config, queryResult);
 
         //than
-        Assertions.assertNotNull(proxyProvider);
-        Assertions.assertTrue(proxyProvider instanceof PacBasedProxyProvider);
-        Assertions.assertEquals(Collections.singletonList(Proxy.NO_PROXY), proxyProvider.select(new URI("http://some-url")));
+        Assert.assertNotNull(proxyProvider);
+        Assert.assertTrue(proxyProvider instanceof PacBasedProxyProvider);
+        Assert.assertEquals(Collections.singletonList(Proxy.NO_PROXY), proxyProvider.select(new URI("http://some-url")));
     }
 
     @Test
-    void createInternalProxyWithoutPac() throws Exception {
+    public void createInternalProxyWithoutPac() throws Exception {
         //given
         final DeploymentConfiguration config = new DeploymentConfiguration();
         final Map<String, RegistryValue> proxyRegistryEntries = new HashMap<>();
@@ -54,12 +54,12 @@ class WindowsProxyUtilsTest {
         final ProxyProvider proxyProvider = WindowsProxyUtils.createInternalProxy(config, queryResult);
 
         //than
-        Assertions.assertNotNull(proxyProvider);
-        Assertions.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
+        Assert.assertNotNull(proxyProvider);
+        Assert.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
     }
 
     @Test
-    void createInternalProxyWithoutPac2() throws Exception {
+    public void createInternalProxyWithoutPac2() throws Exception {
         //given
         final DeploymentConfiguration config = new DeploymentConfiguration();
         final Map<String, RegistryValue> proxyRegistryEntries = new HashMap<>();
@@ -70,12 +70,12 @@ class WindowsProxyUtilsTest {
         final ProxyProvider proxyProvider = WindowsProxyUtils.createInternalProxy(config, queryResult);
 
         //than
-        Assertions.assertNotNull(proxyProvider);
-        Assertions.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
+        Assert.assertNotNull(proxyProvider);
+        Assert.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
     }
 
     @Test
-    void createInternalProxyWithoutProxyUrl() throws Exception {
+    public void createInternalProxyWithoutProxyUrl() throws Exception {
         //given
         final DeploymentConfiguration config = new DeploymentConfiguration();
         final Map<String, RegistryValue> proxyRegistryEntries = new HashMap<>();
@@ -86,12 +86,12 @@ class WindowsProxyUtilsTest {
         final ProxyProvider proxyProvider = WindowsProxyUtils.createInternalProxy(config, queryResult);
 
         //than
-        Assertions.assertNotNull(proxyProvider);
-        Assertions.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
+        Assert.assertNotNull(proxyProvider);
+        Assert.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
     }
 
     @Test
-    void createInternalProxyWithoutProxyUrl2() throws Exception {
+    public void createInternalProxyWithoutProxyUrl2() throws Exception {
         //given
         final DeploymentConfiguration config = new DeploymentConfiguration();
         final Map<String, RegistryValue> proxyRegistryEntries = new HashMap<>();
@@ -103,7 +103,7 @@ class WindowsProxyUtilsTest {
         final ProxyProvider proxyProvider = WindowsProxyUtils.createInternalProxy(config, queryResult);
 
         //than
-        Assertions.assertNotNull(proxyProvider);
-        Assertions.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
+        Assert.assertNotNull(proxyProvider);
+        Assert.assertEquals(DirectProxyProvider.getInstance(), proxyProvider);
     }
 }

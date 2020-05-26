@@ -1,18 +1,17 @@
 package net.adoptopenjdk.icedteaweb.proxy.pac;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 
-class PacUtilsTest {
+public class PacUtilsTest {
 
     @Test
-    void getProxiesFromPacResultTest() {
+    public void getProxiesFromPacResultTest() {
         //given
         final String pacResult = "PROXY proxy.example.com:8080";
 
@@ -20,13 +19,13 @@ class PacUtilsTest {
         final List<Proxy> proxiesFromPacResult = PacUtils.getProxiesFromPacResult(pacResult);
 
         //than
-        Assertions.assertNotNull(proxiesFromPacResult);
-        Assertions.assertEquals(1, proxiesFromPacResult.size());
-        Assertions.assertEquals(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("proxy.example.com", 8080)), proxiesFromPacResult.get(0));
+        Assert.assertNotNull(proxiesFromPacResult);
+        Assert.assertEquals(1, proxiesFromPacResult.size());
+        Assert.assertEquals(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("proxy.example.com", 8080)), proxiesFromPacResult.get(0));
     }
 
     @Test
-    void getProxiesFromPacResultTest2() {
+    public void getProxiesFromPacResultTest2() {
         //given
         final String pacResult = "DIRECT";
 
@@ -34,13 +33,13 @@ class PacUtilsTest {
         final List<Proxy> proxiesFromPacResult = PacUtils.getProxiesFromPacResult(pacResult);
 
         //than
-        Assertions.assertNotNull(proxiesFromPacResult);
-        Assertions.assertEquals(1, proxiesFromPacResult.size());
-        Assertions.assertEquals(Proxy.NO_PROXY, proxiesFromPacResult.get(0));
+        Assert.assertNotNull(proxiesFromPacResult);
+        Assert.assertEquals(1, proxiesFromPacResult.size());
+        Assert.assertEquals(Proxy.NO_PROXY, proxiesFromPacResult.get(0));
     }
 
     @Test
-    void getProxiesFromPacResultTest3() {
+    public void getProxiesFromPacResultTest3() {
         //given
         final String pacResult = "PROXY proxy.example.com:8080; DIRECT";
 
@@ -48,15 +47,15 @@ class PacUtilsTest {
         final List<Proxy> proxiesFromPacResult = PacUtils.getProxiesFromPacResult(pacResult);
 
         //than
-        Assertions.assertNotNull(proxiesFromPacResult);
-        Assertions.assertEquals(2, proxiesFromPacResult.size());
-        Assertions.assertEquals(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("proxy.example.com", 8080)), proxiesFromPacResult.get(0));
-        Assertions.assertEquals(Proxy.NO_PROXY, proxiesFromPacResult.get(1));
+        Assert.assertNotNull(proxiesFromPacResult);
+        Assert.assertEquals(2, proxiesFromPacResult.size());
+        Assert.assertEquals(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("proxy.example.com", 8080)), proxiesFromPacResult.get(0));
+        Assert.assertEquals(Proxy.NO_PROXY, proxiesFromPacResult.get(1));
 
     }
 
     @Test
-    void getProxiesFromPacResultTest4() {
+    public void getProxiesFromPacResultTest4() {
         //given
         final String pacResult = null;
 
@@ -64,18 +63,22 @@ class PacUtilsTest {
         final List<Proxy> proxiesFromPacResult = PacUtils.getProxiesFromPacResult(pacResult);
 
         //than
-        Assertions.assertNotNull(proxiesFromPacResult);
-        Assertions.assertEquals(1, proxiesFromPacResult.size());
-        Assertions.assertEquals(Proxy.NO_PROXY, proxiesFromPacResult.get(0));
+        Assert.assertNotNull(proxiesFromPacResult);
+        Assert.assertEquals(1, proxiesFromPacResult.size());
+        Assert.assertEquals(Proxy.NO_PROXY, proxiesFromPacResult.get(0));
 
     }
 
     @Test
-    void getProxiesFromPacResultTest5() {
+    public void getProxiesFromPacResultTest5() {
         //given
         final String pacResult = "INVALID";
 
         //than
-        Assertions.assertThrows(IllegalArgumentException.class, () -> PacUtils.getProxiesFromPacResult(pacResult));
+        try {
+            PacUtils.getProxiesFromPacResult(pacResult);
+            Assert.fail();
+        }
+        catch (IllegalArgumentException e) {}
     }
 }

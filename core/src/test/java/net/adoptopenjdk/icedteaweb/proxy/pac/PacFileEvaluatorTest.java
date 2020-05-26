@@ -1,11 +1,11 @@
 package net.adoptopenjdk.icedteaweb.proxy.pac;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.net.URI;
 
-class PacFileEvaluatorTest {
+public class PacFileEvaluatorTest {
 
     @Test
     public void testSimplePac() throws Exception {
@@ -17,8 +17,8 @@ class PacFileEvaluatorTest {
         final String proxy = evaluator.getProxies(uri);
 
         //than
-        Assertions.assertNotNull(proxy);
-        Assertions.assertEquals("PROXY proxy.example.com:8080; DIRECT", proxy);
+        Assert.assertNotNull(proxy);
+        Assert.assertEquals("PROXY proxy.example.com:8080; DIRECT", proxy);
     }
 
     @Test
@@ -31,8 +31,8 @@ class PacFileEvaluatorTest {
         final String proxy = evaluator.getProxies(uri);
 
         //than
-        Assertions.assertNotNull(proxy);
-        Assertions.assertEquals("DIRECT", proxy);
+        Assert.assertNotNull(proxy);
+        Assert.assertEquals("DIRECT", proxy);
     }
 
 }

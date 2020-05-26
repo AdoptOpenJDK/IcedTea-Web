@@ -1,8 +1,8 @@
 package net.adoptopenjdk.icedteaweb.proxy.windows.registry;
 
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,25 +21,25 @@ public class RegistryQueryTest {
         final Map<String, RegistryValue> values = RegistryQuery.getRegistryValuesFromLines(key, lines);
 
         //Then
-        Assertions.assertEquals(14, values.size());
+        Assert.assertEquals(14, values.size());
 
-        Assertions.assertNotNull(values.get("DisableCachingOfSSLPages"));
-        Assertions.assertEquals(RegistryValueType.REG_DWORD, values.get("DisableCachingOfSSLPages").getType());
-        Assertions.assertEquals("0x0", values.get("DisableCachingOfSSLPages").getValue());
-        Assertions.assertFalse(values.get("DisableCachingOfSSLPages").getValueAsBoolean());
+        Assert.assertNotNull(values.get("DisableCachingOfSSLPages"));
+        Assert.assertEquals(RegistryValueType.REG_DWORD, values.get("DisableCachingOfSSLPages").getType());
+        Assert.assertEquals("0x0", values.get("DisableCachingOfSSLPages").getValue());
+        Assert.assertFalse(values.get("DisableCachingOfSSLPages").getValueAsBoolean());
 
-        Assertions.assertNotNull(values.get("MigrateProxy"));
-        Assertions.assertEquals(RegistryValueType.REG_DWORD, values.get("MigrateProxy").getType());
-        Assertions.assertEquals("0x1", values.get("MigrateProxy").getValue());
-        Assertions.assertTrue(values.get("MigrateProxy").getValueAsBoolean());
+        Assert.assertNotNull(values.get("MigrateProxy"));
+        Assert.assertEquals(RegistryValueType.REG_DWORD, values.get("MigrateProxy").getType());
+        Assert.assertEquals("0x1", values.get("MigrateProxy").getValue());
+        Assert.assertTrue(values.get("MigrateProxy").getValueAsBoolean());
 
-        Assertions.assertNotNull(values.get("ProxyServer"));
-        Assertions.assertEquals(RegistryValueType.REG_SZ, values.get("ProxyServer").getType());
-        Assertions.assertEquals("loooocalhost:80", values.get("ProxyServer").getValue());
+        Assert.assertNotNull(values.get("ProxyServer"));
+        Assert.assertEquals(RegistryValueType.REG_SZ, values.get("ProxyServer").getType());
+        Assert.assertEquals("loooocalhost:80", values.get("ProxyServer").getValue());
 
-        Assertions.assertNotNull(values.get("AutoConfigURL"));
-        Assertions.assertEquals(RegistryValueType.REG_SZ, values.get("AutoConfigURL").getType());
-        Assertions.assertEquals("huhu", values.get("AutoConfigURL").getValue());
+        Assert.assertNotNull(values.get("AutoConfigURL"));
+        Assert.assertEquals(RegistryValueType.REG_SZ, values.get("AutoConfigURL").getType());
+        Assert.assertEquals("huhu", values.get("AutoConfigURL").getValue());
     }
 
     @Test
@@ -53,11 +53,11 @@ public class RegistryQueryTest {
         final Map<String, RegistryValue> values = RegistryQuery.getRegistryValuesFromLines(key, lines);
 
         //Then
-        Assertions.assertEquals(1, values.size());
+        Assert.assertEquals(1, values.size());
 
-        Assertions.assertNotNull(values.get("AutoConfigURL"));
-        Assertions.assertEquals(RegistryValueType.REG_SZ, values.get("AutoConfigURL").getType());
-        Assertions.assertNull(values.get("AutoConfigURL").getValue());
+        Assert.assertNotNull(values.get("AutoConfigURL"));
+        Assert.assertEquals(RegistryValueType.REG_SZ, values.get("AutoConfigURL").getType());
+        Assert.assertNull(values.get("AutoConfigURL").getValue());
     }
 
 }

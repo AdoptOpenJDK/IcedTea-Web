@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import static net.adoptopenjdk.icedteaweb.proxy.linux.GnomeProxyConfigReader.readGnomeProxyConfig;
 import static net.adoptopenjdk.icedteaweb.proxy.linux.LinuxProxyProvider.LinuxProxyMode.NO_PROXY;
 import static net.adoptopenjdk.icedteaweb.proxy.linux.SystemPropertiesProxyConfigReader.readSystemPropertiesProxyConfig;
-import static net.adoptopenjdk.icedteaweb.proxy.util.ProxyUtlis.showUnsupportedFeatureDialog;
 
 public class LinuxProxyProvider implements ProxyProvider {
 
@@ -52,7 +51,7 @@ public class LinuxProxyProvider implements ProxyProvider {
                 break;
             case MANUAL:
                 if (proxySettings.isAuthenticationEnabled()) {
-                    showUnsupportedFeatureDialog("proxy.unsupportedFeature.httpUser");
+                    LOG.warn("Linux system proxy property 'httpUser' is not supported.");
                 }
                 final ProxyConfigurationImpl proxyConfiguration = new ProxyConfigurationImpl();
                 if (proxySettings.isHttpEnabled()) {

@@ -1,15 +1,15 @@
 package net.adoptopenjdk.icedteaweb.proxy.ui;
 
-import com.openwebstart.controlpanel.FormPanel;
-import com.openwebstart.proxy.ProxyProviderType;
-import com.openwebstart.ui.Notifications;
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.AdvancedProxySettingsDialog;
 import net.adoptopenjdk.icedteaweb.client.util.UiLock;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.proxy.ProxyProviderType;
+import net.adoptopenjdk.icedteaweb.ui.swing.FormPanel;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 
@@ -257,7 +257,7 @@ public class ProxyConfigPanel extends FormPanel {
                 updateEnabledStateForProxyType(providerType);
             }
         } catch (final Exception e) {
-            Notifications.showError(Translator.getInstance().translate("proxyPanel.error.loadSettings"));
+            BasicExceptionDialog.show(e);
             LOG.error("Error while loading proxy settings", e);
             noProxySelection.setSelected(true);
             updateEnabledStateForProxyType(ProxyProviderType.NONE);
