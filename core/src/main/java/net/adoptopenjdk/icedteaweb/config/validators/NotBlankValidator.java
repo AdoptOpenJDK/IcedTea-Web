@@ -2,12 +2,10 @@ package net.adoptopenjdk.icedteaweb.config.validators;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
 
-import java.util.Arrays;
-
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
- * Checks that the value is one of the acceptable String values
+ * Checks that the value is not null or blank
  */
 public class NotBlankValidator implements ValueValidator {
 
