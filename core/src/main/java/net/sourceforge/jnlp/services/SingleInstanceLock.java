@@ -16,9 +16,9 @@
 
 package net.sourceforge.jnlp.services;
 
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,23 +29,20 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 
-import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-
 /**
- * This class represents a Lock for single instance jnlp applications
- *
+ * This class represents a Lock for single instance jnlp applications.
+ * <p>
  * The lock is per-session, per user.
  *
  * @author <a href="mailto:omajid@redhat.com">Omair Majid</a>
  */
 class SingleInstanceLock {
 
-    JNLPFile jnlpFile;
-    File lockFile = null;
-
     public static final int INVALID_PORT = Integer.MIN_VALUE;
 
-    int port = INVALID_PORT;
+    private final File lockFile;
+
+    int port = INVALID_PORT; // indicates that this lock has not been activated
 
     /**
      * Create an object to manage the instance lock for the specified JNLP file.
@@ -53,9 +50,7 @@ class SingleInstanceLock {
      * @param jnlpFile the jnlp file to create the lock for
      */
     public SingleInstanceLock(JNLPFile jnlpFile) {
-        this.jnlpFile = jnlpFile;
-        lockFile = getLockFile();
-
+        lockFile = getLockFile(jnlpFile);
     }
 
     /**
@@ -65,15 +60,12 @@ class SingleInstanceLock {
      * @throws IOException on any io problems
      */
     public void createWithPort(int localPort) throws IOException {
-
-	FileUtils.deleteWithErrMesg(lockFile, "Could not delete lock file [" + lockFile + "]");
         FileUtils.createRestrictedFile(lockFile);
-        BufferedWriter lockFileWriter = new BufferedWriter(new FileWriter(lockFile, false));
-        lockFileWriter.write(String.valueOf(localPort));
-        lockFileWriter.newLine();
-        lockFileWriter.flush();
-        lockFileWriter.close();
-
+        try (BufferedWriter lockFileWriter = new BufferedWriter(new FileWriter(lockFile, false))) {
+            lockFileWriter.write(String.valueOf(localPort));
+            lockFileWriter.newLine();
+            lockFileWriter.flush();
+        }
     }
 
     /**
@@ -114,9 +106,7 @@ class SingleInstanceLock {
      * Returns true if the port is free.
      */
     private boolean isPortFree(int port) {
-        try {
-            ServerSocket socket = new ServerSocket(port);
-            socket.close();
+        try (final ServerSocket ignored = new ServerSocket(port)) {
             return true;
         } catch (BindException e) {
             return false;
@@ -128,9 +118,11 @@ class SingleInstanceLock {
     /**
      * Return a file object that represents the lock file. The lock file itself
      * may or may not exist.
+     *
+     * @param jnlpFile the applicaton for which to create the lock
      */
-    private File getLockFile() {
-        File baseDir = PathsAndFiles.LOCKS_DIR.getFile();
+    private File getLockFile(final JNLPFile jnlpFile) {
+        final File baseDir = PathsAndFiles.LOCKS_DIR.getFile();
 
         if (!baseDir.isDirectory()) {
             if (!baseDir.getParentFile().isDirectory() && !baseDir.getParentFile().mkdirs()) {
@@ -143,15 +135,17 @@ class SingleInstanceLock {
             }
         }
 
-        String lockFileName = getLockFileName();
-        File applicationLockFile = new File(baseDir, lockFileName);
+        final String lockFileName = getLockFileName(jnlpFile);
+        final File applicationLockFile = new File(baseDir, lockFileName);
         return applicationLockFile;
     }
 
     /**
      * Returns the name of the lock file.
+     *
+     * @param jnlpFile the applicaton for which to create the lock
      */
-    private String getLockFileName() {
+    private String getLockFileName(JNLPFile jnlpFile) {
         String initialName = "";
 
         if (jnlpFile.getSourceLocation() != null) {
@@ -171,27 +165,23 @@ class SingleInstanceLock {
 
     /**
      * Parse the lock file.
-     *
-     * @throws NumberFormatException
-     * @throws IOException
      */
     private void parseFile() throws NumberFormatException, IOException {
-        BufferedReader lockFileReader = new BufferedReader(new FileReader(lockFile));
-        int port = Integer.valueOf(lockFileReader.readLine());
-        lockFileReader.close();
-        this.port = port;
+        try (final BufferedReader lockFileReader = new BufferedReader(new FileReader(lockFile))) {
+            this.port = Integer.parseInt(lockFileReader.readLine());
+        }
     }
 
     /**
      * Returns a string identifying this display.
-     *
+     * <p>
      * Implementation note: On systems with X support, this is the DISPLAY
      * variable
      *
      * @return a string that is guaranteed to be not null.
      */
     private String getCurrentDisplay() {
-        String display = System.getenv("DISPLAY");
+        final String display = System.getenv("DISPLAY");
         return (display == null) ? "" : display;
     }
 
