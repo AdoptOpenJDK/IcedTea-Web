@@ -1,0 +1,16 @@
+.idea
+common/target
+core/target
+integration-tests/classloader-integration-tests-module-3/target
+.DS_Store
+integration-tests/classloader-integration-tests/target
+integration/target
+test-extensions/target
+xml-parser/target
+jnlp-api/target
+integration-tests/classloader-integration-tests-module-native/target
+integration-tests/classloader-integration-tests-module-2/target
+integration-tests/classloader-integration-tests-module-parent/target
+integration-tests/classloader-integration-tests-module-1/target
+integration-tests/classloader-integration-tests-module-wrapper/target
+artifact-no-dependencies/target

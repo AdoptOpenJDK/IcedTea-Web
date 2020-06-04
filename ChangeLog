@@ -1,3 +1,14 @@
+2020-06-03  Hendrik Ebbers <hendrik.ebbers@web.de>
+
+        Release changes
+        * configure.ac: (AC_INIT) bumped to 1.8.4
+        * Release 1.8.4 contains backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/389
+        * Release 1.8.4 contains backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/384
+        * Release 1.8.4 contains backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/340
+        * Release 1.8.4 contains https://github.com/AdoptOpenJDK/IcedTea-Web/pull/576
+        * Release 1.8.4 contains https://github.com/AdoptOpenJDK/IcedTea-Web/pull/577
+
+
 2019-08-02  George Adams <george@jclarity.com>
 
         Release changes

@@ -8,6 +8,13 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.8.4 (2020-06-03):
+* Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/389
+* Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/384
+* Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/340
+* https://github.com/AdoptOpenJDK/IcedTea-Web/pull/576
+* https://github.com/AdoptOpenJDK/IcedTea-Web/pull/577
+
 New in release 1.8.3 (2019-08-02):
 * Security updates
   - CVE-2019-10182 - Fixed bug when relative path (..) could leak up (even out of cache)
