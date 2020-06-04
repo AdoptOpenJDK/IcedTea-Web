@@ -240,6 +240,8 @@ public final class FileUtils {
     private static void createRestrictedFile(File file, boolean isDir) throws IOException {
 
         File tempFile = new File(file.getCanonicalPath() + ".temp");
+        FileUtils.deleteWithErrMesg(tempFile, "Could not delete [" + tempFile + "]");
+
 
         if (isDir) {
             if (!tempFile.mkdir()) {
