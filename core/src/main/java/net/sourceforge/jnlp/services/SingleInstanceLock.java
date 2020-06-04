@@ -17,6 +17,8 @@
 package net.sourceforge.jnlp.services;
 
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 
@@ -37,6 +39,8 @@ import java.net.ServerSocket;
  * @author <a href="mailto:omajid@redhat.com">Omair Majid</a>
  */
 class SingleInstanceLock {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SingleInstanceLock.class);
 
     public static final int INVALID_PORT = Integer.MIN_VALUE;
 
@@ -60,7 +64,12 @@ class SingleInstanceLock {
      * @throws IOException on any io problems
      */
     public void createWithPort(int localPort) throws IOException {
+        if (lockFile.exists()) {
+            LOG.error("SingleInstance lock file already present - deleting it.");
+            FileUtils.deleteWithErrMesg(lockFile, "Could not delete [" + lockFile + "]");
+        }
         FileUtils.createRestrictedFile(lockFile);
+        lockFile.deleteOnExit();
         try (BufferedWriter lockFileWriter = new BufferedWriter(new FileWriter(lockFile, false))) {
             lockFileWriter.write(String.valueOf(localPort));
             lockFileWriter.newLine();
