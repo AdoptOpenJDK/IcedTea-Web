@@ -240,8 +240,6 @@ public final class FileUtils {
     private static void createRestrictedFile(File file, boolean isDir) throws IOException {
 
         File tempFile = new File(file.getCanonicalPath() + ".temp");
-        FileUtils.deleteWithErrMesg(tempFile, "Could not delete [" + tempFile + "]");
-
 
         if (isDir) {
             if (!tempFile.mkdir()) {
@@ -253,83 +251,90 @@ public final class FileUtils {
             }
         }
 
-        if (OsUtil.isWindows()) {
-            // prepare ACL flags
-            Set<AclEntryFlag> flags = new LinkedHashSet<>();
-            if (tempFile.isDirectory()) {
-                flags.add(AclEntryFlag.DIRECTORY_INHERIT);
-                flags.add(AclEntryFlag.FILE_INHERIT);
-            }
+        try {
+            if (OsUtil.isWindows()) {
+                // prepare ACL flags
+                Set<AclEntryFlag> flags = new LinkedHashSet<>();
+                if (tempFile.isDirectory()) {
+                    flags.add(AclEntryFlag.DIRECTORY_INHERIT);
+                    flags.add(AclEntryFlag.FILE_INHERIT);
+                }
 
-            // prepare ACL permissions
-            Set<AclEntryPermission> permissions = new LinkedHashSet<>(Arrays.asList(
-                    AclEntryPermission.READ_DATA,
-                    AclEntryPermission.READ_NAMED_ATTRS,
-                    AclEntryPermission.EXECUTE,
-                    AclEntryPermission.READ_ATTRIBUTES,
-                    AclEntryPermission.READ_ACL,
-                    AclEntryPermission.SYNCHRONIZE,
-                    AclEntryPermission.WRITE_DATA,
-                    AclEntryPermission.APPEND_DATA,
-                    AclEntryPermission.WRITE_NAMED_ATTRS,
-                    AclEntryPermission.DELETE_CHILD,
-                    AclEntryPermission.WRITE_ATTRIBUTES,
-                    AclEntryPermission.DELETE,
-                    AclEntryPermission.WRITE_ACL,
-                    AclEntryPermission.WRITE_OWNER
-            ));
+                // prepare ACL permissions
+                Set<AclEntryPermission> permissions = new LinkedHashSet<>(Arrays.asList(
+                        AclEntryPermission.READ_DATA,
+                        AclEntryPermission.READ_NAMED_ATTRS,
+                        AclEntryPermission.EXECUTE,
+                        AclEntryPermission.READ_ATTRIBUTES,
+                        AclEntryPermission.READ_ACL,
+                        AclEntryPermission.SYNCHRONIZE,
+                        AclEntryPermission.WRITE_DATA,
+                        AclEntryPermission.APPEND_DATA,
+                        AclEntryPermission.WRITE_NAMED_ATTRS,
+                        AclEntryPermission.DELETE_CHILD,
+                        AclEntryPermission.WRITE_ATTRIBUTES,
+                        AclEntryPermission.DELETE,
+                        AclEntryPermission.WRITE_ACL,
+                        AclEntryPermission.WRITE_OWNER
+                ));
 
-            // filter ACL's leaving only root and owner
-            AclFileAttributeView view = Files.getFileAttributeView(tempFile.toPath(), AclFileAttributeView.class);
-            List<AclEntry> list = new ArrayList<>();
-            String owner = view.getOwner().getName();
-            for (AclEntry ae : view.getAcl()) {
-                String principalName = ae.principal().getName();
-                if (WIN_ROOT_PRINCIPALS.contains(principalName) || owner.equals(principalName)) {
-                    list.add(AclEntry.newBuilder()
-                            .setType(AclEntryType.ALLOW)
-                            .setPrincipal(ae.principal())
-                            .setPermissions(permissions)
-                            .setFlags(flags)
-                            .build());
+                // filter ACL's leaving only root and owner
+                AclFileAttributeView view = Files.getFileAttributeView(tempFile.toPath(), AclFileAttributeView.class);
+                List<AclEntry> list = new ArrayList<>();
+                String owner = view.getOwner().getName();
+                for (AclEntry ae : view.getAcl()) {
+                    String principalName = ae.principal().getName();
+                    if (WIN_ROOT_PRINCIPALS.contains(principalName) || owner.equals(principalName)) {
+                        list.add(AclEntry.newBuilder()
+                                .setType(AclEntryType.ALLOW)
+                                .setPrincipal(ae.principal())
+                                .setPermissions(permissions)
+                                .setFlags(flags)
+                                .build());
+                    }
+                }
+
+                // apply ACL
+                view.setAcl(list);
+            } else {
+                // remove all permissions
+                if (!tempFile.setExecutable(false, false)) {
+                    throw new IOException("Removing execute permissions on file " + tempFile + " failed ");
+                }
+                if (!tempFile.setReadable(false, false)) {
+                    throw new IOException("Removing read permission on file " + tempFile + " failed ");
+                }
+                if (!tempFile.setWritable(false, false)) {
+                    throw new IOException("Removing write permissions on file " + tempFile + " failed ");
+                }
+
+                // allow owner to read
+                if (!tempFile.setReadable(true, true)) {
+                    throw new IOException("Acquiring read permissions on file " + tempFile + " failed");
+                }
+
+                // allow owner to write
+                if (!tempFile.setWritable(true, true)) {
+                    throw new IOException("Acquiring write permissions on file " + tempFile + " failed");
+                }
+
+                // allow owner to enter directories
+                if (isDir && !tempFile.setExecutable(true, true)) {
+                    throw new IOException("Acquiring execute permissions on file " + tempFile + " failed");
                 }
             }
 
-            // apply ACL
-            view.setAcl(list);
-        } else {
-            // remove all permissions
-            if (!tempFile.setExecutable(false, false)) {
-                throw new IOException("Removing execute permissions on file " + tempFile + " failed ");
-            }
-            if (!tempFile.setReadable(false, false)) {
-                throw new IOException("Removing read permission on file " + tempFile + " failed ");
-            }
-            if (!tempFile.setWritable(false, false)) {
-                throw new IOException("Removing write permissions on file " + tempFile + " failed ");
-            }
-
-            // allow owner to read
-            if (!tempFile.setReadable(true, true)) {
-                throw new IOException("Acquiring read permissions on file " + tempFile + " failed");
-            }
-
-            // allow owner to write
-            if (!tempFile.setWritable(true, true)) {
-                throw new IOException("Acquiring write permissions on file " + tempFile + " failed");
-            }
-
-            // allow owner to enter directories
-            if (isDir && !tempFile.setExecutable(true, true)) {
-                throw new IOException("Acquiring execute permissions on file " + tempFile + " failed");
+            // rename this file. Unless the file is moved/renamed, any program that
+            // opened the file right after it was created might still be able to
+            // read the data.
+            if (!tempFile.renameTo(file)) {
+                throw new IOException("Cannot rename " + tempFile + " to " + file);
             }
         }
-
-        // rename this file. Unless the file is moved/renamed, any program that
-        // opened the file right after it was created might still be able to
-        // read the data.
-        if (!tempFile.renameTo(file)) {
-            throw new IOException("Cannot rename " + tempFile + " to " + file);
+        finally {
+            if (tempFile.exists()) {
+                FileUtils.deleteWithErrMesg(tempFile, "Could not delete [" + tempFile + "]");
+            }
         }
     }
 
