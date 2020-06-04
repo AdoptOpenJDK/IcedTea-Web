@@ -46,7 +46,7 @@ class SingleInstanceLock {
 
     private final File lockFile;
 
-    int port = INVALID_PORT; // indicates that this lock has not been activated
+    private int port = INVALID_PORT; // indicates that this lock has not been activated
 
     /**
      * Create an object to manage the instance lock for the specified JNLP file.
@@ -107,7 +107,7 @@ class SingleInstanceLock {
     /**
      * Returns true if the lock file already exists.
      */
-    private boolean exists() {
+    boolean exists() {
         return lockFile.exists();
     }
 
