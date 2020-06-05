@@ -12,4 +12,5 @@ For a release several steps are needed:
 - The AdoptOpenJDK download page for IcedTeaWeb (https://adoptopenjdk.net/icedtea-web.html) must be updated. See https://github.com/AdoptOpenJDK/openjdk-website/blob/master/src/handlebars/icedtea-web.handlebars
 - The IcedTeaWeb version in Wikipedia must be updated: https://en.wikipedia.org/wiki/IcedTea
 
-Once all steps above are done a new release of IcedTeaWeb has been successfully created. To bundle the release in future versions of AdoptOpenJDK some additional steps are needed.
+Once all steps above are done a new release of IcedTeaWeb has been successfully created.
+To bundle the release in future versions of AdoptOpenJDK we must set the new version number in ICEDTEA_WEB_VERSION from the job create_installer_windows https://ci.adoptopenjdk.net/job/build-scripts/job/release/job/create_installer_windows/configure.
