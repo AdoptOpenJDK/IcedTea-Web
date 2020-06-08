@@ -11,9 +11,13 @@ public class LoggerFactory {
     private static LoggerFactoryImpl initFactory() {
         try {
             final Class<?> factoryClass = LoggerFactory.class.getClassLoader().loadClass(FACTORY_CLASS);
-            return (LoggerFactoryImpl) factoryClass.newInstance();
+            final LoggerFactoryImpl loggerFactory = (LoggerFactoryImpl) factoryClass.newInstance();
+            loggerFactory.getLogger(LoggerFactory.class).debug("init logger factory to {}", loggerFactory);
+            return loggerFactory;
         } catch (Exception e) {
-            return new SystemOutLoggerFactory();
+            final SystemOutLoggerFactory loggerFactory = new SystemOutLoggerFactory();
+            loggerFactory.getLogger(LoggerFactory.class).error("Falling back to SystemOutLogger", e);
+            return loggerFactory;
         }
     }
 
