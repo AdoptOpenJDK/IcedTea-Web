@@ -71,7 +71,7 @@ AM_CONDITIONAL([ENABLE_NATIVE_LAUNCHERS], [test ! x"$RUSTC" = x -a ! x"$CARGO" =
 build_linux=no
 build_windows=no
 case "${host_os}" in
-    linux*)
+    linux*|freebsd*)
         build_linux=yes
         ;;
     cygwin*)
