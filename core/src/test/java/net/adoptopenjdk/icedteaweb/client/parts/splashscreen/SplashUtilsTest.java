@@ -39,8 +39,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import java.lang.reflect.Field;
-
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.ICEDTEA_WEB_SPLASH;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.NO_SPLASH;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -64,7 +62,6 @@ public class SplashUtilsTest {
 
     @Test
     public void determineCallerTest() {
-        modifyIsWebstartApplicationRuntime();
         SplashUtils.getSplashScreen();
     }
 
@@ -128,15 +125,5 @@ public class SplashUtilsTest {
 
         SplashPanel sw = SplashUtils.getSplashScreen();
         assertThat(sw, is(nullValue()));
-    }
-
-    static void modifyIsWebstartApplicationRuntime() {
-        try {
-            Field field = JNLPRuntime.class.getDeclaredField("isWebstartApplication");
-            field.setAccessible(true);
-            field.set(null, true);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 }
