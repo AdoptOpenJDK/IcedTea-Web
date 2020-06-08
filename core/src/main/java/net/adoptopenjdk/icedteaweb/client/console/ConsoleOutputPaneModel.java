@@ -163,35 +163,19 @@ public class ConsoleOutputPaneModel {
 
             if (mark) {
                 sb.append("<div style='color:#");
-                if (messageWithHeader.getHeader().isPlugin && messageWithHeader.getHeader() instanceof PluginHeader) {
-                    if (!((PluginHeader) (messageWithHeader.getHeader())).preInit) {
-                        if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_DIMRED);
-                        } else {
-                            sb.append(HTMLCOLOR_MIDGRAY);
-                        }
+                if (messageWithHeader.getHeader().isClientApp) {
+                    if (messageWithHeader.getHeader().level.printToErrStream()) {
+                        sb.append(HTMLCOLOR_PURPLE);
                     } else {
-                        if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_SPARKRED);
-                        } else {
-                            sb.append(HTMLCOLOR_LIGHTGRAY);
-                        }
+                        sb.append(HTMLCOLOR_GREEN);
                     }
                 } else {
-                    if (messageWithHeader.getHeader().isClientApp) {
-                        if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_PURPLE);
-                        } else {
-                            sb.append(HTMLCOLOR_GREEN);
-                        }
+                    if (messageWithHeader.getHeader().level.isWarning()) {
+                        sb.append(HTMLCOLOR_GREENYELLOW);
+                    } else if (messageWithHeader.getHeader().level.printToErrStream()) {
+                        sb.append(HTMLCOLOR_PINKYREAD);
                     } else {
-                        if (messageWithHeader.getHeader().level.isWarning()) {
-                            sb.append(HTMLCOLOR_GREENYELLOW);
-                        } else if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_PINKYREAD);
-                        } else {
-                            sb.append(HTMLCOLOR_BLACK);
-                        }
+                        sb.append(HTMLCOLOR_BLACK);
                     }
                 }
                 sb.append("'>");
@@ -356,10 +340,7 @@ public class ConsoleOutputPaneModel {
         if (!showApp && header.isClientApp) {
             return true;
         }
-        if (!showJava && !header.isPlugin) {
-            return true;
-        }
-        if (!showPlugin && header.isPlugin) {
+        if (!showJava) {
             return true;
         }
         if (header instanceof PluginHeader) {

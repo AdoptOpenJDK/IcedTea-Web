@@ -41,7 +41,6 @@ import net.adoptopenjdk.icedteaweb.testing.annotations.WindowsIssue;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -84,28 +83,6 @@ public class XDesktopEntryTest {
     private static final String src8 = XDesktopEntry.XDG_DESKTOP_DIR + " = " + des8;
     private static final String src9 = XDesktopEntry.XDG_DESKTOP_DIR + " = " + des9;
     private static Map<String, String> backupedEnv;
-    private static boolean wasJavaws;
-
-    @BeforeClass
-    public static void saveJnlpRuntimeHtml() {
-        wasJavaws = JNLPRuntime.isWebstartApplication();
-    }
-
-    private static void setIsWebstart(boolean value) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field field = JNLPRuntime.class.getDeclaredField("isWebstartApplication");
-        field.setAccessible(true);
-        field.set(null, value);
-    }
-
-    @After
-    public void restoreJnlpRuntimeHtml() throws Exception {
-        setIsWebstart(wasJavaws);
-    }
-
-    @AfterClass
-    public static void restoreJnlpRuntimeHtmlFinally() throws Exception {
-        setIsWebstart(wasJavaws);
-    }
 
     @BeforeClass
     public static void ensureHomeVariable() throws NoSuchFieldException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {

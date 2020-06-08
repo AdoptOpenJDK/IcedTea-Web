@@ -267,29 +267,7 @@ class JNLPSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPermission(Permission perm) {
-        String name = perm.getName();
-
-        // Enable this manually -- it can kill ITW if left uncommented
-        //      if (false)
-        //        System.out.println("Checking permission: " + perm.toString());
-
-        if (!JNLPRuntime.isWebstartApplication() &&
-                ("setPolicy".equals(name) || "setSecurityManager".equals(name))) {
-            throw new SecurityException("Changing the SecurityManager is not allowed.");
-        }
-
         try {
-            // deny all permissions to stopped applications
-            // The call to getApplication() below might not work if an
-            // application hasn't been fully initialized yet.
-            //            if (JNLPRuntime.isDebug()) {
-            //                if (!"getClassLoader".equals(name)) {
-            //                    ApplicationInstance app = getApplication();
-            //                    if (app != null && !app.isRunning())
-            //                        throw new SecurityException(R("RDenyStopped"));
-            //                }
-            //            }
-
             super.checkPermission(perm);
         } catch (SecurityException ex) {
             LOG.debug("Denying permission: {}", perm);

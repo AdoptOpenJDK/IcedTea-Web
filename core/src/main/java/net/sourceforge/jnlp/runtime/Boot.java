@@ -255,7 +255,7 @@ public final class Boot implements PrivilegedAction<Integer> {
             JNLPRuntime.setOfflineForced(true);
         }
 
-        JNLPRuntime.initialize(true);
+        JNLPRuntime.initialize();
 
         if (optionParser.hasOption(CommandLineOptions.LISTCACHEIDS)) {
             List<String> optionArgs = optionParser.getMainArgs();

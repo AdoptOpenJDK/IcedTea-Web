@@ -236,22 +236,11 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
             c.gridy++;
             infoPanel.add(desktopCheck,c);
             c.gridy++;
-            if (!JNLPRuntime.isWebstartApplication()) {
-                htmlPanelDesktop = new HtmlShortcutPanel();
-                infoPanel.add(htmlPanelDesktop, c);
-                htmlPanelDesktop.setVisible(false);
-                c.gridy++;
-            }
             infoPanel.add(menuCheck,c);
             c.gridy++;
-            if (!JNLPRuntime.isWebstartApplication()) {
-                htmlPanelMenu = new HtmlShortcutPanel();
-                infoPanel.add(htmlPanelMenu, c);
-                htmlPanelMenu.setVisible(false);
-                c.gridy++;
-            }
+            final String shortcutConfig = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT);
             infoPanel.add(new JLabel(R("EXAWsettingsInfo",
-                    ShortcutDesc.deploymentJavawsShortcutToString(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT)),
+                    ShortcutDesc.deploymentJavawsShortcutToString(shortcutConfig),
                     R("CPTabDesktopIntegration"))),c);
             c.gridy++;
             infoPanel.add(new JLabel(R("EXAWsettingsManage", R("CPTabMenuShortcuts"))),c);
