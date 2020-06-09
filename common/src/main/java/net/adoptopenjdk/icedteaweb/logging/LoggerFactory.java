@@ -6,18 +6,28 @@ package net.adoptopenjdk.icedteaweb.logging;
 public class LoggerFactory {
 
     private static final String FACTORY_CLASS = "net.sourceforge.jnlp.util.logging.OutputControllerLoggerFactory";
-    private static final LoggerFactoryImpl factory = initFactory();
+    private static final LoggerFactoryImpl factory;
 
-    private static LoggerFactoryImpl initFactory() {
+    static {
+        Exception ex = null;
+        LoggerFactoryImpl loggerFactory;
         try {
             final Class<?> factoryClass = LoggerFactory.class.getClassLoader().loadClass(FACTORY_CLASS);
-            final LoggerFactoryImpl loggerFactory = (LoggerFactoryImpl) factoryClass.newInstance();
-            loggerFactory.getLogger(LoggerFactory.class).debug("init logger factory to {}", loggerFactory);
-            return loggerFactory;
+            loggerFactory = (LoggerFactoryImpl) factoryClass.newInstance();
         } catch (Exception e) {
-            final SystemOutLoggerFactory loggerFactory = new SystemOutLoggerFactory();
-            loggerFactory.getLogger(LoggerFactory.class).error("Falling back to SystemOutLogger", e);
-            return loggerFactory;
+            ex = e;
+            loggerFactory = new SystemOutLoggerFactory();
+        }
+        factory = loggerFactory;
+
+        // one can only get a logger after the factory has been set.
+        // therefore we postpone all the logging to after this comment
+
+        final Logger LOG = factory.getLogger(LoggerFactory.class);
+        if (ex != null) {
+            LOG.error("Falling back to SystemOutLogger", ex);
+        } else {
+            LOG.debug("init logger factory to {}", factory);
         }
     }
 
