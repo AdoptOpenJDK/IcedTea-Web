@@ -201,19 +201,16 @@ public class JavaConsole implements ObservableMessagesProvider {
                 && !JNLPRuntime.isHeadless();
     }
 
-    public static boolean canShowOnStartup(final boolean isApplication) {
-        return canShowOnStartup(isApplication, JNLPRuntime.getConfiguration());
+    public static boolean canShowOnStartup() {
+        return canShowOnStartup(JNLPRuntime.getConfiguration());
     }
 
-    private static boolean canShowOnStartup(final boolean isApplication, final DeploymentConfiguration config) {
+    private static boolean canShowOnStartup(final DeploymentConfiguration config) {
         if (!isEnabled(config)) {
             return false;
         }
-        return ConfigurationConstants.CONSOLE_SHOW.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
-                || (ConfigurationConstants.CONSOLE_SHOW_PLUGIN.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
-                && !isApplication)
-                || (ConfigurationConstants.CONSOLE_SHOW_JAVAWS.equals(config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE))
-                && isApplication);
+        final String startupMode = config.getProperty(ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE);
+        return ConfigurationConstants.CONSOLE_SHOW.equals(startupMode) || ConfigurationConstants.CONSOLE_SHOW_JAVAWS.equals(startupMode);
     }
 
     private void initializeWindow() {

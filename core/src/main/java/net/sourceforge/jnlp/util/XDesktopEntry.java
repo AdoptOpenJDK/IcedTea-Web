@@ -29,7 +29,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneCompl
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 
@@ -155,35 +154,8 @@ public class XDesktopEntry implements GenericDesktopEntry {
             fileContents += "X-Vendor=" + sanitize(file.getInformation().getVendor()) + "\n";
         }
         String exec;
-        String title = "xdesktop writing";
-        if (JNLPRuntime.isWebstartApplication()) {
-            exec = "Exec=" + getJavaWsBin() + " \"" + file.getSourceLocation() + "\"\n";
-            fileContents += exec;
-        } else {
-            if (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.BROWSER) {
-                String browser = info.getBrowser();
-                if (browser == null) {
-                    browser = getBrowserBin();
-                }
-                exec = "Exec="
-                        + browser + " \"" + file.getSourceLocation() + "\"\n";
-                fileContents += exec;
-            } else if ((info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.GENERATED_JNLP
-                    || info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JNLP_HREF) && generatedJnlp != null) {
-                exec =  "Exec="
-                        + getJavaWsBin() + " \"" + generatedJnlp.getAbsolutePath() + "\"\n";
-                fileContents += exec;
-                title = title + " (generated jnlp)";
-            } else if (info.getShortcutType() == AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML) {
-                exec =  "Exec="
-                        + getJavaWsBin() + " -html  \"" + file.getSourceLocation() + "\"\n";
-                fileContents += exec;
-            } else {
-                exec = "Exec="
-                        + getBrowserBin() + " \"" + file.getSourceLocation() + "\"\n";
-                fileContents += exec;
-            }
-        }
+        exec = "Exec=" + getJavaWsBin() + " \"" + file.getSourceLocation() + "\"\n";
+        fileContents += exec;
         return fileContents;
     }
 

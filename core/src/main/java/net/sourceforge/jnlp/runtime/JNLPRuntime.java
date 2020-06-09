@@ -156,9 +156,6 @@ public class JNLPRuntime {
     /** mutex to wait on, for initialization */
     public static Object initMutex = new Object();
 
-    /** set to true if this is a webstart application. */
-    private static boolean isWebstartApplication;
-
     /** set to NEVER to indicate another JVM should not be spawned, even if necessary */
     private static ForkingStrategy forkingStrategy = IF_JNLP_REQUIRES;
 
@@ -220,11 +217,9 @@ public class JNLPRuntime {
      * called by the exit class.
      * </p>
      *
-     * @param isApplication is {@code true} if a webstart application is being
-     * initialized
      * @throws IllegalStateException if the runtime was previously initialized
      */
-    public static void initialize(boolean isApplication) throws IllegalStateException {
+    public static void initialize() throws IllegalStateException {
         checkInitialized();
 
         try {
@@ -233,21 +228,14 @@ public class JNLPRuntime {
             LOG.error("Unable to set system look and feel", e);
         }
 
-        if (JavaConsole.canShowOnStartup(isApplication)) {
+        if (JavaConsole.canShowOnStartup()) {
             JavaConsole.getConsole().showConsoleLater();
         }
         /* exit if there is a fatal exception loading the configuration */
-        if (getConfiguration().getLoadingException() != null) {
-            if (getConfiguration().getLoadingException() instanceof ConfigurationException){
-                // ConfigurationException is thrown only if deployment.config's field
-                // deployment.system.config.mandatory is true, and the destination
-                //where deployment.system.config points is not readable
-                throw new RuntimeException(getConfiguration().getLoadingException());
-            }
-            LOG.warn("Fatal error while reading the configuration, continuing with empty. Please fix: {}", getConfiguration().getLoadingException().getMessage());
+        final ConfigurationException loadingException = getConfiguration().getLoadingException();
+        if (loadingException != null) {
+            throw new RuntimeException(loadingException);
         }
-
-        isWebstartApplication = isApplication;
 
         //Setting the system property for javawebstart's version.
         //The version stored will be the same as java's version.
@@ -490,14 +478,6 @@ public class JNLPRuntime {
      */
     public static DeploymentConfiguration getConfiguration() {
         return DeploymentConfigurationHolder.INSTANCE;
-    }
-
-    /**
-     * @return true if a webstart application has been initialized, and false
-     * for a plugin applet.
-     */
-    public static boolean isWebstartApplication() {
-        return isWebstartApplication;
     }
 
     /**

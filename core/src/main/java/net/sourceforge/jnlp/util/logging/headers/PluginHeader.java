@@ -57,7 +57,7 @@ public class PluginHeader extends Header {
     }
 
     PluginHeader(OutputControllerLevel level, Date timestamp, String date, String user, String caller, String thread1, String thread2, boolean preInit) {
-        super(level, timestamp, date, false, true, false, user, caller, thread1, thread2);
+        super(level, timestamp, date, false, user, caller, thread1, thread2);
         this.preInit = preInit;
     }
 

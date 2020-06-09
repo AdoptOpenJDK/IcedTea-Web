@@ -36,7 +36,6 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.TeeOutputStream;
@@ -51,11 +50,9 @@ public class Header {
     static final String unknown = "unknown";
 
     public final String user;
-    public final boolean application;
     public final OutputControllerLevel level;
     public final Date timestamp;
     public final String date;
-    public final boolean isPlugin;
     public final boolean isClientApp;
     public final String caller;
     public final String thread1;
@@ -82,8 +79,6 @@ public class Header {
                 level, // level
                 timestamp, // timestamp
                 timestamp.toString(), // date
-                JNLPRuntime.isWebstartApplication(), // application
-                false, // isPlugin
                 isClientApp, // isClientApp
                 default_user, // user
                 caller, // caller
@@ -92,13 +87,11 @@ public class Header {
         ;
     }
 
-    protected Header(OutputControllerLevel level, Date timestamp, String date, boolean application, boolean isPlugin, boolean isClientApp, String user, String caller, String thread1, String thread2) {
+    protected Header(OutputControllerLevel level, Date timestamp, String date, boolean isClientApp, String user, String caller, String thread1, String thread2) {
         this.user = user;
-        this.application = application;
         this.level = level;
         this.timestamp = timestamp;
         this.date = date;
-        this.isPlugin = isPlugin;
         this.isClientApp = isClientApp;
         this.caller = caller;
         this.thread1 = thread1;
@@ -163,15 +156,7 @@ public class Header {
 
     public String getOrigin() {
         String s;
-        if (application) {
-            s = "ITW-JAVAWS";
-        } else {
-            if (isPlugin) {
-                s = "ITW-C-PLUGIN";
-            } else {
-                s = "ITW-APPLET";
-            }
-        }
+        s = "ITW-JAVAWS";
         if (isClientApp) {
             s = s + "-" + CLIENT;
         }

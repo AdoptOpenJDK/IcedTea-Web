@@ -32,7 +32,6 @@ statement from your version.
 */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -157,7 +156,7 @@ public class OutputController extends BasicOutputController {
 
         //only crucial stuff is going to system log
         //only java messages handled here, plugin is on his own
-        if (logConfig.isLogToSysLog() && level.isCrucial() && !header.isPlugin) {
+        if (logConfig.isLogToSysLog() && level.isCrucial()) {
             //no headers here
             getSystemLog().log(message.getMessage());
         }
