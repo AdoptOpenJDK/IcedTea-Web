@@ -12,7 +12,7 @@ public class LoggerFactory {
         Exception ex = null;
         LoggerFactoryImpl loggerFactory;
         try {
-            final Class<?> factoryClass = LoggerFactory.class.getClassLoader().loadClass(FACTORY_CLASS);
+            final Class<?> factoryClass = ClassLoader.getSystemClassLoader().loadClass(FACTORY_CLASS);
             loggerFactory = (LoggerFactoryImpl) factoryClass.newInstance();
         } catch (Exception e) {
             ex = e;
