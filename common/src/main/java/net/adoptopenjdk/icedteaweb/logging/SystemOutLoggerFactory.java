@@ -2,6 +2,7 @@ package net.adoptopenjdk.icedteaweb.logging;
 
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory.LoggerFactoryImpl;
 
+import java.io.PrintStream;
 import java.util.Date;
 
 import static net.adoptopenjdk.icedteaweb.OutputUtils.exceptionToString;
@@ -10,6 +11,16 @@ import static net.adoptopenjdk.icedteaweb.OutputUtils.exceptionToString;
  * Implementation of Logger which loges to {@link System#out}.
  */
 class SystemOutLoggerFactory implements LoggerFactoryImpl {
+
+    private static final PrintStream out;
+
+    static {
+        final PrintStream tmp = System.out;
+        if (tmp.getClass().getSimpleName().contains("TeeOutputStream")) {
+            throw new RuntimeException("System.out is already a tee stream");
+        }
+        out = tmp;
+    }
 
     @Override
     public Logger getLogger(final Class<?> forClass) {
@@ -96,7 +107,7 @@ class SystemOutLoggerFactory implements LoggerFactoryImpl {
             final String header = new Date().toString() + " " + level + " " + forClass + ":";
             final String line = header + separator + msg + (t != null ? separator + exceptionToString(t) : "");
 
-            System.out.println(line);
+            out.println(line);
         }
     }
 }

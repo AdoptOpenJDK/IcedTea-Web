@@ -45,7 +45,7 @@ import java.io.PrintStream;
  * Behaves like the 'tee' command, sends output to both actual std stream and a
  * log
  */
-public final class TeeOutputStream extends PrintStream implements SingleStreamLogger{
+public final class TeeOutputStream extends PrintStream implements SingleStreamLogger {
 
     private static final String LINE_SEPARATOR = PlainTextFormatter.getLineSeparator();
 
@@ -85,18 +85,33 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
         if (len == 0) {
             return;
         }
-        appendByteArray(b, off, len);
+
+        byteArrayOutputStream.write(b, off, len);
+        flushLogAtEndOfLine();
+
         super.write(b, off, len);
     }
 
     @Override
     public synchronized void write(int b) {
-        appendByte(b);
+        byteArrayOutputStream.write(b);
+        flushLogAtEndOfLine();
+
         super.write(b);
     }
 
     private void flushLog() {
-        String s = byteArrayOutputStream.toString();
+        flushLog(byteArrayOutputStream.toString());
+    }
+
+    private void flushLogAtEndOfLine() {
+        final String s = byteArrayOutputStream.toString();
+        if (s.endsWith(LINE_SEPARATOR)) {
+            flushLog(s);
+        }
+    }
+
+    private void flushLog(String s) {
         if (s.length() > 0) {
             log(s);
             byteArrayOutputStream.reset();
@@ -105,28 +120,12 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
 
     @Override
     public void log(String s) {
-        JavaMessage  jm = new JavaMessage(new Header(getLevel(), true), s);
+        JavaMessage jm = new JavaMessage(new Header(getLevel(), true), s);
         outputController.log(jm);
     }
 
     private boolean isError() {
         return isError;
-    }
-
-    private void appendByte(int b) {
-        byteArrayOutputStream.write(b);
-        String s = byteArrayOutputStream.toString();
-        if (s.endsWith(LINE_SEPARATOR)) {
-            flushLog();
-        }
-    }
-
-    private void appendByteArray(byte[] b, int off, int len) {
-        byteArrayOutputStream.write(b, off, len);
-        String s = new String(b, off, len);
-        if (s.endsWith(LINE_SEPARATOR)) {
-            flushLog();
-        }
     }
 
     private OutputControllerLevel getLevel() {
