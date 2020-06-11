@@ -52,7 +52,7 @@ public final class FileLog  {
     private final static Logger LOG = LoggerFactory.getLogger(FileLog.class);
 
     public static Header getHeadlineHeader() {
-        return new Header(OutputControllerLevel.WARNING_ALL);
+        return new Header(OutputControllerLevel.WARNING_ALL, false);
     }
 
     private static String getColon() {

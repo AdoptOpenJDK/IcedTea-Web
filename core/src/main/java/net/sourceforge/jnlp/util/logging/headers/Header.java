@@ -58,10 +58,6 @@ public class Header {
     public final String thread1;
     public final String thread2;
 
-    public Header(OutputControllerLevel level) {
-        this(level, false);
-    }
-
     public Header(OutputControllerLevel level, String caller) {
         this(level, new Date(), false, Thread.currentThread(), caller);
     }

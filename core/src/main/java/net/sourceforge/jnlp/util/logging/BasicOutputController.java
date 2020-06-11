@@ -47,13 +47,14 @@ public abstract class BasicOutputController {
 
     public abstract void log(final MessageWithHeader l);
 
-    public void log(final OutputControllerLevel level, final String message) {
-        log(level, (Object) message);
+    public void log(final OutputControllerLevel level, final String o) {
+        final String message = convertToNonNullString(o);
+        log(new JavaMessage(new Header(level, false), message));
     }
 
-    public void log(final OutputControllerLevel level, final Object o) {
+    public void log(final OutputControllerLevel level, final Throwable o) {
         final String message = convertToNonNullString(o);
-        log(new JavaMessage(new Header(level), message));
+        log(new JavaMessage(new Header(level, false), message));
     }
 
     private String convertToNonNullString(final Object o) {

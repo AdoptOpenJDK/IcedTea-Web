@@ -41,17 +41,20 @@ import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR_ALL;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.MESSAGE_ALL;
+
 /**
  * Behaves like the 'tee' command, sends output to both actual std stream and a
  * log
  */
-public final class TeeOutputStream extends PrintStream implements SingleStreamLogger {
+public final class TeeOutputStream extends PrintStream {
 
     private static final String LINE_SEPARATOR = PlainTextFormatter.getLineSeparator();
 
     // Everything written to TeeOutputStream is written to our log too
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    private final boolean isError;
+    private final OutputControllerLevel level;
     private final BasicOutputController outputController;
 
     public TeeOutputStream(PrintStream stdStream, boolean isError) {
@@ -60,7 +63,7 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
 
     TeeOutputStream(PrintStream stdStream, boolean isError, BasicOutputController outputController) {
         super(stdStream);
-        this.isError = isError;
+        this.level = isError ? ERROR_ALL : MESSAGE_ALL;
         this.outputController = outputController;
     }
 
@@ -112,27 +115,10 @@ public final class TeeOutputStream extends PrintStream implements SingleStreamLo
     }
 
     private void flushLog(String s) {
+        byteArrayOutputStream.reset();
         if (s.length() > 0) {
-            log(s);
-            byteArrayOutputStream.reset();
-        }
-    }
-
-    @Override
-    public void log(String s) {
-        JavaMessage jm = new JavaMessage(new Header(getLevel(), true), s);
-        outputController.log(jm);
-    }
-
-    private boolean isError() {
-        return isError;
-    }
-
-    private OutputControllerLevel getLevel() {
-        if (isError()) {
-            return OutputControllerLevel.ERROR_ALL;
-        } else {
-            return OutputControllerLevel.MESSAGE_ALL;
+            final JavaMessage jm = new JavaMessage(new Header(level, true), s);
+            outputController.log(jm);
         }
     }
 }

@@ -33,8 +33,6 @@ statement from your version.
 package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -59,8 +57,6 @@ import static java.util.Objects.requireNonNull;
  *
  */
 public class OutputController extends BasicOutputController {
-
-    private final static Logger LOG = LoggerFactory.getLogger(OutputController.class);
 
     private final PrintStreamLogger outLog;
     private final PrintStreamLogger errLog;
@@ -267,8 +263,6 @@ public class OutputController extends BasicOutputController {
         messageQue.add(l);
         this.notifyAll();
     }
-
-
 
     private static class FileLogHolder {
 
