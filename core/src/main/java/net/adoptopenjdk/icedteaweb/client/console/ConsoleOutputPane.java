@@ -898,23 +898,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         clipboard.setContents(stringSelection, null);
     }
 
-    public static final void main(final String args[]) {
-        SwingUtils.invokeLater(new Runnable() {
-            @Override
-            public final void run() {
-                final JFrame dialog = new JFrame();
-                dialog.setSize(800, 600);
-                dialog.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                final ObservableMessagesProvider producer = new ConsoleOutputPaneModel.TestMessagesProvider();
-                final ConsoleOutputPane jPanel1 = new ConsoleOutputPane(producer);
-                producer.getObservable().addObserver(jPanel1);
-                dialog.getContentPane().add(jPanel1, BorderLayout.CENTER);
-                dialog.pack();
-                dialog.setVisible(true);
-            }
-        });
-    }
-
     private final void updateModel() {
         model.highLight = highLight.isSelected();
         model.matchPattern = match.isSelected();
