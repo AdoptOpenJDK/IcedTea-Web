@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.StdInOutErrController;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -16,7 +17,6 @@ import org.junit.rules.TemporaryFolder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 
@@ -28,7 +28,6 @@ public class UrlProberTest extends NoStdOutErrTest {
 
     private static ServerLauncher testServer;
     private static ServerLauncher testServerWithBrokenHead;
-    private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
 
     @Rule
@@ -38,27 +37,15 @@ public class UrlProberTest extends NoStdOutErrTest {
     @BeforeClass
     //keeping silent outputs from launched jvm
     public static void redirectErr() {
-        backedUpStream[0] = System.out;
-        backedUpStream[1] = System.err;
-        backedUpStream[2] = OutputController.getLogger().getOut();
-        backedUpStream[3] = OutputController.getLogger().getErr();
-
         currentErrorStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(currentErrorStream));
-        System.setErr(new PrintStream(currentErrorStream));
-        OutputController.getLogger().setOut(new PrintStream(currentErrorStream));
-        OutputController.getLogger().setErr(new PrintStream(currentErrorStream));
+        OutputController.getLogger().setInOutErrController(new StdInOutErrController(currentErrorStream, currentErrorStream));
 
     }
 
     @AfterClass
     public static void redirectErrBack() throws IOException {
         ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8.name()));
-
-        System.setOut(backedUpStream[0]);
-        System.setErr(backedUpStream[1]);
-        OutputController.getLogger().setOut(backedUpStream[2]);
-        OutputController.getLogger().setErr(backedUpStream[3]);
+        OutputController.getLogger().setInOutErrController(StdInOutErrController.getInstance());
     }
 
     @Before

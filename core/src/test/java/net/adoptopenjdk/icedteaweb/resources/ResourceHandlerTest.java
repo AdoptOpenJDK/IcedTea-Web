@@ -10,6 +10,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.StdInOutErrController;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -21,7 +22,6 @@ import org.junit.rules.TemporaryFolder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.jar.Attributes;
@@ -43,7 +43,6 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
     private static ServerLauncher testServerWithBrokenHead;
     private static ServerLauncher downloadServer;
 
-    private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
     private String cacheDir;
 
@@ -53,29 +52,15 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
     @BeforeClass
     //keeping silent outputs from launched jvm
     public static void redirectErr() {
-        backedUpStream[0] = System.out;
-        backedUpStream[1] = System.err;
-        backedUpStream[2] = OutputController.getLogger().getOut();
-        backedUpStream[3] = OutputController.getLogger().getErr();
-
         currentErrorStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(currentErrorStream));
-        System.setErr(new PrintStream(currentErrorStream));
-        OutputController.getLogger().setOut(new PrintStream(currentErrorStream));
-        OutputController.getLogger().setErr(new PrintStream(currentErrorStream));
-
+        OutputController.getLogger().setInOutErrController(new StdInOutErrController(currentErrorStream, currentErrorStream));
         JNLPRuntime.setDebug(true);
     }
 
     @AfterClass
     public static void redirectErrBack() throws Exception {
         ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8.name()));
-
-        System.setOut(backedUpStream[0]);
-        System.setErr(backedUpStream[1]);
-        OutputController.getLogger().setOut(backedUpStream[2]);
-        OutputController.getLogger().setErr(backedUpStream[3]);
-
+        OutputController.getLogger().setInOutErrController(StdInOutErrController.getInstance());
         JNLPRuntime.setDebug(false);
     }
 
