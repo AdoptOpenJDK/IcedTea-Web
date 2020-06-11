@@ -33,43 +33,54 @@ statement from your version.
 
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
-public class UnixSystemLog implements SingleStreamLogger{
 
-    private final static Logger LOG = LoggerFactory.getLogger(UnixSystemLog.class);
+public class UnixSystemLog implements SingleStreamLogger {
 
-    public UnixSystemLog(){
-    
-    }
-    
-    
+    private static final Logger LOG = LoggerFactory.getLogger(UnixSystemLog.class);
+
+    private static final String PREAMBLE = "IcedTea-Web java error - for more info see itweb-settings debug options or console." +
+            " See " + TextsProvider.ITW_BUGS + " for help.\nIcedTea-Web java error manual log:\n";
+
+    private static final ExecutorService executor = CachedDaemonThreadPoolProvider.createDaemonThreadPool();
+
     @Override
     public void log(String message) {
-        final String s = "IcedTea-Web java error - for more info see itweb-settings debug options or console. See " + TextsProvider.ITW_BUGS + " for help.\nIcedTea-Web java error manual log: \n" + message;
+        final String s = PREAMBLE + message;
+        final String[] ss = s.split("\\R"); // split string into lines
         try {
-            String[] ss = s.split("\\n"); //exceptions have many lines
+            CompletableFuture<Void> f = CompletableFuture.completedFuture(null);
             for (String m : ss) {
-                m = m.replaceAll("\t", "    ");
-                ProcessBuilder pb = new ProcessBuilder("logger", "-p","user.err", "--", m);
-                Process p = pb.start();
-                ProcessUtils.waitForSafely(p);
-                LOG.debug("System logger called with result of {}", p.exitValue());
+                f = f.thenRunAsync(() -> logToSyslog(m), executor);
             }
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Error while sending message to Unix system log", ex);
+        }
+    }
+
+    private void logToSyslog(String message) {
+        try {
+            message = message.replaceAll("\t", "    ");
+            ProcessBuilder pb = new ProcessBuilder("logger", "-p", "user.err", "--", message);
+            Process p = pb.start();
+            ProcessUtils.waitForSafely(p);
+            LOG.debug("System logger called with result of {}", p.exitValue());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
     public void close() {
-        //nope
+        // nothing to close
     }
-
-
 }

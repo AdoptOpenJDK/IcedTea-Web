@@ -45,6 +45,10 @@ public class CachedDaemonThreadPoolProvider {
         return DAEMON_THREAD_POOL;
     }
 
+    public static ExecutorService createDaemonThreadPool() {
+        return Executors.newCachedThreadPool(new DaemonThreadFactory());
+    }
+
     /**
      * This is copypasted default factory from java.util.concurrent.Executors.
      * The only difference is, that it creates daemon threads.
