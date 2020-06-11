@@ -32,6 +32,7 @@ statement from your version.
 */
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
@@ -56,7 +57,7 @@ import static java.util.Objects.requireNonNull;
  * OutputController class (thread) must NOT call JNLPRuntime.getConfiguration()
  *
  */
-public class OutputController extends BasicOutputController {
+public class OutputController implements BasicOutputController {
 
     private final PrintStreamLogger outLog;
     private final PrintStreamLogger errLog;
@@ -98,7 +99,6 @@ public class OutputController extends BasicOutputController {
     }
 
     public synchronized void flush() {
-
         while (!messageQue.isEmpty()) {
             consume();
         }
@@ -217,7 +217,7 @@ public class OutputController extends BasicOutputController {
             LogConfig.resetLogConfig();
             if (LogConfig.getLogConfig().isLogToConsole()) {
                 javaConsoleInitialized = true;
-                JavaConsole.getConsole();
+                Assert.requireNonNull(JavaConsole.getConsole(), "console");
             }
         }
     }
@@ -306,31 +306,9 @@ public class OutputController extends BasicOutputController {
         return SystemLogHolder.INSTANCE;
     }
 
-    private void printErrorLn(String e) {
-        getErr().println(e);
-
-    }
-
     public void printOutLn(String e) {
         getOut().println(e);
-
     }
-
-    public void printWarningLn(String e) {
-        printOutLn(e);
-        printErrorLn(e);
-    }
-
-    private void printError(String e) {
-        getErr().print(e);
-
-    }
-
-    public void printOut(String e) {
-        getOut().print(e);
-
-    }
-
 
    //package private setters for testing
 

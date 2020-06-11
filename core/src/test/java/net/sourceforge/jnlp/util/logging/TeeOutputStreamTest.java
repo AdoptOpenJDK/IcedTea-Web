@@ -42,12 +42,7 @@ public class TeeOutputStreamTest {
 
     @Before
     public void setup() {
-        final BasicOutputController outputController = new BasicOutputController() {
-            @Override
-            public void log(MessageWithHeader l) {
-                loggedMessages.add(l.getMessage());
-            }
-        };
+        final BasicOutputController outputController = l -> loggedMessages.add(l.getMessage());
 
         loggedMessages = new ArrayList<>();
         out = new ByteArrayOutputStream();

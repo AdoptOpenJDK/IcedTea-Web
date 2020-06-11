@@ -26,12 +26,7 @@ public class OutputControllerLoggerTest {
 
     @Before
     public void setup() {
-        final BasicOutputController outputController = new BasicOutputController() {
-            @Override
-            public void log(MessageWithHeader l) {
-                loggedMessages.add(l);
-            }
-        };
+        final BasicOutputController outputController = l -> loggedMessages.add(l);
 
         loggedMessages = new ArrayList<>();
         sut = new OutputControllerLoggerFactory().getLogger(getClass(), outputController);
