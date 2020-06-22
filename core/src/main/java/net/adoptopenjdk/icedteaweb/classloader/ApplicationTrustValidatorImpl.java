@@ -202,7 +202,10 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
         final LoadableJar mainJar = jars.stream()
                 .filter(jar -> Objects.equals(jar.getJarDesc(), mainJarDesc))
                 .findFirst()
-                .orElseThrow(() -> new LaunchException("Main jar " + mainJarDesc + " not found in " + jars));
+                .orElseThrow(() -> {
+                    LOG.debug("Main jar {} not found in {}", mainJarDesc, jars);
+                    return new LaunchException("Could not find main jar among the eager jars");
+                });
         return toFile(mainJar).orElseThrow(() -> new LaunchException("Could not find/download main jar file."));
     }
 

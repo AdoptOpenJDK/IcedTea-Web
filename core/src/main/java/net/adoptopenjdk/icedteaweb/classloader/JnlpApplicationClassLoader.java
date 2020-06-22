@@ -1,6 +1,9 @@
 package net.adoptopenjdk.icedteaweb.classloader;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,6 +16,8 @@ import java.util.StringJoiner;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class JnlpApplicationClassLoader extends URLClassLoader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(JnlpApplicationClassLoader.class);
 
     private final JarProvider jarProvider;
     private final NativeLibrarySupport nativeLibrarySupport;
@@ -33,13 +38,20 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
         jarProvider.loadEagerJars().forEach(this::addJar);
     }
 
-    private boolean loadMoreJars(final String name) {
-        return jarProvider.loadMoreJars(name).stream()
+    private boolean loadMoreJars(final String name, final String reason) {
+        final boolean result = jarProvider.loadMoreJars(name).stream()
                 .peek(this::addJar)
                 .count() > 0;
+
+        if (result) {
+            LOG.debug("loaded more jars because of {} for {}", reason, name);
+        }
+
+        return result;
     }
 
     private void addJar(LoadableJar jar) {
+        LOG.debug("add jar: {}", jar.jarDesc.getLocation());
         addJarLock.lock();
         try {
             jar.getLocation().ifPresent(location -> {
@@ -63,7 +75,8 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException ignored) {
             }
         }
-        while (loadMoreJars(name));
+        while (loadMoreJars(name, "findClass()"));
+        LOG.debug("Could not find class {}", name);
         throw new ClassNotFoundException(name);
     }
 
@@ -81,16 +94,13 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
                 return result;
             }
         }
-        while (loadMoreJars(name));
+        while (loadMoreJars(name, "findResource()"));
+        LOG.debug("Could not find resource {}", name);
         return null;
     }
 
     @Override
     public Enumeration<URL> findResources(final String name) throws IOException {
-        //noinspection StatementWithEmptyBody
-        while (loadMoreJars(name)) {
-            // continue until finished
-        }
         return super.findResources(name);
     }
 
@@ -136,6 +146,12 @@ public class JnlpApplicationClassLoader extends URLClassLoader {
                     .add("location=" + location.map(URL::toString).orElse("--NOT FOUND IN CACHE--"))
                     .add("jarDesc=" + jarDesc)
                     .toString();
+        }
+
+        public String toLoggingString() {
+            final VersionString version = getJarDesc().getVersion();
+            final URL location = getJarDesc().getLocation();
+            return version != null ? location + "(v:" + version + ")" : location.toString();
         }
     }
 }

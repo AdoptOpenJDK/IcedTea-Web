@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.classloader;
 
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.JarProvider;
 import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader.LoadableJar;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
@@ -68,21 +69,40 @@ public class PartsHandler implements JarProvider, PartsCache {
     public List<LoadableJar> loadEagerJars() {
         partsLock.lock();
         try {
-            return parts.stream()
+            final List<Part> eagerParts = parts.stream()
                     .filter(part -> !part.isLazy())
                     .filter(part -> !loadedByClassloaderParts.contains(part))
-                    .map(this::loadEagerPart)
-                    .flatMap(List::stream)
                     .collect(Collectors.toList());
+
+            return loadEagerParts(eagerParts);
         } finally {
             partsLock.unlock();
         }
     }
 
-    private List<LoadableJar> loadEagerPart(final Part part) {
-        final List<LoadableJar> result = downloadAllOfPart(part);
+    private List<LoadableJar> loadEagerParts(final List<Part> eagerParts) {
+        final List<LoadableJar> result = eagerParts.stream()
+                .map(this::downloadAllOfPart)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
+
+        LOG.debug("eager loaded the following jars: {}", result.stream()
+                .filter(jar -> jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .collect(Collectors.toList())
+        );
+
+        final String failedToLoadJars = result.stream()
+                .filter(jar -> !jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .collect(Collectors.joining(", "));
+        if (!StringUtils.isBlank(failedToLoadJars)) {
+            LOG.debug("failed to download the following jars: {}", failedToLoadJars);
+        }
+
         trustValidator.validateEagerJars(result);
-        loadedByClassloaderParts.add(part);
+        loadedByClassloaderParts.addAll(eagerParts);
+
         return result;
     }
 
@@ -96,15 +116,25 @@ public class PartsHandler implements JarProvider, PartsCache {
                     .collect(Collectors.toList());
 
             if (notLoaded.isEmpty()) {
+                LOG.info("No more parts to load.");
                 return Collections.emptyList();
             }
 
-            final Part next = notLoaded.stream()
+            final List<LoadableJar> supportingJars = notLoaded.stream()
                     .filter(part -> part.supports(resourceName))
                     .findFirst()
-                    .orElse(notLoaded.get(0));
+                    .map(this::loadLazyPart)
+                    .orElse(Collections.emptyList());
 
-            return loadLazyPart(next);
+            if (!supportingJars.isEmpty()) {
+                return supportingJars;
+            }
+
+            return notLoaded.stream()
+                    .filter(part -> part.getPackages().isEmpty())
+                    .findFirst()
+                    .map(this::loadLazyPart)
+                    .orElse(Collections.emptyList());
         } finally {
             partsLock.unlock();
         }
@@ -114,6 +144,22 @@ public class PartsHandler implements JarProvider, PartsCache {
         final List<LoadableJar> result = downloadAllOfPart(part);
         trustValidator.validateLazyJars(result);
         loadedByClassloaderParts.add(part);
+
+        LOG.debug("lazy loaded part {}", part.getName());
+        LOG.debug("downloaded the following jars: {}", result.stream()
+                .filter(jar -> jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .collect(Collectors.joining(", "))
+        );
+
+        final String failedToLoadJars = result.stream()
+                .filter(jar -> !jar.getLocation().isPresent())
+                .map(LoadableJar::toLoggingString)
+                .collect(Collectors.joining(", "));
+        if (!StringUtils.isBlank(failedToLoadJars)) {
+            LOG.debug("failed to download the following jars: {}", failedToLoadJars);
+        }
+
         return result;
     }
 
