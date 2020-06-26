@@ -156,7 +156,7 @@ public class OutputController extends BasicOutputController {
 
         //only crucial stuff is going to system log
         //only java messages handled here, plugin is on his own
-        if (logConfig.isLogToSysLog() && level.isCrucial() && !header.isPlugin) {
+        if (logConfig.isLogToSysLog() && level.isCrucial()) {
             //no headers here
             getSystemLog().log(message.getMessage());
         }

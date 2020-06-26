@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.services;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
@@ -41,56 +40,44 @@ import java.util.Set;
  */
 public class XSingleInstanceService implements ExtendedSingleInstanceService {
 
-    private final static Logger LOG = LoggerFactory.getLogger(XSingleInstanceService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(XSingleInstanceService.class);
+
+    private final List<SingleInstanceListener> listeners = new LinkedList<>();
 
     boolean initialized = false;
-    List<SingleInstanceListener> listeners = new LinkedList<SingleInstanceListener>();
 
     /**
      * Implements a server that listens for arguments from new instances of this
      * application
-     *
      */
-    class SingleInstanceServer implements Runnable {
+    private class SingleInstanceServer implements Runnable {
 
-        SingleInstanceLock lockFile = null;
+        private final SingleInstanceLock lockFile;
 
         public SingleInstanceServer(SingleInstanceLock lockFile) {
             this.lockFile = lockFile;
         }
 
         public void run() {
-            ServerSocket listeningSocket = null;
-            try {
-                listeningSocket = new ServerSocket(0);
+            try (final ServerSocket listeningSocket = new ServerSocket(0)) {
                 lockFile.createWithPort(listeningSocket.getLocalPort());
 
                 LOG.debug("Starting SingleInstanceServer on port {}", listeningSocket);
 
                 while (true) {
                     try {
-                        Socket communicationSocket = listeningSocket.accept();
+                        final Socket communicationSocket = listeningSocket.accept();
                         ObjectInputStream ois = new ObjectInputStream(communicationSocket
                                 .getInputStream());
                         String[] arguments = (String[]) ois.readObject();
                         notifySingleInstanceListeners(arguments);
                     } catch (Exception exception) {
                         // not much to do here...
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, exception);
+                        LOG.error("Exception in SingleInstanceServer", exception);
                     }
-
                 }
             } catch (IOException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            } finally {
-                if (listeningSocket != null) {
-                    try {
-                        listeningSocket.close();
-                    } catch (IOException e) {
-                        // Give up.
-                        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-                    }
-                }
+                LOG.error("Failed to create SingleInstanceServer", e);
             }
         }
     }
@@ -98,7 +85,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
     /**
      * Create a new XSingleInstanceService
      */
-    protected XSingleInstanceService() {
+    XSingleInstanceService() {
     }
 
     /**
@@ -109,13 +96,12 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
     public void initializeSingleInstance() {
         // this is called after the application has started. so safe to use
         // JNLPRuntime.getApplication()
-        JNLPFile jnlpFile = JNLPRuntime.getApplication().orElseThrow(() -> new RuntimeException("could not get application")).getJNLPFile();
+        final JNLPFile jnlpFile = JNLPRuntime.getApplication().orElseThrow(() -> new RuntimeException("could not get application")).getJNLPFile();
         if (!initialized) {
             // Either a new process or a new applet being handled by the plugin.
             checkSingleInstanceRunning(jnlpFile);
             initialized = true;
-            SingleInstanceLock lockFile;
-            lockFile = new SingleInstanceLock(jnlpFile);
+            final SingleInstanceLock lockFile = new SingleInstanceLock(jnlpFile);
             if (!lockFile.isValid()) {
                 startListeningServer(lockFile);
             }
@@ -127,15 +113,14 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
      * Check if another instance of this application is already running
      *
      * @param jnlpFile The {@link JNLPFile} that specifies the application
-     *
      * @throws InstanceExistsException if an instance of this application
-     *         already exists
+     *                                 already exists
      */
     @Override
     public void checkSingleInstanceRunning(JNLPFile jnlpFile) {
-        SingleInstanceLock lockFile = new SingleInstanceLock(jnlpFile);
+        final SingleInstanceLock lockFile = new SingleInstanceLock(jnlpFile);
         if (lockFile.isValid()) {
-            int port = lockFile.getPort();
+            final int port = lockFile.getPort();
             LOG.debug("Lock file is valid (port={}). Exiting.", port);
 
             String[] args = null;
@@ -148,7 +133,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
                 int i = 0;
                 for (Entry<String, String> entry : currentParams) {
                     args[i] = entry.getKey();
-                    args[i+1] = entry.getValue();
+                    args[i + 1] = entry.getValue();
                     i += 2;
                 }
             } else if (jnlpFile.isInstaller()) {
@@ -170,12 +155,10 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
      * Start the listening server to accept arguments from new instances of
      * applications
      *
-     * @param lockFile
-     *            the {@link SingleInstanceLock} that the server should use
+     * @param lockFile the {@link SingleInstanceLock} that the server should use
      */
     private void startListeningServer(SingleInstanceLock lockFile) {
-        SingleInstanceServer server = new SingleInstanceServer(lockFile);
-        Thread serverThread = new Thread(server);
+        final Thread serverThread = new Thread(new SingleInstanceServer(lockFile));
         /*
          * mark as daemon so the JVM can shutdown if the server is the only
          * thread running
@@ -187,20 +170,15 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
     /**
      * Send the arguments for this application to the main instance
      *
-     * @param port the port at which the SingleInstanceServer is listening at
+     * @param port      the port at which the SingleInstanceServer is listening at
      * @param arguments the new arguments
      * @throws IOException on any io exception
      */
-    private void sendProgramArgumentsToExistingApplication(int port, String[] arguments)
-            throws IOException {
-        try {
-            Socket serverCommunicationSocket = new Socket((String) null, port);
-            ObjectOutputStream argumentStream = new ObjectOutputStream(serverCommunicationSocket
-                    .getOutputStream());
-            argumentStream.writeObject(arguments);
-            argumentStream.close();
-            serverCommunicationSocket.close();
-
+    private void sendProgramArgumentsToExistingApplication(int port, String[] arguments) throws IOException {
+        try (final Socket serverCommunicationSocket = new Socket((String) null, port)) {
+            try (final ObjectOutputStream argumentStream = new ObjectOutputStream(serverCommunicationSocket.getOutputStream())) {
+                argumentStream.writeObject(arguments);
+            }
         } catch (UnknownHostException unknownHost) {
             LOG.error("Unable to find localhost");
             throw new RuntimeException(unknownHost);
@@ -224,7 +202,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
      * Add the specified SingleInstanceListener
      *
      * @throws InstanceExistsException which is likely to terminate the
-     *         application but not guaranteed to
+     *                                 application but not guaranteed to
      */
     public void addSingleInstanceListener(SingleInstanceListener sil) {
         initializeSingleInstance();
@@ -240,8 +218,7 @@ public class XSingleInstanceService implements ExtendedSingleInstanceService {
      * Remove the specified SingleInstanceListener
      *
      * @throws InstanceExistsException if an instance of this single instance
-     *         application already exists
-     *
+     *                                 application already exists
      */
     public void removeSingleInstanceListener(SingleInstanceListener sil) {
         initializeSingleInstance();

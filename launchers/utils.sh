@@ -23,6 +23,7 @@ function build() {
     export RHINO_JAR=$RHINO_SRC
     export MSLINKS_JAR=$MSLINKS_SRC
     export GSON_JAR=$GSON_SRC
+    export IPADDRESS_JAR=$IPADDRESS_SRC
   fi
   export JRE
   export ITW_LIBS
@@ -55,7 +56,7 @@ function build() {
         -e "s|[@]RHINO_JAR[@]|$RHINO_JAR|g" \
         -e "s|[@]MSLINKS_JAR[@]|$MSLINKS_JAR|g" \
         -e "s|[@]JSON_JAR[@]|$JSON_JAR|g" \
-        -e "s|[@]TAGSOUP_JAR[@]|$TAGSOUP_JAR|g" \
+        -e "s|[@]IPADDRESS_JAR[@]|$IPADDRESS_JAR|g" \
         -e "s|[@]JAVAWS_JAR[@]|$JAVAWS_JAR|g" \
         -e "s|[@]SPLASH_PNG[@]|$SPLASH_PNG|g" \
         -e "s|[@]MODULARJDK_ARGS_LOCATION[@]|$MODULARJDK_ARGS_LOCATION|g" \

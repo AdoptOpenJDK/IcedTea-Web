@@ -123,6 +123,12 @@ if [ "x$GSON_SRC" == "x" ] ; then
 else
   readonly GSON_SRC=$GSON_SRC
 fi
+if [ "x$IPADDRESS_SRC" == "x" ] ; then
+  readonly IPADDRESS_SRC=`getJar "ipaddress"`
+else
+  readonly IPADDRESS_SRC=$IPADDRESS_SRC
+fi
+
 
 readonly SPLASH_PNG_SRC=`find $PROJECT_TOP/core/src |  grep /javaws_splash.png$`
 if isWindows; then

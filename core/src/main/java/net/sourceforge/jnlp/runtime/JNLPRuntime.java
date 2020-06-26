@@ -225,9 +225,6 @@ public class JNLPRuntime {
         /* exit if there is a fatal exception loading the configuration */
         final ConfigurationException loadingException = getConfiguration().getLoadingException();
         if (loadingException != null) {
-            // ConfigurationException is thrown only if deployment.config's field
-            // deployment.system.config.mandatory is true, and the destination
-            // where deployment.system.config points is not readable
             throw new RuntimeException(loadingException);
         }
 

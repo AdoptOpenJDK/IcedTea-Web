@@ -2,18 +2,13 @@ package net.adoptopenjdk.icedteaweb.client.console;
 
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.headers.Header;
-import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
-import net.sourceforge.jnlp.util.logging.headers.PluginHeader;
-import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Observable;
-import java.util.Random;
 import java.util.regex.Pattern;
 
 public class ConsoleOutputPaneModel {
@@ -47,66 +42,6 @@ public class ConsoleOutputPaneModel {
         abstract int body(MessageWithHeader o1, MessageWithHeader o2);
     }
 
-    //testing data provider
-    static class TestMessagesProvider extends Observable implements ObservableMessagesProvider {
-
-        List<MessageWithHeader> data = new ArrayList<MessageWithHeader>();
-        List<MessageWithHeader> origData = new ArrayList<MessageWithHeader>();
-
-        public List<MessageWithHeader> getData() {
-            return data;
-        }
-
-        @Override
-        public Observable getObservable() {
-            return this;
-        }
-
-        public TestMessagesProvider() {
-            createData();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (true) {
-                        try {
-                            Thread.sleep(new Random().nextInt(2000));
-                            data.add(origData.get(new Random().nextInt(origData.size())));
-                            TestMessagesProvider.this.setChanged();
-                            TestMessagesProvider.this.notifyObservers();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
-        }
-
-        void createData() {
-            String[] plugin = {
-                "plugindebug 1384850630162925 [jvanek][ITW-C-PLUGIN][MESSAGE_DEBUG][Tue Nov 19 09:43:50 CET 2013][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1204] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0:   PIPE: plugin read: plugin PluginProxyInfo reference 1 http://www.walter-fendt.de:80",
-                "preinit_plugindebug 1384850630162920 [jvanek][ITW-C-PLUGIN][MESSAGE_DEBUG][Tue Nov 19 09:43:50 CET 2013][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1204] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0:   PIPE: plugin read: plugin PluginProxyInfo reference 1 http://www.walter-fendt.de:80",
-                "plugindebugX 1384850630162954 [jvanek][ITW-Cplugindebug 1384850630163008 [jvanek][ITW-C-PLUGIN][MESSAGE_DEBUG][Tue Nov 19 09:43:50 CET 2013][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1124] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0: parts[0]=plugin, parts[1]=PluginProxyInfo, reference, parts[3]=1, parts[4]=http://www.walter-fendt.de:80 -- decoded_url=http://www.walter-fendt.de:80",
-                "preinit_pluginerror 1384850630163294 [jvanek][ITW-C-PLUGIN][MESSAGE_ERROR][Tue Nov 19 09:43:50 CET 2013][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1134] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0: Proxy info: plugin PluginProxyInfo reference 1 DIRECT",
-                "pluginerror 1384850630163291 [jvanek][ITW-C-PLUGIN][MESSAGE_ERROR][Tue Nov 19 09:43:50 CET 2013][/home/jvanek/Desktop/icedtea-web/plugin/icedteanp/IcedTeaNPPlugin.cc:1134] ITNPP Thread# 140513434003264, gthread 0x7fcbd531f8c0: Proxy info: plugin PluginProxyInfo reference 1 DIRECT"
-            };
-            for (String string : plugin) {
-                origData.add(new PluginMessage(string));
-            }
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL), "message 1"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_DEBUG), "message 3"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_ALL), "message 2"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.WARNING_DEBUG), "message 4"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_DEBUG), "message 9"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL, true), "app1"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.ERROR_ALL, true), "app2"));
-            origData.add(new JavaMessage(new Header(OutputControllerLevel.MESSAGE_ALL), "message 0 - multilined \n"
-                    + "since beginning\n"
-                    + "         later\n"
-                    + "again from beginning\n"
-                    + "               even later"));
-            data.addAll(origData);
-        }
-    }
     static final Pattern defaultPattern = Pattern.compile("(m?)(.*\n*)*");
     ObservableMessagesProvider dataProvider;
     Pattern lastValidPattern = defaultPattern;
@@ -163,42 +98,23 @@ public class ConsoleOutputPaneModel {
 
             if (mark) {
                 sb.append("<div style='color:#");
-                if (messageWithHeader.getHeader().isPlugin && messageWithHeader.getHeader() instanceof PluginHeader) {
-                    if (!((PluginHeader) (messageWithHeader.getHeader())).preInit) {
-                        if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_DIMRED);
-                        } else {
-                            sb.append(HTMLCOLOR_MIDGRAY);
-                        }
+                if (messageWithHeader.getHeader().isClientApp) {
+                    if (messageWithHeader.getHeader().level.printToErrStream()) {
+                        sb.append(HTMLCOLOR_PURPLE);
                     } else {
-                        if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_SPARKRED);
-                        } else {
-                            sb.append(HTMLCOLOR_LIGHTGRAY);
-                        }
+                        sb.append(HTMLCOLOR_GREEN);
                     }
                 } else {
-                    if (messageWithHeader.getHeader().isClientApp) {
-                        if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_PURPLE);
-                        } else {
-                            sb.append(HTMLCOLOR_GREEN);
-                        }
+                    if (messageWithHeader.getHeader().level.isWarning()) {
+                        sb.append(HTMLCOLOR_GREENYELLOW);
+                    } else if (messageWithHeader.getHeader().level.printToErrStream()) {
+                        sb.append(HTMLCOLOR_PINKYREAD);
                     } else {
-                        if (messageWithHeader.getHeader().level.isWarning()) {
-                            sb.append(HTMLCOLOR_GREENYELLOW);
-                        } else if (messageWithHeader.getHeader().level.printToErrStream()) {
-                            sb.append(HTMLCOLOR_PINKYREAD);
-                        } else {
-                            sb.append(HTMLCOLOR_BLACK);
-                        }
+                        sb.append(HTMLCOLOR_BLACK);
                     }
                 }
                 sb.append("'>");
                 //sb.append("<![CDATA[");
-            }
-            if (messageWithHeader instanceof PluginMessage && ((PluginMessage) (messageWithHeader)).wasError) {
-                sb.append("{corrupted}");
             }
             String line = (createLine(messageWithHeader));
             if (mark) {
@@ -356,27 +272,6 @@ public class ConsoleOutputPaneModel {
         if (!showApp && header.isClientApp) {
             return true;
         }
-        if (!showJava && !header.isPlugin) {
-            return true;
-        }
-        if (!showPlugin && header.isPlugin) {
-            return true;
-        }
-        if (header instanceof PluginHeader) {
-            PluginHeader mm = (PluginHeader) header;
-            if (!showPreInit && mm.preInit) {
-                return true;
-            }
-            if (!showPostInit && !mm.preInit) {
-                return true;
-            }
-            if (!showIncomplete && m instanceof PluginMessage && ((PluginMessage) (m)).wasError) {
-                return true;
-            }
-            if (!showComplete && m instanceof PluginMessage && !((PluginMessage) (m)).wasError) {
-                return true;
-            }
-        }
         if (regExLabel) {
             String s = createLine(m);
             if (matchPattern && !usedPattern.matcher(s).matches()) {
@@ -397,23 +292,17 @@ public class ConsoleOutputPaneModel {
     boolean regExLabel;
     boolean revertSort;
     boolean showCode;
-    boolean showComplete;
     boolean showDate;
     boolean showDebug;
     boolean showErr;
     boolean showHeaders;
-    boolean showIncomplete;
     boolean showInfo;
     boolean showItw;
     boolean showApp;
-    boolean showJava;
     boolean showLevel;
     boolean showMessage;
     boolean showOrigin;
     boolean showOut;
-    boolean showPlugin;
-    boolean showPostInit;
-    boolean showPreInit;
     boolean showThread1;
     boolean showThread2;
     boolean showUser;

@@ -3,6 +3,7 @@ package net.adoptopenjdk.icedteaweb.config;
 import net.adoptopenjdk.icedteaweb.config.validators.BooleanValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.FilePathValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.MultipleStringValueValidator;
+import net.adoptopenjdk.icedteaweb.config.validators.NotBlankValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.PortValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.RangedIntegerValidator;
 import net.adoptopenjdk.icedteaweb.config.validators.RustCpValidator;
@@ -147,5 +148,12 @@ public class ValidatorFactory {
 
     public static ValueValidator createRustCpValidator() {
         return new RustCpValidator();
+    }
+
+    /**
+     * @return a {@link NotBlankValidator} that checks if a value is not null or blank.
+     */
+    public static NotBlankValidator createNotBlankValidator() {
+        return new NotBlankValidator();
     }
  }
