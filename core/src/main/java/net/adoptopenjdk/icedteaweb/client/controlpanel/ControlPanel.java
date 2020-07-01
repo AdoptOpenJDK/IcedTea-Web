@@ -35,6 +35,8 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import javax.naming.ConfigurationException;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -48,6 +50,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.io.IOException;
@@ -230,6 +233,21 @@ public class ControlPanel extends JFrame {
         final JList<String> settingsList = new JList<>(panels.keySet().toArray(new String[0]));
         settingsList.addListSelectionListener(e -> cardLayout.show(settingsPanel, settingsList.getSelectedValue()));
         settingsList.setSelectedIndex(0);
+        DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer() {
+
+            private final JPanel panel = new JPanel(new BorderLayout());
+
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index, final boolean isSelected, final boolean cellHasFocus) {
+                panel.removeAll();
+                final Component wrappedComponent = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                panel.add(wrappedComponent);
+                panel.setBorder(BorderFactory.createEmptyBorder(1, 3, 2, 6));
+                panel.setBackground(wrappedComponent.getBackground());
+                return panel;
+            }
+        };
+        settingsList.setCellRenderer(cellRenderer);
         final JScrollPane settingsListScrollPane = new JScrollPane(settingsList);
         settingsListScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
