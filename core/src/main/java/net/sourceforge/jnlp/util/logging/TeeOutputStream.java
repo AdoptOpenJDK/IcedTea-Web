@@ -104,21 +104,19 @@ public final class TeeOutputStream extends PrintStream {
     }
 
     private void flushLog() {
-        flushLog(byteArrayOutputStream.toString());
+        flushLog(true);
     }
 
     private void flushLogAtEndOfLine() {
-        final String s = byteArrayOutputStream.toString();
-        if (s.endsWith(LINE_SEPARATOR)) {
-            flushLog(s);
-        }
+        flushLog(false);
     }
 
-    private void flushLog(String s) {
-        byteArrayOutputStream.reset();
-        if (s.length() > 0) {
+    private void flushLog(boolean always) {
+        final String s = byteArrayOutputStream.toString();
+        if (s.length() > 0 && (always || s.endsWith(LINE_SEPARATOR))) {
             final JavaMessage jm = new JavaMessage(new Header(level, true), s);
             outputController.log(jm);
+            byteArrayOutputStream.reset();
         }
     }
 }
