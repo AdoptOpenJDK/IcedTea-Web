@@ -4,8 +4,6 @@ import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import net.sourceforge.jnlp.util.logging.headers.ObservableMessagesProvider;
-import net.sourceforge.jnlp.util.logging.headers.PluginHeader;
-import net.sourceforge.jnlp.util.logging.headers.PluginMessage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,9 +115,6 @@ public class ConsoleOutputPaneModel {
                 }
                 sb.append("'>");
                 //sb.append("<![CDATA[");
-            }
-            if (messageWithHeader instanceof PluginMessage && ((PluginMessage) (messageWithHeader)).wasError) {
-                sb.append("{corrupted}");
             }
             String line = (createLine(messageWithHeader));
             if (mark) {
@@ -277,24 +272,6 @@ public class ConsoleOutputPaneModel {
         if (!showApp && header.isClientApp) {
             return true;
         }
-        if (!showJava) {
-            return true;
-        }
-        if (header instanceof PluginHeader) {
-            PluginHeader mm = (PluginHeader) header;
-            if (!showPreInit && mm.preInit) {
-                return true;
-            }
-            if (!showPostInit && !mm.preInit) {
-                return true;
-            }
-            if (!showIncomplete && m instanceof PluginMessage && ((PluginMessage) (m)).wasError) {
-                return true;
-            }
-            if (!showComplete && m instanceof PluginMessage && !((PluginMessage) (m)).wasError) {
-                return true;
-            }
-        }
         if (regExLabel) {
             String s = createLine(m);
             if (matchPattern && !usedPattern.matcher(s).matches()) {
@@ -315,23 +292,17 @@ public class ConsoleOutputPaneModel {
     boolean regExLabel;
     boolean revertSort;
     boolean showCode;
-    boolean showComplete;
     boolean showDate;
     boolean showDebug;
     boolean showErr;
     boolean showHeaders;
-    boolean showIncomplete;
     boolean showInfo;
     boolean showItw;
     boolean showApp;
-    boolean showJava;
     boolean showLevel;
     boolean showMessage;
     boolean showOrigin;
     boolean showOut;
-    boolean showPlugin;
-    boolean showPostInit;
-    boolean showPreInit;
     boolean showThread1;
     boolean showThread2;
     boolean showUser;

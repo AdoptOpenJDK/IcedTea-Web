@@ -105,9 +105,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         showMessage = new JCheckBox();
         showOut = new JCheckBox();
         showErr = new JCheckBox();
-        showJava = new JCheckBox();
-        showPlugin = new JCheckBox();
-        showPreInit = new JCheckBox();
         sortByLabel = new JLabel();
         regExLabel = new JCheckBox();
         sortBy = new JComboBox<>();
@@ -122,7 +119,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         previous = new JButton();
         search = new JTextField();
         caseSensitive = new JCheckBox();
-        showIncomplete = new JCheckBox();
         highLight = new JCheckBox();
         wordWrap = new JCheckBox();
         showDebug = new JCheckBox();
@@ -131,8 +127,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         showApp = new JCheckBox();
         showCode = new JCheckBox();
         statistics = new JLabel();
-        showPostInit = new JCheckBox();
-        showComplete = new JCheckBox();
         match = new JRadioButton();
         notMatch = new JRadioButton();
         revertSort = new JCheckBox();
@@ -147,17 +141,7 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         setHeadersCheckBoxesEnabled(showHeaders.isSelected());
         setMessagesCheckBoxesEnabled(showMessage.isSelected());
         refresh.setEnabled(!autorefresh.isSelected());
-        showPlugin.setSelected(false);
-        showPreInit.setSelected(false);
-        showPostInit.setSelected(false);
-        showIncomplete.setSelected(false);
-        showComplete.setSelected(false);
 
-        showPlugin.setEnabled(false);
-        showPreInit.setEnabled(false);
-        showPostInit.setEnabled(false);
-        showIncomplete.setEnabled(false);
-        showComplete.setEnabled(false);
         regExFilter.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -373,19 +357,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         showErr.setText(Translator.R("COPstdErr"));
         showErr.addActionListener(getDefaultActionSingleton());
 
-        showJava.setSelected(true);
-        showJava.setText(Translator.R("COPjava"));
-        showJava.addActionListener(getDefaultActionSingleton());
-
-        showPlugin.setSelected(true);
-        showPlugin.setText(Translator.R("COPplugin"));
-        showPlugin.addActionListener(getDefaultActionSingleton());
-
-        showPreInit.setSelected(true);
-        showPreInit.setText(Translator.R("COPpreInit"));
-        showPreInit.setToolTipText(Translator.R("COPpluginOnly"));
-        showPreInit.addActionListener(getDefaultActionSingleton());
-
         sortByLabel.setText(Translator.R("COPSortBy") + ":");
 
         regExLabel.setText(Translator.R("COPregex") + ":");
@@ -462,11 +433,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
 
         caseSensitive.setText(Translator.R("COPcaseSensitive"));
 
-        showIncomplete.setSelected(true);
-        showIncomplete.setText(Translator.R("COPincomplete"));
-        showIncomplete.setToolTipText(Translator.R("COPpluginOnly"));
-        showIncomplete.addActionListener(getDefaultActionSingleton());
-
         highLight.setSelected(true);
         highLight.setText(Translator.R("COPhighlight"));
         highLight.addActionListener(getDefaultActionSingleton());
@@ -495,16 +461,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         showCode.addActionListener(getDefaultActionSingleton());
 
         statistics.setText("x/y");
-
-        showPostInit.setSelected(true);
-        showPostInit.setText(Translator.R("COPpostInit"));
-        showPostInit.setToolTipText(Translator.R("COPpluginOnly"));
-        showPostInit.addActionListener(getDefaultActionSingleton());
-
-        showComplete.setSelected(true);
-        showComplete.setText(Translator.R("COPcomplete"));
-        showComplete.setToolTipText(Translator.R("COPpluginOnly"));
-        showComplete.addActionListener(getDefaultActionSingleton());
 
         match.setSelected(true);
         match.setText(Translator.R("COPmatch"));
@@ -560,21 +516,14 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                 addComponent(caseSensitive)).addGroup(
                 GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup().
                 addComponent(showMessage).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showOut).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(showErr).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showJava).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showPlugin).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(showDebug).addGap(6, 6, 6).
+                addComponent(showOut).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showErr).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
+                addComponent(showDebug).addGap(6, 6, 6).
                 addComponent(showInfo).addGap(6, 6, 6).
                 addComponent(showItw).addGap(6, 6, 6).
                 addComponent(showApp)
                 )).addGap(2, 2, 2).
-                addComponent(statistics)).addGroup(
-                GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup().
-                addComponent(showPreInit).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showPostInit).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showIncomplete).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showComplete)).
+                addComponent(statistics)).
                 addGroup(jPanel2Layout.createSequentialGroup().
                 addComponent(autorefresh).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(refresh).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
@@ -605,18 +554,11 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                 addComponent(showMessage).
                 addComponent(showOut).
                 addComponent(showErr).
-                addComponent(showJava).
-                addComponent(showPlugin).
                 addComponent(showDebug).
                 addComponent(showInfo).
                 addComponent(showItw).
                 addComponent(showApp).
                 addComponent(statistics)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
-                jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
-                addComponent(showPreInit).
-                addComponent(showIncomplete).
-                addComponent(showPostInit).
-                addComponent(showComplete)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
                 jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING).
                 addGroup(
                 jPanel2Layout.createSequentialGroup().addGap(32, 32, 32).addGroup(
@@ -763,8 +705,6 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     private final void setMessagesCheckBoxesEnabled(final boolean enable) {
         showOut.setEnabled(enable);
         showErr.setEnabled(enable);
-        showJava.setEnabled(enable);
-        showPlugin.setEnabled(enable);
         showDebug.setEnabled(enable);
         showInfo.setEnabled(enable);
         showItw.setEnabled(enable);
@@ -904,23 +844,17 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         model.regExLabel = regExLabel.isSelected();
         model.revertSort = revertSort.isSelected();
         model.showCode = showCode.isSelected();
-        model.showComplete = showComplete.isSelected();
         model.showDate = showDate.isSelected();
         model.showDebug = showDebug.isSelected();
         model.showErr = showErr.isSelected();
         model.showHeaders = showHeaders.isSelected();
-        model.showIncomplete = showIncomplete.isSelected();
         model.showInfo = showInfo.isSelected();
         model.showItw = showItw.isSelected();
         model.showApp = showApp.isSelected();
-        model.showJava = showJava.isSelected();
         model.showLevel = showLevel.isSelected();
         model.showMessage = showMessage.isSelected();
         model.showOrigin = showOrigin.isSelected();
         model.showOut = showOut.isSelected();
-        model.showPlugin = showPlugin.isSelected();
-        model.showPostInit = showPostInit.isSelected();
-        model.showPreInit = showPreInit.isSelected();
         model.showThread1 = showThread1.isSelected();
         model.showThread2 = showThread2.isSelected();
         model.showUser = showUser.isSelected();
@@ -950,24 +884,18 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     private final JTextField search;
     private final JLabel searchLabel;
     private final JCheckBox showCode;
-    private final JCheckBox showComplete;
     private final JCheckBox showDate;
     private final JCheckBox showDebug;
     private final JCheckBox showErr;
     private final JCheckBox showHeaders;
     private final JButton showHide;
-    private final JCheckBox showIncomplete;
     private final JCheckBox showInfo;
     private final JCheckBox showItw;
     private final JCheckBox showApp;
-    private final JCheckBox showJava;
     private final JCheckBox showLevel;
     private final JCheckBox showMessage;
     private final JCheckBox showOrigin;
     private final JCheckBox showOut;
-    private final JCheckBox showPlugin;
-    private final JCheckBox showPostInit;
-    private final JCheckBox showPreInit;
     private final JCheckBox showThread1;
     private final JCheckBox showThread2;
     private final JCheckBox showUser;
