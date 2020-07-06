@@ -53,8 +53,8 @@ public class Header {
     public final String threadHash;
     public final String threadName;
 
-    public Header(OutputControllerLevel level, String caller) {
-        this(level, new Date(), false, Thread.currentThread(), caller);
+    public Header(OutputControllerLevel level, String callerClass) {
+        this(level, new Date(), false, Thread.currentThread(), callerClass);
     }
 
     public Header(OutputControllerLevel level, boolean isClientApp) {
@@ -65,28 +65,15 @@ public class Header {
         this(level, timestamp, isClientApp, thread, getCallerClass(thread.getStackTrace()));
     }
 
-    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread, String caller) {
-        this(
-                level, // level
-                timestamp, // timestamp
-                timestamp.toString(), // date
-                isClientApp, // isClientApp
-                DEFAULT_USER, // user
-                caller, // caller
-                Integer.toHexString(thread.hashCode()), // thread1
-                thread.getName()) // thread2
-        ;
-    }
-
-    protected Header(OutputControllerLevel level, Date timestampForSorting, String timestamp, boolean isClientApp, String osUser, String callerClass, String threadHash, String threadName) {
-        this.osUser = osUser;
+    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread, String callerClass) {
+        this.osUser = DEFAULT_USER;
         this.level = level;
-        this.timestampForSorting = timestampForSorting;
-        this.timestamp = timestamp;
+        this.timestampForSorting = timestamp;
+        this.timestamp = timestamp.toString();
         this.isClientApp = isClientApp;
         this.callerClass = callerClass;
-        this.threadHash = threadHash;
-        this.threadName = threadName;
+        this.threadHash = Integer.toHexString(thread.hashCode());
+        this.threadName = thread.getName();
     }
 
     @Override
