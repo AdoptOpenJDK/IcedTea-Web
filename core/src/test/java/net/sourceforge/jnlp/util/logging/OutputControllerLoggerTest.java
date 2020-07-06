@@ -39,7 +39,7 @@ public class OutputControllerLoggerTest {
 
         final MessageWithHeader msg = loggedMessages.get(0);
         assertThat(msg.getMessage(), is("message ONE"));
-        assertThat(msg.getHeader().caller, is(getClass().getName()));
+        assertThat(msg.getHeader().callerClass, is(getClass().getName()));
         assertThat(msg.getHeader().level, is(MESSAGE_DEBUG));
         assertThat(msg.hasStackTrace(), is(false));
         assertThat(msg.getStackTrace(), is(nullValue()));
@@ -52,7 +52,7 @@ public class OutputControllerLoggerTest {
 
         final MessageWithHeader msg = loggedMessages.get(0);
         assertThat(msg.getMessage(), is("message TWO"));
-        assertThat(msg.getHeader().caller, is(getClass().getName()));
+        assertThat(msg.getHeader().callerClass, is(getClass().getName()));
         assertThat(msg.getHeader().level, is(MESSAGE_DEBUG));
         assertThat(msg.hasStackTrace(), is(true));
         assertThat(msg.getStackTrace(), containsString("Ex Msg"));
