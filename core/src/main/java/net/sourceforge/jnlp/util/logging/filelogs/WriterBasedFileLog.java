@@ -33,8 +33,9 @@ statement from your version. */
 package net.sourceforge.jnlp.util.logging.filelogs;
 
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.sourceforge.jnlp.util.logging.FileLog;
+import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
+import net.sourceforge.jnlp.util.logging.headers.Header;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,6 +43,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.INFO;
 
 /**
  * This class writes log information to file.
@@ -57,7 +60,7 @@ public final class WriterBasedFileLog implements SingleStreamLogger {
                 FileUtils.createRestrictedFile(futureFile);
             }
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName), append), StandardCharsets.UTF_8));
-            log(FileLog.getHeadlineHeader().toString() + " writer-based impl.");
+            log(new Header(INFO, false) + " writer-based impl.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

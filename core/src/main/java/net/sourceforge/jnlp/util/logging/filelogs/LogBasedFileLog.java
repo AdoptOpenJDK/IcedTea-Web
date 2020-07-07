@@ -33,8 +33,8 @@ statement from your version. */
 package net.sourceforge.jnlp.util.logging.filelogs;
 
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.sourceforge.jnlp.util.logging.FileLog;
 import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
+import net.sourceforge.jnlp.util.logging.headers.Header;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +43,8 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARN;
 
 /**
  * This class writes log information to file.
@@ -74,7 +76,7 @@ public final class LogBasedFileLog implements SingleStreamLogger {
             impl = Logger.getLogger(loggerName);
             impl.setLevel(Level.ALL);
             impl.addHandler(fh);
-            log(FileLog.getHeadlineHeader().toString() + " log-based impl.");
+            log(new Header(WARN, false) + " log-based impl.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
