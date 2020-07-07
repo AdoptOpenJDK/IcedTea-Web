@@ -11,6 +11,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.DEBUG;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.INFO;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARN;
+
 public class ConsoleOutputPaneModel {
 
     ConsoleOutputPaneModel(ObservableMessagesProvider dataProvider) {
@@ -97,17 +102,19 @@ public class ConsoleOutputPaneModel {
 
 
             if (mark) {
+                final Header header = messageWithHeader.getHeader();
+                final OutputControllerLevel level = header.level;
                 sb.append("<div style='color:#");
-                if (messageWithHeader.getHeader().isClientApp) {
-                    if (messageWithHeader.getHeader().level.printToErrStream()) {
+                if (header.isClientApp) {
+                    if (level == ERROR) {
                         sb.append(HTMLCOLOR_PURPLE);
                     } else {
                         sb.append(HTMLCOLOR_GREEN);
                     }
                 } else {
-                    if (messageWithHeader.getHeader().level.isWarning()) {
+                    if (level == WARN) {
                         sb.append(HTMLCOLOR_GREENYELLOW);
-                    } else if (messageWithHeader.getHeader().level.printToErrStream()) {
+                    } else if (level == ERROR) {
                         sb.append(HTMLCOLOR_PINKYREAD);
                     } else {
                         sb.append(HTMLCOLOR_BLACK);
@@ -254,16 +261,16 @@ public class ConsoleOutputPaneModel {
         final Header header = m.getHeader();
         final OutputControllerLevel level = header.level;
 
-        if (!showOut && level.printToOutStream() && !level.isWarning()) {
+        if (!showOut && !level.printToErrStream()) {
             return true;
         }
-        if (!showErr && level.printToErrStream() && !level.isWarning()) {
+        if (!showErr && !level.printToOutStream()) {
             return true;
         }
-        if (!showDebug && level.isDebug()) {
+        if (!showDebug && level == DEBUG) {
             return true;
         }
-        if (!showInfo && level.isInfo()) {
+        if (!showInfo && level == INFO) {
             return true;
         }
         if (!showItw && !header.isClientApp) {
