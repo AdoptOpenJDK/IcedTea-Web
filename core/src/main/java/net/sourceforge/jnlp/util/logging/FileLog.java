@@ -62,10 +62,6 @@ public final class FileLog {
         return createFileLog("javantx");
     }
 
-    public static SingleStreamLogger createAppFileLog() {
-        return createFileLog("clienta");
-    }
-
     private static SingleStreamLogger createFileLog(String id) {
         SingleStreamLogger s;
         try {

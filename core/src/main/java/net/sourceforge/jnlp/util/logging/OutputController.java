@@ -118,7 +118,7 @@ public class OutputController implements BasicOutputController {
     private void consumeClientAppMessage(MessageWithHeader message) {
         final LogConfig logConfig = LogConfig.getLogConfig();
         if (logConfig.isLogToFile() && logConfig.isLogToFileForClientApp()) {
-            getAppFileLog().log(convertToPrintableString(message, logConfig));
+            getFileLog().log(convertToPrintableString(message, logConfig));
         }
     }
 
@@ -242,18 +242,6 @@ public class OutputController implements BasicOutputController {
 
     private SingleStreamLogger getFileLog() {
         return FileLogHolder.INSTANCE;
-    }
-
-
-    private static class AppFileLogHolder {
-
-        //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
-        //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
-        private static final SingleStreamLogger INSTANCE = FileLog.createAppFileLog();
-    }
-
-    private SingleStreamLogger getAppFileLog() {
-        return AppFileLogHolder.INSTANCE;
     }
 
     private static class SystemLogHolder {
