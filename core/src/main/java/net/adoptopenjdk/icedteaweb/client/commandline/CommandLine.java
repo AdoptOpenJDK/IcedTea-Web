@@ -33,6 +33,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.docprovider.ItwebSettingsTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
+import net.sourceforge.jnlp.util.logging.FileLog;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 import javax.naming.ConfigurationException;
@@ -72,6 +73,11 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @author <a href="mailto:Omair%20Majid%20&lt;omajid@redhat.com&gt;">Omair Majid</a>
  */
 public class CommandLine {
+
+    static {
+        // this is placed here above the any thing else to ensure no logger has been created prior to this line
+        FileLog.setLogFileNamePostfix("settings");
+    }
 
     private final static Logger LOG = LoggerFactory.getLogger(CommandLine.class);
 

@@ -20,9 +20,11 @@ import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.util.logging.FileLog;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_LOCATION;
@@ -61,7 +63,12 @@ public class ItwJvmLauncher implements JvmLauncher {
 
         LOG.info("About to launch external with commands: '{}'", commands.toString());
 
-        final Process p = new ProcessBuilder()
+        final ProcessBuilder pb = new ProcessBuilder();
+        final Map<String, String> env = pb.environment();
+        env.put(FileLog.LOG_PREFIX_ENV, FileLog.getLogFileNamePrefix());
+        env.put(FileLog.LOG_POSTFIX_ENV, FileLog.getLogFileNamePostfix() + "-app");
+
+        final Process p = pb
                 .command(commands)
                 .inheritIO()
                 .start();
