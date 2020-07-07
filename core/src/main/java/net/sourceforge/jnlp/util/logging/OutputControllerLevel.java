@@ -25,35 +25,27 @@ public enum OutputControllerLevel {
     MESSAGE_ALL,
     MESSAGE_DEBUG,
     WARNING_ALL,
-    @Deprecated WARNING_DEBUG,
     ERROR_ALL,
-    @Deprecated ERROR_DEBUG,
 
     ;
 
     public boolean printToOutStream() {
         return this == MESSAGE_ALL
                 || this == MESSAGE_DEBUG
-                || this == WARNING_ALL
-                || this == WARNING_DEBUG;
+                || this == WARNING_ALL;
     }
 
     public boolean printToErrStream() {
         return this == ERROR_ALL
-                || this == ERROR_DEBUG
-                || this == WARNING_ALL
-                || this == WARNING_DEBUG;
+                || this == WARNING_ALL;
     }
 
     public boolean isWarning() {
-        return this == WARNING_ALL
-                || this == WARNING_DEBUG;
+        return this == WARNING_ALL;
     }
 
     public boolean isDebug() {
-        return this == ERROR_DEBUG
-                || this == MESSAGE_DEBUG
-                || this == WARNING_DEBUG;
+        return this == MESSAGE_DEBUG;
     }
 
     public boolean isInfo() {
