@@ -41,8 +41,8 @@ import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR_ALL;
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.MESSAGE_ALL;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.INFO;
 
 /**
  * Behaves like the 'tee' command, sends output to both actual std stream and a
@@ -63,7 +63,7 @@ public final class TeeOutputStream extends PrintStream {
 
     TeeOutputStream(PrintStream stdStream, boolean isError, BasicOutputController outputController) {
         super(stdStream);
-        this.level = isError ? ERROR_ALL : MESSAGE_ALL;
+        this.level = isError ? ERROR : INFO;
         this.outputController = outputController;
     }
 

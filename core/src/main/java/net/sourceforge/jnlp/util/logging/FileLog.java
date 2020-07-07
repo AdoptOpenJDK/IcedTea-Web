@@ -55,7 +55,7 @@ public final class FileLog {
     private static final SimpleDateFormat FILE_LOG_NAME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd_HH" + TIME_SEPARATOR + "mm" + TIME_SEPARATOR + "ss.S");
 
     public static Header getHeadlineHeader() {
-        return new Header(OutputControllerLevel.WARNING_ALL, false);
+        return new Header(OutputControllerLevel.WARN, false);
     }
 
     public static SingleStreamLogger createFileLog() {

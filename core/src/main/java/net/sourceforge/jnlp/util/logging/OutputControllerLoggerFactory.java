@@ -8,10 +8,10 @@ import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR_ALL;
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.MESSAGE_ALL;
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.MESSAGE_DEBUG;
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARNING_ALL;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.INFO;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.DEBUG;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARN;
 
 /**
  * Factory for creating {@link Logger Loggers} which log to the {@link OutputController}.
@@ -42,62 +42,62 @@ public class OutputControllerLoggerFactory implements LoggerFactoryImpl {
 
         @Override
         public void debug(final String msg) {
-            log(MESSAGE_DEBUG, msg, null);
+            log(DEBUG, msg, null);
         }
 
         @Override
         public void debug(final String msg, final Object... arguments) {
-            log(MESSAGE_DEBUG, expand(msg, arguments), null);
+            log(DEBUG, expand(msg, arguments), null);
         }
 
         @Override
         public void debug(final String msg, final Throwable t) {
-            log(MESSAGE_DEBUG, msg, t);
+            log(DEBUG, msg, t);
         }
 
         @Override
         public void info(final String msg) {
-            log(MESSAGE_ALL, msg, null);
+            log(INFO, msg, null);
         }
 
         @Override
         public void info(final String msg, final Object... arguments) {
-            log(MESSAGE_ALL, expand(msg, arguments), null);
+            log(INFO, expand(msg, arguments), null);
         }
 
         @Override
         public void info(final String msg, final Throwable t) {
-            log(MESSAGE_ALL, msg, t);
+            log(INFO, msg, t);
         }
 
         @Override
         public void warn(final String msg) {
-            log(WARNING_ALL, msg, null);
+            log(WARN, msg, null);
         }
 
         @Override
         public void warn(final String msg, final Object... arguments) {
-            log(WARNING_ALL, expand(msg, arguments), null);
+            log(WARN, expand(msg, arguments), null);
         }
 
         @Override
         public void warn(final String msg, final Throwable t) {
-            log(WARNING_ALL, msg, t);
+            log(WARN, msg, t);
         }
 
         @Override
         public void error(final String msg) {
-            log(ERROR_ALL, msg, null);
+            log(ERROR, msg, null);
         }
 
         @Override
         public void error(final String msg, final Object... arguments) {
-            log(ERROR_ALL, expand(msg, arguments), null);
+            log(ERROR, expand(msg, arguments), null);
         }
 
         @Override
         public void error(final String msg, final Throwable t) {
-            log(ERROR_ALL, msg, t);
+            log(ERROR, msg, t);
         }
 
         private void log(final OutputControllerLevel level, final String msg, final Throwable t) {

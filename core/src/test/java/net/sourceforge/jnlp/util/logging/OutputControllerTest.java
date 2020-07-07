@@ -84,20 +84,20 @@ public class OutputControllerTest {
         LogConfig.getLogConfig().setLogToFile(false);
         LogConfig.getLogConfig().setLogToStreams(true);
         LogConfig.getLogConfig().setLogToSysLog(false);
-        oc.log(msg(OutputControllerLevel.MESSAGE_DEBUG, line1));
+        oc.log(msg(OutputControllerLevel.DEBUG, line1));
         oc.flush();
         Assert.assertFalse((os1.toString(UTF_8).contains(line1)));
         Assert.assertFalse((os2.toString(UTF_8).contains(line1)));
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line1));
+        oc.log(msg(OutputControllerLevel.INFO, line1));
         oc.flush();
         Assert.assertTrue((os1.toString(UTF_8).contains(line1)));
         Assert.assertFalse((os2.toString(UTF_8).contains(line1)));
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line1));
+        oc.log(msg(OutputControllerLevel.ERROR, line1));
         oc.flush();
         Assert.assertTrue((os2.toString(UTF_8).contains(line1)));
 
         LogConfig.getLogConfig().setEnableLogging(true);
-        oc.log(msg(OutputControllerLevel.MESSAGE_DEBUG, line2));
+        oc.log(msg(OutputControllerLevel.DEBUG, line2));
         oc.flush();
         Assert.assertTrue((os1.toString(UTF_8).contains(line2)));
         Assert.assertFalse((os2.toString(UTF_8).contains(line2)));
@@ -105,13 +105,13 @@ public class OutputControllerTest {
         Assert.assertTrue((os1.toString(UTF_8).contains(line2)));
         Assert.assertFalse((os2.toString(UTF_8).contains(line2)));
 
-        oc.log(msg(OutputControllerLevel.MESSAGE_DEBUG, line3));
+        oc.log(msg(OutputControllerLevel.DEBUG, line3));
         oc.flush();
         Assert.assertTrue((os1.toString(UTF_8).contains(line3)));
         Assert.assertFalse((os2.toString(UTF_8).contains(line3)));
 
         LogConfig.getLogConfig().setEnableLogging(false);
-        oc.log(msg(OutputControllerLevel.WARNING_ALL, line5));
+        oc.log(msg(OutputControllerLevel.WARN, line5));
         oc.flush();
         Assert.assertTrue((os1.toString(UTF_8).contains(line5)));
         Assert.assertTrue((os2.toString(UTF_8).contains(line5)));
@@ -143,7 +143,7 @@ public class OutputControllerTest {
             for (int i = 0; i < iterations; i++) {
                 try {
                     //be sure this pattern is kept in asserts
-                    oc.log(msg(OutputControllerLevel.WARNING_ALL, "thread " + id + " line " + i));
+                    oc.log(msg(OutputControllerLevel.WARN, "thread " + id + " line " + i));
                     Thread.sleep(random.nextInt(delayable));
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
@@ -240,18 +240,18 @@ public class OutputControllerTest {
         ByteArrayOutputStream os1 = new ByteArrayOutputStream();
         ByteArrayOutputStream os2 = new ByteArrayOutputStream();
         OutputController oc = new OutputController(os1, os2);
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line1));
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line1));
+        oc.log(msg(OutputControllerLevel.INFO, line1));
+        oc.log(msg(OutputControllerLevel.ERROR, line1));
         oc.flush();
         ByteArrayOutputStream os3 = new ByteArrayOutputStream();
         ByteArrayOutputStream os4 = new ByteArrayOutputStream();
         oc.setInOutErrController(new StdInOutErrController(os3, os2));
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line2));
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line2));
+        oc.log(msg(OutputControllerLevel.INFO, line2));
+        oc.log(msg(OutputControllerLevel.ERROR, line2));
         oc.flush();
         oc.setInOutErrController(new StdInOutErrController(os3, os4));
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line3));
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line3));
+        oc.log(msg(OutputControllerLevel.INFO, line3));
+        oc.log(msg(OutputControllerLevel.ERROR, line3));
         oc.flush();
 
         Assert.assertTrue((os1.toString(UTF_8).contains(line1)));
@@ -272,8 +272,8 @@ public class OutputControllerTest {
 
         LogConfig.getLogConfig().setLogToStreams(false);
 
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line4));
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line4));
+        oc.log(msg(OutputControllerLevel.INFO, line4));
+        oc.log(msg(OutputControllerLevel.ERROR, line4));
 
         Assert.assertFalse((os1.toString(UTF_8).contains(line4)));
         Assert.assertFalse((os2.toString(UTF_8).contains(line4)));
@@ -299,9 +299,9 @@ public class OutputControllerTest {
         f2.deleteOnExit();
         oc.setFileLog(new WriterBasedFileLog(f1.getAbsolutePath(), false));
         LogConfig.getLogConfig().setLogToFile(true);
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line1));
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line2));
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line3));
+        oc.log(msg(OutputControllerLevel.INFO, line1));
+        oc.log(msg(OutputControllerLevel.ERROR, line2));
+        oc.log(msg(OutputControllerLevel.INFO, line3));
         oc.flush();
         s1 = StreamUtils.readStreamAsString(new FileInputStream(f1), true);
         s2 = StreamUtils.readStreamAsString(new FileInputStream(f2), true);
@@ -314,8 +314,8 @@ public class OutputControllerTest {
         Assert.assertFalse((s2.contains(line3)));
 
         oc.setFileLog(new WriterBasedFileLog(f2.getAbsolutePath(), false));
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line5));
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line5));
+        oc.log(msg(OutputControllerLevel.ERROR, line5));
+        oc.log(msg(OutputControllerLevel.INFO, line5));
         oc.flush();
 
         s1 = StreamUtils.readStreamAsString(new FileInputStream(f1), true);
@@ -332,8 +332,8 @@ public class OutputControllerTest {
         Assert.assertTrue((s2.contains(line5)));
 
         LogConfig.getLogConfig().setLogToFile(false);
-        oc.log(msg(OutputControllerLevel.ERROR_ALL, line6));
-        oc.log(msg(OutputControllerLevel.MESSAGE_ALL, line6));
+        oc.log(msg(OutputControllerLevel.ERROR, line6));
+        oc.log(msg(OutputControllerLevel.INFO, line6));
         oc.flush();
 
         s1 = StreamUtils.readStreamAsString(new FileInputStream(f1), true);

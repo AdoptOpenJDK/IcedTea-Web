@@ -9,7 +9,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.MESSAGE_DEBUG;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.DEBUG;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
@@ -40,7 +40,7 @@ public class OutputControllerLoggerTest {
         final MessageWithHeader msg = loggedMessages.get(0);
         assertThat(msg.getMessage(), is("message ONE"));
         assertThat(msg.getHeader().callerClass, is(getClass().getName()));
-        assertThat(msg.getHeader().level, is(MESSAGE_DEBUG));
+        assertThat(msg.getHeader().level, is(DEBUG));
         assertThat(msg.hasStackTrace(), is(false));
         assertThat(msg.getStackTrace(), is(nullValue()));
     }
@@ -53,7 +53,7 @@ public class OutputControllerLoggerTest {
         final MessageWithHeader msg = loggedMessages.get(0);
         assertThat(msg.getMessage(), is("message TWO"));
         assertThat(msg.getHeader().callerClass, is(getClass().getName()));
-        assertThat(msg.getHeader().level, is(MESSAGE_DEBUG));
+        assertThat(msg.getHeader().level, is(DEBUG));
         assertThat(msg.hasStackTrace(), is(true));
         assertThat(msg.getStackTrace(), containsString("Ex Msg"));
         assertThat(msg.getStackTrace(), containsString(getClass().getName()));
