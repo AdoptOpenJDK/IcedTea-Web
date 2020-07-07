@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static java.util.Comparator.comparing;
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.DEBUG;
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR;
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.INFO;
@@ -31,7 +32,13 @@ public class ConsoleOutputPaneModel {
         return false;
     }
 
-    private abstract class CatchedMessageWithHeaderComparator implements Comparator<MessageWithHeader> {
+    private class CatchedMessageWithHeaderComparator implements Comparator<MessageWithHeader> {
+
+        private final Comparator<Header> delegate;
+
+        protected CatchedMessageWithHeaderComparator(Comparator<Header> delegate) {
+            this.delegate = delegate;
+        }
 
         @Override
         public int compare(MessageWithHeader o1, MessageWithHeader o2) {
@@ -44,7 +51,9 @@ public class ConsoleOutputPaneModel {
             }
         }
 
-        abstract int body(MessageWithHeader o1, MessageWithHeader o2);
+        protected int body(MessageWithHeader o1, MessageWithHeader o2) {
+            return delegate.compare(o1.getHeader(), o2.getHeader());
+        }
     }
 
     static final Pattern defaultPattern = Pattern.compile("(m?)(.*\n*)*");
@@ -53,10 +62,6 @@ public class ConsoleOutputPaneModel {
     Pattern usedPattern = lastValidPattern;
     int lastUpdateIndex; //to add just what was added newly
     int statisticsShown;
-    private static final String HTMLCOLOR_DIMRED = "FF6666";
-    private static final String HTMLCOLOR_MIDGRAY = "666666";
-    private static final String HTMLCOLOR_SPARKRED = "FF0000";
-    private static final String HTMLCOLOR_LIGHTGRAY = "AAAAAA";
     private static final String HTMLCOLOR_GREENYELLOW = "AAAA00";
     private static final String HTMLCOLOR_PINKYREAD = "FF0055";
     private static final String HTMLCOLOR_BLACK = "000000";
@@ -169,92 +174,51 @@ public class ConsoleOutputPaneModel {
             sb.append(": ");
         }
         if (showMessage) {
-            sb.append(m.getMessage().toString());
+            sb.append(m.getMessage());
         }
         return sb.toString();
     }
 
     List<MessageWithHeader> preSort(List<MessageWithHeader> data, int sortByLocal) {
-        List<MessageWithHeader> sortedData;
-        if (sortByLocal == 0) {
-            if (revertSort) {
-                sortedData = Collections.synchronizedList(new ArrayList<MessageWithHeader>(data));
-                Collections.reverse(sortedData);
-            } else {
-                sortedData = data;
-            }
-        } else {
-            sortedData = Collections.synchronizedList(new ArrayList<MessageWithHeader>(data));
-            switch (sortByLocal) {
-                case 1:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().osUser.compareTo(o2.getHeader().osUser);
-
-                        }
-                    });
-                    break;
-                case 2:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().getOrigin().compareTo(o2.getHeader().getOrigin());
-                        }
-                    });
-                    break;
-                case 3:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().level.toString().compareTo(o2.getHeader().level.toString());
-                        }
-                    });
-                    break;
-                case 4:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().timestampForSorting.compareTo(o2.getHeader().timestampForSorting);
-                        }
-                    });
-                    break;
-                case 5:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().callerClass.compareTo(o2.getHeader().callerClass);
-                        }
-                    });
-                    break;
-                case 6:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().threadHash.compareTo(o2.getHeader().threadHash);
-                        }
-                    });
-                    break;
-                case 7:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getMessage().compareTo(o2.getMessage());
-                        }
-                    });
-                    break;
-                case 8:
-                    Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
-                        @Override
-                        public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().threadName.compareTo(o2.getHeader().threadName);
-                        }
-                    });
-                    break;
-            }
-
+        final List<MessageWithHeader> sortedData = new ArrayList<>(data);
+        switch (sortByLocal) {
+            case 0:
+                if (revertSort) {
+                    Collections.reverse(sortedData);
+                }
+                break;
+            case 1:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(comparing(h -> h.osUser)));
+                break;
+            case 2:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(comparing(h -> h.isClientApp)));
+                break;
+            case 3:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(comparing(h -> h.level)));
+                break;
+            case 4:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(comparing(h -> h.timestampForSorting)));
+                break;
+            case 5:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(comparing(h -> h.callerClass)));
+                break;
+            case 6:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(comparing(h -> h.threadHash)));
+                break;
+            case 7:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(null) {
+                    @Override
+                    public int body(MessageWithHeader o1, MessageWithHeader o2) {
+                        return o1.getMessage().compareTo(o2.getMessage());
+                    }
+                });
+                break;
+            case 8:
+                sortedData.sort(new CatchedMessageWithHeaderComparator(comparing(h -> h.threadName)));
+                break;
         }
-        return sortedData;
+
+        return Collections.synchronizedList(sortedData);
     }
 
     boolean filtered(MessageWithHeader m) {
@@ -280,11 +244,9 @@ public class ConsoleOutputPaneModel {
             return true;
         }
         if (regExLabel) {
-            String s = createLine(m);
-            if (matchPattern && !usedPattern.matcher(s).matches()) {
-                return true;
-            }
-            if (!matchPattern && usedPattern.matcher(s).matches()) {
+            final String s = createLine(m);
+            final boolean matches = usedPattern.matcher(s).matches();
+            if (matchPattern != matches) {
                 return true;
             }
         }
