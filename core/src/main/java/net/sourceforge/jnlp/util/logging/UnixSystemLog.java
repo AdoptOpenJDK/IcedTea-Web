@@ -67,9 +67,9 @@ public class UnixSystemLog implements SingleStreamLogger {
         }
     }
 
-    private void logToSyslog(String message) {
+    private void logToSyslog(final String msg) {
         try {
-            message = message.replaceAll("\t", "    ");
+            final String message = msg.replaceAll("\t", "    ");
             ProcessBuilder pb = new ProcessBuilder("logger", "-p", "user.err", "--", message);
             Process p = pb.start();
             ProcessUtils.waitForSafely(p);
