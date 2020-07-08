@@ -1,4 +1,4 @@
-/*Copyright (C) 2013 Red Hat, Inc.
+/*Copyright (C) 2020 Karakun AG
 
  This file is part of IcedTea.
 
