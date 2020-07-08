@@ -37,6 +37,7 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.StdInOutErrController;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -59,6 +60,11 @@ public class DefaultLaunchHandlerTest extends NoStdOutErrTest {
         out = new ByteArrayOutputStream();
         err = new ByteArrayOutputStream();
         l.setInOutErrController(new StdInOutErrController(out, err));
+    }
+
+    @After
+    public final void tearDown() {
+        l.setInOutErrController(StdInOutErrController.getInstance());
     }
 
     @Test
