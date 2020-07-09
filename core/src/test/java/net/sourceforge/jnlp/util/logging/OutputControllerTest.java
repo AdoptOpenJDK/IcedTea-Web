@@ -41,6 +41,7 @@ import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -161,6 +162,7 @@ public class OutputControllerTest {
      * todo - include syslog once implemented
      */
     @Test
+    @Ignore("hangs regularly on integration server")
     public void isParallelLoggingWorking() throws Exception {
         LogConfig.getLogConfig().setEnableLogging(true);
         LogConfig.getLogConfig().setLogToStreams(true);
