@@ -32,45 +32,34 @@ statement from your version.
 */
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import static java.util.Objects.requireNonNull;
-
-
 /**
- *
  * OutputController class (thread) must NOT call JNLPRuntime.getConfiguration()
- *
  */
-public class OutputController extends BasicOutputController {
+public class OutputController implements BasicOutputController {
 
-    private final static Logger LOG = LoggerFactory.getLogger(OutputController.class);
+    private StdInOutErrController inOutErrController;
 
-    private final PrintStreamLogger outLog;
-    private final PrintStreamLogger errLog;
     private final List<MessageWithHeader> messageQue = new LinkedList<>();
     //itw logger have to be fully initialised before start
     private final Thread consumerThread = new Thread(new MessageQueConsumer(), "Output controller consumer daemon");
     private final Thread shutdownThread = new Thread(this::flush);
     private boolean javaConsoleInitialized;
-     /*stdin reader for headless dialogues*/
-    private BufferedReader br;
 
     //bounded to instance
     private class MessageQueConsumer implements Runnable {
@@ -102,7 +91,6 @@ public class OutputController extends BasicOutputController {
     }
 
     public synchronized void flush() {
-
         while (!messageQue.isEmpty()) {
             consume();
         }
@@ -116,7 +104,7 @@ public class OutputController extends BasicOutputController {
             JavaConsole.getConsole().addMessage(message);
         }
 
-        if (message.getHeader().isClientApp){
+        if (message.getHeader().isClientApp) {
             consumeClientAppMessage(message);
         } else {
             consumeItwMessage(message);
@@ -143,10 +131,10 @@ public class OutputController extends BasicOutputController {
 
         if (logConfig.isLogToStreams()) {
             if (level.printToOutStream()) {
-                outLog.log(messageString);
+                inOutErrController.getOut().log(messageString);
             }
             if (level.printToErrStream()) {
-                errLog.log(messageString);
+                inOutErrController.getErr().log(messageString);
             }
         }
 
@@ -175,16 +163,10 @@ public class OutputController extends BasicOutputController {
                 (withStackTrace ? separator + s.getStackTrace() : "");
     }
 
-    private OutputController() {
-        this(System.out, System.err);
-    }
-
-
     private static class OutputControllerHolder {
-
         //https://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
         //https://en.wikipedia.org/wiki/Double-checked_locking#Usage_in_Java
-        private static final OutputController INSTANCE = new OutputController();
+        private static final OutputController INSTANCE = new OutputController(StdInOutErrController.getInstance());
     }
 
     /**
@@ -200,9 +182,16 @@ public class OutputController extends BasicOutputController {
      * for testing purposes the logger with custom streams can be created
      * otherwise only getLogger()'s singleton can be called.
      */
-    public OutputController(PrintStream out, PrintStream err) {
-        outLog = new PrintStreamLogger(requireNonNull(out, "out"));
-        errLog = new PrintStreamLogger(requireNonNull(err, "err"));
+    public OutputController(OutputStream out, OutputStream err) {
+        this(new StdInOutErrController(out, err));
+    }
+
+    /**
+     * for testing purposes the logger with custom streams can be created
+     * otherwise only getLogger()'s singleton can be called.
+     */
+    private OutputController(StdInOutErrController inOutErrController) {
+        this.inOutErrController = Assert.requireNonNull(inOutErrController, "inOutErrController");
 
         // the consumer thread is started in JNLPRuntime.getConfig() after config is loaded
         consumerThread.setDaemon(true);
@@ -221,54 +210,24 @@ public class OutputController extends BasicOutputController {
             LogConfig.resetLogConfig();
             if (LogConfig.getLogConfig().isLogToConsole()) {
                 javaConsoleInitialized = true;
-                JavaConsole.getConsole();
+                Assert.requireNonNull(JavaConsole.getConsole(), "console");
             }
         }
     }
 
     /**
-     *
-     * @return current stream for std.out reprint
+     * Some tests may require set the output/error stream and check the output.
+     * This is the gate for it.
      */
-    public PrintStream getOut() {
-        flush();
-        return outLog.getStream();
-    }
-
-    /**
-     *
-     * @return current stream for std.err reprint
-     */
-    public PrintStream getErr() {
-        flush();
-        return errLog.getStream();
-    }
-
-    /**
-     * Some tests may require set the output stream and check the output. This
-     * is the gate for it.
-     */
-    public void setOut(PrintStream out) {
-        flush();
-        this.outLog.setStream(out);
-    }
-
-    /**
-     * Some tests may require set the output stream and check the output. This
-     * is the gate for it.
-     */
-    public void setErr(PrintStream err) {
-        flush();
-        this.errLog.setStream(err);
+    public void setInOutErrController(StdInOutErrController inOutErrController) {
+        this.inOutErrController = Assert.requireNonNull(inOutErrController, "inOutErrController");
     }
 
     @Override
-    public synchronized void log(MessageWithHeader l){
+    public synchronized void log(MessageWithHeader l) {
         messageQue.add(l);
         this.notifyAll();
     }
-
-
 
     private static class FileLogHolder {
 
@@ -312,44 +271,18 @@ public class OutputController extends BasicOutputController {
         return SystemLogHolder.INSTANCE;
     }
 
-    private void printErrorLn(String e) {
-        getErr().println(e);
-
-    }
-
     public void printOutLn(String e) {
-        getOut().println(e);
-
+        flush();
+        inOutErrController.getOutStream().println(e);
     }
 
-    public void printWarningLn(String e) {
-        printOutLn(e);
-        printErrorLn(e);
+    public String readLine() throws IOException {
+        return inOutErrController.readLine();
     }
 
-    private void printError(String e) {
-        getErr().print(e);
-
-    }
-
-    public void printOut(String e) {
-        getOut().print(e);
-
-    }
-
-
-   //package private setters for testing
+    //package private setters for testing
 
     void setFileLog(SingleStreamLogger fileLog) {
         FileLogHolder.INSTANCE = fileLog;
     }
-
-    public synchronized String readLine() throws IOException {
-        if (br == null) {
-            br = new BufferedReader(new InputStreamReader(System.in));
-        }
-        return br.readLine();
-    }
-
-
 }

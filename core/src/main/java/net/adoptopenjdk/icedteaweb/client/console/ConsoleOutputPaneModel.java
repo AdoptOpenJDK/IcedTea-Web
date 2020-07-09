@@ -183,7 +183,7 @@ public class ConsoleOutputPaneModel {
                     Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
                         @Override
                         public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().user.compareTo(o2.getHeader().user);
+                            return o1.getHeader().osUser.compareTo(o2.getHeader().osUser);
 
                         }
                     });
@@ -208,7 +208,7 @@ public class ConsoleOutputPaneModel {
                     Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
                         @Override
                         public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().timestamp.compareTo(o2.getHeader().timestamp);
+                            return o1.getHeader().timestampForSorting.compareTo(o2.getHeader().timestampForSorting);
                         }
                     });
                     break;
@@ -216,7 +216,7 @@ public class ConsoleOutputPaneModel {
                     Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
                         @Override
                         public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().caller.compareTo(o2.getHeader().caller);
+                            return o1.getHeader().callerClass.compareTo(o2.getHeader().callerClass);
                         }
                     });
                     break;
@@ -224,7 +224,7 @@ public class ConsoleOutputPaneModel {
                     Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
                         @Override
                         public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().thread1.compareTo(o2.getHeader().thread1);
+                            return o1.getHeader().threadHash.compareTo(o2.getHeader().threadHash);
                         }
                     });
                     break;
@@ -240,7 +240,7 @@ public class ConsoleOutputPaneModel {
                     Collections.sort(sortedData, new CatchedMessageWithHeaderComparator() {
                         @Override
                         public int body(MessageWithHeader o1, MessageWithHeader o2) {
-                            return o1.getHeader().thread2.compareTo(o2.getHeader().thread2);
+                            return o1.getHeader().threadName.compareTo(o2.getHeader().threadName);
                         }
                     });
                     break;

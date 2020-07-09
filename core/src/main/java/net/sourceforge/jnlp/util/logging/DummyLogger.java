@@ -33,30 +33,14 @@ statement from your version.
 
 package net.sourceforge.jnlp.util.logging;
 
-import java.io.PrintStream;
-
-public class PrintStreamLogger implements SingleStreamLogger {
-    private  PrintStream stream;
-
-    public PrintStreamLogger(PrintStream stream){
-        this.stream = stream;
+public class DummyLogger implements SingleStreamLogger {
+    @Override
+    public final void log(String s) {
+        //dummy
     }
 
     @Override
-    public void log(String s) {
-        stream.println(s);
-    }
-
-    public PrintStream getStream() {
-        return stream;
-    }
-
-    public void setStream(PrintStream stream) {
-        this.stream = stream;
-    }
-
-    @Override
-    public void close() {
-        stream.flush();
+    public final void close() {
+        //dummy
     }
 }

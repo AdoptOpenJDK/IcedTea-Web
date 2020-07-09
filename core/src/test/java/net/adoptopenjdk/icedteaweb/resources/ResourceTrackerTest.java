@@ -43,6 +43,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.StdInOutErrController;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -52,7 +53,6 @@ import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -63,10 +63,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ResourceTrackerTest extends NoStdOutErrTest{
+public class ResourceTrackerTest extends NoStdOutErrTest {
 
     public static ServerLauncher downloadServer;
-    private static final PrintStream[] backedUpStream = new PrintStream[4];
     private static ByteArrayOutputStream currentErrorStream;
 
 
@@ -89,6 +88,7 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
             Assert.assertFalse("url " + i + " must be normalized (and so not equals) too normalized url " + i, u[i].equals(n[i]));
         }
     }
+
     public static final int CHANGE_BORDER = 8;
 
     public static URL[] getUrls() throws MalformedURLException {
@@ -125,42 +125,14 @@ public class ResourceTrackerTest extends NoStdOutErrTest{
     @BeforeClass
     //keeping silent outputs from launched jvm
     public static void redirectErr() {
-        for (int i = 0; i < backedUpStream.length; i++) {
-            if (backedUpStream[i] == null) {
-                switch (i) {
-                    case 0:
-                        backedUpStream[i] = System.out;
-                        break;
-                    case 1:
-                        backedUpStream[i] = System.err;
-                        break;
-                    case 2:
-                        backedUpStream[i] = OutputController.getLogger().getOut();
-                        break;
-                    case 3:
-                        backedUpStream[i] = OutputController.getLogger().getErr();
-                        break;
-                }
-
-            }
-
-        }
         currentErrorStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(currentErrorStream));
-        System.setErr(new PrintStream(currentErrorStream));
-        OutputController.getLogger().setOut(new PrintStream(currentErrorStream));
-        OutputController.getLogger().setErr(new PrintStream(currentErrorStream));
-
-
+        OutputController.getLogger().setInOutErrController(new StdInOutErrController(currentErrorStream, currentErrorStream));
     }
 
     @AfterClass
     public static void redirectErrBack() throws IOException {
         ServerAccess.logErrorReprint(currentErrorStream.toString(UTF_8.name()));
-        System.setOut(backedUpStream[0]);
-        System.setErr(backedUpStream[1]);
-        OutputController.getLogger().setOut(backedUpStream[2]);
-        OutputController.getLogger().setErr(backedUpStream[3]);
+        OutputController.getLogger().setInOutErrController(StdInOutErrController.getInstance());
     }
 
     @BeforeClass

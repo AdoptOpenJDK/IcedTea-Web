@@ -33,58 +33,42 @@ statement from your version. */
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
-import net.sourceforge.jnlp.util.logging.LogConfig;
+import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.StdInOutErrController;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Field;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.sourceforge.jnlp.LaunchException.SEVERE;
 import static org.junit.Assert.assertEquals;
 
-public class DefaultLaunchHandlerTest {
+public class DefaultLaunchHandlerTest extends NoStdOutErrTest {
 
-    private static class LocalLogger extends OutputController {
+    private final OutputController l = OutputController.getLogger();
 
-        private static class AccessibleStream extends PrintStream {
+    private ByteArrayOutputStream out;
+    private ByteArrayOutputStream err;
 
-            AccessibleStream(ByteArrayOutputStream out) {
-                super(out);
-            }
+    @Before
+    public final void setUp() {
+        out = new ByteArrayOutputStream();
+        err = new ByteArrayOutputStream();
+        l.setInOutErrController(new StdInOutErrController(out, err));
+    }
 
-            public ByteArrayOutputStream getOut() {
-                return (ByteArrayOutputStream) out;
-            }
-        }
-
-        LocalLogger() {
-            super(new AccessibleStream(new ByteArrayOutputStream()), new AccessibleStream(new ByteArrayOutputStream()));
-            try{
-                Field f = LogConfig.class.getDeclaredField("logToStreams");
-                f.setAccessible(true);
-                f.set(LogConfig.getLogConfig(), true);
-            }catch(Exception ex){
-                ServerAccess.logException(ex);
-            }
-        }
-
-        String getStream1() {
-            return ((AccessibleStream) (super.getOut())).getOut().toString();
-        }
-
-        String getStream2() {
-            return ((AccessibleStream) (super.getErr())).getOut().toString();
-        }
+    @After
+    public final void tearDown() {
+        l.setInOutErrController(StdInOutErrController.getInstance());
     }
 
     @Test
-    public void testBasicLaunch() {
-        LocalLogger l = new LocalLogger();
+    public void testBasicLaunch() throws Exception {
         DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         // all no-ops with no output
@@ -92,40 +76,37 @@ public class DefaultLaunchHandlerTest {
         handler.launchStarting(null);
         handler.launchCompleted(null);
 
-        assertEquals("", l.getStream1());
-        assertEquals("", l.getStream2());
+        assertEquals("", out.toString(UTF_8.name()));
+        assertEquals("", err.toString(UTF_8.name()));
     }
 
     @Test
     @Ignore //Test must be restructured. Checking Logging output is not the best idea...
-    public void testLaunchWarning() {
-        LocalLogger l = new LocalLogger();
+    public void testLaunchWarning() throws Exception {
         DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         LaunchException warning = new LaunchException(null, null,
                 SEVERE, "warning type", "test warning", "this is a test of the warning");
         handler.handleLaunchWarning(warning);
 
-        assertEquals("netx: warning type: test warning\n", l.getStream1());
+        assertEquals("netx: warning type: test warning\n", out.toString(UTF_8.name()));
     }
 
     @Test
     @Ignore //Test must be restructured. Checking Logging output is not the best idea...
-    public void testLaunchError() {
-        LocalLogger l = new LocalLogger();
+    public void testLaunchError() throws Exception {
         DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         LaunchException error = new LaunchException(null, null,
                 SEVERE, "error type", "test error", "this is a test of the error");
         handler.handleLaunchError(error);
 
-        assertEquals("netx: error type: test error\n", l.getStream1());
+        assertEquals("netx: error type: test error\n", out.toString(UTF_8.name()));
     }
 
     @Test
     @Ignore //Test must be restructured. Checking Logging output is not the best idea...
-    public void testLaunchErrorWithCause() {
-        LocalLogger l = new LocalLogger();
+    public void testLaunchErrorWithCause() throws Exception {
         DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         ParseException parse = new ParseException("no information element");
@@ -133,13 +114,12 @@ public class DefaultLaunchHandlerTest {
                 SEVERE, "error type", "test error", "this is a test of the error");
         handler.handleLaunchError(error);
 
-        assertEquals("netx: error type: test error (no information element)\n", l.getStream1());
+        assertEquals("netx: error type: test error (no information element)\n", out.toString(UTF_8.name()));
     }
 
     @Test
     @Ignore //Test must be restructured. Checking Logging output is not the best idea...
-    public void testLaunchErrorWithNestedCause() {
-        LocalLogger l = new LocalLogger();
+    public void testLaunchErrorWithNestedCause() throws Exception {
         DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         ParseException parse = new ParseException("no information element");
@@ -148,19 +128,18 @@ public class DefaultLaunchHandlerTest {
                 SEVERE, "error type", "test error", "this is a test of the error");
         handler.handleLaunchError(error);
 
-        assertEquals("netx: error type: test error (programmer made a mistake (no information element))\n", l.getStream1());
+        assertEquals("netx: error type: test error (programmer made a mistake (no information element))\n", out.toString(UTF_8.name()));
     }
 
     @Test
     @Ignore //Test must be restructured. Checking Logging output is not the best idea...
-    public void testValidationError() {
-        LocalLogger l = new LocalLogger();
+    public void testValidationError() throws Exception {
         DefaultLaunchHandler handler = new DefaultLaunchHandler(l);
 
         LaunchException error = new LaunchException(null, null,
                 SEVERE, "validation-error type", "test validation-error", "this is a test of a validation error");
         handler.validationError(error);
 
-        assertEquals("netx: validation-error type: test validation-error\n", l.getStream1());
+        assertEquals("netx: validation-error type: test validation-error\n", out.toString(UTF_8.name()));
     }
 }

@@ -121,7 +121,7 @@ public class CommandLine {
                     + helpMessagesProvider.prepare().getCommands()
                     + helpMessagesProvider.getFormatter().getNewLine();
         }
-        OutputController.getLogger().printOut(helpMessage);
+        OutputController.getLogger().printOutLn(helpMessage);
         return SUCCESS;
     }
 
