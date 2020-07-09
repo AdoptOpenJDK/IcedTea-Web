@@ -37,10 +37,12 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Header {
 
+    private static final SimpleDateFormat TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
     private static final String[] LOGGING_INFRASTRUCTURE_CLASSES = {OutputController.class.getName(), Header.class.getName(), TeeOutputStream.class.getName(), "sun.applet.PluginDebug"};
     private static final String DEFAULT_USER = JavaSystemProperties.getUserName();
 
@@ -65,7 +67,7 @@ public class Header {
     private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread, String callerClass) {
         this.level = level;
         this.timestampForSorting = timestamp;
-        this.timestamp = timestamp.toString();
+        this.timestamp = TIMESTAMP_FORMATTER.format(timestamp);
         this.isClientApp = isClientApp;
         this.origin = isClientApp ? "ITW-APP " : "ITW-CORE";
         this.callerClass = callerClass;
