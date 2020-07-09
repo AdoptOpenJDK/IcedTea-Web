@@ -48,6 +48,10 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.DEBUG;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARN;
+
 /**
  * OutputController class (thread) must NOT call JNLPRuntime.getConfiguration()
  */
@@ -123,7 +127,7 @@ public class OutputController implements BasicOutputController {
         final Header header = message.getHeader();
         final OutputControllerLevel level = header.level;
 
-        if (!JNLPRuntime.isDebug() && (level.isDebug())) {
+        if (!JNLPRuntime.isDebug() && level == DEBUG) {
             return;
         }
 
@@ -144,7 +148,7 @@ public class OutputController implements BasicOutputController {
 
         //only crucial stuff is going to system log
         //only java messages handled here, plugin is on his own
-        if (logConfig.isLogToSysLog() && level.isCrucial()) {
+        if (logConfig.isLogToSysLog() && (level == ERROR || level == WARN)) {
             //no headers here
             getSystemLog().log(message.getMessage());
         }
