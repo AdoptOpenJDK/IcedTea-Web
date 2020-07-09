@@ -56,14 +56,14 @@ public class CachedDaemonThreadPoolProvider {
      * Except creating new threads, the rest of class is complicated creation of
      * name.
      */
-    private static class DaemonThreadFactory implements ThreadFactory {
+    public static class DaemonThreadFactory implements ThreadFactory {
 
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
         private final ThreadGroup group;
         private final AtomicInteger threadNumber = new AtomicInteger(1);
         private final String namePrefix;
 
-        DaemonThreadFactory() {
+        public DaemonThreadFactory() {
             SecurityManager s = System.getSecurityManager();
             group = (s != null) ? s.getThreadGroup()
                     : Thread.currentThread().getThreadGroup();

@@ -40,8 +40,9 @@ import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class UnixSystemLog implements SingleStreamLogger {
@@ -50,18 +51,14 @@ public class UnixSystemLog implements SingleStreamLogger {
 
     private static final String PREAMBLE = "IcedTea-Web java error - for more info see itweb-settings debug options or console." +
             " See " + TextsProvider.ITW_BUGS + " for help.\nIcedTea-Web java error manual log:\n";
-
-    private static final ExecutorService executor = CachedDaemonThreadPoolProvider.createDaemonThreadPool();
+    private final ExecutorService singleExecutor = Executors.newSingleThreadExecutor(new CachedDaemonThreadPoolProvider.DaemonThreadFactory());
 
     @Override
-    public void log(String message) {
+    public void log(final String message) {
         final String s = PREAMBLE + message;
         final String[] ss = s.split("\\R"); // split string into lines
         try {
-            CompletableFuture<Void> f = CompletableFuture.completedFuture(null);
-            for (String m : ss) {
-                f = f.thenRunAsync(() -> logToSyslog(m), executor);
-            }
+            Arrays.stream(ss).forEach(m -> singleExecutor.submit(() -> logToSyslog(m)));
         } catch (Exception ex) {
             LOG.error("Error while sending message to Unix system log", ex);
         }
@@ -70,8 +67,8 @@ public class UnixSystemLog implements SingleStreamLogger {
     private void logToSyslog(final String msg) {
         try {
             final String message = msg.replaceAll("\t", "    ");
-            ProcessBuilder pb = new ProcessBuilder("logger", "-p", "user.err", "--", message);
-            Process p = pb.start();
+            final ProcessBuilder pb = new ProcessBuilder("logger", "-p", "user.err", "--", message);
+            final Process p = pb.start();
             ProcessUtils.waitForSafely(p);
             LOG.debug("System logger called with result of {}", p.exitValue());
         } catch (IOException e) {
