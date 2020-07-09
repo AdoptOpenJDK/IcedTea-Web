@@ -40,7 +40,6 @@ import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -55,24 +54,22 @@ public class UnixSystemLog implements SingleStreamLogger {
 
     @Override
     public void log(final String message) {
-        final String s = PREAMBLE + message;
-        final String[] ss = s.split("\\R"); // split string into lines
-        try {
-            Arrays.stream(ss).forEach(m -> singleExecutor.submit(() -> logToSyslog(m)));
-        } catch (Exception ex) {
-            LOG.error("Error while sending message to Unix system log", ex);
-        }
+        singleExecutor.submit(() -> logToSyslog(message));
     }
 
-    private void logToSyslog(final String msg) {
-        try {
-            final String message = msg.replaceAll("\t", "    ");
-            final ProcessBuilder pb = new ProcessBuilder("logger", "-p", "user.err", "--", message);
-            final Process p = pb.start();
-            ProcessUtils.waitForSafely(p);
-            LOG.debug("System logger called with result of {}", p.exitValue());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private void logToSyslog(final String message) {
+        final String s = PREAMBLE + message;
+        final String[] messages = s.split("\\R"); // split string into lines
+        for (String msg : messages) {
+            try {
+                final String m = msg.replaceAll("\t", "    ");
+                final ProcessBuilder pb = new ProcessBuilder("logger", "-p", "user.err", "--", m);
+                final Process p = pb.start();
+                ProcessUtils.waitForSafely(p);
+                LOG.debug("System logger called with result of {}", p.exitValue());
+            } catch (IOException e) {
+                LOG.error("Error while sending message to Unix system log", e);
+            }
         }
     }
 
