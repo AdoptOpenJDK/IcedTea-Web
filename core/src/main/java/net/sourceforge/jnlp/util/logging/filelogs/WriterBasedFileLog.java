@@ -60,7 +60,7 @@ public final class WriterBasedFileLog implements SingleStreamLogger {
                 FileUtils.createRestrictedFile(futureFile);
             }
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName), append), StandardCharsets.UTF_8));
-            log(new Header(INFO, false) + " writer-based impl.");
+            log(new Header(INFO, getClass().getName()) + " writer-based impl.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

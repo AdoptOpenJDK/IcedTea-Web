@@ -44,7 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARN;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.INFO;
 
 /**
  * This class writes log information to file.
@@ -76,7 +76,7 @@ public final class LogBasedFileLog implements SingleStreamLogger {
             impl = Logger.getLogger(loggerName);
             impl.setLevel(Level.ALL);
             impl.addHandler(fh);
-            log(new Header(WARN, false) + " log-based impl.");
+            log(new Header(INFO, getClass().getName()) + " log-based impl.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

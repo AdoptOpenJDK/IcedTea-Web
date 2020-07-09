@@ -74,7 +74,7 @@ public class ConsoleOutputPaneModel {
     String importList(int start) {
         return importList(highLight, start);
     }
-    
+
     String importList(boolean mark, int start) {
         return  importList(mark, start, sortBy);
     }
@@ -164,8 +164,8 @@ public class ConsoleOutputPaneModel {
         if (showHeaders) {
             sb.append(m.getHeader().toString(showUser,
                     showOrigin,
-                    showLevel,
                     showDate,
+                    showLevel,
                     showCode,
                     showThread1,
                     showThread2));

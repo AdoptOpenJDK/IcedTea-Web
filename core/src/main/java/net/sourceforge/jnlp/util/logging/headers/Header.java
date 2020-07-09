@@ -44,11 +44,12 @@ public class Header {
     private static final String[] LOGGING_INFRASTRUCTURE_CLASSES = {OutputController.class.getName(), Header.class.getName(), TeeOutputStream.class.getName(), "sun.applet.PluginDebug"};
     private static final String DEFAULT_USER = JavaSystemProperties.getUserName();
 
-    public final String osUser;
+    public final String osUser = DEFAULT_USER;
     public final OutputControllerLevel level;
     public final Date timestampForSorting;
     public final String timestamp;
     public final boolean isClientApp;
+    public final String origin;
     public final String callerClass;
     public final String threadHash;
     public final String threadName;
@@ -58,19 +59,15 @@ public class Header {
     }
 
     public Header(OutputControllerLevel level, boolean isClientApp) {
-        this(level, new Date(), isClientApp, Thread.currentThread());
-    }
-
-    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread) {
-        this(level, timestamp, isClientApp, thread, getCallerClass(thread.getStackTrace()));
+        this(level, new Date(), isClientApp, Thread.currentThread(), getCallerClass());
     }
 
     private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread, String callerClass) {
-        this.osUser = DEFAULT_USER;
         this.level = level;
         this.timestampForSorting = timestamp;
         this.timestamp = timestamp.toString();
         this.isClientApp = isClientApp;
+        this.origin = isClientApp ? "ITW-APP " : "ITW-CORE";
         this.callerClass = callerClass;
         this.threadHash = Integer.toHexString(thread.hashCode());
         this.threadName = thread.getName();
@@ -82,34 +79,36 @@ public class Header {
     }
 
     public String toShortString() {
-        return toString(false, false, true, true, false, false, false);
+        return toString(false, true, true, true, true, false, false);
     }
 
-    public String toString(boolean showOsUser, boolean showOrigin, boolean showLogLevel, boolean showTimestamp, boolean showCallerClass, boolean showThreadHash, boolean threadName) {
+    public String toString(boolean showOsUser, boolean showOrigin, boolean showTimestamp, boolean showLogLevel, boolean showCallerClass, boolean showThreadHash, boolean showThreadName) {
         StringBuilder sb = new StringBuilder();
         try {
             if (showOsUser) {
                 sb.append("[").append(osUser).append("]");
             }
             if (showOrigin) {
-                sb.append("[").append(getOrigin()).append("]");
-            }
-
-            if (showLogLevel && level != null) {
-                sb.append('[').append(level.toString()).append(']');
+                sb.append("[").append(origin).append("]");
             }
             if (showTimestamp) {
                 sb.append('[').append(timestamp).append(']');
             }
+            if (showLogLevel && level != null) {
+                sb.append('[').append(level.display()).append(']');
+            }
             if (showCallerClass && callerClass != null) {
                 sb.append('[').append(callerClass).append(']');
             }
-            if (showThreadHash && threadName) {
-                sb.append(threadsToString());
-            } else if (showThreadHash) {
-                sb.append(thread1ToString());
-            } else if (threadName) {
-                sb.append(thread2ToString());
+            if (showThreadName || showThreadHash) {
+                sb.append('[');
+                if (showThreadName) {
+                    sb.append(threadName);
+                }
+                if (showThreadHash) {
+                    sb.append('#').append(threadHash);
+                }
+                sb.append(']');
             }
         } catch (Exception ignored) {
             // cannot log here as we are creating a log message
@@ -117,23 +116,8 @@ public class Header {
         return sb.toString();
     }
 
-    public String thread1ToString() {
-        return " [Thread: <" + threadHash + ">]";
-    }
-
-    public String thread2ToString() {
-        return "[Thread: " + threadName +"]";
-    }
-
-    private String threadsToString() {
-        return "[Thread: " + threadName + "<" + threadHash + ">]";
-    }
-
-    public String getOrigin() {
-        return isClientApp ? "ITW-JAVAWS-CLIENT" : "ITW-JAVAWS";
-    }
-
-    private static String getCallerClass(StackTraceElement[] stack) {
+    private static String getCallerClass() {
+        final StackTraceElement[] stack = (new Exception()).getStackTrace();
         try {
             //0 is always thread
             //1..? is OutputController itself
