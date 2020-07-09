@@ -78,6 +78,6 @@ public class UnixSystemLog implements SingleStreamLogger {
 
     @Override
     public void close() {
-        // nothing to close
+        singleExecutor.shutdown();
     }
 }
