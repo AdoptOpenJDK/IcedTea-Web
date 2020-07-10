@@ -32,13 +32,14 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
+import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
-import net.sourceforge.jnlp.util.logging.headers.Header;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,26 +51,48 @@ public final class FileLog {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileLog.class);
 
-    private static final String TIME_SEPARATOR = OsUtil.isWindows() ? "_" : ":";
+    public static String LOG_PREFIX_ENV = "itwLogFilePrefix";
+    public static String LOG_POSTFIX_ENV = "itwLogFilePostfix";
+
     private static final String DEFAULT_LOGGER_NAME = TextsProvider.ITW + " file-logger";
+    private static final String TIME_SEPARATOR = OsUtil.isWindows() ? "_" : ":";
     private static final SimpleDateFormat FILE_LOG_NAME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd_HH" + TIME_SEPARATOR + "mm" + TIME_SEPARATOR + "ss.S");
 
-    public static Header getHeadlineHeader() {
-        return new Header(OutputControllerLevel.WARN, false);
+    private static final String logFileNamePrefix;
+    private static String logFileNamePostfix;
+
+    static {
+        final String envPrefix = System.getenv(LOG_PREFIX_ENV);
+        if (!StringUtils.isBlank(envPrefix)) {
+            logFileNamePrefix = envPrefix;
+        } else {
+            logFileNamePrefix = FILE_LOG_NAME_FORMATTER.format(new Date());
+        }
+
+        final String envPostfix = System.getenv(LOG_POSTFIX_ENV);
+        if (!StringUtils.isBlank(envPostfix)) {
+            logFileNamePostfix = envPostfix;
+        } else {
+            logFileNamePostfix = "itw";
+        }
+    }
+
+    public static String getLogFileNamePrefix() {
+        return logFileNamePrefix;
+    }
+
+    public static String getLogFileNamePostfix() {
+        return logFileNamePostfix;
+    }
+
+    public static void setLogFileNamePostfix(String logFileNamePostfix) {
+        FileLog.logFileNamePostfix = Assert.requireNonBlank(logFileNamePostfix, "logFileNamePostfix");
     }
 
     public static SingleStreamLogger createFileLog() {
-        return createFileLog("javantx");
-    }
-
-    public static SingleStreamLogger createAppFileLog() {
-        return createFileLog("clienta");
-    }
-
-    private static SingleStreamLogger createFileLog(String id) {
         SingleStreamLogger s;
         try {
-            final String fileName = getFileName(id);
+            final String fileName = getFileName();
             if (LogConfig.getLogConfig().isLegacyLogBasedFileLog()) {
                 s = new LogBasedFileLog(DEFAULT_LOGGER_NAME, fileName, false);
             } else {
@@ -84,9 +107,8 @@ public final class FileLog {
         return s;
     }
 
-    private static String getFileName(String id) {
-        final String timeStamp = FILE_LOG_NAME_FORMATTER.format(new Date());
-        return LogConfig.getLogConfig().getIcedteaLogDir() + "itw-" + id + "-" + timeStamp + ".log";
+    private static String getFileName() {
+        final String logDir = LogConfig.getLogConfig().getIcedteaLogDir();
+        return logDir + (logFileNamePrefix + "-" + logFileNamePostfix + ".log");
     }
-
 }

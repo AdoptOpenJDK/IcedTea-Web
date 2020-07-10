@@ -12,11 +12,17 @@ public enum OutputControllerLevel {
 
     ;
 
+    private final String displayName = (name() + "   ").substring(0,5);
+
     public boolean printToOutStream() {
         return this == INFO || this == DEBUG || this == WARN;
     }
 
     public boolean printToErrStream() {
         return this == ERROR || this == WARN;
+    }
+
+    public String display() {
+        return displayName;
     }
 }

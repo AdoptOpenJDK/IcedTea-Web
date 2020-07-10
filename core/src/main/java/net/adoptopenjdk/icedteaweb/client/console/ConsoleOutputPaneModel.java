@@ -74,7 +74,7 @@ public class ConsoleOutputPaneModel {
     String importList(int start) {
         return importList(highLight, start);
     }
-    
+
     String importList(boolean mark, int start) {
         return  importList(mark, start, sortBy);
     }
@@ -164,11 +164,11 @@ public class ConsoleOutputPaneModel {
         if (showHeaders) {
             sb.append(m.getHeader().toString(showUser,
                     showOrigin,
-                    showLevel,
                     showDate,
+                    showLevel,
                     showCode,
-                    showThread1,
-                    showThread2));
+                    showThreadHash,
+                    showThreadName));
         }
         if (showMessage && showHeaders) {
             sb.append(": ");
@@ -272,8 +272,8 @@ public class ConsoleOutputPaneModel {
     boolean showMessage;
     boolean showOrigin;
     boolean showOut;
-    boolean showThread1;
-    boolean showThread2;
+    boolean showThreadHash;
+    boolean showThreadName;
     boolean showUser;
     int sortBy;
     boolean wordWrap;
