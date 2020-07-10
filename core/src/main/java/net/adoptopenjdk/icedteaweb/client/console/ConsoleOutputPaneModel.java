@@ -167,8 +167,8 @@ public class ConsoleOutputPaneModel {
                     showDate,
                     showLevel,
                     showCode,
-                    showThread1,
-                    showThread2));
+                    showThreadHash,
+                    showThreadName));
         }
         if (showMessage && showHeaders) {
             sb.append(": ");
@@ -272,8 +272,8 @@ public class ConsoleOutputPaneModel {
     boolean showMessage;
     boolean showOrigin;
     boolean showOut;
-    boolean showThread1;
-    boolean showThread2;
+    boolean showThreadHash;
+    boolean showThreadName;
     boolean showUser;
     int sortBy;
     boolean wordWrap;

@@ -15,7 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -32,7 +31,6 @@ import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.html.HTMLDocument;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -100,8 +98,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         showOrigin = new JCheckBox();
         showLevel = new JCheckBox();
         showDate = new JCheckBox();
-        showThread1 = new JCheckBox();
-        showThread2 = new JCheckBox();
+        showThreadHash = new JCheckBox();
+        showThreadName = new JCheckBox();
         showMessage = new JCheckBox();
         showOut = new JCheckBox();
         showErr = new JCheckBox();
@@ -337,13 +335,13 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         showDate.setText(Translator.R("COPdate"));
         showDate.addActionListener(getDefaultActionSingleton());
 
-        showThread1.setSelected(true);
-        showThread1.setText(Translator.R("COPthread1"));
-        showThread1.addActionListener(getDefaultActionSingleton());
+        showThreadHash.setSelected(true);
+        showThreadHash.setText(Translator.R("COPthreadHash"));
+        showThreadHash.addActionListener(getDefaultActionSingleton());
 
-        showThread2.setSelected(true);
-        showThread2.setText(Translator.R("COPthread2"));
-        showThread2.addActionListener(getDefaultActionSingleton());
+        showThreadName.setSelected(true);
+        showThreadName.setText(Translator.R("COPthreadName"));
+        showThreadName.addActionListener(getDefaultActionSingleton());
 
         showMessage.setSelected(true);
         showMessage.setText(Translator.R("COPShowMessages"));
@@ -369,8 +367,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
             Translator.R("COPlevel"),
             Translator.R("COPdate"),
             Translator.R("COPcode"),
-            Translator.R("COPthread1"),
-            Translator.R("COPthread2"),
+            Translator.R("COPthreadHash"),
+            Translator.R("COPthreadName"),
             Translator.R("COPmessage")}));
         sortBy.addActionListener(getDefaultActionSingleton());
 
@@ -498,8 +496,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                 addComponent(showLevel).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).
                 addComponent(showDate).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
                 addComponent(showCode).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).
-                addComponent(showThread1).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(showThread2)).
+                addComponent(showThreadHash).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(showThreadName)).
                 addGroup(jPanel2Layout.createSequentialGroup().addGroup(
                 jPanel2Layout.createParallelGroup(GroupLayout.Alignment.TRAILING).addGroup(
                 GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
@@ -548,8 +546,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
                 addComponent(showDate).
                 addComponent(showOrigin).
                 addComponent(showCode).
-                addComponent(showThread1).
-                addComponent(showThread2)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
+                addComponent(showThreadHash).
+                addComponent(showThreadName)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(
                 jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).
                 addComponent(showMessage).
                 addComponent(showOut).
@@ -698,8 +696,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         showLevel.setEnabled(enable);
         showDate.setEnabled(enable);
         showCode.setEnabled(enable);
-        showThread1.setEnabled(enable);
-        showThread2.setEnabled(enable);
+        showThreadHash.setEnabled(enable);
+        showThreadName.setEnabled(enable);
     }
 
     private final void setMessagesCheckBoxesEnabled(final boolean enable) {
@@ -855,8 +853,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
         model.showMessage = showMessage.isSelected();
         model.showOrigin = showOrigin.isSelected();
         model.showOut = showOut.isSelected();
-        model.showThread1 = showThread1.isSelected();
-        model.showThread2 = showThread2.isSelected();
+        model.showThreadHash = showThreadHash.isSelected();
+        model.showThreadName = showThreadName.isSelected();
         model.showUser = showUser.isSelected();
         model.sortBy = sortBy.getSelectedIndex();
         model.wordWrap = wordWrap.isSelected();
@@ -896,8 +894,8 @@ public class ConsoleOutputPane extends JPanel implements Observer {
     private final JCheckBox showMessage;
     private final JCheckBox showOrigin;
     private final JCheckBox showOut;
-    private final JCheckBox showThread1;
-    private final JCheckBox showThread2;
+    private final JCheckBox showThreadHash;
+    private final JCheckBox showThreadName;
     private final JCheckBox showUser;
     private final JCheckBox sortCopyAll;
     private final JComboBox<String> sortBy;
