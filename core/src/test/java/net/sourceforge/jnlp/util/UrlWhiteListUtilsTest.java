@@ -74,78 +74,78 @@ public class UrlWhiteListUtilsTest {
     @Test
     public void urlInWhiteList() throws Exception {
         List<String> wList = Arrays.asList(new String[]{
-                "https://retailfactory.mercedes-benz.com",
-                "https://*.mercedes-benz.com",
-                "https://retailfactory.*.com",
-                "https://retailfactory.mercedes-benz.*",
+                "https://rfy.m-b.com",
+                "https://*.m-b.com",
+                "https://rfy.*.com",
+                "https://rfy.m-b.*",
                 "https://*.*.*:446",
                 "https://*:447",
                 "https://*.mydomain.com",
                 "http://*.mydomain.com",
-                "*.corpintra.net",
-                "*.daimler.com"});
+                "*.cintra.net",
+                "*.dmlr.com"});
 
-        // "https://retailfactory.mercedes-benz.com"
-        URL url = new URL("https://retailfactory.mercedes-benz.com:443/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); //+ " https://retailfactory.mercedes-benz.com:443/some_URL");
+        // "https://rfry.m-b.com"
+        URL url = new URL("https://rfy.m-b.com:443/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); //+ " https://rfy.m-b.com:443/some_URL");
 
-        // "https://retailfactory.mercedes-benz.com:443"
-        url = new URL("https://retailfactory.mercedes-benz.com:445/some_URL");
-        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory.mercedes-benz.com:445/some_URL");
+        // "https://rfy.m-b.com:443"
+        url = new URL("https://rfy.m-b.com:445/some_URL");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy.m-b.com:445/some_URL");
 
-        //  "https://*.mercedes-benz.com"
-        url = new URL("https://retailfactoryA.mercedes-benz.com:443/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz.com:443/some_URL");
+        //  "https://*.m-b.com"
+        url = new URL("https://rfyA.m-b.com:443/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b.com:443/some_URL");
 
-        // "https://retailfactory.*.com"
-        url = new URL("https://retailfactory.mercedes-benz1.com:443/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory.mercedes-benz1.com:443/some_URL");
+        // "https://rfy.*.com"
+        url = new URL("https://rfy.m-b1.com:443/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy.m-b1.com:443/some_URL");
 
-        //  "https://*.mercedes-benz.com"
-        url = new URL("https://retailfactory.mercedes-benz.org:443/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory.mercedes-benz.org:443/some_URL");
+        //  "https://*.m-b.com"
+        url = new URL("https://rfy.m-b.org:443/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy.m-b.org:443/some_URL");
 
         // "https://*.*.*:446"
-        url = new URL("https://retailfactory1.mercedes-benz1.org:446/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        url = new URL("https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "https://*:447"
-        url = new URL("https://retailfactory1.mercedes-benz1.org:447/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        url = new URL("https://rfy1.m-b1.org:447/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "https://*.*.*:446"
-        url = new URL("https://retailfactory1.mercedes-benz1.com:445/some_URL");
-        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.com:445/some_URL");
+        url = new URL("https://rfy1.m-b1.com:445/some_URL");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.com:445/some_URL");
 
         // "https://*.mydomain.com"
         url = new URL("https://abc.mydomain.com:443/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "https://*.mydomain.com"
         url = new URL("https://abc.mydomain.com:444/some_URL");
-        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "http://*.mydomain.com"
         url = new URL("http://abc.mydomain.com:80/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "http://*.mydomain.com"
         url = new URL("http://abc.mydomain.com:81/some_URL");
-        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
-        // "*.corpintra.net"
-        url = new URL("https://abc.corpintra.net:443/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        // "*.cintra.net"
+        url = new URL("https://abc.cintra.net:443/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
-        url = new URL("http://abc.corpintra.net:443/some_URL");
-        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        url = new URL("http://abc.cintra.net:443/some_URL");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
-        // "*.daimler.com"
-        url = new URL("https://abc.daimler.com:443/some_URL");
-        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        // "*.dmlr.com"
+        url = new URL("https://abc.dmlr.com:443/some_URL");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
 
-        // "*.daimler.com"
-        url = new URL("https://abc.daimler.com:44/some_URL");
-        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://retailfactory1.mercedes-benz1.org:446/some_URL");
+        // "*.dmlr.com"
+        url = new URL("https://abc.dmlr.com:44/some_URL");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
     }
 }
