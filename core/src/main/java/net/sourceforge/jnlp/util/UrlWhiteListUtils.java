@@ -1,36 +1,3 @@
-/* UrlWhiteListUtils.java
- Copyright (C) 2011 Red Hat, Inc.
-
- This file is part of IcedTea.
-
-IcedTea is free software; you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, version 2.
-
-IcedTea is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-IcedTea; see the file COPYING. If not, write to the
-Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-02110-1301 USA.
-
-Linking this library statically or dynamically with other modules is making a
-combined work based on this library. Thus, the terms and conditions of the GNU
-General Public License cover the whole combination.
-
-As a special exception, the copyright holders of this library give you
-permission to link this library with independent modules to produce an
-executable, regardless of the license terms of these independent modules, and
-to copy and distribute the resulting executable under terms of your choice,
-provided that you also meet, for each linked independent module, the terms and
-conditions of the license of that module. An independent module is a module
-which is not derived from or based on this library. If you modify this library,
-you may extend this exception to your version of the library, but you are not
-obligated to do so. If you do not wish to do so, delete this exception
-statement from your version.
-*/
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.Assert;
@@ -43,6 +10,10 @@ import java.util.List;
 
 public class UrlWhiteListUtils {
     private final static Logger LOG = LoggerFactory.getLogger(UrlWhiteListUtils.class);
+    public static final String HTTPS = "https";
+    public static final String HTTP = "http";
+    public static final String HTTP_PORT = "80";
+    public static final String HTTPS_PORT = "443";
 
     public static boolean isUrlProtocolEqual(URL url1, URL url2) {
         Assert.requireNonNull(url1, "url");
@@ -85,14 +56,17 @@ public class UrlWhiteListUtils {
         boolean result = whiteList.stream().anyMatch(wlUrlStr -> {
                 try {
                     if (exactMatch) {
-                        URL wlUrl = new URL(wlUrlStr);
+                        final URL wlUrl = new URL(wlUrlStr);
                         return UrlUtils.notNullUrlEquals(url, wlUrl);
                     } else {
-                        URL expandedWlUrl = new URL(UrlWhiteListUtils.expandedWhiteListUrlString(wlUrlStr));
-                        return (isUrlProtocolEqual(expandedWlUrl, url) && isUrlHostWithWildcardEqual(expandedWlUrl, url)
-                            && (expandedWlUrl.getPort() != -1 ? expandedWlUrl.getPort() == url.getPort() : true));
+                        final URL expandedWlUrl = new URL(UrlWhiteListUtils.expandedWhiteListUrlString(wlUrlStr));
+                        final boolean isUrlProtocolEqual = isUrlProtocolEqual(expandedWlUrl, url);
+                        final boolean isUrlHostWithWildcardEqual = isUrlHostWithWildcardEqual(expandedWlUrl, url);
+                        final boolean isUrlPortEqual = expandedWlUrl.getPort() != -1 ? expandedWlUrl.getPort() == url.getPort() : true;
+                        return isUrlProtocolEqual && isUrlHostWithWildcardEqual && isUrlPortEqual;
                     }
                 } catch (Exception e) {
+                    LOG.debug("Bad white list url: " + wlUrlStr);
                     return false;
                 }
         });
@@ -113,19 +87,18 @@ public class UrlWhiteListUtils {
 
     private static String expandPort(final String wlUrlStr) {
         String expandedUrlStr = wlUrlStr;
-        URL expURL = null;
         try {
-            expURL = new URL(expandedUrlStr);
+            final URL expURL = new URL(expandedUrlStr);
             if (expURL.getPort() == -1) {
-                if (expURL.getProtocol().equalsIgnoreCase(("http"))) {
-                    expandedUrlStr = expandedUrlStr + ":80";
+                if (expURL.getProtocol().equalsIgnoreCase(HTTP)) {
+                    expandedUrlStr = expandedUrlStr + ":" + HTTP_PORT;
                 }
-                if (expURL.getProtocol().equalsIgnoreCase(("https"))) {
-                    expandedUrlStr = expandedUrlStr + ":443";
+                if (expURL.getProtocol().equalsIgnoreCase(HTTPS)) {
+                    expandedUrlStr = expandedUrlStr + ":" + HTTPS_PORT;
                 }
             }
         } catch (Exception e) {
-            int ind = expandedUrlStr.lastIndexOf(":");
+            final int ind = expandedUrlStr.lastIndexOf(":");
             if (e.getCause() instanceof NumberFormatException && expandedUrlStr.substring(ind+1, expandedUrlStr.length()).equals("*") ) {
                 expandedUrlStr =  expandedUrlStr.substring(0,ind) + "";
             }
@@ -134,8 +107,8 @@ public class UrlWhiteListUtils {
     }
 
     public static String expandedWhiteListUrlString(final String wlUrlStr) {
-        String expandedUrlStr = expandProtocol(wlUrlStr);
-        expandedUrlStr = expandPort(expandedUrlStr);
+        final String expandedUrlProtocol = expandProtocol(wlUrlStr);
+        final String expandedUrlStr = expandPort(expandedUrlProtocol);
         return expandedUrlStr;
     }
 }
