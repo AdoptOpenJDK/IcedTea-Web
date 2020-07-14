@@ -12,7 +12,7 @@ import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.IpUtil;
+import net.sourceforge.jnlp.util.UrlWhiteListUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -122,18 +122,9 @@ class ResourceHandler {
         final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
                 .stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList());
 
-        if (whitelist.isEmpty()) {
-            return; // empty whitelist == allow all connections
-        }
+        boolean result = UrlWhiteListUtils.isUrlInWhitelist(url, whitelist, true, true);
 
-        // if host is null or "" or it is localhost or loopback
-        if (IpUtil.isLocalhostOrLoopback(url)) {
-            return; // local server need not be in whitelist
-        }
-
-        final String urlString = url.getProtocol() + "://" + url.getHost() + ((url.getPort() != -1) ? ":" + url.getPort() : "");
-
-        if (!whitelist.contains(urlString)) {
+        if (result == false) {
             BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
             LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
             JNLPRuntime.exit(-1);
