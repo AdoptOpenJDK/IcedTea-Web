@@ -94,6 +94,10 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 throw new RuntimeException("Server error: " + serverResponse);
             }
 
+            downloadDetails.addListener((current, total) -> {
+                resource.setSize(total);
+                resource.setTransferred(current);
+            });
             final long bytesTransferred = tryDownloading(downloadDetails);
 
             resource.setStatus(DOWNLOADED);
@@ -130,7 +134,6 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
             final DownloadInfo downloadInfo = new DownloadInfo(resourceHref, version, downloadDetails.lastModified);
             final File cacheFile = Cache.addToCache(downloadInfo, unpackedContent);
-
             resource.setLocalFile(cacheFile);
             return countingInputStream.numBytesRead();
         }
@@ -150,12 +153,13 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
             final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
             final InputStream inputStream = connection.getInputStream();
+            final long totalSize = connection.getContentLength();
 
-            if (! String.valueOf(connection.getResponseCode()).startsWith("2")) {
+            if (!String.valueOf(connection.getResponseCode()).startsWith("2")) {
                 throw new IllegalStateException("Request returned " + connection.getResponseCode() + " for URL " + connection.getURL());
             }
 
-            return new DownloadDetails(downloadFrom, inputStream, contentType, contentEncoding, version, lastModified);
+            return new DownloadDetails(downloadFrom, inputStream, contentType, contentEncoding, version, lastModified, totalSize);
         } catch (IOException ex) {
             if (INVALID_HTTP_RESPONSE.equals(ex.getMessage())) {
                 LOG.warn(INVALID_HTTP_RESPONSE + " message detected. Attempting direct socket");
@@ -185,7 +189,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final String contentEncoding = headerMap.get(CONTENT_ENCODING_HEADER);
         final InputStream inputStream = new ByteArrayInputStream(body);
 
-        return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified);
+        return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified, body.length);
     }
 
     private long parseLong(final String s, final long defaultValue) {
