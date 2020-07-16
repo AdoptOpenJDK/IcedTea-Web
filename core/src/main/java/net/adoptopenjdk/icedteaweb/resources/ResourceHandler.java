@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.resources;
 
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -23,11 +22,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
-import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 
@@ -119,13 +116,8 @@ class ResourceHandler {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
 
-        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
-                .stream()
-                .filter(s -> !StringUtils.isBlank(s))
-                .map(s -> UrlWhiteListUtils.expandWhiteListUrlString(s))
-                .collect(Collectors.toList());
-
-        boolean result = UrlWhiteListUtils.isUrlInWhitelist(url, whitelist, true, true);
+        final List<String> whitelist = UrlWhiteListUtils.getExpandedWhiteList();
+        final boolean result = UrlWhiteListUtils.isUrlInWhitelist(url, whitelist, true, true);
 
         if (result == false) {
             BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));

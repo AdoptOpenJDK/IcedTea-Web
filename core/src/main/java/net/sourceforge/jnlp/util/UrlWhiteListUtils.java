@@ -1,19 +1,46 @@
 package net.sourceforge.jnlp.util;
 
 import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 public class UrlWhiteListUtils {
+    private static List<String> expandedWhitelist;
+    private static final Lock whiteListLock = new ReentrantLock();
+
     private final static Logger LOG = LoggerFactory.getLogger(UrlWhiteListUtils.class);
     public static final String HTTPS = "https";
     public static final String HTTP = "http";
     public static final String HTTP_PORT = "80";
     public static final String HTTPS_PORT = "443";
+
+    public static List<String> getExpandedWhiteList() {
+        whiteListLock.lock();
+        try {
+            if (expandedWhitelist == null) {
+                expandedWhitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
+                        .stream()
+                        .filter(s -> !StringUtils.isBlank(s))
+                        .map(s -> UrlWhiteListUtils.expandWhiteListUrlString(s))
+                        .collect(Collectors.toList());
+
+            }
+            return expandedWhitelist;
+        } finally {
+            whiteListLock.unlock();
+        }
+    }
 
     public static boolean isUrlProtocolEqual(URL url1, URL url2) {
         Assert.requireNonNull(url1, "url");
@@ -27,7 +54,7 @@ public class UrlWhiteListUtils {
         String[] wlUrlHostParts = urlWithWildcard.getHost().split("\\.");
         String[] urlHostParts = url.getHost().split("\\.");
         // proto://*:port
-        if (wlUrlHostParts.length == 1 && wlUrlHostParts[0].length() ==1 && wlUrlHostParts[0].charAt(0) == '*') {
+        if (wlUrlHostParts.length == 1 && wlUrlHostParts[0].length() == 1 && wlUrlHostParts[0].charAt(0) == '*') {
             return true;
         }
         if (wlUrlHostParts.length != urlHostParts.length) {
@@ -53,58 +80,59 @@ public class UrlWhiteListUtils {
             return true; // local server need not be in whitelist
         }
 
-        boolean result = whiteList.stream().anyMatch(wlUrlStr -> {
-                try {
-                    if (exactMatch) {
-                        final URL wlUrl = new URL(wlUrlStr);
-                        return UrlUtils.notNullUrlEquals(url, wlUrl);
-                    } else {
+        final boolean result = whiteList.stream().anyMatch(wlUrlStr -> {
+            try {
+                if (exactMatch) {
+                    final URL wlUrl = new URL(wlUrlStr);
+                    return UrlUtils.notNullUrlEquals(url, wlUrl);
+                } else {
 //                        final URL expandedWlUrl = new URL(UrlWhiteListUtils.expandWhiteListUrlString(wlUrlStr));
-                        final URL expandedWlUrl = new URL(wlUrlStr);
-                        final boolean isUrlProtocolEqual = isUrlProtocolEqual(expandedWlUrl, url);
-                        final boolean isUrlHostWithWildcardEqual = isUrlHostWithWildcardEqual(expandedWlUrl, url);
-                        final boolean isUrlPortEqual = expandedWlUrl.getPort() != -1 ? expandedWlUrl.getPort() == url.getPort() : true;
-                        return isUrlProtocolEqual && isUrlHostWithWildcardEqual && isUrlPortEqual;
-                    }
-                } catch (Exception e) {
-                    LOG.debug("Bad white list url: " + wlUrlStr);
-                    return false;
+                    final URL expandedWlUrl = new URL(wlUrlStr);
+                    final boolean isUrlProtocolEqual = isUrlProtocolEqual(expandedWlUrl, url);
+                    final boolean isUrlHostWithWildcardEqual = isUrlHostWithWildcardEqual(expandedWlUrl, url);
+                    final boolean isUrlPortEqual = expandedWlUrl.getPort() != -1 ? expandedWlUrl.getPort() == url.getPort() : true;
+                    return isUrlProtocolEqual && isUrlHostWithWildcardEqual && isUrlPortEqual;
                 }
+            } catch (Exception e) {
+                LOG.warn("Bad white list url: " + wlUrlStr);
+                return false;
+            }
         });
         return result;
     }
 
-    private static String expandProtocol(final String wlUrlStr)  {
-        String expandedUrlStr = wlUrlStr;
+    private static String expandProtocol(final String wlUrlStr) {
         try {
-            new URL(expandedUrlStr);
+            new URL(wlUrlStr);
         } catch (Exception e) {
+            // If protocol is missing then assume it is https
             if (e instanceof MalformedURLException && e.getMessage().contains("no protocol")) {
-                expandedUrlStr = HTTPS + "://" + expandedUrlStr;
+                return HTTPS + "://" + wlUrlStr;
             }
         }
-        return expandedUrlStr;
+        return wlUrlStr;
     }
 
     private static String expandPort(final String wlUrlStr) {
-        String expandedUrlStr = wlUrlStr;
         try {
-            final URL expURL = new URL(expandedUrlStr);
+            final URL expURL = new URL(wlUrlStr);
+            // if port is missing then take it as default port for the protocol
             if (expURL.getPort() == -1) {
                 if (expURL.getProtocol().equalsIgnoreCase(HTTP)) {
-                    expandedUrlStr = expandedUrlStr + ":" + HTTP_PORT;
+                    return wlUrlStr + ":" + HTTP_PORT;
                 }
                 if (expURL.getProtocol().equalsIgnoreCase(HTTPS)) {
-                    expandedUrlStr = expandedUrlStr + ":" + HTTPS_PORT;
+                    return wlUrlStr + ":" + HTTPS_PORT;
                 }
             }
         } catch (Exception e) {
-            final int ind = expandedUrlStr.lastIndexOf(":");
-            if (e.getCause() instanceof NumberFormatException && expandedUrlStr.substring(ind+1, expandedUrlStr.length()).equals("*") ) {
-                expandedUrlStr =  expandedUrlStr.substring(0,ind) + "";
+            // if port is illegal due to * then replace * with ""
+            final int ind = wlUrlStr.lastIndexOf(":");
+            if (e.getCause() instanceof NumberFormatException && wlUrlStr.substring(ind + 1, wlUrlStr.length()).equals("*")) {
+                return wlUrlStr.substring(0, ind) + "";
             }
         }
-        return expandedUrlStr;
+        return wlUrlStr;
     }
 
     public static String expandWhiteListUrlString(final String wlUrlStr) {
