@@ -120,7 +120,10 @@ class ResourceHandler {
         Assert.requireNonNull(url, "url");
 
         final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
-                .stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList());
+                .stream()
+                .filter(s -> !StringUtils.isBlank(s))
+                .map(s -> UrlWhiteListUtils.expandWhiteListUrlString(s))
+                .collect(Collectors.toList());
 
         boolean result = UrlWhiteListUtils.isUrlInWhitelist(url, whitelist, true, true);
 

@@ -59,7 +59,8 @@ public class UrlWhiteListUtils {
                         final URL wlUrl = new URL(wlUrlStr);
                         return UrlUtils.notNullUrlEquals(url, wlUrl);
                     } else {
-                        final URL expandedWlUrl = new URL(UrlWhiteListUtils.expandedWhiteListUrlString(wlUrlStr));
+//                        final URL expandedWlUrl = new URL(UrlWhiteListUtils.expandWhiteListUrlString(wlUrlStr));
+                        final URL expandedWlUrl = new URL(wlUrlStr);
                         final boolean isUrlProtocolEqual = isUrlProtocolEqual(expandedWlUrl, url);
                         final boolean isUrlHostWithWildcardEqual = isUrlHostWithWildcardEqual(expandedWlUrl, url);
                         final boolean isUrlPortEqual = expandedWlUrl.getPort() != -1 ? expandedWlUrl.getPort() == url.getPort() : true;
@@ -79,7 +80,7 @@ public class UrlWhiteListUtils {
             new URL(expandedUrlStr);
         } catch (Exception e) {
             if (e instanceof MalformedURLException && e.getMessage().contains("no protocol")) {
-                expandedUrlStr = "https://" + expandedUrlStr;
+                expandedUrlStr = HTTPS + "://" + expandedUrlStr;
             }
         }
         return expandedUrlStr;
@@ -106,7 +107,7 @@ public class UrlWhiteListUtils {
         return expandedUrlStr;
     }
 
-    public static String expandedWhiteListUrlString(final String wlUrlStr) {
+    public static String expandWhiteListUrlString(final String wlUrlStr) {
         final String expandedUrlProtocol = expandProtocol(wlUrlStr);
         final String expandedUrlStr = expandPort(expandedUrlProtocol);
         return expandedUrlStr;
