@@ -36,113 +36,60 @@ package net.sourceforge.jnlp.util.logging;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 /**
  * It is crucial that BeforeClass inits logging subsystem.
- * If  logging subsytem of itw is enabled from itw, then junit's classloader do not
+ * If  logging subsystem of itw is enabled from itw, then junit's classloader do not
  * see it. And so when is junit manipulating with logging, then it creates new (second!)
  * static instance. On opposite, if junit creates the instance, then itw see this one.
- *
+ * <p>
  * Explanation is that junit classloader (fresh for each test-class)  is creating
- * special classloader for itw (or better itw is creating its own one). The itw 
+ * special classloader for itw (or better itw is creating its own one). The itw
  * classloader is then branch...or leaf of junit classloader. So any class loaded
  * by junit classloader is visible from itw, but not vice verse.
  */
 public class NoStdOutErrTest {
 
-    private final static Logger LOG = LoggerFactory.getLogger(NoStdOutErrTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NoStdOutErrTest.class);
 
     private static boolean originalStds;
-    private static final String setLogToStreams = "setLogToStreams";
-    /*
-     * "printed" exceptions are otherwise  consumed via junit if thrown :-/
-     */
-    private static Object origOut;
-    private static Object origErr;
 
-    private static PrintStream dummy = new PrintStream(new OutputStream() {
-                @Override
-                public void write(int b) {
-                    //DO NOTHING
-                }
-            });
-    
+    private static final OutputStream dummy = new OutputStream() {
+        @Override
+        public void write(int b) {
+            //DO NOTHING
+        }
+    };
+
     @BeforeClass
     public static synchronized void disableStds() {
-        try {
-            //init logger and log and flush message
-            //it is crucial for junit to grip it
-            LOG.debug("initialising");
-            //one more times: if TESTED class is the first which creates instance of logger
-            //then when junit can not access this class, and creates its own for its purposes
-            //when junit creates this class, then also TESTED class have access to it and so it behaves as expected
-            OutputController.getLogger().flush();
-            originalStds = LogConfig.getLogConfig().isLogToStreams();
-            invokeSetLogToStreams(false);
-            removeStreams();
-        } catch (Exception ex) {
-            ServerAccess.logException(ex);
-        }
+        //init logger and log and flush message
+        //it is crucial for junit to grip it
+        LOG.debug("initialising");
+        //one more times: if TESTED class is the first which creates instance of logger
+        //then when junit can not access this class, and creates its own for its purposes
+        //when junit creates this class, then also TESTED class have access to it and so it behaves as expected
+
+        OutputController.getLogger().flush();
+        OutputController.getLogger().setInOutErrController(new StdInOutErrController(dummy, dummy));
+
+        originalStds = LogConfig.getLogConfig().isLogToStreams();
+        LogConfig.getLogConfig().setLogToStreams(false);
     }
 
     @AfterClass
     public static synchronized void restoreStds() {
-        try {
-            OutputController.getLogger().flush();
-            invokeSetLogToStreams(originalStds);
-            resetStreams();
-        } catch (Exception ex) {
-            ServerAccess.logException(ex);
-        }
-    }
-    
-    protected void setEnableLogging(boolean enableLogging) {
-        LogConfig.getLogConfig().setEnableLogging(enableLogging);
+        OutputController.getLogger().flush();
+        OutputController.getLogger().setInOutErrController(StdInOutErrController.getInstance());
+
+        LogConfig.getLogConfig().setLogToStreams(originalStds);
     }
 
-    private static synchronized void invokeSetLogToStreams(boolean state) {
-        try {
-            Method lcs = LogConfig.class.getDeclaredMethod(setLogToStreams, boolean.class);
-            lcs.setAccessible(true);
-            lcs.invoke(LogConfig.getLogConfig(), state);
-        } catch (Exception ex) {
-            ServerAccess.logException(ex);
-        }
-    }
-    
-    private static synchronized void removeStreams() {
-        try {
-            Field lcs1 = OutputController.class.getDeclaredField("outLog");
-            lcs1.setAccessible(true);
-            origOut = lcs1.get(OutputController.getLogger());
-            Field lcs2 = OutputController.class.getDeclaredField("errLog");
-            lcs2.setAccessible(true);
-            origErr = lcs1.get(OutputController.getLogger());
-            lcs1.set(OutputController.getLogger(), new PrintStreamLogger(dummy));
-            lcs2.set(OutputController.getLogger(), new PrintStreamLogger(dummy));
-        } catch (Exception ex) {
-            ServerAccess.logException(ex);
-        }
-    }
-    
-    private static synchronized void resetStreams() {
-        try {
-            Field lcs1 = OutputController.class.getDeclaredField("outLog");
-            lcs1.setAccessible(true);
-            Field lcs2 = OutputController.class.getDeclaredField("errLog");
-            lcs2.setAccessible(true);
-            lcs1.set(OutputController.getLogger(), origOut);
-            lcs2.set(OutputController.getLogger(), origErr);
-        } catch (Exception ex) {
-            ServerAccess.logException(ex);
-        }
+    protected void setEnableLogging(boolean enableLogging) {
+        LogConfig.getLogConfig().setEnableLogging(enableLogging);
     }
 }

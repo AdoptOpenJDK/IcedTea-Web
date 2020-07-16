@@ -32,37 +32,12 @@ statement from your version.
 */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.OutputUtils;
-import net.sourceforge.jnlp.util.logging.headers.Header;
-import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
 
 /**
  * Basic class which can be subclassed in tests to mock out the OutputController.
  */
-public abstract class BasicOutputController {
-
-    private static final String NULL_OBJECT = "Trying to log null object";
-
-    public abstract void log(final MessageWithHeader l);
-
-    public void log(final OutputControllerLevel level, final String message) {
-        log(level, (Object) message);
-    }
-
-    public void log(final OutputControllerLevel level, final Object o) {
-        final String message = convertToNonNullString(o);
-        log(new JavaMessage(new Header(level), message));
-    }
-
-    private String convertToNonNullString(final Object o) {
-        if (o == null) {
-            return NULL_OBJECT;
-        } else if (o instanceof Throwable) {
-            return OutputUtils.exceptionToString((Throwable) o);
-        } else {
-            return o.toString();
-        }
-    }
+public interface BasicOutputController {
+    void log(final MessageWithHeader l);
 }

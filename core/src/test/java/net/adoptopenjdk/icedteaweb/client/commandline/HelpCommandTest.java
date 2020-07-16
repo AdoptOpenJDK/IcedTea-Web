@@ -90,6 +90,6 @@ public class HelpCommandTest extends AbstractCommandTest {
                 "    -reset all      - Resets all settings to their original values.(No argument expected)" + EOL +
                 "    -set name value - Sets the settings to the new value specified, if it is an appropriate value.(Expected even number of arguments with param=value as valid argument)" + EOL +
                 "    -verbose        - Enable verbose output.(No argument expected)" + EOL +
-                EOL));
+                EOL + EOL));
     }
 }

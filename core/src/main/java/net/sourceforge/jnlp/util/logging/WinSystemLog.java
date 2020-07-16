@@ -33,23 +33,5 @@ statement from your version.
 
 package net.sourceforge.jnlp.util.logging;
 
-
-
-public class WinSystemLog implements SingleStreamLogger{
-    
-    public WinSystemLog(){
-    
-    }
-    
- 
-    @Override
-    public void log(String s) {
-     //not yet implemented   
-    }
-      
-    @Override
-    public void close() {
-        //nope
-    }
-
+public class WinSystemLog extends DummyLogger {
 }

@@ -2,6 +2,8 @@ package net.adoptopenjdk.icedteaweb.extensionpoint;
 
 import net.adoptopenjdk.icedteaweb.client.controlpanel.ControlPanelStyle;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.DefaultControlPanelStyle;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.sourceforge.jnlp.ItwJvmLauncher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -32,6 +34,10 @@ public interface ExtensionPoint {
 
     default MenuAndDesktopIntegration createMenuAndDesktopIntegration(final DeploymentConfiguration configuration) {
         return new ItwMenuAndDesktopIntegration();
+    }
+
+    default DownloadIndicator createDownloadIndicator(final DeploymentConfiguration configuration) {
+        return new DefaultDownloadIndicator();
     }
 
     default ProxySelector createProxySelector(final DeploymentConfiguration configuration) {
