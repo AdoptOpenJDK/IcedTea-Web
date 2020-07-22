@@ -15,7 +15,6 @@ import net.sourceforge.jnlp.util.UrlWhiteListUtils;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -116,11 +115,10 @@ class ResourceHandler {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
 
-        final List<String> whitelist = UrlWhiteListUtils.getExpandedWhiteList();
-        final boolean result = UrlWhiteListUtils.isUrlInWhitelist(url, whitelist, true, true);
-
+        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
+        final boolean result = UrlWhiteListUtils.isUrlInWhitelist(url);
         if (result == false) {
-            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
+            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
             LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
             JNLPRuntime.exit(-1);
         }

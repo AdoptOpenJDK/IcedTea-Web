@@ -15,37 +15,33 @@ import static net.sourceforge.jnlp.util.UrlWhiteListUtils.isUrlInWhitelist;
 public class UrlWhiteListUtilsTest {
 
     @Test
-    public void expandLegalWhitelistUrlString() {
-        Assert.assertEquals("http://subdomain.domain.com:8080", UrlWhiteListUtils.expandWhiteListUrlString("http://subdomain.domain.com:8080"));
+    public void validateWhitelistUrlString() {
+        Assert.assertEquals("http://subdomain.domain.com:8888", UrlWhiteListUtils.validateWhiteListUrlString("http://subdomain.domain.com:8888").getWhiteListEntry());
+        Assert.assertEquals("https://subdomain.domain.com:9999", UrlWhiteListUtils.validateWhiteListUrlString("https://subdomain.domain.com:9999").getWhiteListEntry());
 
-        Assert.assertEquals("https://domain.com:443", UrlWhiteListUtils.expandWhiteListUrlString("domain.com"));
-        Assert.assertEquals("https://*.domain.com:443", UrlWhiteListUtils.expandWhiteListUrlString("*.domain.com"));
-        Assert.assertEquals("https://*.domain.com", UrlWhiteListUtils.expandWhiteListUrlString("*.domain.com:*"));
+        Assert.assertEquals("https://domain.com:443", UrlWhiteListUtils.validateWhiteListUrlString("domain.com").getWhiteListEntry());
+        Assert.assertEquals("https://*.domain.com:443", UrlWhiteListUtils.validateWhiteListUrlString("*.domain.com").getWhiteListEntry());
+        Assert.assertEquals("https://*.domain.com", UrlWhiteListUtils.validateWhiteListUrlString("*.domain.com:*").getWhiteListEntry());
 
-        Assert.assertEquals("http://subdomain.domain.com:80", UrlWhiteListUtils.expandWhiteListUrlString("http://subdomain.domain.com"));
-        Assert.assertEquals("https://subdomain.domain.com:443", UrlWhiteListUtils.expandWhiteListUrlString("https://subdomain.domain.com"));
+        Assert.assertEquals("http://subdomain.domain.com:80", UrlWhiteListUtils.validateWhiteListUrlString("http://subdomain.domain.com").getWhiteListEntry());
+        Assert.assertEquals("https://subdomain.domain.com:443", UrlWhiteListUtils.validateWhiteListUrlString("https://subdomain.domain.com").getWhiteListEntry());
 
-        Assert.assertEquals("http://subdomain.domain.com", UrlWhiteListUtils.expandWhiteListUrlString("http://subdomain.domain.com:*"));
-        Assert.assertEquals("https://subdomain.domain.com", UrlWhiteListUtils.expandWhiteListUrlString("https://subdomain.domain.com:*"));
+        Assert.assertEquals("http://subdomain.domain.com", UrlWhiteListUtils.validateWhiteListUrlString("http://subdomain.domain.com:*").getWhiteListEntry());
+        Assert.assertEquals("https://subdomain.domain.com", UrlWhiteListUtils.validateWhiteListUrlString("https://subdomain.domain.com:*").getWhiteListEntry());
 
-        Assert.assertEquals("http://*:80", UrlWhiteListUtils.expandWhiteListUrlString("http://*:80"));
-        Assert.assertEquals("https://*:443", UrlWhiteListUtils.expandWhiteListUrlString("https://*:443"));
+        Assert.assertEquals("http://*:80", UrlWhiteListUtils.validateWhiteListUrlString("http://*:80").getWhiteListEntry());
+        Assert.assertEquals("https://*:443", UrlWhiteListUtils.validateWhiteListUrlString("https://*:443").getWhiteListEntry());
 
-        Assert.assertEquals("http://*", UrlWhiteListUtils.expandWhiteListUrlString("http://*:*"));
-        Assert.assertEquals("https://*", UrlWhiteListUtils.expandWhiteListUrlString("https://*:*"));
-
-        // Expected: https://*.domain.com:*, Actual: https://*.domain.com
-        // If we resolve this to ' https://*.domain.com', doesn't this mean default port 443? But what we want is any port is whitelisted
-       // Assert.assertEquals("https://*.domain.com:*", UrlWhiteListUtils.expandWhiteListUrlString("*.domain.com:*"));
+        Assert.assertEquals("http://*", UrlWhiteListUtils.validateWhiteListUrlString("http://*:*").getWhiteListEntry());
+        Assert.assertEquals("https://*", UrlWhiteListUtils.validateWhiteListUrlString("https://*:*").getWhiteListEntry());
     }
 
-    @Test(expected = MalformedURLException.class)
-    public void expandIllegalWhitelistUrlString() throws MalformedURLException {
-        URL expURL = new URL(UrlWhiteListUtils.expandWhiteListUrlString("https://subdomain.domain.com:1*"));
-
-             expURL = new URL(UrlWhiteListUtils.expandWhiteListUrlString("https://*jvms.domain.com:443"));
-
-             expURL = new URL(UrlWhiteListUtils.expandWhiteListUrlString("*.domain.com:ABC"));
+    @Test
+    public void validateIllegalWhitelistUrlString() throws MalformedURLException {
+        Assert.assertFalse(UrlWhiteListUtils.validateWhiteListUrlString("https://subdomain.domain.com:1*").getErrorMessage().isEmpty());
+        Assert.assertFalse(UrlWhiteListUtils.validateWhiteListUrlString("*.domain.com:ABC").getErrorMessage().isEmpty());
+        Assert.assertTrue(UrlWhiteListUtils.validateWhiteListUrlString("//*.domain.com:123").getErrorMessage().isEmpty());
+        Assert.assertFalse(UrlWhiteListUtils.validateWhiteListUrlString("https://*jvms.domain.com:443").getErrorMessage().isEmpty());
     }
 
     @Test
@@ -65,7 +61,7 @@ public class UrlWhiteListUtilsTest {
         List<String> wList = wildcardWhiteList
                 .stream()
                 .filter(s -> !StringUtils.isBlank(s))
-                .map(s -> UrlWhiteListUtils.expandWhiteListUrlString(s))
+                .map(s -> UrlWhiteListUtils.validateWhiteListUrlString(s).getWhiteListEntry())
                 .collect(Collectors.toList());
 
         // "https://rfry.m-b.com"
@@ -130,5 +126,32 @@ public class UrlWhiteListUtilsTest {
         // "*.dmlr.com"
         url = new URL("https://abc.dmlr.com:44/some_URL");
         Assert.assertFalse(isUrlInWhitelist(url, wList, true, false)); // + " https://rfy1.m-b1.org:446/some_URL");
+    }
+
+    @Test
+    public void demoUrlInWhiteList() throws Exception {
+        List<String> wildcardWhiteList = Arrays.asList(new String[]{
+                "docs.oracle.com:*",
+                "*.oracle.org",
+                "docs.*.net",
+        });
+
+        List<String> wList = wildcardWhiteList
+                .stream()
+                .filter(s -> !StringUtils.isBlank(s))
+                .map(s -> UrlWhiteListUtils.validateWhiteListUrlString(s).getWhiteListEntry())
+                .collect(Collectors.toList());
+
+        URL url = new URL("https://docs.oracle.com/j2se/tutorial");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false));
+
+        url = new URL("https://any.oracle.org:443/j2se/tutorial");
+        Assert.assertTrue(isUrlInWhitelist(url, wList, true, false));
+
+        url = new URL("https://any.one.oracle.org:443/j2se/tutorial");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false));
+
+        url = new URL("https://any.net:443/j2se/tutorial");
+        Assert.assertFalse(isUrlInWhitelist(url, wList, true, false));
     }
 }
