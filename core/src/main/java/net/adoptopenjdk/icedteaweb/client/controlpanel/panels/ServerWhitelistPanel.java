@@ -63,7 +63,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
         final List<UrlWhiteListUtils.ValidatedWhiteListEntry> validatedWhitelist = UrlWhiteListUtils.getValidatedWhiteList();
 
         final JTable table = new JTable(createTableModel(whitelist, validatedWhitelist));
-        table.setRowHeight(50);
+        table.setRowHeight(45);
         table.setIntercellSpacing(new Dimension(2,2));
 
         final JTableHeader tableHeader = table.getTableHeader();
@@ -79,7 +79,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
             }
         });
 
-        final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warning-small.png");
+        final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warn16.png");
         table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
