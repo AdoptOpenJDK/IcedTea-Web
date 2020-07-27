@@ -956,10 +956,10 @@ if ENABLE_NATIVE_LAUNCHERS
 # there is curently harecoded sh, so it can somehow basically work
 # see the DESKTOP_SUFFIX for final tuning
 launcher.build/$(javaws) launcher.build/$(itweb_settings) launcher.build/$(policyeditor): rust-launcher/src/main.rs rust-launcher/Cargo.toml
-	export ITW_TMP_REPLACEMENT=$(TESTS_DIR)/rust_tests_tmp ; \
-	mkdir -p $$ITW_TMP_REPLACEMENT; \
 	filename=`basename $@` ; \
 	type=$${filename%.*} ; \
+	export ITW_TMP_REPLACEMENT=$(TESTS_DIR)/rust_tests_tmp/$$type ; \
+	mkdir -p $$ITW_TMP_REPLACEMENT; \
 	srcs=$(TOP_SRC_DIR)/rust-launcher ; \
 	outs=$(TOP_BUILD_DIR)/launcher.in.$$type  ; \
 	mkdir -p launcher.build  ; \
