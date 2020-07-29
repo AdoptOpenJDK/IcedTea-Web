@@ -9,6 +9,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -54,12 +55,15 @@ public class UrlWhiteListUtils {
     private static boolean isUrlHostMatching(URL wlUrl, URL url) {
         Assert.requireNonNull(wlUrl, "url");
         Assert.requireNonNull(url, "url");
-        String[] wlUrlHostParts = wlUrl.getHost().split(HOSTPARTSEPARATOR);
-        String[] urlHostParts = url.getHost().split(HOSTPARTSEPARATOR);
+
         // proto://*:port
-        if (wlUrlHostParts.length == 1 && wlUrlHostParts[0].length() == 1 && wlUrlHostParts[0].charAt(0) == WILDCARD.charAt(0)) {
+        if (Objects.equals(wlUrl.getHost(), WILDCARD)) {
             return true;
         }
+
+        final String[] wlUrlHostParts = wlUrl.getHost().split(HOSTPARTSEPARATOR);
+        final String[] urlHostParts = url.getHost().split(HOSTPARTSEPARATOR);
+
         if (wlUrlHostParts.length != urlHostParts.length) {
             return false;
         }
@@ -149,12 +153,28 @@ public class UrlWhiteListUtils {
 
     private static void validateWhiteListUrlHost(final String wlUrlStr) throws Exception {
         final URL wlURL = new URL(wlUrlStr);
-        String host = wlURL.getHost();
-        String[] hostParts = host.split(HOSTPARTSEPARATOR);
-        // check if a host part contains * then that is the only character
+        final String hostStr = wlURL.getHost();
+
+        final boolean isIPHost = hostStr.replace(HOSTPARTSEPARATOR.charAt(0), '0').chars().allMatch(c -> Character.isDigit(c) || c == WILDCARD.charAt(0));
+        if (isIPHost) {
+            IpUtil.validateIPHost(hostStr);
+        }
+
+        if (Objects.equals(hostStr, WILDCARD)) {
+            return;
+        }
+
+        final String[] hostParts = hostStr.split(HOSTPARTSEPARATOR);
         for (String s : hostParts) {
-            if (s.contains(WILDCARD) && s.length() > 1) {
-                throw new Exception(R("SWPVALIDATEHOST"));
+            if (s.contains(WILDCARD)) {
+                // * in hostpart of ip4 address is not allowed
+                if (isIPHost) {
+                    throw new Exception(R("SWPVALIDATEIPHOST"));
+                }
+                // * in hostpart of non-ip host should be the only character
+                if (s.length() > 1) {
+                    throw new Exception(R("SWPVALIDATEHOST"));
+                }
             }
         }
     }

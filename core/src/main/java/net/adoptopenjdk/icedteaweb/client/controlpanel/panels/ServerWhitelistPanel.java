@@ -24,13 +24,16 @@ import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.UrlWhiteListUtils;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,40 +66,36 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
         final List<UrlWhiteListUtils.ValidatedWhiteListEntry> validatedWhitelist = UrlWhiteListUtils.getValidatedWhiteList();
 
         final JTable table = new JTable(createTableModel(whitelist, validatedWhitelist));
-        table.setRowHeight(45);
-        table.setIntercellSpacing(new Dimension(2,2));
-
-        final JTableHeader tableHeader = table.getTableHeader();
-        tableHeader.setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel component = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                Font headerFont = new Font(tableHeader.getFont().getName(), Font.BOLD, tableHeader.getFont().getSize());
-                component.setFont(headerFont);
-                component.setBackground(Color.lightGray);
-                component.setHorizontalAlignment(JLabel.CENTER);
-                return component;
-            }
-        });
-
+        table.getTableHeader().setReorderingAllowed(false);
+        table.setFillsViewportHeight(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setAutoCreateRowSorter(true);
+        TableColumnModel colModel=table.getColumnModel();
+        colModel.getColumn(0).setPreferredWidth(100);
+        colModel.getColumn(1).setPreferredWidth(250);
         final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warn16.png");
         table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = new JLabel("<html><body>" + (String)value + "</body></html>");
+                JLabel label = new JLabel(/*"<html><body>" + */ (String)value /* + "</body></html>"*/);
                 label.setOpaque(true);
-                if (((String)value).startsWith(ERROR_MARKER))  {
+                label.setBackground(table.getBackground());
+                if (((String)value).startsWith(R("SWPVALIDATEWLURL")))  {
                     label.setIcon(icon);
                 }
                 if (isSelected) {
                     label.setBackground(table.getSelectionBackground());
                     label.setForeground(table.getSelectionForeground());
                 }
+                label.setIconTextGap(5);
+                //label.setHorizontalTextPosition(SwingConstants.CENTER);
+                label.setVerticalTextPosition(SwingConstants.CENTER);
                 return label;
             }
         });
 
         final JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -121,7 +120,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
             public Object getValueAt(int rowIndex, int columnIndex) {
                 switch (columnIndex) {
                     case 0 : return whitelist.get(rowIndex);
-                    case 1 : return (validatedWhitelist.get(rowIndex).getErrorMessage().isEmpty() ? validatedWhitelist.get(rowIndex).getWhiteListEntry() : ERROR_MARKER + " " + validatedWhitelist.get(rowIndex).getErrorMessage());
+                    case 1 : return (validatedWhitelist.get(rowIndex).getErrorMessage().isEmpty() ? validatedWhitelist.get(rowIndex).getWhiteListEntry() : /*ERROR_MARKER +  "!" +*/ validatedWhitelist.get(rowIndex).getErrorMessage());
                     default: throw new IllegalArgumentException();
                 }
             }
