@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.CodeSigner;
 import java.security.KeyStore;
+import java.security.Timestamp;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -58,6 +59,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
 
@@ -303,10 +305,12 @@ public class JarCertVerifier implements CertVerifier {
     VerifyResult verifyJarEntryCerts(final String jarPath, final boolean jarHasManifest, final List<JarEntry> entries) {
         // Contains number of entries the cert with this CertPath has signed.
         final Map<CertPath, Integer> jarSignCount = new HashMap<>();
+        final Map<CertPath, CodeSigner> codeSigners = new HashMap<>();
         int numSignableEntriesInJar = 0;
 
         // Record current time just before checking the jar begins.
         final ZonedDateTime now = ZonedDateTime.now();
+        final ZonedDateTime shortlyAfterNow = now.plus(6, MONTHS);
         if (jarHasManifest) {
             for (JarEntry je : entries) {
                 final boolean shouldHaveSignature = !je.isDirectory() && !isMetaInfFile(je.getName());
@@ -316,6 +320,7 @@ public class JarCertVerifier implements CertVerifier {
                     if (signers != null) {
                         for (final CodeSigner signer : signers) {
                             final CertPath certPath = signer.getSignerCertPath();
+                            codeSigners.put(certPath, signer);
                             jarSignCount.putIfAbsent(certPath, 0);
                             jarSignCount.computeIfPresent(certPath, (cp, count) -> count + 1);
                         }
@@ -342,15 +347,48 @@ public class JarCertVerifier implements CertVerifier {
                 final Certificate cert = certPath.getCertificates().get(0);
                 if (cert instanceof X509Certificate) {
                     checkCertUsage(certPath, (X509Certificate) cert);
+
                     final ZonedDateTime notBefore = zonedDateTime(((X509Certificate) cert).getNotBefore());
                     final ZonedDateTime notAfter = zonedDateTime(((X509Certificate) cert).getNotAfter());
-                    if (now.isBefore(notBefore)) {
-                        certInfo.setNotYetValidCert();
-                    }
-                    if (now.isAfter(notAfter)) {
-                        certInfo.setHasExpiredCert();
-                    } else if (now.plus(6, MONTHS).isAfter(notAfter)) {
-                        certInfo.setHasExpiringCert();
+
+                    final Optional<Timestamp> optionalSignatureTimestamp = Optional.ofNullable(codeSigners.get(certPath))
+                            .map(CodeSigner::getTimestamp);
+                    final X509Certificate tsaCertificate = (X509Certificate) optionalSignatureTimestamp
+                            .map(Timestamp::getSignerCertPath)
+                            .map(CertPath::getCertificates)
+                            .map(certs -> certs.get(0))
+                            .filter(c -> c instanceof X509Certificate)
+                            .orElse(null);
+
+                    if (tsaCertificate != null) {
+                        final ZonedDateTime tsaNotBefore = zonedDateTime(tsaCertificate.getNotBefore());
+                        final ZonedDateTime tsaNotAfter = zonedDateTime(tsaCertificate.getNotAfter());
+                        final ZonedDateTime signedAt = zonedDateTime(optionalSignatureTimestamp.get().getTimestamp());
+
+                        if (signedAt.isBefore(tsaNotBefore) || now.isBefore(tsaNotBefore)) {
+                            certInfo.setNotYetValidCert();
+                        }
+                        if (now.isAfter(tsaNotAfter) && now.isAfter(notAfter)) {
+                            certInfo.setHasExpiredCert();
+                        }  else if (shortlyAfterNow.isAfter(tsaNotAfter)) {
+                            certInfo.setHasExpiringCert();
+                        }
+
+                        if (signedAt.isBefore(notBefore)) {
+                            certInfo.setNotYetValidCert();
+                        }
+                        if (signedAt.isAfter(notAfter)) {
+                            certInfo.setHasExpiredCert();
+                        }
+                    } else {
+                        if (now.isBefore(notBefore)) {
+                            certInfo.setNotYetValidCert();
+                        }
+                        if (now.isAfter(notAfter)) {
+                            certInfo.setHasExpiredCert();
+                        } else if (shortlyAfterNow.isAfter(notAfter)) {
+                            certInfo.setHasExpiringCert();
+                        }
                     }
                 }
             }
