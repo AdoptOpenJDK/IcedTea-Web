@@ -1,6 +1,7 @@
 package net.sourceforge.jnlp.runtime.classloader;
 
 import java.net.URL;
+import java.util.Objects;
 
 public class DelegatingClassLoader extends ClassLoader
 {
@@ -35,7 +36,6 @@ public class DelegatingClassLoader extends ClassLoader
 
     public int hashCode()
     {
-
         int result = 1;
         result = 31 * result + (this.classLoader == null ? 0 : this.classLoader.hashCode());
         result = 31 * result + (this.getParent() == null ? 0 : this.getParent().hashCode());
@@ -59,30 +59,14 @@ public class DelegatingClassLoader extends ClassLoader
         else
         {
             DelegatingClassLoader other = (DelegatingClassLoader) obj;
-            if (this.classLoader == null)
-            {
-                if (other.classLoader != null)
-                {
-                    return false;
-                }
-            }
-            else if (!this.classLoader.equals(other.classLoader))
+            if(Objects.equals(this.classLoader,other.classLoader)==false)
             {
                 return false;
             }
-
-            if (this.getParent() == null)
-            {
-                if (other.getParent() != null)
-                {
-                    return false;
-                }
-            }
-            else if (!this.getParent().equals(other.getParent()))
+            if(Objects.equals(this.getParent(),other.getParent()) == false)
             {
                 return false;
             }
-
             return true;
         }
     }
