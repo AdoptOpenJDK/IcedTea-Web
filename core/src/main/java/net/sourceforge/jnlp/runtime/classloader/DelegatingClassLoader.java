@@ -14,8 +14,7 @@ public class DelegatingClassLoader extends ClassLoader {
     }
 
     private DelegatingClassLoader(ClassLoader loader) {
-        super(loader);
-        Assert.requireNonNull(loader, "loader");
+        super(Assert.requireNonNull(loader, "loader"));
         this.classLoader = loader;
     }
 
