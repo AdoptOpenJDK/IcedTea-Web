@@ -36,6 +36,7 @@ package net.sourceforge.jnlp.signing;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.testing.tools.CodeSignerCreator;
+import net.sourceforge.jnlp.signing.JarCertVerifier.SignVerifyResult;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

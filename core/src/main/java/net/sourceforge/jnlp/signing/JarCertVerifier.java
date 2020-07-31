@@ -725,4 +725,8 @@ public class JarCertVerifier implements CertVerifier {
     private boolean hasCompletelySignedApp(CertInformation info, int sumOfSignableEntries) {
         return SignVerifyUtils.getTotalJarEntries(info.getSignedJars()) == sumOfSignableEntries;
     }
+
+    enum SignVerifyResult {
+        UNSIGNED, SIGNED_OK, SIGNED_NOT_OK
+    }
 }
