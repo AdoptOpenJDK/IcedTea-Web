@@ -22,7 +22,6 @@ import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.client.GuiLaunchHandler;
 import net.adoptopenjdk.icedteaweb.client.console.JavaConsole;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogMessageHandler;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.extensionpoint.ExtensionPoint;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -233,8 +232,9 @@ public class JNLPRuntime {
         System.setProperty("javawebstart.version", "javaws-" +
                 JavaSystemProperties.getJavaVersion());
 
-        if (!isHeadless() && indicator == null)
-            indicator = new DefaultDownloadIndicator();
+        if (!isHeadless()) {
+            indicator = JNLPRuntime.getExtensionPoint().createDownloadIndicator(getConfiguration());
+        }
 
         if (handler == null) {
             if (isHeadless()) {
@@ -617,6 +617,7 @@ public class JNLPRuntime {
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDefaultDownloadIndicator(DownloadIndicator indicator) {
+        LOG.debug("Setting download indicator to " + indicator);
         JNLPRuntime.indicator = indicator;
     }
 

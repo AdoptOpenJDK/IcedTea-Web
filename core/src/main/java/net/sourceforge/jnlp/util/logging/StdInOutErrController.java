@@ -1,4 +1,4 @@
-/*Copyright (C) 2013 Red Hat, Inc.
+/*Copyright (C) 2020 Karakun AG
 
  This file is part of IcedTea.
 
@@ -30,33 +30,60 @@ you may extend this exception to your version of the library, but you are not
 obligated to do so. If you do not wish to do so, delete this exception
 statement from your version.
 */
-
 package net.sourceforge.jnlp.util.logging;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 
-public class PrintStreamLogger implements SingleStreamLogger {
-    private  PrintStream stream;
+import static java.util.Objects.requireNonNull;
 
-    public PrintStreamLogger(PrintStream stream){
-        this.stream = stream;
+public class StdInOutErrController {
+    private static final StdInOutErrController INSTANCE = new StdInOutErrController(System.out, System.err);
+
+    private final PrintStreamLogger outLog;
+    private final PrintStreamLogger errLog;
+    /*stdin reader for headless dialogues*/
+    private BufferedReader br;
+
+    public static StdInOutErrController getInstance() {
+        return INSTANCE;
     }
 
-    @Override
-    public void log(String s) {
-        stream.println(s);
+    /**
+     * for testing purposes the logger with custom streams can be created
+     * otherwise only getLogger()'s singleton can be called.
+     */
+    public StdInOutErrController(OutputStream out, OutputStream err) {
+        this(new PrintStream(requireNonNull(out, "out")), new PrintStream(requireNonNull(err, "err")));
     }
 
-    public PrintStream getStream() {
-        return stream;
+    private StdInOutErrController(PrintStream out, PrintStream err) {
+        outLog = new PrintStreamLogger(requireNonNull(out, "out"));
+        errLog = new PrintStreamLogger(requireNonNull(err, "err"));
     }
 
-    public void setStream(PrintStream stream) {
-        this.stream = stream;
+    public PrintStreamLogger getOut() {
+        return outLog;
     }
 
-    @Override
-    public void close() {
-        stream.flush();
+    /**
+     * @return current stream for std.out reprint
+     */
+    public PrintStream getOutStream() {
+        return outLog.getStream();
+    }
+
+    public PrintStreamLogger getErr() {
+        return errLog;
+    }
+
+    public synchronized String readLine() throws IOException {
+        if (br == null) {
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }
+        return br.readLine();
     }
 }

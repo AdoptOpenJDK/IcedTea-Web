@@ -32,70 +32,47 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version. */
 package net.sourceforge.jnlp.util.logging.headers;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.TeeOutputStream;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Header {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Header.class);
+    private static final SimpleDateFormat TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
+    private static final String[] LOGGING_INFRASTRUCTURE_CLASSES = {OutputController.class.getName(), Header.class.getName(), TeeOutputStream.class.getName(), "sun.applet.PluginDebug"};
+    private static final String DEFAULT_USER = JavaSystemProperties.getUserName();
 
-    static final String default_user = JavaSystemProperties.getUserName();
-    static final String unknown = "unknown";
-
-    public final String user;
+    public final String osUser = DEFAULT_USER;
     public final OutputControllerLevel level;
-    public final Date timestamp;
-    public final String date;
+    public final Date timestampForSorting;
+    public final String timestamp;
     public final boolean isClientApp;
-    public final String caller;
-    public final String thread1;
-    public final String thread2;
+    public final String origin;
+    public final String callerClass;
+    public final String threadHash;
+    public final String threadName;
 
-    public Header(OutputControllerLevel level) {
-        this(level, false);
-    }
-
-    public Header(OutputControllerLevel level, String caller) {
-        this(level, new Date(), false, Thread.currentThread(), caller);
+    public Header(OutputControllerLevel level, String callerClass) {
+        this(level, new Date(), false, Thread.currentThread(), callerClass);
     }
 
     public Header(OutputControllerLevel level, boolean isClientApp) {
-        this(level, new Date(), isClientApp, Thread.currentThread());
+        this(level, new Date(), isClientApp, Thread.currentThread(), getCallerClass());
     }
 
-    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread) {
-        this(level, timestamp, isClientApp, thread, getCallerClass(thread.getStackTrace()));
-    }
-
-    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread, String caller) {
-        this(
-                level, // level
-                timestamp, // timestamp
-                timestamp.toString(), // date
-                isClientApp, // isClientApp
-                default_user, // user
-                caller, // caller
-                Integer.toHexString(thread.hashCode()), // thread1
-                thread.getName()) // thread2
-        ;
-    }
-
-    protected Header(OutputControllerLevel level, Date timestamp, String date, boolean isClientApp, String user, String caller, String thread1, String thread2) {
-        this.user = user;
+    private Header(OutputControllerLevel level, Date timestamp, boolean isClientApp, Thread thread, String callerClass) {
         this.level = level;
-        this.timestamp = timestamp;
-        this.date = date;
+        this.timestampForSorting = timestamp;
+        this.timestamp = TIMESTAMP_FORMATTER.format(timestamp);
         this.isClientApp = isClientApp;
-        this.caller = caller;
-        this.thread1 = thread1;
-        this.thread2 = thread2;
+        this.origin = isClientApp ? "ITW-APP " : "ITW-CORE";
+        this.callerClass = callerClass;
+        this.threadHash = Integer.toHexString(thread.hashCode());
+        this.threadName = thread.getName();
     }
 
     @Override
@@ -104,88 +81,72 @@ public class Header {
     }
 
     public String toShortString() {
-        return toString(false, false, true, true, false, false, false);
+        return toString(false, true, true, true, true, false, false);
     }
 
-    public String toString(boolean userb, boolean originb, boolean levelb, boolean dateb, boolean callerb, boolean thread1b, boolean thread2b) {
+    public String toString(boolean showOsUser, boolean showOrigin, boolean showTimestamp, boolean showLogLevel, boolean showCallerClass, boolean showThreadHash, boolean showThreadName) {
         StringBuilder sb = new StringBuilder();
         try {
-            if (userb) {
-                sb.append("[").append(user).append("]");
+            if (showOsUser) {
+                sb.append("[").append(osUser).append("]");
             }
-            if (originb) {
-                sb.append("[").append(getOrigin()).append("]");
+            if (showOrigin) {
+                sb.append("[").append(origin).append("]");
             }
-
-            if (levelb && level != null) {
-                sb.append('[').append(level.toString()).append(']');
+            if (showTimestamp) {
+                sb.append('[').append(timestamp).append(']');
             }
-            if (dateb) {
-                sb.append('[').append(date).append(']');
+            if (showLogLevel && level != null) {
+                sb.append('[').append(level.display()).append(']');
             }
-            if (callerb && caller != null) {
-                sb.append('[').append(caller).append(']');
+            if (showCallerClass && callerClass != null) {
+                sb.append('[').append(callerClass).append(']');
             }
-            if (thread1b && thread2b) {
-                sb.append(threadsToString());
-            } else if (thread1b) {
-                sb.append(thread1ToString());
-            } else if (thread2b) {
-                sb.append(thread2ToString());
+            if (showThreadName || showThreadHash) {
+                sb.append('[');
+                if (showThreadName) {
+                    sb.append(threadName);
+                }
+                if (showThreadHash) {
+                    sb.append('#').append(threadHash);
+                }
+                sb.append(']');
             }
-        } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+        } catch (Exception ignored) {
+            // cannot log here as we are creating a log message
         }
         return sb.toString();
     }
 
-    public String thread1ToString() {
-        return " NETX Thread# " + thread1;
-    }
-
-    public String thread2ToString() {
-        return "name " + thread2;
-    }
-
-    private String threadsToString() {
-        return thread1ToString()
-                + ", " + thread2ToString();
-    }
-
-    private static final String CLIENT = "CLIENT";
-
-    public String getOrigin() {
-        String s;
-        s = "ITW-JAVAWS";
-        if (isClientApp) {
-            s = s + "-" + CLIENT;
-        }
-        return s;
-
-    }
-
-    private static String getCallerClass(StackTraceElement[] stack) {
+    private static String getCallerClass() {
+        final StackTraceElement[] stack = (new Exception()).getStackTrace();
         try {
             //0 is always thread
             //1..? is OutputController itself
             //pick up first after.
             StackTraceElement result = stack[0];
-            int i = 1;
-            for (; i < stack.length; i++) {
-                result = stack[i];//at least moving up
-                if (stack[i].getClassName().contains(OutputController.class.getName())
-                        || //PluginDebug.class.getName() not available during netx make
-                        stack[i].getClassName().contains("sun.applet.PluginDebug")
-                        || stack[i].getClassName().contains(Header.class.getName())
-                        || stack[i].getClassName().contains(TeeOutputStream.class.getName())) {
-                } else {
+            final int numStacks = stack.length;
+            for (int i = 1; i < numStacks; i++) {
+                result = stack[i];
+                if (!isLoggingInfrastructureStackElement(result)) {
                     break;
                 }
             }
             return result.toString();
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            // cannot log here as we are in the process of creating a log message
             return "Unknown caller";
         }
+    }
+
+    private static boolean isLoggingInfrastructureStackElement(StackTraceElement element) {
+        final String classOfCurrentStackElement = element.getClassName();
+
+        for (final String loggingInfrastructureClass : LOGGING_INFRASTRUCTURE_CLASSES) {
+            if (classOfCurrentStackElement.contains(loggingInfrastructureClass)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

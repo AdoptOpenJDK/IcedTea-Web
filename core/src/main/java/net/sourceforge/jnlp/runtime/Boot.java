@@ -293,7 +293,7 @@ public final class Boot implements PrivilegedAction<Integer> {
                     + helpMessagesProvider.getFormatter().getNewLine();
         }
 
-        OutputController.getLogger().printOut(helpMessage);
+        OutputController.getLogger().printOutLn(helpMessage);
     }
 
     private static void handleAbout() {
@@ -308,7 +308,7 @@ public final class Boot implements PrivilegedAction<Integer> {
             itwInfoMessage = itwInfoMessage
                     + aboutMessagesProvider.prepare().getIntroduction();
         }
-        OutputController.getLogger().printOut(itwInfoMessage);
+        OutputController.getLogger().printOutLn(itwInfoMessage);
     }
 
     static String fixJnlpProtocol(String param) {

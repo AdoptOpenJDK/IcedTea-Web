@@ -32,14 +32,14 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version. */
 package net.sourceforge.jnlp.util.logging;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.logging.filelogs.LogBasedFileLog;
 import net.sourceforge.jnlp.util.logging.filelogs.WriterBasedFileLog;
-import net.sourceforge.jnlp.util.logging.headers.Header;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,77 +47,68 @@ import java.util.Date;
 /**
  * This class is utility and factory around file logs.
  */
-public final class FileLog  {
+public final class FileLog {
 
-    private final static Logger LOG = LoggerFactory.getLogger(FileLog.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FileLog.class);
 
-    public static Header getHeadlineHeader() {
-        return new Header(OutputControllerLevel.WARNING_ALL);
-    }
+    public static String LOG_PREFIX_ENV = "itwLogFilePrefix";
+    public static String LOG_POSTFIX_ENV = "itwLogFilePostfix";
 
-    private static String getColon() {
-        if (OsUtil.isWindows()) {
-            return "_";
+    private static final String DEFAULT_LOGGER_NAME = TextsProvider.ITW + " file-logger";
+    private static final String TIME_SEPARATOR = OsUtil.isWindows() ? "_" : ":";
+    private static final SimpleDateFormat FILE_LOG_NAME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd_HH" + TIME_SEPARATOR + "mm" + TIME_SEPARATOR + "ss.S");
+
+    private static final String logFileNamePrefix;
+    private static String logFileNamePostfix;
+
+    static {
+        final String envPrefix = System.getenv(LOG_PREFIX_ENV);
+        if (!StringUtils.isBlank(envPrefix)) {
+            logFileNamePrefix = envPrefix;
         } else {
-            return ":";
-        }
-    }
-    
-    private static final class SingleStreamLoggerImpl implements SingleStreamLogger {
-
-        public SingleStreamLoggerImpl() {
+            logFileNamePrefix = FILE_LOG_NAME_FORMATTER.format(new Date());
         }
 
-        @Override
-        public void log(String s) {
-            //dummy
-        }
-
-        @Override
-        public void close() {
-            //dummy
+        final String envPostfix = System.getenv(LOG_POSTFIX_ENV);
+        if (!StringUtils.isBlank(envPostfix)) {
+            logFileNamePostfix = envPostfix;
+        } else {
+            logFileNamePostfix = "itw";
         }
     }
 
-    private static final SimpleDateFormat fileLogNameFormatter = new SimpleDateFormat("yyyy-MM-dd_HH" + getColon() + "mm" + getColon() + "ss.S");
-    /**"Tue Nov 19 09:43:50 CET 2013"*/
+    public static String getLogFileNamePrefix() {
+        return logFileNamePrefix;
+    }
 
-    private static final String defaultloggerName = TextsProvider.ITW + " file-logger";
+    public static String getLogFileNamePostfix() {
+        return logFileNamePostfix;
+    }
 
+    public static void setLogFileNamePostfix(String logFileNamePostfix) {
+        FileLog.logFileNamePostfix = Assert.requireNonBlank(logFileNamePostfix, "logFileNamePostfix");
+    }
 
     public static SingleStreamLogger createFileLog() {
-        return createFileLog("javantx");
-    }
-    
-    public static SingleStreamLogger createAppFileLog() {
-        return createFileLog("clienta");
-    }
-    
-    private static SingleStreamLogger createFileLog(String id) {
         SingleStreamLogger s;
         try {
+            final String fileName = getFileName();
             if (LogConfig.getLogConfig().isLegacyLogBasedFileLog()) {
-                s = new LogBasedFileLog(defaultloggerName, getFileName(id), false);
+                s = new LogBasedFileLog(DEFAULT_LOGGER_NAME, fileName, false);
             } else {
-                s = new WriterBasedFileLog(getFileName(id), false);
+                s = new WriterBasedFileLog(fileName, false);
             }
+            LOG.debug("Start logging into: {}", s);
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-            //we do not wont to block whole logging just because initialization error in "new FileLog()"
-            s = new SingleStreamLoggerImpl();
+            LOG.error("Exception while creating FileLog", ex);
+            // we do not wont to block whole logging just because initialization error in "new FileLog()"
+            s = new DummyLogger();
         }
         return s;
     }
 
-    private static String getFileName(String id) {
-        String s = LogConfig.getLogConfig().getIcedteaLogDir() + "itw-" + id + "-" + getStamp() + ".log";
-        LOG.debug("Attempting to log into: {}", s);
-        return s;
+    private static String getFileName() {
+        final String logDir = LogConfig.getLogConfig().getIcedteaLogDir();
+        return logDir + (logFileNamePrefix + "-" + logFileNamePostfix + ".log");
     }
-    
-  
-    private static String getStamp() {
-        return fileLogNameFormatter.format(new Date());
-    }
-
 }

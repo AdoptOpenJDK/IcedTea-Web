@@ -33,23 +33,14 @@ statement from your version.
 
 package net.sourceforge.jnlp.util.logging;
 
-
-
-public class NoopSystemLog implements SingleStreamLogger {
-    
-    public NoopSystemLog(){
-    
-    }
-    
- 
+public class DummyLogger implements SingleStreamLogger {
     @Override
-    public void log(String s) {
-     //not yet implemented   
-    }
-      
-    @Override
-    public void close() {
-        //nope
+    public final void log(String s) {
+        //dummy
     }
 
+    @Override
+    public final void close() {
+        //dummy
+    }
 }

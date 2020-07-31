@@ -22,6 +22,7 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptionsParser;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
+import net.sourceforge.jnlp.util.logging.StdInOutErrController;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,7 +31,6 @@ import org.junit.BeforeClass;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Locale;
@@ -68,14 +68,14 @@ public abstract class AbstractCommandTest extends NoStdOutErrTest {
     @Before
     public void beforeEach() {
         outContent = new ByteArrayOutputStream();
-        OutputController.getLogger().setOut(new PrintStream(outContent));
         errContent = new ByteArrayOutputStream();
-        OutputController.getLogger().setErr(new PrintStream(errContent));
+        OutputController.getLogger().setInOutErrController(new StdInOutErrController(outContent, errContent));
     }
 
     @After
     public void afterEach() throws IOException {
         clearDeployFile();
+        OutputController.getLogger().setInOutErrController(StdInOutErrController.getInstance());
     }
 
     String getOutContent() {

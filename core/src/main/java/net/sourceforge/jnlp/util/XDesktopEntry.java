@@ -265,7 +265,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
             String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
                     shortcutFile.getCanonicalPath() };
-            OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Executing: " + Arrays.toString(execString));
+            LOG.debug("Executing: " + Arrays.toString(execString));
             ProcessBuilder pb = new ProcessBuilder(execString);
             pb.inheritIO();
             Process installer = pb.start();
@@ -359,7 +359,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
             Files.copy(cacheFile.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
         this.iconLocation = target.getAbsolutePath();
-        OutputController.getLogger().log(OutputControllerLevel.ERROR_DEBUG, "Cached desktop shortcut icon: " + target + " ,  With source from: " + cacheFile.getAbsolutePath());
+        LOG.debug("Cached desktop shortcut icon: " + target + " ,  With source from: " + cacheFile.getAbsolutePath());
     }
 
     private File convertToIco(final File source, final String targetName) {
@@ -522,18 +522,18 @@ public class XDesktopEntry implements GenericDesktopEntry {
     }
 
     private static String findAndVerifyGeneratedJnlpDir() {
-        return findAndVerifyBasicDir(PathsAndFiles.GEN_JNLPS_DIR.getFile(), " directory for storing generated jnlps cannot be created. You may expect failure");
+        return findAndVerifyBasicDir(PathsAndFiles.GEN_JNLPS_DIR.getFile(), "directory for storing generated jnlps cannot be created. You may expect failure");
     }
 
     private static String findAndVerifyJavawsMenuDir() {
-        return findAndVerifyBasicDir(PathsAndFiles.MENUS_DIR.getFile(), " directory for storing menu entry cannot be created. You may expect failure");
+        return findAndVerifyBasicDir(PathsAndFiles.MENUS_DIR.getFile(), "directory for storing menu entry cannot be created. You may expect failure");
     }
 
     private static String findAndVerifyBasicDir(File f, String message) {
         String fPath = f.getAbsolutePath();
         if (!f.exists()) {
             if (!f.mkdirs()) {
-                OutputController.getLogger().log(OutputControllerLevel.ERROR_ALL, fPath + message);
+                LOG.error(fPath + " - " + message);
             }
         }
         return fPath;

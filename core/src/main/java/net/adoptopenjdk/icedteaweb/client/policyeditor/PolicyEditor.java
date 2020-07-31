@@ -1735,7 +1735,7 @@ public class PolicyEditor extends JPanel {
                         + helpMessagesProvider.prepare().getOptions()
                         + helpMessagesProvider.getFormatter().getNewLine();
             }
-            OutputController.getLogger().printOut(HELP_MESSAGE);
+            OutputController.getLogger().printOutLn(HELP_MESSAGE);
             return;
         }
 
