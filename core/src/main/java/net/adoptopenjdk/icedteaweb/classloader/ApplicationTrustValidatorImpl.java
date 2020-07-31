@@ -142,8 +142,9 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
             }
             allowUnsignedApplicationToRun = true;
         } else {
-            if (!hasTrustedCertificate(certVerifier.getFullySigningCertificates())) {
-                final Map<CertPath, CertInformation> certInfos = calculateCertInfo(certVerifier.getFullySigningCertificates());
+            final Set<CertPath> fullySigningCertificates = certVerifier.getFullySigningCertificates();
+            if (!hasTrustedCertificate(fullySigningCertificates)) {
+                final Map<CertPath, CertInformation> certInfos = calculateCertInfo(fullySigningCertificates);
 
                 for (final Map.Entry<CertPath, CertInformation> entry : certInfos.entrySet()) {
                     final AllowDenySandbox result = userInteractions.askUserHowToRunApplicationWithCertIssues(jnlpFile, entry.getKey(), entry.getValue());
@@ -160,7 +161,7 @@ public class ApplicationTrustValidatorImpl implements ApplicationTrustValidator 
                     }
                 }
 
-                if (!hasTrustedCertificate(certVerifier.getFullySigningCertificates())) {
+                if (!hasTrustedCertificate(fullySigningCertificates)) {
                     throw new LaunchException("User exited application when asked to how to run application with certificate issues");
                 }
             }
