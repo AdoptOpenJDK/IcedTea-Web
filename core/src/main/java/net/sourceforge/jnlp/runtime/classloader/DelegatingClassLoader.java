@@ -11,7 +11,7 @@ public class DelegatingClassLoader extends ClassLoader {
         return instance;
     }
 
-    DelegatingClassLoader(ClassLoader loader) {
+    private DelegatingClassLoader(ClassLoader loader) {
         super(loader);
         this.classLoader = loader;
     }
