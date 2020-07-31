@@ -45,14 +45,4 @@ public class IpUtil {
         final HostName hostName = new HostName(host);
         hostName.validate();
     }
-
-    public static void main(String[] args) throws Exception {
-        new URL("http://123.google.235");
-        final HostName hostName = new HostName("123.*.234.212");
-        hostName.validate();
-        final String addr =  ""; //"123.*.235.1" "123.234.234.456";"www.google.com" "123.1oogle.com"
-        IPAddressString ipstr = new IPAddressString(addr);
-        System.out.println(ipstr.isValid() + " " + ipstr.isIPv4());
-        ipstr.validateIPv4();
-    }
 }
