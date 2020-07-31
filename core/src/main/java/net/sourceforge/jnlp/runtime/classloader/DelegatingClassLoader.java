@@ -50,7 +50,7 @@ public class DelegatingClassLoader extends ClassLoader {
             if(!Objects.equals(this.classLoader,other.classLoader)) {
                 return false;
             }
-            if(Objects.equals(this.getParent(),other.getParent()) == false) {
+            if(!Objects.equals(this.getParent(),other.getParent())) {
                 return false;
             }
             return true;
