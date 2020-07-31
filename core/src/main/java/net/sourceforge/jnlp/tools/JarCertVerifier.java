@@ -310,7 +310,7 @@ public class JarCertVerifier implements CertVerifier {
 
         // Record current time just before checking the jar begins.
         final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime shortlyAfterNow = now.plus(6, MONTHS);
+        final ZonedDateTime expiresSoon = now.plus(6, MONTHS);
         if (jarHasManifest) {
             for (JarEntry je : entries) {
                 final boolean shouldHaveSignature = !je.isDirectory() && !isMetaInfFile(je.getName());
@@ -356,6 +356,7 @@ public class JarCertVerifier implements CertVerifier {
                     final X509Certificate tsaCertificate = (X509Certificate) optionalSignatureTimestamp
                             .map(Timestamp::getSignerCertPath)
                             .map(CertPath::getCertificates)
+                            .filter(certs -> !certs.isEmpty())
                             .map(certs -> certs.get(0))
                             .filter(c -> c instanceof X509Certificate)
                             .orElse(null);
@@ -363,14 +364,16 @@ public class JarCertVerifier implements CertVerifier {
                     if (tsaCertificate != null) {
                         final ZonedDateTime tsaNotBefore = zonedDateTime(tsaCertificate.getNotBefore());
                         final ZonedDateTime tsaNotAfter = zonedDateTime(tsaCertificate.getNotAfter());
-                        final ZonedDateTime signedAt = zonedDateTime(optionalSignatureTimestamp.get().getTimestamp());
+                        final ZonedDateTime signedAt = zonedDateTime(optionalSignatureTimestamp
+                                .orElseThrow(() -> new RuntimeException("timestamp is null even tough we have a tsa certificate"))
+                                .getTimestamp());
 
                         if (signedAt.isBefore(tsaNotBefore) || now.isBefore(tsaNotBefore)) {
                             certInfo.setNotYetValidCert();
                         }
                         if (now.isAfter(tsaNotAfter) && now.isAfter(notAfter)) {
                             certInfo.setHasExpiredCert();
-                        }  else if (shortlyAfterNow.isAfter(tsaNotAfter)) {
+                        }  else if (expiresSoon.isAfter(tsaNotAfter)) {
                             certInfo.setHasExpiringCert();
                         }
 
@@ -386,7 +389,7 @@ public class JarCertVerifier implements CertVerifier {
                         }
                         if (now.isAfter(notAfter)) {
                             certInfo.setHasExpiredCert();
-                        } else if (shortlyAfterNow.isAfter(notAfter)) {
+                        } else if (expiresSoon.isAfter(notAfter)) {
                             certInfo.setHasExpiringCert();
                         }
                     }
