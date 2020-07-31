@@ -418,7 +418,7 @@ public class JarCertVerifier implements CertVerifier {
      * This will return false if any of verified jars have content more than just META-INF/.
      */
     private boolean isTriviallySigned() {
-        return SignVerifyUtils.getTotalJarEntries(jarSignableEntries) <= 0 && certs.size() <= 0;
+        return getTotalJarEntries(jarSignableEntries) <= 0 && certs.size() <= 0;
     }
 
     private boolean isSigned() {
@@ -614,11 +614,11 @@ public class JarCertVerifier implements CertVerifier {
     private boolean hasAlreadyTrustedPublisher(
             Map<CertPath, CertInformation> certs,
             Map<String, Integer> signedJars) {
-        int sumOfSignableEntries = SignVerifyUtils.getTotalJarEntries(signedJars);
+        int sumOfSignableEntries = getTotalJarEntries(signedJars);
         for (CertInformation certInfo : certs.values()) {
             Map<String, Integer> certSignedJars = certInfo.getSignedJars();
 
-            if (SignVerifyUtils.getTotalJarEntries(certSignedJars) == sumOfSignableEntries
+            if (getTotalJarEntries(certSignedJars) == sumOfSignableEntries
                     && certInfo.isPublisherAlreadyTrusted()) {
                 return true;
             }
@@ -636,11 +636,11 @@ public class JarCertVerifier implements CertVerifier {
      */
     private boolean hasRootInCacerts(Map<CertPath, CertInformation> certs,
                                      Map<String, Integer> signedJars) {
-        int sumOfSignableEntries = SignVerifyUtils.getTotalJarEntries(signedJars);
+        int sumOfSignableEntries = getTotalJarEntries(signedJars);
         for (CertInformation certInfo : certs.values()) {
             Map<String, Integer> certSignedJars = certInfo.getSignedJars();
 
-            if (SignVerifyUtils.getTotalJarEntries(certSignedJars) == sumOfSignableEntries
+            if (getTotalJarEntries(certSignedJars) == sumOfSignableEntries
                     && certInfo.isRootInCacerts()) {
                 return true;
             }
@@ -659,7 +659,7 @@ public class JarCertVerifier implements CertVerifier {
      */
     private boolean isFullySigned(Map<CertPath, CertInformation> certs,
                                   Map<String, Integer> signedJars) {
-        int sumOfSignableEntries = SignVerifyUtils.getTotalJarEntries(signedJars);
+        int sumOfSignableEntries = getTotalJarEntries(signedJars);
         for (CertPath cPath : certs.keySet()) {
             // If this cert has signed everything, return true
             if (hasCompletelySignedApp(certs.get(cPath), sumOfSignableEntries)) {
@@ -682,7 +682,7 @@ public class JarCertVerifier implements CertVerifier {
     private void checkTrustWithUser(SecurityDelegate securityDelegate, JarCertVerifier jcv, JNLPFile file)
             throws LaunchException {
 
-        int sumOfSignableEntries = SignVerifyUtils.getTotalJarEntries(jcv.getJarSignableEntries());
+        int sumOfSignableEntries = getTotalJarEntries(jcv.getJarSignableEntries());
         for (CertPath cPath : jcv.getCertsList()) {
             jcv.setCurrentlyUsedCertPath(cPath);
             CertInformation info = jcv.getCertInformation(cPath);
@@ -723,7 +723,19 @@ public class JarCertVerifier implements CertVerifier {
      * @return True if the signer has fully signed this app.
      */
     private boolean hasCompletelySignedApp(CertInformation info, int sumOfSignableEntries) {
-        return SignVerifyUtils.getTotalJarEntries(info.getSignedJars()) == sumOfSignableEntries;
+        return getTotalJarEntries(info.getSignedJars()) == sumOfSignableEntries;
+    }
+
+    /**
+     * Get the total number of entries in the provided map.
+     *
+     * @param map map of all jars
+     * @return The number of entries.
+     */
+    private int getTotalJarEntries(final Map<String, Integer> map) {
+        return map.values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     enum SignVerifyResult {

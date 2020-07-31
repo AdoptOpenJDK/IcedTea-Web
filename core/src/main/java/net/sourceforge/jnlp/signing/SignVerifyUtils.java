@@ -60,19 +60,6 @@ public class SignVerifyUtils {
         );
     }
 
-    /**
-     * Get the total number of entries in the provided map.
-     *
-     * @param map map of all jars
-     * @return The number of entries.
-     */
-    @Deprecated
-    static int getTotalJarEntries(final Map<String, Integer> map) {
-        return map.values().stream()
-                .mapToInt(Integer::intValue)
-                .sum();
-    }
-
     static CertificatesFullySigningTheJar determineCertificatesFullySigningThe(final File file) {
         Assert.requireNonNull(file, "file");
 
