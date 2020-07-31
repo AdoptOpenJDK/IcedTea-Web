@@ -3,7 +3,6 @@ package net.sourceforge.jnlp.util;
 import inet.ipaddr.HostName;
 import inet.ipaddr.HostNameException;
 import inet.ipaddr.IPAddress;
-import inet.ipaddr.IPAddressString;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 
 import java.net.URI;
