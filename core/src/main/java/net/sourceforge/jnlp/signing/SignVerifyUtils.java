@@ -241,15 +241,4 @@ public class SignVerifyUtils {
         // Otherwise a parent cert was not found to be trusted.
         info.setUntrusted();
     }
-
-    @Deprecated
-    static ApplicationSigningState mergeSigningState(final ApplicationSigningState state1, final ApplicationSigningState state2) {
-        if (state1 == ApplicationSigningState.FULL && state2 == ApplicationSigningState.FULL) {
-            return ApplicationSigningState.FULL;
-        }
-        if (state1 == ApplicationSigningState.NONE && state2 == ApplicationSigningState.NONE) {
-            return ApplicationSigningState.NONE;
-        }
-        return ApplicationSigningState.PARTIAL;
-    }
 }

@@ -141,9 +141,19 @@ public class JarCertVerifier implements CertVerifier {
                 .collect(Collectors.toSet());
 
         return certificates.stream()
-                .map(certificate -> getState(certificate))
-                .reduce((state1, state2) -> SignVerifyUtils.mergeSigningState(state1, state2))
+                .map(this::getState)
+                .reduce(this::mergeSigningState)
                 .orElse(ApplicationSigningState.NONE); // What is the correct state if we do not have any certificates????
+    }
+
+    private ApplicationSigningState mergeSigningState(final ApplicationSigningState state1, final ApplicationSigningState state2) {
+        if (state1 == ApplicationSigningState.FULL && state2 == ApplicationSigningState.FULL) {
+            return ApplicationSigningState.FULL;
+        }
+        if (state1 == ApplicationSigningState.NONE && state2 == ApplicationSigningState.NONE) {
+            return ApplicationSigningState.NONE;
+        }
+        return ApplicationSigningState.PARTIAL;
     }
 
     public List<CertificatesFullySigningTheJar> getAllResources() {
