@@ -19,8 +19,7 @@ public class DelegatingClassLoader extends ClassLoader {
     }
 
     public void setClassLoader(ClassLoader loader) {
-        Assert.requireNonNull(loader, "loader");
-        this.classLoader = loader;
+        this.classLoader = Assert.requireNonNull(loader, "loader");
     }
 
     protected Class findClass(String name) throws ClassNotFoundException {
