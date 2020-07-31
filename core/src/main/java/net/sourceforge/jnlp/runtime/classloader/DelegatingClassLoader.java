@@ -59,7 +59,7 @@ public class DelegatingClassLoader extends ClassLoader
         else
         {
             DelegatingClassLoader other = (DelegatingClassLoader) obj;
-            if(Objects.equals(this.classLoader,other.classLoader)==false)
+            if(!Objects.equals(this.classLoader,other.classLoader))
             {
                 return false;
             }
