@@ -7,7 +7,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.signing.NewJarCertVerifier;
 
 import java.security.Permission;
 import java.util.Collection;
@@ -37,12 +36,9 @@ public class SecurityDelegateNew implements SecurityDelegate {
 
     private final JNLPFile jnlpFile;
 
-    private final NewJarCertVerifier certVerifier;
-
-    public SecurityDelegateNew(final ApplicationPermissions applicationPermissions, final JNLPFile jnlpFile, final NewJarCertVerifier certVerifier) {
+    public SecurityDelegateNew(final ApplicationPermissions applicationPermissions, final JNLPFile jnlpFile) {
         this.applicationPermissions = applicationPermissions;
         this.jnlpFile = jnlpFile;
-        this.certVerifier = certVerifier;
         runInSandbox = false;
     }
 

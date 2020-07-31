@@ -72,7 +72,7 @@ public class DefaultDialogFactoryTest {
     }
 
     private void showPartiallySignedWarning() {
-        dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, new SecurityDelegateNew(null, file, null));
+        dialogFactory.showPartiallySignedWarningDialog(file, jarCertVerifier, new SecurityDelegateNew(null, file));
     }
 
     private void showMissingALACAttributePanel() throws MalformedURLException {
