@@ -1,5 +1,7 @@
 package net.sourceforge.jnlp.runtime.classloader;
 
+import net.adoptopenjdk.icedteaweb.Assert;
+
 import java.net.URL;
 import java.util.Objects;
 
@@ -13,10 +15,12 @@ public class DelegatingClassLoader extends ClassLoader {
 
     DelegatingClassLoader(ClassLoader loader) {
         super(loader);
+        Assert.requireNonNull(loader, "loader");
         this.classLoader = loader;
     }
 
     public void setClassLoader(ClassLoader loader) {
+        Assert.requireNonNull(loader, "loader");
         this.classLoader = loader;
     }
 
