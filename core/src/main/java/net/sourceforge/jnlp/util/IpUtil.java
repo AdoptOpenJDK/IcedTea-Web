@@ -29,19 +29,4 @@ public class IpUtil {
         final HostName hostName = new HostName(host);
         return hostName.resolvesToSelf();
     }
-
-    /**
-     * @param host host string to verify
-     * @return true if the given host string is an IP address
-     */
-    static boolean isHostAnIPAddress(final String host) {
-
-        final HostName hostName = new HostName(host);
-        return hostName.asAddress(IPAddress.IPVersion.IPV4) != null;
-    }
-
-    static void validateIPHost(final String host) throws HostNameException {
-        final HostName hostName = new HostName(host);
-        hostName.validate();
-    }
 }
