@@ -18,13 +18,10 @@ import net.sourceforge.jnlp.util.IpUtil;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
@@ -37,8 +34,7 @@ class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
 
-    private static final Executor localExecutor = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors() * 4,
-            10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new DaemonThreadFactory());
+    private static final Executor localExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 4, new DaemonThreadFactory());
 
     private final Resource resource;
 
@@ -47,28 +43,38 @@ class ResourceHandler {
     }
 
     Future<Resource> putIntoCache() {
+        LOG.debug("Will check and maybe put into cache: {}", ResourceTracker.getSimpleName(resource));
         validateWithWhitelist();
 
         // the thread which is processing this resource will set its future onto the resource all other
         // threads will return this future and ensure a resource is only processed by a single thread
         synchronized (resource) {
-            return Optional.ofNullable(resource.getFutureForDownloaded())
-                    .orElseGet(() -> {
-                        final Future<Resource> futureResource = startDownload();
-                        resource.startProcessing(futureResource);
-                        return futureResource;
-                    });
+            final Future<Resource> future = resource.getFutureForDownloaded();
+            if(future == null) {
+                LOG.debug("Download for {} has not been started until now", ResourceTracker.getSimpleName(resource));
+                final Future<Resource> futureResource = getDownloadStateAndStartUnstartedDownload();
+                resource.startProcessing(futureResource);
+                return futureResource;
+            } else {
+                LOG.debug("Download for {} has already been started.", ResourceTracker.getSimpleName(resource));
+                return future;
+            }
         }
     }
 
-    private Future<Resource> startDownload() {
+    private Future<Resource> getDownloadStateAndStartUnstartedDownload() {
+        LOG.debug("Checking download state of {}", ResourceTracker.getSimpleName(resource));
         final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {
+            LOG.debug("Resource is already downloaded: {} ", ResourceTracker.getSimpleName(resource));
             result.complete(resource);
         } else if (isNotCacheable()) {
+            LOG.debug("Resource is not cacheable: {}", ResourceTracker.getSimpleName(resource));
             result.complete(initNoneCacheableResources());
         } else {
+            LOG.debug("Download has not been started yet: {}", ResourceTracker.getSimpleName(resource));
             localExecutor.execute(() -> {
+                LOG.debug("IN THREAD 1");
                 try {
                     result.complete(download());
                 } catch (Exception e) {
@@ -101,7 +107,7 @@ class ResourceHandler {
                 return downloadResource();
             } catch (Exception e) {
                 if (--triesLeft < 0) {
-                    LOG.info("giving up while downloading '{}' because of {}", resource.getLocation(), e.getMessage());
+                    LOG.info("giving up while downloading '{}' because of {}", ResourceTracker.getSimpleName(resource), e.getMessage());
                     LOG.debug("Exception while downloading", e);
                     resource.setStatus(ERROR);
                     throw e;
@@ -111,6 +117,8 @@ class ResourceHandler {
     }
 
     private Resource downloadResource() {
+        LOG.debug("Download of resource {} will start now!", ResourceTracker.getSimpleName(resource));
+        Thread.dumpStack();
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
         final InitializationResult initResult = initializer.init();
         if (initResult.needsDownload()) {

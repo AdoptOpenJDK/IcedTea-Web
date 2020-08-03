@@ -27,14 +27,14 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -144,10 +144,12 @@ public class ResourceTracker {
      */
     public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
         Assert.requireNonNull(location, "location");
+        LOG.debug("Will add resource at location '{}'", location);
+
 
         final URL normalizedLocation = normalizeUrlQuietly(location);
         final Resource resource = createResource(normalizedLocation, version, downloadOptions, updatePolicy);
-
+        LOG.debug("Will add resource '{}'", ResourceTracker.getSimpleName(resource));
         if (addToResources(resource)) {
             startDownloadingIfPrefetch(resource);
         }
@@ -286,14 +288,12 @@ public class ResourceTracker {
      * Wait for a group of resources to be downloaded and made
      * available locally.
      *
-     * @param urls    the resources to wait for
-     * @throws InterruptedException     if thread is interrupted
+     * @param urls the resources to wait for
+     * @throws InterruptedException               if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public void waitForResources(URL... urls) throws InterruptedException {
-        if (urls.length > 0) {
             wait(getResources(urls));
-        }
     }
 
     /**
@@ -304,14 +304,11 @@ public class ResourceTracker {
      * @param timeout  the time in ms to wait before returning, 0 for no timeout
      * @param timeUnit the unit for timeout
      * @return whether the resources downloaded before the timeout
-     * @throws InterruptedException     if thread is interrupted
+     * @throws InterruptedException               if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
-        if (urls.length > 0) {
-            return wait(getResources(urls), timeout, timeUnit);
-        }
-        return true;
+        return wait(getResources(urls), timeout, timeUnit);
     }
 
     /**
@@ -387,13 +384,16 @@ public class ResourceTracker {
      * @throws InterruptedException if another thread interrupted the wait
      */
     private void wait(Resource... resources) throws InterruptedException {
-        for (Future<Resource> future : triggerDownloadForAll(resources)) {
-            try {
-                future.get();
-            } catch (ExecutionException e) {
-                LOG.debug("Error in waiting for resource", e);
-            }
-        }
+        wait(resources, 100_000_000, TimeUnit.DAYS);
+    }
+
+    public static final String getSimpleName(Resource resource) {
+        return Optional.ofNullable(resource)
+                .map(r -> r.getLocation())
+                .map(l -> l.getPath())
+                .map(p -> p.split("/"))
+                .map(a -> a[a.length - 1])
+                .orElse("UNKNOWN");
     }
 
     private List<Future<Resource>> triggerDownloadForAll(Resource... resources) {
@@ -417,30 +417,35 @@ public class ResourceTracker {
      * @throws InterruptedException if another thread interrupted the wait
      */
     private boolean wait(Resource[] resources, long timeout, TimeUnit timeUnit) throws InterruptedException {
+        Assert.requireNonNull(timeUnit, "timeUnit");
         if (timeout <= 0) {
             throw new IllegalArgumentException("Timout must be bigger than 0");
         }
-        long startTime = System.nanoTime();
-        long nanoTimeout = timeUnit.toNanos(timeout);
-
-        // save futures in list to allow parallel start of all resources
-        final List<Future<Resource>> futures = triggerDownloadForAll(resources);
-
-        for (Future<Resource> future : futures) {
-            final long nanoSinceStartOfMethod = System.nanoTime() - startTime;
-            final long waitTime = nanoTimeout - nanoSinceStartOfMethod;
-
-            if (waitTime <= 0) {
-                return false;
-            }
-
-            try {
-                future.get(waitTime, TimeUnit.NANOSECONDS);
-            } catch (TimeoutException e) {
-                return false;
-            } catch (ExecutionException ignored) {
-            }
+        if(resources == null || resources.length == 0) {
+            return true;
         }
-        return true;
+        final long startTimeInNanos = System.nanoTime();
+        final long nanosTillTimeout = timeUnit.toNanos(timeout);
+
+        final List<Future<Resource>> collectedDownloadFutures = Arrays.asList(resources).stream()
+                .map(r -> triggerDownloadFor(r))
+                .collect(Collectors.toList());
+
+        return collectedDownloadFutures.stream()
+                .map(future -> {
+                    final long nanosSinceStartOfMethod = System.nanoTime() - startTimeInNanos;
+                    if (nanosSinceStartOfMethod > nanosTillTimeout) {
+                        return false;
+                    }
+                    try {
+                        future.get(nanosTillTimeout - nanosSinceStartOfMethod, TimeUnit.NANOSECONDS);
+                        return true;
+                    } catch (Exception e) {
+                        return false;
+                    }
+                })
+                .filter(r -> !r)
+                .findAny()
+                .orElse(true);
     }
 }
