@@ -20,11 +20,11 @@ All issues of the former Bugzilla issue tracker at classpath.org were already mi
 ## First Timers Support
 We love open source. Based on this we develop IcedTeaWeb as an open source project.
 If you are new to open source development we have some specific issues for you.
-Just have a look at all issues with the `good first issue` label.
+Just have a look at [all issues with the `good first issue` label](https://github.com/AdoptOpenJDK/IcedTea-Web/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 This issues are reserved for people who never contributed to Open Source before.
 We know that the process of creating a pull request is the biggest barrier for new contributors.
-This issues are for you 💝 We use such issues for example to get involved at Hacktoberfest.
-If you want to know more about open source development and contribution in general you should have a look at this overview.
+This issues are for you 💝 We use such issues for example to get involved at [Hacktoberfest](https://hacktoberfest.digitalocean.com).
+If you want to know more about open source development and contribution in general you should have a look at [this overview](https://github.com/firstcontributions/first-contributions).
 
 ## License
 The project is released as open source under the GPLv2 with exceptions.
