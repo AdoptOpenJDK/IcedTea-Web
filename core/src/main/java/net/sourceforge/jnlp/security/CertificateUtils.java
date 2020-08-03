@@ -177,10 +177,10 @@ public class CertificateUtils {
         for (KeyStore keyStore : keyStores) {
             try {
                 // Check against all certs
-                Enumeration<String> aliases = keyStore.aliases();
+                final Enumeration<String> aliases = keyStore.aliases();
                 while (aliases.hasMoreElements()) {
                     // Verify against this entry
-                    String alias = aliases.nextElement();
+                    final String alias = aliases.nextElement();
                     if (c.equals(keyStore.getCertificate(alias))) {
                         LOG.debug("{} found in cacerts ({})", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore));
                         return true;

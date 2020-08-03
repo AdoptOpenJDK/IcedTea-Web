@@ -416,19 +416,15 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     private boolean isTrustedTsa(CertPath certPath) {
-        try {
-            final List<KeyStore> caKeyStores = KeyStores.getCAKeyStores();
-            // Check entire cert path for a trusted CA
-            for (final Certificate c : certPath.getCertificates()) {
-                if (c instanceof X509Certificate) {
-                    final X509Certificate x509 = (X509Certificate) c;
-                    if (CertificateUtils.inKeyStores(x509, caKeyStores)) {
-                        return true;
-                    }
+        final List<KeyStore> caKeyStores = KeyStores.getCAKeyStores();
+        // Check entire cert path for a trusted CA
+        for (final Certificate c : certPath.getCertificates()) {
+            if (c instanceof X509Certificate) {
+                final X509Certificate x509 = (X509Certificate) c;
+                if (CertificateUtils.inKeyStores(x509, caKeyStores)) {
+                    return true;
                 }
             }
-        } catch (RuntimeException e) {
-            LOG.warn("Unable to read through CA cert store files.");
         }
         return false;
     }
