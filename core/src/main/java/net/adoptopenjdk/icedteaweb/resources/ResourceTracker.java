@@ -17,7 +17,6 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -178,7 +177,7 @@ public class ResourceTracker {
 
     private void startDownloadingIfPrefetch(Resource resource) {
         if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
-            new ResourceHandler(resource).putIntoCache();
+            triggerDownloadFor(resource);
         }
     }
 
@@ -388,19 +387,25 @@ public class ResourceTracker {
      * @throws InterruptedException if another thread interrupted the wait
      */
     private void wait(Resource... resources) throws InterruptedException {
-        // save futures in list to allow parallel start of all resources
-        final List<Future<Resource>> futures = Stream.of(resources)
-                .map(ResourceHandler::new)
-                .map(ResourceHandler::putIntoCache)
-                .collect(Collectors.toList());
-
-        for (Future<Resource> future : futures) {
+        for (Future<Resource> future : triggerDownloadForAll(resources)) {
             try {
                 future.get();
-            } catch (ExecutionException ignored) {
+            } catch (ExecutionException e) {
+                LOG.debug("Error in waiting for resource", e);
             }
         }
     }
+
+    private List<Future<Resource>> triggerDownloadForAll(Resource... resources) {
+        return Stream.of(resources)
+                .map(this::triggerDownloadFor)
+                .collect(Collectors.toList());
+    }
+
+    private Future<Resource> triggerDownloadFor(Resource resource) {
+        return new ResourceHandler(resource).putIntoCache();
+    }
+
 
     /**
      * Wait for some resources.
@@ -419,10 +424,7 @@ public class ResourceTracker {
         long nanoTimeout = timeUnit.toNanos(timeout);
 
         // save futures in list to allow parallel start of all resources
-        final List<Future<Resource>> futures = Stream.of(resources)
-                .map(ResourceHandler::new)
-                .map(ResourceHandler::putIntoCache)
-                .collect(Collectors.toList());
+        final List<Future<Resource>> futures = triggerDownloadForAll(resources);
 
         for (Future<Resource> future : futures) {
             final long nanoSinceStartOfMethod = System.nanoTime() - startTime;

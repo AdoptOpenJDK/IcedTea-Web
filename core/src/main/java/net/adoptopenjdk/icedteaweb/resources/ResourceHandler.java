@@ -7,6 +7,7 @@ import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider.DaemonThreadFactory;
 import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
@@ -17,6 +18,7 @@ import net.sourceforge.jnlp.util.IpUtil;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -34,8 +36,9 @@ import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
-    private static final Executor localExecutor = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 2,
-            10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+
+    private static final Executor localExecutor = new ThreadPoolExecutor(1, Runtime.getRuntime().availableProcessors() * 4,
+            10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new DaemonThreadFactory());
 
     private final Resource resource;
 
@@ -45,18 +48,21 @@ class ResourceHandler {
 
     Future<Resource> putIntoCache() {
         validateWithWhitelist();
-        final CompletableFuture<Resource> result = new CompletableFuture<>();
 
         // the thread which is processing this resource will set its future onto the resource all other
         // threads will return this future and ensure a resource is only processed by a single thread
         synchronized (resource) {
-            final Future<Resource> futureResource = resource.getFutureForDownloaded();
-            if (futureResource != null) {
-                return futureResource;
-            }
-            resource.startProcessing(result);
+            return Optional.ofNullable(resource.getFutureForDownloaded())
+                    .orElseGet(() -> {
+                        final Future<Resource> futureResource = startDownload();
+                        resource.startProcessing(futureResource);
+                        return futureResource;
+                    });
         }
+    }
 
+    private Future<Resource> startDownload() {
+        final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {
             result.complete(resource);
         } else if (isNotCacheable()) {
@@ -70,7 +76,6 @@ class ResourceHandler {
                 }
             });
         }
-
         return result;
     }
 
