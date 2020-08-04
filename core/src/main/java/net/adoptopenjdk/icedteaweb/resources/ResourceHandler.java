@@ -39,7 +39,7 @@ class ResourceHandler {
     }
 
     Future<Resource> putIntoCache(final Executor downloadExecutor) {
-        LOG.debug("Will check and maybe put into cache: {}", ResourceTracker.getSimpleName(resource));
+        LOG.debug("Will check and maybe put into cache: {}", resource.getSimpleName());
         validateWithWhitelist();
 
         // the thread which is processing this resource will set its future onto the resource all other
@@ -47,12 +47,12 @@ class ResourceHandler {
         synchronized (resource) {
             final Future<Resource> future = resource.getFutureForDownloaded();
             if(future == null) {
-                LOG.debug("Download for {} has not been started until now", ResourceTracker.getSimpleName(resource));
+                LOG.debug("Download for {} has not been started until now", resource.getSimpleName());
                 final Future<Resource> futureResource = getDownloadStateAndStartUnstartedDownload(downloadExecutor);
                 resource.startProcessing(futureResource);
                 return futureResource;
             } else {
-                LOG.debug("Download for {} has already been started.", ResourceTracker.getSimpleName(resource));
+                LOG.debug("Download for {} has already been started.", resource.getSimpleName());
                 return future;
             }
         }
@@ -60,16 +60,16 @@ class ResourceHandler {
 
     private Future<Resource> getDownloadStateAndStartUnstartedDownload(final Executor downloadExecutor) {
         Assert.requireNonNull(downloadExecutor, "downloadExecutor");
-        LOG.debug("Checking download state of {}", ResourceTracker.getSimpleName(resource));
+        LOG.debug("Checking download state of {}", resource.getSimpleName());
         final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {
-            LOG.debug("Resource is already downloaded: {} ", ResourceTracker.getSimpleName(resource));
+            LOG.debug("Resource is already downloaded: {} ", resource.getSimpleName());
             result.complete(resource);
         } else if (isNotCacheable()) {
-            LOG.debug("Resource is not cacheable: {}", ResourceTracker.getSimpleName(resource));
+            LOG.debug("Resource is not cacheable: {}", resource.getSimpleName());
             result.complete(initNoneCacheableResources());
         } else {
-            LOG.debug("Download has not been started yet: {}", ResourceTracker.getSimpleName(resource));
+            LOG.debug("Download has not been started yet: {}", resource.getSimpleName());
             downloadExecutor.execute(() -> {
                 try {
                     result.complete(download());
@@ -103,8 +103,7 @@ class ResourceHandler {
                 return downloadResource();
             } catch (Exception e) {
                 if (--triesLeft < 0) {
-                    LOG.info("giving up while downloading '{}' because of {}", ResourceTracker.getSimpleName(resource), e.getMessage());
-                    LOG.debug("Exception while downloading", e);
+                    LOG.debug("Exception while downloading '{}'", resource.getSimpleName(), e);
                     resource.setStatus(ERROR);
                     throw e;
                 }
@@ -113,7 +112,7 @@ class ResourceHandler {
     }
 
     private Resource downloadResource() {
-        LOG.debug("Download of resource {} will start now!", ResourceTracker.getSimpleName(resource));
+        LOG.debug("Download of resource {} will start now!", resource.getSimpleName());
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
         final InitializationResult initResult = initializer.init();
         if (initResult.needsDownload()) {

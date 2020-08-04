@@ -35,7 +35,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -152,7 +151,7 @@ public class ResourceTracker {
 
         final URL normalizedLocation = normalizeUrlQuietly(location);
         final Resource resource = createResource(normalizedLocation, version, downloadOptions, updatePolicy);
-        LOG.debug("Will add resource '{}'", ResourceTracker.getSimpleName(resource));
+        LOG.debug("Will add resource '{}'", resource.getSimpleName());
         if (addToResources(resource)) {
             startDownloadingIfPrefetch(resource);
         }
@@ -363,15 +362,6 @@ public class ResourceTracker {
             }
             return result;
         }
-    }
-
-    public static final String getSimpleName(Resource resource) {
-        return Optional.ofNullable(resource)
-                .map(r -> r.getLocation())
-                .map(l -> l.getPath())
-                .map(p -> p.split("/"))
-                .map(a -> a[a.length - 1])
-                .orElse("UNKNOWN");
     }
 
     private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {

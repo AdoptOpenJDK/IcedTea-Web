@@ -26,6 +26,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -281,5 +282,13 @@ public class Resource {
     @Override
     public String toString() {
         return "location=" + location.toString() + " version=" + requestVersion + " state=" + status;
+    }
+
+    public String getSimpleName() {
+        return Optional.ofNullable(getLocation())
+                .map(l -> l.getPath())
+                .map(p -> p.split("/"))
+                .map(a -> a[a.length - 1])
+                .orElse("UNKNOWN");
     }
 }
