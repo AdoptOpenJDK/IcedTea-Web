@@ -353,6 +353,7 @@ public class JarCertVerifier implements CertVerifier {
 
                     final Optional<Timestamp> optionalTsa = Optional.ofNullable(codeSigners.get(certPath))
                             .map(CodeSigner::getTimestamp);
+
                     final X509Certificate tsaCertificate = (X509Certificate) optionalTsa
                             .map(Timestamp::getSignerCertPath)
                             .map(CertPath::getCertificates)
@@ -361,12 +362,18 @@ public class JarCertVerifier implements CertVerifier {
                             .filter(c -> c instanceof X509Certificate)
                             .orElse(null);
 
-                    if (tsaCertificate != null && isTrustedTsa(optionalTsa.map(Timestamp::getSignerCertPath).orElseThrow(() -> new RuntimeException("cert path is null even tough we have a tsa certificate")))) {
+                    final CertPath tsaCertPath = optionalTsa
+                            .map(Timestamp::getSignerCertPath)
+                            .orElse(null);
+
+                    final Date tsaDate = optionalTsa
+                            .map(Timestamp::getTimestamp)
+                            .orElse(null);
+
+                    if (tsaCertificate != null && isTrustedTsa(tsaCertPath)) {
                         final ZonedDateTime tsaNotBefore = zonedDateTime(tsaCertificate.getNotBefore());
                         final ZonedDateTime tsaNotAfter = zonedDateTime(tsaCertificate.getNotAfter());
-                        final ZonedDateTime signedAt = zonedDateTime(optionalTsa.map(Timestamp::getTimestamp)
-                                .orElseThrow(() -> new RuntimeException("timestamp is null even tough we have a tsa certificate"))
-                        );
+                        final ZonedDateTime signedAt = zonedDateTime(tsaDate);
 
                         if (signedAt.isBefore(tsaNotBefore) || now.isBefore(tsaNotBefore)) {
                             certInfo.setNotYetValidCert();
@@ -440,6 +447,9 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     private ZonedDateTime zonedDateTime(final Date date) {
+        if (date == null) {
+            return ZonedDateTime.now();
+        }
         return date.toInstant().atZone(ZoneId.systemDefault());
     }
 
