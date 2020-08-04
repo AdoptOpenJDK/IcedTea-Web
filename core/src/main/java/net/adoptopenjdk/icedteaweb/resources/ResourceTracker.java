@@ -24,6 +24,7 @@ import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.util.UrlUtils;
 
+import javax.jnlp.DownloadServiceListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -432,20 +433,43 @@ public class ResourceTracker {
                 .collect(Collectors.toList());
 
         return collectedDownloadFutures.stream()
-                .map(future -> {
-                    final long nanosSinceStartOfMethod = System.nanoTime() - startTimeInNanos;
-                    if (nanosSinceStartOfMethod > nanosTillTimeout) {
-                        return false;
-                    }
-                    try {
-                        future.get(nanosTillTimeout - nanosSinceStartOfMethod, TimeUnit.NANOSECONDS);
-                        return true;
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
+                .map(future -> isDone(future, startTimeInNanos, nanosTillTimeout))
                 .filter(r -> !r)
                 .findAny()
                 .orElse(true);
+    }
+
+    private boolean isDone(final Future<Resource> future, final long startTimeInNanos, final long timeoutInNanos) {
+        final long nanosSinceStartOfMethod = System.nanoTime() - startTimeInNanos;
+        if (nanosSinceStartOfMethod > timeoutInNanos) {
+            return false;
+        }
+        try {
+            future.get(timeoutInNanos - nanosSinceStartOfMethod, TimeUnit.NANOSECONDS);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void addDownloadListener(final URL resourceUrl, URL[] allResources, final DownloadServiceListener listener) {
+        final Resource resource = getResource(resourceUrl);
+        resource.addPropertyChangeListener(Resource.SIZE_PROPERTY, e -> listener.progress(resourceUrl, "version", resource.getTransferred(), resource.getSize(), getPercentageDownloaded(allResources)));
+        resource.addPropertyChangeListener(Resource.TRANSFERRED_PROPERTY, e -> listener.progress(resourceUrl, "version", resource.getTransferred(), resource.getSize(), getPercentageDownloaded(allResources)));
+    }
+
+    private int getPercentageDownloaded(URL[] allResources) {
+        return (int) Arrays.asList(allResources).stream()
+                .map(u -> getResource(u))
+                .mapToDouble(r -> {
+                    if(r.isComplete()) {
+                        return 100.0d;
+                    }
+                    if(r.isBeingProcessed()) {
+                        final double p = (100.0d * r.getTransferred()) / r.getSize();
+                        return Math.max(0.0d, Math.min(100.0d, p));
+                    }
+                    return 0.0d;
+                }).sum() / allResources.length;
     }
 }

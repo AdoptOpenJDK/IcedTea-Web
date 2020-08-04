@@ -16,8 +16,8 @@
 
 package net.adoptopenjdk.icedteaweb.client.parts.downloadindicator;
 
-import java.net.URL;
 import javax.jnlp.DownloadServiceListener;
+import java.net.URL;
 
 /**
  * A DownloadIndicator creates DownloadServiceListeners that are
@@ -54,27 +54,4 @@ public interface DownloadIndicator {
      * @param listener the listener that is no longer in use
      */
     void disposeListener(DownloadServiceListener listener);
-
-    /**
-     * Return the desired time in milliseconds between updates.
-     * Updates are not guaranteed to occur based on this value; for
-     * example, they may occur based on the download percent or some
-     * other factor.
-     *
-     * @return rate in milliseconds, must be &gt;= 0
-     */
-    int getUpdateRate();
-
-    /**
-     * Return a time in milliseconds to wait for a download to
-     * complete before obtaining a listener for the download.  This
-     * value can be used to skip lengthy operations, such as
-     * initializing a GUI, for downloads that complete quickly.  The
-     * getListener method is not called if the download completes
-     * in less time than the returned delay.
-     *
-     * @return delay in milliseconds, must be &gt;= 0
-     */
-    int getInitialDelay();
-
 }
