@@ -30,14 +30,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
@@ -245,10 +241,10 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!resource.isComplete()) {
-                wait(resource);
+                waitForCompletion(resource);
             }
-        } catch (InterruptedException ex) {
-            LOG.error("Interrupted while fetching resource {}: {}", location, ex.getMessage());
+        } catch (Exception ex) {
+            LOG.error("Error while fetching resource " + location, ex);
             return null; // need an error exception to throw
         }
         return getCacheFile(resource);
@@ -294,22 +290,7 @@ public class ResourceTracker {
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public void waitForResources(URL... urls) throws InterruptedException {
-            wait(getResources(urls));
-    }
-
-    /**
-     * Wait for a group of resources to be downloaded and made
-     * available locally.
-     *
-     * @param urls     the resources to wait for
-     * @param timeout  the time in ms to wait before returning, 0 for no timeout
-     * @param timeUnit the unit for timeout
-     * @return whether the resources downloaded before the timeout
-     * @throws InterruptedException               if thread is interrupted
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    public boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
-        return wait(getResources(urls), timeout, timeUnit);
+        waitForCompletion(getResources(urls));
     }
 
     /**
@@ -378,16 +359,6 @@ public class ResourceTracker {
         }
     }
 
-    /**
-     * Wait for some resources.
-     *
-     * @param resources the resources to wait for
-     * @throws InterruptedException if another thread interrupted the wait
-     */
-    private void wait(Resource... resources) throws InterruptedException {
-        wait(resources, 100_000_000, TimeUnit.DAYS);
-    }
-
     public static final String getSimpleName(Resource resource) {
         return Optional.ofNullable(resource)
                 .map(r -> r.getLocation())
@@ -395,12 +366,6 @@ public class ResourceTracker {
                 .map(p -> p.split("/"))
                 .map(a -> a[a.length - 1])
                 .orElse("UNKNOWN");
-    }
-
-    private List<Future<Resource>> triggerDownloadForAll(Resource... resources) {
-        return Stream.of(resources)
-                .map(this::triggerDownloadFor)
-                .collect(Collectors.toList());
     }
 
     private Future<Resource> triggerDownloadFor(Resource resource) {
@@ -412,45 +377,25 @@ public class ResourceTracker {
      * Wait for some resources.
      *
      * @param resources the resources to wait for
-     * @param timeout   the timeout, or {@code 0} to wait until completed
      * @return {@code true} if the resources were downloaded or had errors,
      * {@code false} if the timeout was reached
      * @throws InterruptedException if another thread interrupted the wait
      */
-    private boolean wait(Resource[] resources, long timeout, TimeUnit timeUnit) throws InterruptedException {
-        Assert.requireNonNull(timeUnit, "timeUnit");
-        if (timeout <= 0) {
-            throw new IllegalArgumentException("Timout must be bigger than 0");
+    private void waitForCompletion(Resource... resources) throws InterruptedException {
+        if (resources == null || resources.length == 0) {
+            return;
         }
-        if(resources == null || resources.length == 0) {
-            return true;
-        }
-        final long startTimeInNanos = System.nanoTime();
-        final long nanosTillTimeout = timeUnit.toNanos(timeout);
-
-        final List<Future<Resource>> collectedDownloadFutures = Arrays.asList(resources).stream()
+        Arrays.asList(resources).stream()
                 .map(r -> triggerDownloadFor(r))
-                .collect(Collectors.toList());
-
-        return collectedDownloadFutures.stream()
-                .map(future -> isDone(future, startTimeInNanos, nanosTillTimeout))
-                .filter(r -> !r)
-                .findAny()
-                .orElse(true);
+                .forEach(f -> {
+                    try {
+                        f.get();
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error while waiting for download", e);
+                    }
+                });
     }
 
-    private boolean isDone(final Future<Resource> future, final long startTimeInNanos, final long timeoutInNanos) {
-        final long nanosSinceStartOfMethod = System.nanoTime() - startTimeInNanos;
-        if (nanosSinceStartOfMethod > timeoutInNanos) {
-            return false;
-        }
-        try {
-            future.get(timeoutInNanos - nanosSinceStartOfMethod, TimeUnit.NANOSECONDS);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     public void addDownloadListener(final URL resourceUrl, URL[] allResources, final DownloadServiceListener listener) {
         final Resource resource = getResource(resourceUrl);
@@ -462,10 +407,10 @@ public class ResourceTracker {
         return (int) Arrays.asList(allResources).stream()
                 .map(u -> getResource(u))
                 .mapToDouble(r -> {
-                    if(r.isComplete()) {
+                    if (r.isComplete()) {
                         return 100.0d;
                     }
-                    if(r.isBeingProcessed()) {
+                    if (r.isBeingProcessed()) {
                         final double p = (100.0d * r.getTransferred()) / r.getSize();
                         return Math.max(0.0d, Math.min(100.0d, p));
                     }

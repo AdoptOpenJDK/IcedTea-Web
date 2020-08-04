@@ -47,7 +47,6 @@ import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.concurrent.TimeUnit.DAYS;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.JAR_PROTOCOL;
 
@@ -247,8 +246,8 @@ public class CacheUtil {
             } finally {
                 indicator.disposeListener(listener);
             }
-        } catch (InterruptedException ex) {
-            LOG.error("Downloading of resources was interrupted", ex);
+        } catch (Exception ex) {
+            LOG.error("Downloading of resources ended with error", ex);
         }
     }
 
