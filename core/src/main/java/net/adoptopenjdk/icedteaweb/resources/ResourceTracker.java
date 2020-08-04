@@ -20,8 +20,11 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider.DaemonThreadFactory;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.jnlp.DownloadServiceListener;
@@ -33,6 +36,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
@@ -176,7 +182,7 @@ public class ResourceTracker {
 
     private void startDownloadingIfPrefetch(Resource resource) {
         if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
-            triggerDownloadFor(resource);
+            triggerDownloadFor(resource, Executors.newSingleThreadExecutor(new DaemonThreadFactory()));
         }
     }
 
@@ -368,10 +374,9 @@ public class ResourceTracker {
                 .orElse("UNKNOWN");
     }
 
-    private Future<Resource> triggerDownloadFor(Resource resource) {
-        return new ResourceHandler(resource).putIntoCache();
+    private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {
+        return new ResourceHandler(resource).putIntoCache(downloadExecutor);
     }
-
 
     /**
      * Wait for some resources.
@@ -381,19 +386,28 @@ public class ResourceTracker {
      * {@code false} if the timeout was reached
      * @throws InterruptedException if another thread interrupted the wait
      */
-    private void waitForCompletion(Resource... resources) throws InterruptedException {
+    private void waitForCompletion(Resource... resources) {
         if (resources == null || resources.length == 0) {
             return;
         }
-        Arrays.asList(resources).stream()
-                .map(r -> triggerDownloadFor(r))
-                .forEach(f -> {
-                    try {
-                        f.get();
-                    } catch (Exception e) {
-                        throw new RuntimeException("Error while waiting for download", e);
-                    }
-                });
+
+        final int configuredThreadCount = Integer.parseInt(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT));
+        final int threadCount = Math.min(configuredThreadCount, resources.length);
+        final ExecutorService downloadExecutor = Executors.newFixedThreadPool(threadCount, new DaemonThreadFactory());
+        try {
+            Arrays.asList(resources).stream()
+                    .map(r -> triggerDownloadFor(r, downloadExecutor))
+                    .forEach(f -> {
+                        try {
+                            f.get();
+                        } catch (Exception e) {
+                            throw new RuntimeException("Error while waiting for download", e);
+                        }
+                    });
+        } finally {
+            LOG.debug("Download done. Shutting down executor");
+            downloadExecutor.shutdownNow();
+        }
     }
 
 

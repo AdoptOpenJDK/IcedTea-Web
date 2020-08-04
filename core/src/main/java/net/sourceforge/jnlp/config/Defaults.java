@@ -469,6 +469,13 @@ public class Defaults {
                     new SecurityValueValidator()
             ),
 
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT,
+                    //Based on https://docs.pushtechnology.com/cloud/latest/manual/html/designguide/solution/support/connection_limitations.html
+                    String.valueOf(6),
+                    ValidatorFactory.createRangedIntegerValidator(1, 24)
+            ),
+
             /*
              * JVM executable for itw
              */
