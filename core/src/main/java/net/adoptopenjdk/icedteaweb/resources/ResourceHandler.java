@@ -59,7 +59,6 @@ class ResourceHandler {
     }
 
     private Future<Resource> getDownloadStateAndStartUnstartedDownload(final Executor downloadExecutor) {
-        Assert.requireNonNull(downloadExecutor, "downloadExecutor");
         LOG.debug("Checking download state of {}", resource.getSimpleName());
         final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {

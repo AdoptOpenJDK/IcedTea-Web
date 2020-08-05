@@ -364,10 +364,6 @@ public class ResourceTracker {
         }
     }
 
-    private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {
-        return new ResourceHandler(resource).putIntoCache(downloadExecutor);
-    }
-
     /**
      * Wait for some resources.
      *
@@ -400,6 +396,9 @@ public class ResourceTracker {
         }
     }
 
+    private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {
+        return new ResourceHandler(resource).putIntoCache(downloadExecutor);
+    }
 
     public void addDownloadListener(final URL resourceUrl, URL[] allResources, final DownloadServiceListener listener) {
         final Resource resource = getResource(resourceUrl);
@@ -414,7 +413,7 @@ public class ResourceTracker {
                     if (r.isComplete()) {
                         return 100.0d;
                     }
-                    if (r.isBeingProcessed()) {
+                    if (r.isBeingProcessed() && r.getSize() > 0) {
                         final double p = (100.0d * r.getTransferred()) / r.getSize();
                         return Math.max(0.0d, Math.min(100.0d, p));
                     }
