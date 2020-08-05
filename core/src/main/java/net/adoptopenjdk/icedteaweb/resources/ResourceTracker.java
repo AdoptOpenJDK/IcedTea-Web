@@ -33,12 +33,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
@@ -381,15 +383,15 @@ public class ResourceTracker {
         final int threadCount = Math.min(configuredThreadCount, resources.length);
         final ExecutorService downloadExecutor = Executors.newFixedThreadPool(threadCount, new DaemonThreadFactory());
         try {
-            Arrays.asList(resources).stream()
+            final List<Future<Resource>> futures = Arrays.asList(resources).stream()
                     .map(r -> triggerDownloadFor(r, downloadExecutor))
-                    .forEach(f -> {
-                        try {
-                            f.get();
-                        } catch (Exception e) {
-                            throw new RuntimeException("Error while waiting for download", e);
-                        }
-                    });
+                    .collect(Collectors.toList());
+
+            for (Future<Resource> future : futures) {
+                future.get();
+            }
+        } catch (final Exception e) {
+            throw new RuntimeException("Error while waiting for download", e);
         } finally {
             LOG.debug("Download done. Shutting down executor");
             downloadExecutor.shutdownNow();
