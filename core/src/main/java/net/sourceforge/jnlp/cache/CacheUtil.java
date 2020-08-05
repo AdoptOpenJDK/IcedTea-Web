@@ -18,6 +18,7 @@ package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
+import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DummyDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
@@ -30,8 +31,8 @@ import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
 import javax.jnlp.DownloadServiceListener;
 import java.io.File;
@@ -39,7 +40,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +47,6 @@ import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.JAR_PROTOCOL;
 
@@ -120,7 +119,7 @@ public class CacheUtil {
      * if not, then URLConnection.openStream can be used to obtain
      * the contents.
      *
-     * @param source  the url of resource
+     * @param source the url of resource
      * @return whether this resource can be cached
      */
     public static boolean isCacheable(URL source) {
@@ -129,14 +128,13 @@ public class CacheUtil {
     }
 
 
-
     /**
      * Converts a URL into a local path string within the given directory. For
      * example a url with subdirectory /tmp/ will
      * result in a File that is located somewhere within /tmp/
      *
      * @param location the url
-     * @param root   the subdirectory
+     * @param root     the subdirectory
      * @return the file
      */
     public static File urlToPath(URL location, String root) {
@@ -229,69 +227,27 @@ public class CacheUtil {
     /**
      * Waits until the resources are downloaded, while showing a
      * progress indicator.
+     *
      * @param jnlpClassLoader the classloader
-     * @param tracker   the resource tracker
-     * @param resources the resources to wait for
-     * @param title     name of the download
+     * @param tracker         the resource tracker
+     * @param resources       the resources to wait for
+     * @param title           name of the download
      */
     public static void waitForResources(final JNLPClassLoader jnlpClassLoader, final ResourceTracker tracker, final URL[] resources, final String title) {
-        final DownloadIndicator indicator = JNLPRuntime.getDefaultDownloadIndicator();
-        DownloadServiceListener listener = null;
-
         try {
-            if (indicator == null) {
+            final DownloadIndicator indicator = Optional.ofNullable(JNLPRuntime.getDefaultDownloadIndicator())
+                    .orElseGet(() -> new DummyDownloadIndicator());
+            final DownloadServiceListener listener = getDownloadServiceListener(jnlpClassLoader, title, resources, indicator);
+            try {
+                for (URL url : resources) {
+                    tracker.addDownloadListener(url, resources, listener);
+                }
                 tracker.waitForResources(resources);
-                return;
-            }
-
-            // see if resources can be downloaded very quickly; avoids
-            // overhead of creating display components for the resources
-            if (tracker.waitForResources(resources, indicator.getInitialDelay(), MILLISECONDS)) {
-                return;
-            }
-
-            // only resources not starting out downloaded are displayed
-            final List<URL> urlList = new ArrayList<>();
-            for (URL url : resources) {
-                if (!tracker.checkResource(url))
-                    urlList.add(url);
-            }
-            final URL[] undownloaded = urlList.toArray(new URL[0]);
-
-            listener = getDownloadServiceListener(jnlpClassLoader, title, undownloaded, indicator);
-
-            do {
-                long read = 0;
-                long total = 0;
-
-                for (URL url : undownloaded) {
-                    // add in any -1's; they're insignificant
-                    total += tracker.getTotalSize(url);
-                    read += tracker.getAmountRead(url);
-                }
-
-                int percent = (int) ((100 * read) / Math.max(1, total));
-
-                for (URL url : undownloaded) {
-                    listener.progress(url, "version",
-                            tracker.getAmountRead(url),
-                            tracker.getTotalSize(url),
-                            percent);
-                }
-            } while (!tracker.waitForResources(resources, indicator.getUpdateRate(), MILLISECONDS));
-
-            // make sure they read 100% until indicator closes
-            for (URL url : undownloaded) {
-                listener.progress(url, "version",
-                        tracker.getTotalSize(url),
-                        tracker.getTotalSize(url),
-                        100);
-            }
-        } catch (InterruptedException ex) {
-            LOG.error("Downloading of resources was interrupted", ex);
-        } finally {
-            if (indicator != null && listener != null)
+            } finally {
                 indicator.disposeListener(listener);
+            }
+        } catch (Exception ex) {
+            LOG.error("Downloading of resources ended with error", ex);
         }
     }
 
