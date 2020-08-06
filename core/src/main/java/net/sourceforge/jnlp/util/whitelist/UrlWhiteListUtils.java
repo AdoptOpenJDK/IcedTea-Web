@@ -67,7 +67,17 @@ public class UrlWhiteListUtils {
         return whiteList.stream().anyMatch(wlEntry -> wlEntry.matches(url));
     }
 
-
+    static WhitelistEntry validateWhitelistUrl(final String wlUrlStr) {
+        Assert.requireNonNull(wlUrlStr, "wlUrlStr");
+        try {
+            final String validatedWLUrlProtocol = validateWhitelistUrlProtocol(wlUrlStr);
+            final String validatedWLUrlStr = validateWhitelistUrlPort(validatedWLUrlProtocol);
+            final URL validatedUrl = validateWhitelistUrlHost(validatedWLUrlStr);
+            return WhitelistEntry.validWhitelistEntry(wlUrlStr, validatedUrl);
+        } catch (Exception e) {
+            return WhitelistEntry.invalidWhitelistEntry(wlUrlStr, e.getMessage());
+        }
+    }
 
     private static String validateWhitelistUrlProtocol(final String wlUrlStr) throws MalformedURLException {
         final String[] splitProtocol = wlUrlStr.split(PROTOCOL_SEPARATOR);
@@ -105,27 +115,6 @@ public class UrlWhiteListUtils {
         return wlUrlStr;
     }
 
-    // IP Address => all digits, 4 parts, *, -
-    private static boolean isIP(final String wlUrlStr) {
-        final boolean hasValidChars = wlUrlStr.replace(HOST_PART_SEP.charAt(0), '0').chars().allMatch(c -> Character.isDigit(c) || c == WILDCARD.charAt(0) || c == '-');
-        final String[] ipParts = wlUrlStr.split(HOST_PART_REGEX);
-        return hasValidChars && ipParts.length == 4;
-    }
-
-    private static void validateIPPart(final String ipPart) throws Exception {
-        if (ipPart.contains(WILDCARD) || ipPart.contains("-")) {
-            throw new Exception(R("SWPINVALIDIPHOST"));
-        }
-        try {
-            final int ipPartInt = Integer.parseInt(ipPart);
-            if (ipPartInt < 0 || ipPartInt > 255) {
-                throw new Exception(R("SWPINVALIDIPHOST"));
-            }
-        } catch (NumberFormatException nfe) {
-            throw new Exception(R("SWPINVALIDIPHOST"));
-        }
-    }
-
     private static URL validateWhitelistUrlHost(final String wlUrlStr) throws Exception {
         final URL wlURL = new URL(wlUrlStr);
         final String hostStr = wlURL.getHost();
@@ -151,16 +140,24 @@ public class UrlWhiteListUtils {
         return wlURL;
     }
 
-    static WhitelistEntry validateWhitelistUrl(final String wlUrlStr) {
-        Assert.requireNonNull(wlUrlStr, "wlUrlStr");
-        try {
-            final String validatedWLUrlProtocol = validateWhitelistUrlProtocol(wlUrlStr);
-            final String validatedWLUrlStr = validateWhitelistUrlPort(validatedWLUrlProtocol);
-            final URL validatedUrl = validateWhitelistUrlHost(validatedWLUrlStr);
-            return WhitelistEntry.validWhitelistEntry(wlUrlStr, validatedUrl);
-        } catch (Exception e) {
-            return WhitelistEntry.invalidWhitelistEntry(wlUrlStr, e.getMessage());
-        }
+    // IP Address => all digits, 4 parts, *, -
+    private static boolean isIP(final String wlUrlStr) {
+        final boolean hasValidChars = wlUrlStr.replace(HOST_PART_SEP.charAt(0), '0').chars().allMatch(c -> Character.isDigit(c) || c == WILDCARD.charAt(0) || c == '-');
+        final String[] ipParts = wlUrlStr.split(HOST_PART_REGEX);
+        return hasValidChars && ipParts.length == 4;
     }
 
+    private static void validateIPPart(final String ipPart) throws Exception {
+        if (ipPart.contains(WILDCARD) || ipPart.contains("-")) {
+            throw new Exception(R("SWPINVALIDIPHOST"));
+        }
+        try {
+            final int ipPartInt = Integer.parseInt(ipPart);
+            if (ipPartInt < 0 || ipPartInt > 255) {
+                throw new Exception(R("SWPINVALIDIPHOST"));
+            }
+        } catch (NumberFormatException nfe) {
+            throw new Exception(R("SWPINVALIDIPHOST"));
+        }
+    }
 }
