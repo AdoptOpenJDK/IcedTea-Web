@@ -212,7 +212,7 @@ public class UrlWhiteListUtils {
             validateWhitelistUrlHost(validatedWLUrlStr);
             return WhitelistEntry.validWhitelistEntry(wlUrlStr, validatedWLUrlStr);
         } catch (Exception e) {
-            return WhitelistEntry.invalidWhitelistentry(wlUrlStr, e.getMessage());
+            return WhitelistEntry.invalidWhitelistEntry(wlUrlStr, e.getMessage());
         }
     }
 
@@ -247,7 +247,7 @@ public class UrlWhiteListUtils {
             return new WhitelistEntry(wlEntry, validatedEntry, null);
         }
 
-        public static WhitelistEntry invalidWhitelistentry(final String wlEntry, final String errorMessage) {
+        public static WhitelistEntry invalidWhitelistEntry(final String wlEntry, final String errorMessage) {
             return new WhitelistEntry(wlEntry, null, errorMessage);
         }
     }
