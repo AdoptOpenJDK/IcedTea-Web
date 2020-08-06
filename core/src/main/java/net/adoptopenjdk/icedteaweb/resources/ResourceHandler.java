@@ -18,9 +18,6 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
@@ -30,8 +27,6 @@ import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
-    private static final Executor localExecutor = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors() * 2,
-            10L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
     private final Resource resource;
 
@@ -39,26 +34,38 @@ class ResourceHandler {
         this.resource = Assert.requireNonNull(resource, "resource");
     }
 
-    Future<Resource> putIntoCache() {
+    Future<Resource> putIntoCache(final Executor downloadExecutor) {
+        LOG.debug("Will check and maybe put into cache: {}", resource.getSimpleName());
         validateWithWhitelist();
-        final CompletableFuture<Resource> result = new CompletableFuture<>();
 
         // the thread which is processing this resource will set its future onto the resource all other
         // threads will return this future and ensure a resource is only processed by a single thread
         synchronized (resource) {
-            final Future<Resource> futureResource = resource.getFutureForDownloaded();
-            if (futureResource != null) {
+            final Future<Resource> future = resource.getFutureForDownloaded();
+            if(future == null) {
+                LOG.debug("Download for {} has not been started until now", resource.getSimpleName());
+                final Future<Resource> futureResource = getDownloadStateAndStartUnstartedDownload(downloadExecutor);
+                resource.startProcessing(futureResource);
                 return futureResource;
+            } else {
+                LOG.debug("Download for {} has already been started.", resource.getSimpleName());
+                return future;
             }
-            resource.startProcessing(result);
         }
+    }
 
+    private Future<Resource> getDownloadStateAndStartUnstartedDownload(final Executor downloadExecutor) {
+        LOG.debug("Checking download state of {}", resource.getSimpleName());
+        final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {
+            LOG.debug("Resource is already downloaded: {} ", resource.getSimpleName());
             result.complete(resource);
         } else if (isNotCacheable()) {
+            LOG.debug("Resource is not cacheable: {}", resource.getSimpleName());
             result.complete(initNoneCacheableResources());
         } else {
-            localExecutor.execute(() -> {
+            LOG.debug("Download has not been started yet: {}", resource.getSimpleName());
+            downloadExecutor.execute(() -> {
                 try {
                     result.complete(download());
                 } catch (Exception e) {
@@ -66,7 +73,6 @@ class ResourceHandler {
                 }
             });
         }
-
         return result;
     }
 
@@ -92,8 +98,7 @@ class ResourceHandler {
                 return downloadResource();
             } catch (Exception e) {
                 if (--triesLeft < 0) {
-                    LOG.info("giving up while downloading '{}' because of {}", resource.getLocation(), e.getMessage());
-                    LOG.debug("Exception while downloading", e);
+                    LOG.debug("Exception while downloading '{}'", resource.getSimpleName(), e);
                     resource.setStatus(ERROR);
                     throw e;
                 }
@@ -102,6 +107,7 @@ class ResourceHandler {
     }
 
     private Resource downloadResource() {
+        LOG.debug("Download of resource {} will start now!", resource.getSimpleName());
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
         final InitializationResult initResult = initializer.init();
         if (initResult.needsDownload()) {

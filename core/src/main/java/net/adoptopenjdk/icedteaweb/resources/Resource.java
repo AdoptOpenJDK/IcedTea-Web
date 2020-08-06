@@ -21,9 +21,12 @@ import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.WeakList;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Future;
 
 /**
@@ -49,6 +52,10 @@ public class Resource {
 
     /** list of weak references of resources currently in use */
     private static final WeakList<Resource> resources = new WeakList<>();
+    public static final String SIZE_PROPERTY = "size";
+    public static final String TRANSFERRED_PROPERTY = "transferred";
+
+    private final PropertyChangeSupport propertyChangeSupport;
 
     public enum Status {
         INCOMPLETE,
@@ -91,6 +98,15 @@ public class Resource {
         this.requestVersion = requestVersion;
         this.downloadOptions = downloadOptions;
         this.updatePolicy = updatePolicy;
+        this.propertyChangeSupport = new PropertyChangeSupport(this);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        this.propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        this.propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     /**
@@ -169,7 +185,9 @@ public class Resource {
      * @param transferred set the whole transferred amount to this value
      */
     public void setTransferred(long transferred) {
+        final long oldTransferred = this.transferred;
         this.transferred = transferred;
+        this.propertyChangeSupport.firePropertyChange(TRANSFERRED_PROPERTY, oldTransferred, this.transferred);
     }
 
     /**
@@ -187,7 +205,9 @@ public class Resource {
      * @param size desired size of resource
      */
     public void setSize(long size) {
+        final long oldSize = this.size;
         this.size = size;
+        this.propertyChangeSupport.firePropertyChange(SIZE_PROPERTY, oldSize, this.size);
     }
 
     boolean isBeingProcessed() {
@@ -262,5 +282,13 @@ public class Resource {
     @Override
     public String toString() {
         return "location=" + location.toString() + " version=" + requestVersion + " state=" + status;
+    }
+
+    public String getSimpleName() {
+        return Optional.ofNullable(getLocation())
+                .map(l -> l.getPath())
+                .map(p -> p.split("/"))
+                .map(a -> a[a.length - 1])
+                .orElse("UNKNOWN");
     }
 }

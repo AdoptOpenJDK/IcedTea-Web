@@ -67,13 +67,7 @@ public class ManagedApplicationWithProgressClassTest implements IntegrationTest 
 
         tmpItwHome.createTrustSettings(jnlpUrl);
 
-        final DefaultDownloadIndicator testDownloadIndicator = new DefaultDownloadIndicator() {
-            @Override
-            public int getInitialDelay() {
-                // pimp the initial delay so that the progress indicator really shows up
-                return 1;
-            }
-        };
+        final DefaultDownloadIndicator testDownloadIndicator = new DefaultDownloadIndicator();
 
         JNLPRuntime.setDefaultDownloadIndicator(testDownloadIndicator);
 

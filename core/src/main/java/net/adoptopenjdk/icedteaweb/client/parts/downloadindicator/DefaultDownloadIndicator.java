@@ -104,22 +104,6 @@ public class DefaultDownloadIndicator implements DownloadIndicator {
     }
 
     /**
-     * @return the update rate.
-     */
-    @Override
-    public int getUpdateRate() {
-        return 150; //ms
-    }
-
-    /**
-     * @return the initial delay before obtaining a listener.
-     */
-    @Override
-    public int getInitialDelay() {
-        return 300; //ms
-    }
-
-    /**
      * Return a download service listener that displays the progress
      * in a shared download info window.
      *

@@ -72,6 +72,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     }
 
     private CompletableFuture<Resource> downloadFrom(final URL url) {
+        LOG.debug("Will download in background: {}", url);
         final CompletableFuture<Resource> result = new CompletableFuture<>();
         CachedDaemonThreadPoolProvider.getThreadPool().execute(() -> {
             try {
@@ -84,8 +85,6 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     }
 
     private Resource tryDownloading(final URL downloadFrom) throws IOException {
-        LOG.debug("Downloading {} from {}", resource, downloadFrom);
-
         try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
             final DownloadDetails downloadDetails = getDownloadDetails(connection);
 

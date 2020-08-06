@@ -17,27 +17,30 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider.DaemonThreadFactory;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
+import javax.jnlp.DownloadServiceListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
@@ -145,10 +148,12 @@ public class ResourceTracker {
      */
     public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
         Assert.requireNonNull(location, "location");
+        LOG.debug("Will add resource at location '{}'", location);
+
 
         final URL normalizedLocation = normalizeUrlQuietly(location);
         final Resource resource = createResource(normalizedLocation, version, downloadOptions, updatePolicy);
-
+        LOG.debug("Will add resource '{}'", resource.getSimpleName());
         if (addToResources(resource)) {
             startDownloadingIfPrefetch(resource);
         }
@@ -178,7 +183,7 @@ public class ResourceTracker {
 
     private void startDownloadingIfPrefetch(Resource resource) {
         if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
-            new ResourceHandler(resource).putIntoCache();
+            triggerDownloadFor(resource, Executors.newSingleThreadExecutor(new DaemonThreadFactory()));
         }
     }
 
@@ -243,10 +248,10 @@ public class ResourceTracker {
         Resource resource = getResource(location);
         try {
             if (!resource.isComplete()) {
-                wait(resource);
+                waitForCompletion(resource);
             }
-        } catch (InterruptedException ex) {
-            LOG.error("Interrupted while fetching resource {}: {}", location, ex.getMessage());
+        } catch (Exception ex) {
+            LOG.error("Error while fetching resource " + location, ex);
             return null; // need an error exception to throw
         }
         return getCacheFile(resource);
@@ -287,32 +292,12 @@ public class ResourceTracker {
      * Wait for a group of resources to be downloaded and made
      * available locally.
      *
-     * @param urls    the resources to wait for
-     * @throws InterruptedException     if thread is interrupted
+     * @param urls the resources to wait for
+     * @throws InterruptedException               if thread is interrupted
      * @throws IllegalResourceDescriptorException if the resource is not being tracked
      */
     public void waitForResources(URL... urls) throws InterruptedException {
-        if (urls.length > 0) {
-            wait(getResources(urls));
-        }
-    }
-
-    /**
-     * Wait for a group of resources to be downloaded and made
-     * available locally.
-     *
-     * @param urls     the resources to wait for
-     * @param timeout  the time in ms to wait before returning, 0 for no timeout
-     * @param timeUnit the unit for timeout
-     * @return whether the resources downloaded before the timeout
-     * @throws InterruptedException     if thread is interrupted
-     * @throws IllegalResourceDescriptorException if the resource is not being tracked
-     */
-    public boolean waitForResources(URL[] urls, long timeout, TimeUnit timeUnit) throws InterruptedException {
-        if (urls.length > 0) {
-            return wait(getResources(urls), timeout, timeUnit);
-        }
-        return true;
+        waitForCompletion(getResources(urls));
     }
 
     /**
@@ -385,60 +370,56 @@ public class ResourceTracker {
      * Wait for some resources.
      *
      * @param resources the resources to wait for
-     * @throws InterruptedException if another thread interrupted the wait
-     */
-    private void wait(Resource... resources) throws InterruptedException {
-        // save futures in list to allow parallel start of all resources
-        final List<Future<Resource>> futures = Stream.of(resources)
-                .map(ResourceHandler::new)
-                .map(ResourceHandler::putIntoCache)
-                .collect(Collectors.toList());
-
-        for (Future<Resource> future : futures) {
-            try {
-                future.get();
-            } catch (ExecutionException ignored) {
-            }
-        }
-    }
-
-    /**
-     * Wait for some resources.
-     *
-     * @param resources the resources to wait for
-     * @param timeout   the timeout, or {@code 0} to wait until completed
      * @return {@code true} if the resources were downloaded or had errors,
      * {@code false} if the timeout was reached
      * @throws InterruptedException if another thread interrupted the wait
      */
-    private boolean wait(Resource[] resources, long timeout, TimeUnit timeUnit) throws InterruptedException {
-        if (timeout <= 0) {
-            throw new IllegalArgumentException("Timout must be bigger than 0");
+    private void waitForCompletion(Resource... resources) {
+        if (resources == null || resources.length == 0) {
+            return;
         }
-        long startTime = System.nanoTime();
-        long nanoTimeout = timeUnit.toNanos(timeout);
 
-        // save futures in list to allow parallel start of all resources
-        final List<Future<Resource>> futures = Stream.of(resources)
-                .map(ResourceHandler::new)
-                .map(ResourceHandler::putIntoCache)
-                .collect(Collectors.toList());
+        final int configuredThreadCount = Integer.parseInt(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT));
+        final int threadCount = Math.min(configuredThreadCount, resources.length);
+        final ExecutorService downloadExecutor = Executors.newFixedThreadPool(threadCount, new DaemonThreadFactory());
+        try {
+            final List<Future<Resource>> futures = Arrays.asList(resources).stream()
+                    .map(r -> triggerDownloadFor(r, downloadExecutor))
+                    .collect(Collectors.toList());
 
-        for (Future<Resource> future : futures) {
-            final long nanoSinceStartOfMethod = System.nanoTime() - startTime;
-            final long waitTime = nanoTimeout - nanoSinceStartOfMethod;
-
-            if (waitTime <= 0) {
-                return false;
+            for (Future<Resource> future : futures) {
+                future.get();
             }
-
-            try {
-                future.get(waitTime, TimeUnit.NANOSECONDS);
-            } catch (TimeoutException e) {
-                return false;
-            } catch (ExecutionException ignored) {
-            }
+        } catch (final Exception e) {
+            throw new RuntimeException("Error while waiting for download", e);
+        } finally {
+            LOG.debug("Download done. Shutting down executor");
+            downloadExecutor.shutdownNow();
         }
-        return true;
+    }
+
+    private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {
+        return new ResourceHandler(resource).putIntoCache(downloadExecutor);
+    }
+
+    public void addDownloadListener(final URL resourceUrl, URL[] allResources, final DownloadServiceListener listener) {
+        final Resource resource = getResource(resourceUrl);
+        resource.addPropertyChangeListener(Resource.SIZE_PROPERTY, e -> listener.progress(resourceUrl, "version", resource.getTransferred(), resource.getSize(), getPercentageDownloaded(allResources)));
+        resource.addPropertyChangeListener(Resource.TRANSFERRED_PROPERTY, e -> listener.progress(resourceUrl, "version", resource.getTransferred(), resource.getSize(), getPercentageDownloaded(allResources)));
+    }
+
+    private int getPercentageDownloaded(URL[] allResources) {
+        return (int) Arrays.asList(allResources).stream()
+                .map(u -> getResource(u))
+                .mapToDouble(r -> {
+                    if (r.isComplete()) {
+                        return 100.0d;
+                    }
+                    if (r.isBeingProcessed() && r.getSize() > 0) {
+                        final double p = (100.0d * r.getTransferred()) / r.getSize();
+                        return Math.max(0.0d, Math.min(100.0d, p));
+                    }
+                    return 0.0d;
+                }).sum() / allResources.length;
     }
 }
