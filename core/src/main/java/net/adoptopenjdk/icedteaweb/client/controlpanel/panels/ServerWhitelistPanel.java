@@ -23,6 +23,7 @@ import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
+import net.sourceforge.jnlp.util.whitelist.WhitelistEntry;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -56,7 +57,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
 
         Assert.requireNonNull(config, "config");
 
-        final List<UrlWhiteListUtils.WhitelistEntry> whitelist = UrlWhiteListUtils.getApplicationUrlWhiteList();
+        final List<WhitelistEntry> whitelist = UrlWhiteListUtils.getApplicationUrlWhiteList();
 
         final JTable table = new JTable(createTableModel(whitelist));
         table.getTableHeader().setReorderingAllowed(false);
@@ -102,7 +103,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private TableModel createTableModel(final List<UrlWhiteListUtils.WhitelistEntry> whitelist) {
+    private TableModel createTableModel(final List<WhitelistEntry> whitelist) {
         final String[] colNames = {R("SWPCol0Header"), R("SWPCol1Header")};
         return new AbstractTableModel() {
             @Override
@@ -121,7 +122,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
-                UrlWhiteListUtils.WhitelistEntry whitelistEntry = whitelist.get(rowIndex);
+                WhitelistEntry whitelistEntry = whitelist.get(rowIndex);
                 switch (columnIndex) {
                     case 0:
                         return whitelistEntry.getWhitelistEntry();

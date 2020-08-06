@@ -81,7 +81,7 @@ public class UrlWhiteListUtilsTest {
                 "*.dmlr.com"
         );
 
-        List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
+        List<WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
         // "https://rfry.m-b.com"
         URL url = new URL("https://rfy.m-b.com:443/some_URL");
@@ -158,7 +158,7 @@ public class UrlWhiteListUtilsTest {
                 "docs.*.net"
         );
 
-        List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
+        List<WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
         URL url = new URL("https://docs.oracle.com/j2se/tutorial");
         Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
@@ -190,7 +190,7 @@ public class UrlWhiteListUtilsTest {
                 "http://124.134.145.156:335/abc/efg"
         );
 
-        List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
+        List<WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
         URL url = new URL("https://123.134.145.156/tutorial");
         Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
@@ -236,7 +236,7 @@ public class UrlWhiteListUtilsTest {
                 "http://*"
         );
 
-        List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
+        List<WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
         URL url = new URL("https://123.134.145.156/tutorial");
         Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
@@ -251,7 +251,7 @@ public class UrlWhiteListUtilsTest {
         Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
     }
 
-    private static List<UrlWhiteListUtils.WhitelistEntry> getValidatedWhitelist(List<String> wildcardWhiteList) {
+    private static List<WhitelistEntry> getValidatedWhitelist(List<String> wildcardWhiteList) {
         return wildcardWhiteList
                 .stream()
                 .filter(s -> !StringUtils.isBlank(s))
