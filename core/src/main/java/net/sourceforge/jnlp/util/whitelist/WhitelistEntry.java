@@ -18,10 +18,14 @@ public class WhitelistEntry {
     private final String errorMessage;
 
     static WhitelistEntry validWhitelistEntry(final String wlEntry, URL effectiveWhitelistEntry) {
+        Assert.requireNonNull(wlEntry, "wlEntry");
+        Assert.requireNonNull(effectiveWhitelistEntry, "effectiveWhitelistEntry");
         return new WhitelistEntry(wlEntry, effectiveWhitelistEntry, null);
     }
 
     static WhitelistEntry invalidWhitelistEntry(final String wlEntry, final String errorMessage) {
+        Assert.requireNonNull(wlEntry, "wlEntry");
+        Assert.requireNonNull(errorMessage, "errorMessage");
         return new WhitelistEntry(wlEntry, null, errorMessage);
     }
 
@@ -48,6 +52,8 @@ public class WhitelistEntry {
     }
 
     public boolean matches(URL url) {
+        Assert.requireNonNull(url, "url");
+
         if (isValid()) { // ignore invalid whitelist entries
             return isUrlProtocolMatching(effectiveWhitelistEntry, url) && isUrlHostMatching(effectiveWhitelistEntry, url) && isUrlPortMatching(effectiveWhitelistEntry, url);
         } else {
@@ -55,15 +61,10 @@ public class WhitelistEntry {
         }
     }
     private static boolean isUrlProtocolMatching(URL url1, URL url2) {
-        Assert.requireNonNull(url1, "url1");
-        Assert.requireNonNull(url2, "url2");
         return Objects.equals(url1.getProtocol(), url2.getProtocol());
     }
 
     private static boolean isUrlHostMatching(URL wlUrl, URL url) {
-        Assert.requireNonNull(wlUrl, "wlUrl");
-        Assert.requireNonNull(url, "url");
-
         // proto://*:port
         if (Objects.equals(wlUrl.getHost(), WILDCARD)) {
             return true;
@@ -75,6 +76,7 @@ public class WhitelistEntry {
         if (wlUrlHostParts.length != urlHostParts.length) {
             return false;
         }
+
         boolean result = true;
         for (int i = 0; i < wlUrlHostParts.length; i++) {
             // hostparts are equal if whitelist url has * or they are same
@@ -84,9 +86,6 @@ public class WhitelistEntry {
     }
 
     private static boolean isUrlPortMatching(URL wlUrl, URL url) {
-        Assert.requireNonNull(wlUrl, "wlUrl");
-        Assert.requireNonNull(url, "url");
-
         if (wlUrl.getPort() != -1) {
             // url does not have port then force default port as we do the same for whitelist url
             if (url.getPort() == -1) {
