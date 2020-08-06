@@ -19,71 +19,38 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SE
 
 public class UrlWhiteListUtils {
     private static final String WILDCARD = "*";
-    private static final String HOSTPARTSEPARATOR = "\\.";
+    private static final String HOST_PART_SEP = ".";
+    private static final String HOST_PART_REGEX = "\\.";
     public static final String HTTPS = "https";
     public static final String HTTP = "http";
-    public static final String HTTP_PORT = "80";
-    public static final String HTTPS_PORT = "443";
+    private static final String PROTOCOL_SEPARATOR = "://";
 
     private final static Logger LOG = LoggerFactory.getLogger(UrlWhiteListUtils.class);
 
-    private static List<ValidatedWhiteListEntry> whiteList;
+    private static List<WhitelistEntry> applicationUrlWhiteList;
     private static final Lock whiteListLock = new ReentrantLock();
 
-    public static List<ValidatedWhiteListEntry> getValidatedWhiteList() {
+    public static List<WhitelistEntry> getApplicationUrlWhiteList() {
         whiteListLock.lock();
         try {
-            if (whiteList == null) {
-                whiteList = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
+            if (applicationUrlWhiteList == null) {
+                applicationUrlWhiteList = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
                         .stream()
                         .filter(s -> !StringUtils.isBlank(s))
-                        .map(s -> UrlWhiteListUtils.validateWhiteListUrlString(s))
+                        .map(s -> UrlWhiteListUtils.validateWhitelistUrl(s))
                         .collect(Collectors.toList());
             }
-            return whiteList;
+            return applicationUrlWhiteList;
         } finally {
             whiteListLock.unlock();
         }
     }
 
-    private static boolean isUrlProtocolMatching(URL url1, URL url2) {
-        Assert.requireNonNull(url1, "url");
-        Assert.requireNonNull(url2, "url");
-        return url1.getProtocol().equals(url2.getProtocol());
+    public static boolean isUrlInApplicationUrlWhitelist(final URL url) {
+        return isUrlInWhitelist(url, getApplicationUrlWhiteList(), true);
     }
 
-    private static boolean isUrlHostMatching(URL wlUrl, URL url) {
-        Assert.requireNonNull(wlUrl, "url");
-        Assert.requireNonNull(url, "url");
-
-        // proto://*:port
-        if (Objects.equals(wlUrl.getHost(), WILDCARD)) {
-            return true;
-        }
-
-        final String[] wlUrlHostParts = wlUrl.getHost().split(HOSTPARTSEPARATOR);
-        final String[] urlHostParts = url.getHost().split(HOSTPARTSEPARATOR);
-
-        if (wlUrlHostParts.length != urlHostParts.length) {
-            return false;
-        }
-        boolean result = true;
-        for (int i = 0; i < wlUrlHostParts.length; i++) {
-            result = result && (wlUrlHostParts[i].charAt(0) == '*' || wlUrlHostParts[i].equals(urlHostParts[i]));
-        }
-        return result;
-    }
-
-    private static boolean isUrlPortMatching(URL wlUrl, URL url) {
-        return wlUrl.getPort() != -1 ? wlUrl.getPort() == url.getPort() : true;
-    }
-
-    public static boolean isUrlInWhitelist(final URL url) {
-        final List<String> whiteList = getValidatedWhiteList().stream().map(vwl -> vwl.getWhiteListEntry()).collect(Collectors.toList());
-        return isUrlInWhitelist(url, whiteList, true, false);
-    }
-
-    public static boolean isUrlInWhitelist(final URL url, final List<String> whiteList, final boolean allowLocalhost, final boolean exactMatch) {
+    static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList, final boolean allowLocalhost) {
         Assert.requireNonNull(url, "url");
         Assert.requireNonNull(whiteList, "whiteList");
 
@@ -96,119 +63,191 @@ public class UrlWhiteListUtils {
             return true; // local server need not be in whitelist
         }
 
-        final boolean result = whiteList.stream().anyMatch(wlUrlStr -> {
+        final boolean result = whiteList.stream().anyMatch(wlEntry -> {
             try {
-                final URL wlUrl = new URL(wlUrlStr);
-                if (exactMatch) {
-                    return UrlUtils.notNullUrlEquals(url, wlUrl);
-                } else {
+                if (wlEntry.isValid()) { // ignore invalid whitelist entries
+                    final URL wlUrl = new URL(wlEntry.getValidatedWhitelistEntry());
                     return isUrlProtocolMatching(wlUrl, url) && isUrlHostMatching(wlUrl, url) && isUrlPortMatching(wlUrl, url);
+                } else {
+                    return false;
                 }
             } catch (Exception e) {
-                LOG.warn("Bad white list url: " + wlUrlStr);
+                LOG.warn("Bad white list url: " + wlEntry.getValidatedWhitelistEntry());
                 return false;
             }
         });
         return result;
     }
 
-    private static String validateWhiteListUrlProtocol(final String wlUrlStr) throws MalformedURLException {
-        // TODO Improve detection of no protocol
+    private static boolean isUrlProtocolMatching(URL url1, URL url2) {
+        Assert.requireNonNull(url1, "url1");
+        Assert.requireNonNull(url2, "url2");
+        return Objects.equals(url1.getProtocol(), url2.getProtocol());
+    }
+
+    private static boolean isUrlHostMatching(URL wlUrl, URL url) {
+        Assert.requireNonNull(wlUrl, "wlUrl");
+        Assert.requireNonNull(url, "url");
+
+        // proto://*:port
+        if (Objects.equals(wlUrl.getHost(), WILDCARD)) {
+            return true;
+        }
+
+        final String[] wlUrlHostParts = wlUrl.getHost().split(HOST_PART_REGEX);
+        final String[] urlHostParts = url.getHost().split(HOST_PART_REGEX);
+
+        if (wlUrlHostParts.length != urlHostParts.length) {
+            return false;
+        }
+        boolean result = true;
+        for (int i = 0; i < wlUrlHostParts.length; i++) {
+            // hostparts are equal if whitelist url has * or they are same
+            result = result && (Objects.equals(wlUrlHostParts[i], WILDCARD) || Objects.equals(wlUrlHostParts[i], urlHostParts[i]));
+        }
+        return result;
+    }
+
+    private static boolean isUrlPortMatching(URL wlUrl, URL url) {
+        Assert.requireNonNull(wlUrl, "wlUrl");
+        Assert.requireNonNull(url, "url");
+
+        if (wlUrl.getPort() != -1) {
+            // url does not have port then force default port as we do the same for whitelist url
+            if (url.getPort() == -1) {
+                return wlUrl.getPort() == url.getDefaultPort();
+            } else {
+                return wlUrl.getPort() == url.getPort();
+            }
+        }
+        return true;
+    }
+
+    private static String validateWhitelistUrlProtocol(final String wlUrlStr) throws MalformedURLException {
+        final String[] splitProtocol = wlUrlStr.split(PROTOCOL_SEPARATOR);
+        if (splitProtocol.length == 1) {
+            final char firstChar = wlUrlStr.charAt(0);
+            if (PROTOCOL_SEPARATOR.indexOf(firstChar) == -1) { // firstChar is not / or :
+                return HTTPS + PROTOCOL_SEPARATOR + wlUrlStr;
+            }
+        }
         try {
             new URL(wlUrlStr);
         } catch (Exception e) {
-            // If protocol is missing then assume it is https
-            if (e instanceof MalformedURLException && (e.getMessage().contains("no protocol") || e.getMessage().contains("unknown protocol"))) {
-                return HTTPS + "://" + wlUrlStr;
-            } else if (e.getMessage().contains("protocol")) {
+            if (e.getMessage().contains("protocol")) {
                 throw e;
             }
         }
         return wlUrlStr;
     }
 
-    private static String validatewhiteListUrlPort(final String wlUrlStr) throws MalformedURLException {
-        // TODO : Decide whether to enforce default port
+    private static String validateWhitelistUrlPort(final String wlUrlStr) throws MalformedURLException {
         try {
             final URL wlUrl = new URL(wlUrlStr);
             // if port is missing then take it as default port for the protocol
             if (wlUrl.getPort() == -1) {
-                if (wlUrl.getProtocol().equalsIgnoreCase(HTTP)) {
-                    return wlUrlStr + ":" + HTTP_PORT;
-                }
-                if (wlUrl.getProtocol().equalsIgnoreCase(HTTPS)) {
-                    return wlUrlStr + ":" + HTTPS_PORT;
-                }
+                return wlUrl.getProtocol() + PROTOCOL_SEPARATOR + wlUrl.getHost() + ":" + wlUrl.getDefaultPort();
             }
         } catch (Exception e) {
             // if port is illegal due to * then replace * with ""
             final int ind = wlUrlStr.lastIndexOf(":");
-            if (e.getCause() instanceof NumberFormatException && wlUrlStr.substring(ind + 1, wlUrlStr.length()).equals(WILDCARD)) {
-                return wlUrlStr.substring(0, ind) + "";
+            if (e.getCause() instanceof NumberFormatException && Objects.equals(wlUrlStr.substring(ind + 1, wlUrlStr.length()), WILDCARD)) {
+                return wlUrlStr.substring(0, ind);
             }
             throw e;
         }
         return wlUrlStr;
     }
 
-    private static void validateWhiteListUrlHost(final String wlUrlStr) throws Exception {
+    // IP Address => all digits, 4 parts, *, -
+    private static boolean isIP(final String wlUrlStr) {
+        final boolean hasValidChars = wlUrlStr.replace(HOST_PART_SEP.charAt(0), '0').chars().allMatch(c -> Character.isDigit(c) || c == WILDCARD.charAt(0) || c == '-');
+        final String[] ipParts = wlUrlStr.split(HOST_PART_REGEX);
+        return hasValidChars && ipParts.length == 4;
+    }
+
+    private static void validateIPPart(final String ipPart) throws Exception {
+        if (ipPart.contains(WILDCARD) || ipPart.contains("-")) {
+            throw new Exception(R("SWPINVALIDIPHOST"));
+        }
+        try {
+            final int ipPartInt = Integer.parseInt(ipPart);
+            if (ipPartInt < 0 || ipPartInt > 255) {
+                throw new Exception(R("SWPINVALIDIPHOST"));
+            }
+        } catch (NumberFormatException nfe) {
+            throw new Exception(R("SWPINVALIDIPHOST"));
+        }
+    }
+
+    private static void validateWhitelistUrlHost(final String wlUrlStr) throws Exception {
         final URL wlURL = new URL(wlUrlStr);
         final String hostStr = wlURL.getHost();
 
-        final boolean isIPHost = hostStr.replace(HOSTPARTSEPARATOR.charAt(0), '0').chars().allMatch(c -> Character.isDigit(c) || c == WILDCARD.charAt(0));
-        if (isIPHost) {
-            IpUtil.validateIPHost(hostStr);
-        }
-
+        // Whitelist Host is *
         if (Objects.equals(hostStr, WILDCARD)) {
             return;
         }
 
-        final String[] hostParts = hostStr.split(HOSTPARTSEPARATOR);
-        for (String s : hostParts) {
-            if (s.contains(WILDCARD)) {
-                // * in hostpart of ip4 address is not allowed
-                if (isIPHost) {
-                    throw new Exception(R("SWPVALIDATEIPHOST"));
-                }
-                // * in hostpart of non-ip host should be the only character
-                if (s.length() > 1) {
+        final boolean isIPHost = isIP(hostStr);
+        final String[] hostParts = hostStr.split(HOST_PART_REGEX);
+        for (int i = 0; i < hostParts.length; i++) {
+            if (isIPHost) {
+                validateIPPart(hostParts[i]);
+            } else { // non IP host
+                // * is allowed only in first part and it should be the only char
+                if (hostParts[i].contains(WILDCARD) && (hostParts[i].length() > 1 || i != 0)) {
                     throw new Exception(R("SWPVALIDATEHOST"));
                 }
             }
         }
     }
 
-    static ValidatedWhiteListEntry validateWhiteListUrlString(final String wlUrlStr) {
+    static WhitelistEntry validateWhitelistUrl(final String wlUrlStr) {
+        Assert.requireNonNull(wlUrlStr, "wlUrlStr");
         try {
-            final String validatedWLUrlProtocol = validateWhiteListUrlProtocol(wlUrlStr);
-            final String validatedWLUrlStr = validatewhiteListUrlPort(validatedWLUrlProtocol);
-            validateWhiteListUrlHost(validatedWLUrlStr);
-            return new ValidatedWhiteListEntry(validatedWLUrlStr);
+            final String validatedWLUrlProtocol = validateWhitelistUrlProtocol(wlUrlStr);
+            final String validatedWLUrlStr = validateWhitelistUrlPort(validatedWLUrlProtocol);
+            validateWhitelistUrlHost(validatedWLUrlStr);
+            return WhitelistEntry.validWhitelistEntry(wlUrlStr, validatedWLUrlStr);
         } catch (Exception e) {
-            return new ValidatedWhiteListEntry(wlUrlStr, R("SWPVALIDATEWLURL") + ": " + e.getMessage());
+            return WhitelistEntry.invalidWhitelistentry(wlUrlStr, e.getMessage());
         }
     }
 
-    public static class ValidatedWhiteListEntry {
-        private final String whiteListEntry;
+    public static class WhitelistEntry {
+        private final String whitelistEntry;
+        private final String validatedWhitelistEntry;
         private final String errorMessage;
 
-        public String getWhiteListEntry() {
-            return whiteListEntry;
+        public String getWhitelistEntry() {
+            return whitelistEntry;
+        }
+
+        public String getValidatedWhitelistEntry() {
+            return validatedWhitelistEntry;
         }
 
         public String getErrorMessage() {
             return errorMessage;
         }
 
-        public ValidatedWhiteListEntry(final String whiteListEntry) {
-            this(whiteListEntry, "");
+        private WhitelistEntry(final String whitelistEntry, final String validatedWhitelistEntry, final String errorMessage) {
+            this.whitelistEntry = whitelistEntry;
+            this.validatedWhitelistEntry = validatedWhitelistEntry;
+            this.errorMessage = errorMessage;
         }
 
-        public ValidatedWhiteListEntry(final String whiteListEntry, final String errorMessage) {
-            this.whiteListEntry = whiteListEntry;
-            this.errorMessage = errorMessage;
+        public boolean isValid() {
+            return errorMessage == null;
+        }
+
+        public static WhitelistEntry validWhitelistEntry(final String wlEntry, final String validatedEntry) {
+            return new WhitelistEntry(wlEntry, validatedEntry, null);
+        }
+
+        public static WhitelistEntry invalidWhitelistentry(final String wlEntry, final String errorMessage) {
+            return new WhitelistEntry(wlEntry, null, errorMessage);
         }
     }
 }

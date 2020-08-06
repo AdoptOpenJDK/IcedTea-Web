@@ -116,8 +116,8 @@ class ResourceHandler {
         Assert.requireNonNull(url, "url");
 
         // Validate with whitelist specified in deployment.properties. localhost is considered valid.
-        final boolean result = UrlWhiteListUtils.isUrlInWhitelist(url);
-        if (result == false) {
+        final boolean found = UrlWhiteListUtils.isUrlInApplicationUrlWhitelist(url);
+        if (!found) {
             BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
             LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
             JNLPRuntime.exit(-1);

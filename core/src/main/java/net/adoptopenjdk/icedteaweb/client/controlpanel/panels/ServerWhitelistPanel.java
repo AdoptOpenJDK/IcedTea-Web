@@ -26,24 +26,18 @@ import net.sourceforge.jnlp.util.UrlWhiteListUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
-import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 /**
  * This provides a way for the user to display the server white list defined in <code>deployment.properties</code>.
@@ -62,44 +56,53 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
 
         Assert.requireNonNull(config, "config");
 
-        final List<String> whitelist = config.getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST);
-        final List<UrlWhiteListUtils.ValidatedWhiteListEntry> validatedWhitelist = UrlWhiteListUtils.getValidatedWhiteList();
+        final List<UrlWhiteListUtils.WhitelistEntry> whitelist = UrlWhiteListUtils.getApplicationUrlWhiteList();
 
-        final JTable table = new JTable(createTableModel(whitelist, validatedWhitelist));
+        final JTable table = new JTable(createTableModel(whitelist));
         table.getTableHeader().setReorderingAllowed(false);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         table.setAutoCreateRowSorter(true);
-        TableColumnModel colModel=table.getColumnModel();
+
+        final TableColumnModel colModel = table.getColumnModel();
         colModel.getColumn(0).setPreferredWidth(100);
         colModel.getColumn(1).setPreferredWidth(250);
+
         final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warn16.png");
-        table.getColumnModel().getColumn(1).setCellRenderer(new DefaultTableCellRenderer() {
+        final DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = new JLabel(/*"<html><body>" + */ (String)value /* + "</body></html>"*/);
-                label.setOpaque(true);
-                label.setBackground(table.getBackground());
-                if (((String)value).startsWith(R("SWPVALIDATEWLURL")))  {
-                    label.setIcon(icon);
+                final WhitelistEntryState wleState = (WhitelistEntryState) value;
+                if (wleState != null) {
+                    setText(wleState.getMessage());
+                    if (!wleState.isValid()) {
+                        setIcon(icon);
+                    } else {
+                        setIcon(null);
+                    }
+                } else {
+                    setText(null);
+                    setIcon(null);
                 }
                 if (isSelected) {
-                    label.setBackground(table.getSelectionBackground());
-                    label.setForeground(table.getSelectionForeground());
+                    setBackground(table.getSelectionBackground());
+                    setForeground(table.getSelectionForeground());
+                } else {
+                    setBackground(table.getBackground());
+                    setForeground(table.getForeground());
                 }
-                label.setIconTextGap(5);
-                //label.setHorizontalTextPosition(SwingConstants.CENTER);
-                label.setVerticalTextPosition(SwingConstants.CENTER);
-                return label;
+                return this;
             }
-        });
-
+        };
+        table.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
+        cellRenderer.setIconTextGap(5);
+        cellRenderer.setVerticalTextPosition(SwingConstants.CENTER);
         final JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private TableModel createTableModel(final List<String> whitelist, final List<UrlWhiteListUtils.ValidatedWhiteListEntry> validatedWhitelist) {
+    private TableModel createTableModel(final List<UrlWhiteListUtils.WhitelistEntry> whitelist) {
         final String[] colNames = {R("SWPCol0Header"), R("SWPCol1Header")};
         return new AbstractTableModel() {
             @Override
@@ -118,12 +121,34 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
 
             @Override
             public Object getValueAt(int rowIndex, int columnIndex) {
+                UrlWhiteListUtils.WhitelistEntry whitelistEntry = whitelist.get(rowIndex);
                 switch (columnIndex) {
-                    case 0 : return whitelist.get(rowIndex);
-                    case 1 : return (validatedWhitelist.get(rowIndex).getErrorMessage().isEmpty() ? validatedWhitelist.get(rowIndex).getWhiteListEntry() : /*ERROR_MARKER +  "!" +*/ validatedWhitelist.get(rowIndex).getErrorMessage());
-                    default: throw new IllegalArgumentException();
+                    case 0:
+                        return whitelistEntry.getWhitelistEntry();
+                    case 1:
+                        return new WhitelistEntryState(whitelistEntry.isValid(), whitelistEntry.isValid() ? whitelistEntry.getValidatedWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + whitelistEntry.getErrorMessage());
+                    default:
+                        throw new IllegalArgumentException();
                 }
             }
         };
+    }
+
+    private static class WhitelistEntryState {
+        final private boolean valid;
+        final private String message;
+
+        public WhitelistEntryState(boolean valid, String message) {
+            this.valid = valid;
+            this.message = message;
+        }
+
+        public boolean isValid() {
+            return valid;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }
