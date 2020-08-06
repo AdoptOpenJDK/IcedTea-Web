@@ -126,13 +126,13 @@ public class UrlWhiteListUtils {
         }
     }
 
-    private static void validateWhitelistUrlHost(final String wlUrlStr) throws Exception {
+    private static URL validateWhitelistUrlHost(final String wlUrlStr) throws Exception {
         final URL wlURL = new URL(wlUrlStr);
         final String hostStr = wlURL.getHost();
 
         // Whitelist Host is *
         if (Objects.equals(hostStr, WILDCARD)) {
-            return;
+            return wlURL;
         }
 
         final boolean isIPHost = isIP(hostStr);
@@ -147,6 +147,8 @@ public class UrlWhiteListUtils {
                 }
             }
         }
+
+        return wlURL;
     }
 
     static WhitelistEntry validateWhitelistUrl(final String wlUrlStr) {
@@ -154,8 +156,8 @@ public class UrlWhiteListUtils {
         try {
             final String validatedWLUrlProtocol = validateWhitelistUrlProtocol(wlUrlStr);
             final String validatedWLUrlStr = validateWhitelistUrlPort(validatedWLUrlProtocol);
-            validateWhitelistUrlHost(validatedWLUrlStr);
-            return WhitelistEntry.validWhitelistEntry(wlUrlStr, validatedWLUrlStr);
+            final URL validatedUrl = validateWhitelistUrlHost(validatedWLUrlStr);
+            return WhitelistEntry.validWhitelistEntry(wlUrlStr, validatedUrl);
         } catch (Exception e) {
             return WhitelistEntry.invalidWhitelistEntry(wlUrlStr, e.getMessage());
         }

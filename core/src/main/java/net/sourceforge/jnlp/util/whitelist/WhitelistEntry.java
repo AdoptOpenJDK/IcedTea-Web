@@ -1,11 +1,10 @@
 package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * ...
@@ -14,21 +13,19 @@ public class WhitelistEntry {
     private static final String WILDCARD = "*";
     private static final String HOST_PART_REGEX = "\\.";
 
-    private static final Logger LOG = LoggerFactory.getLogger(WhitelistEntry.class);
-
     private final String rawWhitelistEntry;
-    private final String effectiveWhitelistEntry;
+    private final URL effectiveWhitelistEntry;
     private final String errorMessage;
 
-    static WhitelistEntry validWhitelistEntry(final String wlEntry, final String validatedEntry) {
-        return new WhitelistEntry(wlEntry, validatedEntry, null);
+    static WhitelistEntry validWhitelistEntry(final String wlEntry, URL effectiveWhitelistEntry) {
+        return new WhitelistEntry(wlEntry, effectiveWhitelistEntry, null);
     }
 
     static WhitelistEntry invalidWhitelistEntry(final String wlEntry, final String errorMessage) {
         return new WhitelistEntry(wlEntry, null, errorMessage);
     }
 
-    private WhitelistEntry(final String rawWhitelistEntry, final String effectiveWhitelistEntry, final String errorMessage) {
+    private WhitelistEntry(final String rawWhitelistEntry, final URL effectiveWhitelistEntry, final String errorMessage) {
         this.rawWhitelistEntry = rawWhitelistEntry;
         this.effectiveWhitelistEntry = effectiveWhitelistEntry;
         this.errorMessage = errorMessage;
@@ -39,7 +36,7 @@ public class WhitelistEntry {
     }
 
     public String getEffectiveWhitelistEntry() {
-        return effectiveWhitelistEntry;
+        return Optional.ofNullable(effectiveWhitelistEntry).map(Objects::toString).orElse(null);
     }
 
     public String getErrorMessage() {
@@ -51,15 +48,9 @@ public class WhitelistEntry {
     }
 
     public boolean matches(URL url) {
-        try {
-            if (isValid()) { // ignore invalid whitelist entries
-                final URL wlUrl = new URL(getEffectiveWhitelistEntry());
-                return isUrlProtocolMatching(wlUrl, url) && isUrlHostMatching(wlUrl, url) && isUrlPortMatching(wlUrl, url);
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            LOG.warn("Bad white list url: " + getEffectiveWhitelistEntry());
+        if (isValid()) { // ignore invalid whitelist entries
+            return isUrlProtocolMatching(effectiveWhitelistEntry, url) && isUrlHostMatching(effectiveWhitelistEntry, url) && isUrlPortMatching(effectiveWhitelistEntry, url);
+        } else {
             return false;
         }
     }
