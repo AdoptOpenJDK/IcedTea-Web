@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.util;
+package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import org.junit.Assert;

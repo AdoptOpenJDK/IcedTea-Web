@@ -22,7 +22,7 @@ import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.util.UrlWhiteListUtils;
+import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;

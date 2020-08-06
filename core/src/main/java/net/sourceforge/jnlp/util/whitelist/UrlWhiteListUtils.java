@@ -1,10 +1,11 @@
-package net.sourceforge.jnlp.util;
+package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.IpUtil;
 
 import java.net.MalformedURLException;
 import java.net.URL;
