@@ -13,13 +13,11 @@ import java.util.Objects;
 public class WhitelistEntry {
     private static final String WILDCARD = "*";
     private static final String HOST_PART_REGEX = "\\.";
-    public static final String HTTPS = "https";
-    public static final String HTTP = "http";
 
     private static final Logger LOG = LoggerFactory.getLogger(WhitelistEntry.class);
 
-    private final String whitelistEntry;
-    private final String validatedWhitelistEntry;
+    private final String rawWhitelistEntry;
+    private final String effectiveWhitelistEntry;
     private final String errorMessage;
 
     static WhitelistEntry validWhitelistEntry(final String wlEntry, final String validatedEntry) {
@@ -30,18 +28,18 @@ public class WhitelistEntry {
         return new WhitelistEntry(wlEntry, null, errorMessage);
     }
 
-    private WhitelistEntry(final String whitelistEntry, final String validatedWhitelistEntry, final String errorMessage) {
-        this.whitelistEntry = whitelistEntry;
-        this.validatedWhitelistEntry = validatedWhitelistEntry;
+    private WhitelistEntry(final String rawWhitelistEntry, final String effectiveWhitelistEntry, final String errorMessage) {
+        this.rawWhitelistEntry = rawWhitelistEntry;
+        this.effectiveWhitelistEntry = effectiveWhitelistEntry;
         this.errorMessage = errorMessage;
     }
 
-    public String getWhitelistEntry() {
-        return whitelistEntry;
+    public String getRawWhitelistEntry() {
+        return rawWhitelistEntry;
     }
 
-    public String getValidatedWhitelistEntry() {
-        return validatedWhitelistEntry;
+    public String getEffectiveWhitelistEntry() {
+        return effectiveWhitelistEntry;
     }
 
     public String getErrorMessage() {
@@ -55,13 +53,13 @@ public class WhitelistEntry {
     public boolean matches(URL url) {
         try {
             if (isValid()) { // ignore invalid whitelist entries
-                final URL wlUrl = new URL(getValidatedWhitelistEntry());
+                final URL wlUrl = new URL(getEffectiveWhitelistEntry());
                 return isUrlProtocolMatching(wlUrl, url) && isUrlHostMatching(wlUrl, url) && isUrlPortMatching(wlUrl, url);
             } else {
                 return false;
             }
         } catch (Exception e) {
-            LOG.warn("Bad white list url: " + getValidatedWhitelistEntry());
+            LOG.warn("Bad white list url: " + getEffectiveWhitelistEntry());
             return false;
         }
     }

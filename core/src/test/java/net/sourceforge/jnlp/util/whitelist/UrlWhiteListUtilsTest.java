@@ -13,31 +13,31 @@ public class UrlWhiteListUtilsTest {
 
     @Test
     public void validateWhitelistUrlString() {
-        Assert.assertEquals("http://subdomain.domain.com:8888", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com:8888").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://subdomain.domain.com:9999", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com:9999").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://123.134.145.156:9999", UrlWhiteListUtils.validateWhitelistUrl("https://123.134.145.156:9999").getValidatedWhitelistEntry());
-        Assert.assertEquals("http://123.134.145.156:8888", UrlWhiteListUtils.validateWhitelistUrl("http://123.134.145.156:8888").getValidatedWhitelistEntry());
+        Assert.assertEquals("http://subdomain.domain.com:8888", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com:8888").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://subdomain.domain.com:9999", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com:9999").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://123.134.145.156:9999", UrlWhiteListUtils.validateWhitelistUrl("https://123.134.145.156:9999").getEffectiveWhitelistEntry());
+        Assert.assertEquals("http://123.134.145.156:8888", UrlWhiteListUtils.validateWhitelistUrl("http://123.134.145.156:8888").getEffectiveWhitelistEntry());
 
-        Assert.assertEquals("https://domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("domain.com").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://*.domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("*.domain.com").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://123.134.145.156:443", UrlWhiteListUtils.validateWhitelistUrl("123.134.145.156:443").getValidatedWhitelistEntry());
+        Assert.assertEquals("https://domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("domain.com").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://*.domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("*.domain.com").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://123.134.145.156:443", UrlWhiteListUtils.validateWhitelistUrl("123.134.145.156:443").getEffectiveWhitelistEntry());
 
-        Assert.assertEquals("http://subdomain.domain.com:80", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com").getValidatedWhitelistEntry());
-        Assert.assertEquals("http://subdomain.domain.com:80", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com/abc/efg").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://subdomain.domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://subdomain.domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com/abc/efg").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://123.134.145.156:443", UrlWhiteListUtils.validateWhitelistUrl("https://123.134.145.156").getValidatedWhitelistEntry());
+        Assert.assertEquals("http://subdomain.domain.com:80", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com").getEffectiveWhitelistEntry());
+        Assert.assertEquals("http://subdomain.domain.com:80", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com/abc/efg").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://subdomain.domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://subdomain.domain.com:443", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com/abc/efg").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://123.134.145.156:443", UrlWhiteListUtils.validateWhitelistUrl("https://123.134.145.156").getEffectiveWhitelistEntry());
 
-        Assert.assertEquals("http://subdomain.domain.com", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com:*").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://subdomain.domain.com", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com:*").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://123.134.145.156", UrlWhiteListUtils.validateWhitelistUrl("https://123.134.145.156:*").getValidatedWhitelistEntry());
+        Assert.assertEquals("http://subdomain.domain.com", UrlWhiteListUtils.validateWhitelistUrl("http://subdomain.domain.com:*").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://subdomain.domain.com", UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com:*").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://123.134.145.156", UrlWhiteListUtils.validateWhitelistUrl("https://123.134.145.156:*").getEffectiveWhitelistEntry());
 
-        Assert.assertEquals("https://*:443", UrlWhiteListUtils.validateWhitelistUrl("*").getValidatedWhitelistEntry());
-        Assert.assertEquals("http://*:80", UrlWhiteListUtils.validateWhitelistUrl("http://*:80").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://*:443", UrlWhiteListUtils.validateWhitelistUrl("https://*:443").getValidatedWhitelistEntry());
+        Assert.assertEquals("https://*:443", UrlWhiteListUtils.validateWhitelistUrl("*").getEffectiveWhitelistEntry());
+        Assert.assertEquals("http://*:80", UrlWhiteListUtils.validateWhitelistUrl("http://*:80").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://*:443", UrlWhiteListUtils.validateWhitelistUrl("https://*:443").getEffectiveWhitelistEntry());
 
-        Assert.assertEquals("http://*", UrlWhiteListUtils.validateWhitelistUrl("http://*:*").getValidatedWhitelistEntry());
-        Assert.assertEquals("https://*", UrlWhiteListUtils.validateWhitelistUrl("https://*:*").getValidatedWhitelistEntry());
+        Assert.assertEquals("http://*", UrlWhiteListUtils.validateWhitelistUrl("http://*:*").getEffectiveWhitelistEntry());
+        Assert.assertEquals("https://*", UrlWhiteListUtils.validateWhitelistUrl("https://*:*").getEffectiveWhitelistEntry());
     }
 
     @Test

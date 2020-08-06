@@ -125,9 +125,9 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
                 WhitelistEntry whitelistEntry = whitelist.get(rowIndex);
                 switch (columnIndex) {
                     case 0:
-                        return whitelistEntry.getWhitelistEntry();
+                        return whitelistEntry.getRawWhitelistEntry();
                     case 1:
-                        return new WhitelistEntryState(whitelistEntry.isValid(), whitelistEntry.isValid() ? whitelistEntry.getValidatedWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + whitelistEntry.getErrorMessage());
+                        return new WhitelistEntryState(whitelistEntry.isValid(), whitelistEntry.isValid() ? whitelistEntry.getEffectiveWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + whitelistEntry.getErrorMessage());
                     default:
                         throw new IllegalArgumentException();
                 }
