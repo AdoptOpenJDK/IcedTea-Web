@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.resources;
 
 
 import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -12,22 +11,19 @@ import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.IpUtil;
+import net.sourceforge.jnlp.util.UrlWhiteListUtils;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
-import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 
@@ -119,22 +115,10 @@ class ResourceHandler {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
 
-        final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
-                .stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList());
-
-        if (whitelist.isEmpty()) {
-            return; // empty whitelist == allow all connections
-        }
-
-        // if host is null or "" or it is localhost or loopback
-        if (IpUtil.isLocalhostOrLoopback(url)) {
-            return; // local server need not be in whitelist
-        }
-
-        final String urlString = url.getProtocol() + "://" + url.getHost() + ((url.getPort() != -1) ? ":" + url.getPort() : "");
-
-        if (!whitelist.contains(urlString)) {
-            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + resource.getLocation()));
+        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
+        final boolean found = UrlWhiteListUtils.isUrlInApplicationUrlWhitelist(url);
+        if (!found) {
+            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
             LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
             JNLPRuntime.exit(-1);
         }
