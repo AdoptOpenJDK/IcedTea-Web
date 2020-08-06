@@ -26,7 +26,7 @@ public class UrlWhiteListUtils {
     public static final String HTTP = "http";
     private static final String PROTOCOL_SEPARATOR = "://";
 
-    private final static Logger LOG = LoggerFactory.getLogger(UrlWhiteListUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UrlWhiteListUtils.class);
 
     private static List<WhitelistEntry> applicationUrlWhiteList;
     private static final Lock whiteListLock = new ReentrantLock();
@@ -38,7 +38,7 @@ public class UrlWhiteListUtils {
                 applicationUrlWhiteList = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
                         .stream()
                         .filter(s -> !StringUtils.isBlank(s))
-                        .map(s -> UrlWhiteListUtils.validateWhitelistUrl(s))
+                        .map(UrlWhiteListUtils::validateWhitelistUrl)
                         .collect(Collectors.toList());
             }
             return applicationUrlWhiteList;
@@ -152,7 +152,7 @@ public class UrlWhiteListUtils {
         } catch (Exception e) {
             // if port is illegal due to * then replace * with ""
             final int ind = wlUrlStr.lastIndexOf(":");
-            if (e.getCause() instanceof NumberFormatException && Objects.equals(wlUrlStr.substring(ind + 1, wlUrlStr.length()), WILDCARD)) {
+            if (e.getCause() instanceof NumberFormatException && Objects.equals(wlUrlStr.substring(ind + 1), WILDCARD)) {
                 return wlUrlStr.substring(0, ind);
             }
             throw e;
