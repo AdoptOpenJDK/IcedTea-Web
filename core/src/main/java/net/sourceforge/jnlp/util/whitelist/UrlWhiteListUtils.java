@@ -48,10 +48,10 @@ public class UrlWhiteListUtils {
     }
 
     public static boolean isUrlInApplicationUrlWhitelist(final URL url) {
-        return isUrlInWhitelist(url, getApplicationUrlWhiteList(), true);
+        return isUrlInWhitelist(url, getApplicationUrlWhiteList());
     }
 
-    static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList, final boolean allowLocalhost) {
+    static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
         Assert.requireNonNull(url, "url");
         Assert.requireNonNull(whiteList, "whiteList");
 
@@ -60,7 +60,7 @@ public class UrlWhiteListUtils {
         }
 
         // is it localhost or loopback
-        if (allowLocalhost && IpUtil.isLocalhostOrLoopback(url)) {
+        if (IpUtil.isLocalhostOrLoopback(url)) {
             return true; // local server need not be in whitelist
         }
 

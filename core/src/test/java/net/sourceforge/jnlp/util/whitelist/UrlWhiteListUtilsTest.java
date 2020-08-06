@@ -85,69 +85,69 @@ public class UrlWhiteListUtilsTest {
 
         // "https://rfry.m-b.com"
         URL url = new URL("https://rfy.m-b.com:443/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); //+ " https://rfy.m-b.com:443/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); //+ " https://rfy.m-b.com:443/some_URL");
 
         // "https://rfy.m-b.com:443"
         url = new URL("https://rfy.m-b.com:445/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy.m-b.com:445/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy.m-b.com:445/some_URL");
 
         //  "https://*.m-b.com"
         url = new URL("https://rfyA.m-b.com:443/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b.com:443/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b.com:443/some_URL");
 
         // "https://rfy.*.com"
         url = new URL("https://rfy.m-b1.com:443/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy.m-b1.com:443/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy.m-b1.com:443/some_URL");
 
         //  "https://*.m-b.com"
         url = new URL("https://rfy.m-b.org:443/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy.m-b.org:443/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy.m-b.org:443/some_URL");
 
         url = new URL("https://rfy.m-b.com:443/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy.m-b.org:443/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy.m-b.org:443/some_URL");
 
         // "https://*.*.*:446"
         url = new URL("https://rfy1.m-b1.org:446/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "https://*:447"
         url = new URL("https://rfy1.m-b1.org:447/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "https://*:446"
         url = new URL("https://rfy1.m-b1.com:445/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.com:445/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.com:445/some_URL");
 
         // "https://*.mydomain.com"
         url = new URL("https://abc.mydomain.com:443/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "https://*.mydomain.com"
         url = new URL("https://abc.mydomain.com:444/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "http://*.mydomain.com"
         url = new URL("http://abc.mydomain.com:80/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "http://*.mydomain.com"
         url = new URL("http://abc.mydomain.com:81/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "*.cintra.net"
         url = new URL("https://abc.cintra.net:443/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         url = new URL("http://abc.cintra.net:443/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "*.dmlr.com"
         url = new URL("https://abc.dmlr.com:443/some_URL");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
 
         // "*.dmlr.com"
         url = new URL("https://abc.dmlr.com:44/some_URL");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true)); // + " https://rfy1.m-b1.org:446/some_URL");
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList)); // + " https://rfy1.m-b1.org:446/some_URL");
     }
 
     @Test
@@ -161,19 +161,19 @@ public class UrlWhiteListUtilsTest {
         List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
         URL url = new URL("https://docs.oracle.com/j2se/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://any.oracle.org:443/j2se/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://any.one.oracle.org:443/j2se/tutorial");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://any.net:443/j2se/tutorial");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://docs.any.net:443/j2se/tutorial");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
     }
 
     @Test
@@ -193,40 +193,40 @@ public class UrlWhiteListUtilsTest {
         List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
         URL url = new URL("https://123.134.145.156/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://123.134.145.156:443/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://124.134.145.156:443");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://124.134.145.156/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://124.134.145.156:80/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://125.134.145.157:90/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://123.134.145.156:167/j2se/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://124.134.145.156:333/j2se/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://124.134.145.158:333/j2se/tutorial");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://126.134.145.156:333/j2se/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://124.134.145.156:335/abc/efg");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://124.134.145.156:336/abcd/efg");
-        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertFalse(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
     }
 
     @Test
@@ -239,16 +239,16 @@ public class UrlWhiteListUtilsTest {
         List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
         URL url = new URL("https://123.134.145.156/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("https://abc.efg.com/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://abc.com/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
 
         url = new URL("http://123.134.145.156:80/tutorial");
-        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList, true));
+        Assert.assertTrue(UrlWhiteListUtils.isUrlInWhitelist(url, wList));
     }
 
     private static List<UrlWhiteListUtils.WhitelistEntry> getValidatedWhitelist(List<String> wildcardWhiteList) {
