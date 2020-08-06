@@ -4,7 +4,6 @@ import net.adoptopenjdk.icedteaweb.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +41,7 @@ public class UrlWhiteListUtilsTest {
     }
 
     @Test
-    public void validateIllegalWhitelistUrlString() throws MalformedURLException {
+    public void validateIllegalWhitelistUrlString() {
         Assert.assertFalse(UrlWhiteListUtils.validateWhitelistUrl("https://subdomain.domain.com:1*").isValid());
         Assert.assertFalse(UrlWhiteListUtils.validateWhitelistUrl("https://*jvms.domain.com:443").isValid());
         Assert.assertFalse(UrlWhiteListUtils.validateWhitelistUrl("https://jvms.*.com:443").isValid());
@@ -60,7 +59,7 @@ public class UrlWhiteListUtilsTest {
     }
 
     @Test
-    public void validateIllegalWhitelistIPUrlString() throws MalformedURLException {
+    public void validateIllegalWhitelistIPUrlString() {
         Assert.assertFalse(UrlWhiteListUtils.validateWhitelistUrl("https://123.*.156.145").getErrorMessage().isEmpty());
         Assert.assertFalse(UrlWhiteListUtils.validateWhitelistUrl("https://123.1*.0.156").getErrorMessage().isEmpty());
         Assert.assertFalse(UrlWhiteListUtils.validateWhitelistUrl("https://123.134.145.-1").getErrorMessage().isEmpty());
@@ -69,7 +68,7 @@ public class UrlWhiteListUtilsTest {
 
     @Test
     public void urlInWhiteList() throws Exception {
-        List<String> wildcardWhiteList = Arrays.asList(new String[]{
+        List<String> wildcardWhiteList = Arrays.asList(
                 "https://rfy.m-b.com",
                 "https://*.m-b.com",
                 "https://rfy.*.com",
@@ -79,7 +78,8 @@ public class UrlWhiteListUtilsTest {
                 "https://*.mydomain.com",
                 "http://*.mydomain.com",
                 "*.cintra.net",
-                "*.dmlr.com"});
+                "*.dmlr.com"
+        );
 
         List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
@@ -152,11 +152,11 @@ public class UrlWhiteListUtilsTest {
 
     @Test
     public void demoUrlInWhiteList() throws Exception {
-        List<String> wildcardWhiteList = Arrays.asList(new String[]{
+        List<String> wildcardWhiteList = Arrays.asList(
                 "docs.oracle.com",
                 "*.oracle.org",
-                "docs.*.net",
-        });
+                "docs.*.net"
+        );
 
         List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
@@ -178,7 +178,7 @@ public class UrlWhiteListUtilsTest {
 
     @Test
     public void ipUrlInWhiteList() throws Exception {
-        List<String> wildcardWhiteList = Arrays.asList(new String[]{
+        List<String> wildcardWhiteList = Arrays.asList(
                 "123.134.145.156",
                 "123.134.145.156:167",
                 "*.134.145.156:167",
@@ -187,8 +187,8 @@ public class UrlWhiteListUtilsTest {
                 "https://123.134.145.156",
                 "https://126.134.145.156:333",
                 "http://124.134.145.156:333",
-                "http://124.134.145.156:335/abc/efg",
-        });
+                "http://124.134.145.156:335/abc/efg"
+        );
 
         List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
@@ -231,10 +231,10 @@ public class UrlWhiteListUtilsTest {
 
     @Test
     public void wildCard() throws Exception {
-        List<String> wildcardWhiteList = Arrays.asList(new String[]{
+        List<String> wildcardWhiteList = Arrays.asList(
                 "*",
                 "http://*"
-        });
+        );
 
         List<UrlWhiteListUtils.WhitelistEntry> wList = getValidatedWhitelist(wildcardWhiteList);
 
@@ -255,7 +255,7 @@ public class UrlWhiteListUtilsTest {
         return wildcardWhiteList
                 .stream()
                 .filter(s -> !StringUtils.isBlank(s))
-                .map(s -> UrlWhiteListUtils.validateWhitelistUrl(s))
+                .map(UrlWhiteListUtils::validateWhitelistUrl)
                 .collect(Collectors.toList());
     }
 }
