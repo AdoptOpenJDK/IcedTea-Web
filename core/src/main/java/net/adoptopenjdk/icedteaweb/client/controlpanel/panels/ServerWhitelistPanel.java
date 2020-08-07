@@ -45,7 +45,6 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 @SuppressWarnings("serial")
 public class ServerWhitelistPanel extends NamedBorderPanel {
-    private static final String ERROR_MARKER = "Error:";
 
     /**
      * This creates a new instance of the server white list panel.
@@ -112,7 +111,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
             }
 
             public String getColumnName(int col) {
-                return colNames[col].toString();
+                return colNames[col];
             }
 
             @Override
@@ -127,7 +126,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
                     case 0:
                         return whitelistEntry.getRawWhitelistEntry();
                     case 1:
-                        return new WhitelistEntryState(whitelistEntry.isValid(), whitelistEntry.isValid() ? whitelistEntry.getEffectiveWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + whitelistEntry.getErrorMessage());
+                        return new WhitelistEntryState(whitelistEntry);
                     default:
                         throw new IllegalArgumentException();
                 }
@@ -136,20 +135,18 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
     }
 
     private static class WhitelistEntryState {
-        final private boolean valid;
-        final private String message;
+        private final WhitelistEntry entry;
 
-        public WhitelistEntryState(boolean valid, String message) {
-            this.valid = valid;
-            this.message = message;
+        public WhitelistEntryState(WhitelistEntry entry) {
+            this.entry = entry;
         }
 
         public boolean isValid() {
-            return valid;
+            return entry.isValid();
         }
 
         public String getMessage() {
-            return message;
+            return isValid() ? entry.getEffectiveWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + entry.getErrorMessage();
         }
     }
 }
