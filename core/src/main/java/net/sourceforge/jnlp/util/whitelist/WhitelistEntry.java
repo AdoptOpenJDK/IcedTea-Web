@@ -52,12 +52,11 @@ public class WhitelistEntry {
     }
 
     public boolean matches(URL url) {
-        Assert.requireNonNull(url, "url");
-
-        if (isValid()) { // ignore invalid whitelist entries
-            return isUrlProtocolMatching(effectiveWhitelistEntry, url) && isUrlHostMatching(effectiveWhitelistEntry, url) && isUrlPortMatching(effectiveWhitelistEntry, url);
-        } else {
+        if (!isValid() || url == null) {
+            // ignore invalid url or whitelist entries
             return false;
+        } else {
+            return isUrlProtocolMatching(effectiveWhitelistEntry, url) && isUrlHostMatching(effectiveWhitelistEntry, url) && isUrlPortMatching(effectiveWhitelistEntry, url);
         }
     }
     private static boolean isUrlProtocolMatching(URL url1, URL url2) {
