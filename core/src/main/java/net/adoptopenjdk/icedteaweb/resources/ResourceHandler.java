@@ -11,7 +11,7 @@ import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.UrlWhiteListUtils;
+import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
 
 import java.io.File;
 import java.net.URL;
