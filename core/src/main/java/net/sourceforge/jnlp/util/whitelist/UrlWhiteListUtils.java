@@ -32,16 +32,20 @@ public class UrlWhiteListUtils {
     private static final Lock whiteListLock = new ReentrantLock();
 
     public static List<WhitelistEntry> getApplicationUrlWhiteList() {
+        if (applicationUrlWhiteList == null) {
+            applicationUrlWhiteList = getUrlWhiteList(KEY_SECURITY_SERVER_WHITELIST);
+        }
+        return applicationUrlWhiteList;
+    }
+
+    public static List<WhitelistEntry> getUrlWhiteList(final String whitelistPropertyName) {
         whiteListLock.lock();
         try {
-            if (applicationUrlWhiteList == null) {
-                applicationUrlWhiteList = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
-                        .stream()
-                        .filter(s -> !StringUtils.isBlank(s))
-                        .map(UrlWhiteListUtils::validateWhitelistUrl)
-                        .collect(Collectors.toList());
-            }
-            return applicationUrlWhiteList;
+            return JNLPRuntime.getConfiguration().getPropertyAsList(whitelistPropertyName)
+                    .stream()
+                    .filter(s -> !StringUtils.isBlank(s))
+                    .map(UrlWhiteListUtils::validateWhitelistUrl)
+                    .collect(Collectors.toList());
         } finally {
             whiteListLock.unlock();
         }
@@ -51,7 +55,7 @@ public class UrlWhiteListUtils {
         return isUrlInWhitelist(url, getApplicationUrlWhiteList());
     }
 
-    static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
+    public static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
         Assert.requireNonNull(url, "url");
         Assert.requireNonNull(whiteList, "whiteList");
 

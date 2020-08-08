@@ -44,8 +44,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * This provides a way for the user to display the server white list defined in <code>deployment.properties</code>.
  */
 @SuppressWarnings("serial")
-public class ServerWhitelistPanel extends NamedBorderPanel {
-    private static final String ERROR_MARKER = "Error:";
+public class ServerWhitelistPanel extends AbstractServerWhitelistPanel {
 
     /**
      * This creates a new instance of the server white list panel.
@@ -53,103 +52,11 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
      * @param config Loaded DeploymentConfiguration file.
      */
     public ServerWhitelistPanel(final DeploymentConfiguration config) {
-        super(Translator.R("CPServerWhitelist"), new BorderLayout());
-
-        Assert.requireNonNull(config, "config");
-
-        final List<WhitelistEntry> whitelist = UrlWhiteListUtils.getApplicationUrlWhiteList();
-
-        final JTable table = new JTable(createTableModel(whitelist));
-        table.getTableHeader().setReorderingAllowed(false);
-        table.setFillsViewportHeight(true);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setAutoCreateRowSorter(true);
-
-        final TableColumnModel colModel = table.getColumnModel();
-        colModel.getColumn(0).setPreferredWidth(100);
-        colModel.getColumn(1).setPreferredWidth(250);
-
-        final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warn16.png");
-        final DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                final WhitelistEntryState wleState = (WhitelistEntryState) value;
-                if (wleState != null) {
-                    setText(wleState.getMessage());
-                    if (!wleState.isValid()) {
-                        setIcon(icon);
-                    } else {
-                        setIcon(null);
-                    }
-                } else {
-                    setText(null);
-                    setIcon(null);
-                }
-                if (isSelected) {
-                    setBackground(table.getSelectionBackground());
-                    setForeground(table.getSelectionForeground());
-                } else {
-                    setBackground(table.getBackground());
-                    setForeground(table.getForeground());
-                }
-                return this;
-            }
-        };
-        table.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
-        cellRenderer.setIconTextGap(5);
-        cellRenderer.setVerticalTextPosition(SwingConstants.CENTER);
-        final JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        add(scrollPane, BorderLayout.CENTER);
+        super(config);
     }
 
-    private TableModel createTableModel(final List<WhitelistEntry> whitelist) {
-        final String[] colNames = {R("SWPCol0Header"), R("SWPCol1Header")};
-        return new AbstractTableModel() {
-            @Override
-            public int getRowCount() {
-                return whitelist.size();
-            }
-
-            public String getColumnName(int col) {
-                return colNames[col].toString();
-            }
-
-            @Override
-            public int getColumnCount() {
-                return colNames.length;
-            }
-
-            @Override
-            public Object getValueAt(int rowIndex, int columnIndex) {
-                WhitelistEntry whitelistEntry = whitelist.get(rowIndex);
-                switch (columnIndex) {
-                    case 0:
-                        return whitelistEntry.getRawWhitelistEntry();
-                    case 1:
-                        return new WhitelistEntryState(whitelistEntry.isValid(), whitelistEntry.isValid() ? whitelistEntry.getEffectiveWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + whitelistEntry.getErrorMessage());
-                    default:
-                        throw new IllegalArgumentException();
-                }
-            }
-        };
-    }
-
-    private static class WhitelistEntryState {
-        final private boolean valid;
-        final private String message;
-
-        public WhitelistEntryState(boolean valid, String message) {
-            this.valid = valid;
-            this.message = message;
-        }
-
-        public boolean isValid() {
-            return valid;
-        }
-
-        public String getMessage() {
-            return message;
-        }
+    @Override
+    protected List<WhitelistEntry> createWhitelist() {
+        return  UrlWhiteListUtils.getApplicationUrlWhiteList();
     }
 }
