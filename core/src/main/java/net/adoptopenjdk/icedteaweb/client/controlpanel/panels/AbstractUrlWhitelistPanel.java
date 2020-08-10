@@ -36,6 +36,7 @@ import javax.swing.table.TableModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.util.List;
+import java.util.Optional;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -116,12 +117,12 @@ public abstract class AbstractUrlWhitelistPanel extends NamedBorderPanel {
             this.entry = entry;
         }
 
-        public boolean isValid() {
-            return entry.isValid();
+        public ImageIcon getIcon() {
+            return entry.isValid() ? null : WARNING_ICON;
         }
 
         public String getMessage() {
-            return isValid() ? entry.getEffectiveWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + entry.getErrorMessage();
+            return entry.isValid() ? entry.getEffectiveWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + entry.getErrorMessage();
         }
     }
 
@@ -135,18 +136,13 @@ public abstract class AbstractUrlWhitelistPanel extends NamedBorderPanel {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            final WhitelistEntryState wleState = (WhitelistEntryState) value;
-            if (wleState != null) {
-                setText(wleState.getMessage());
-                if (!wleState.isValid()) {
-                    setIcon(WARNING_ICON);
-                } else {
-                    setIcon(null);
-                }
-            } else {
-                setText(null);
-                setIcon(null);
-            }
+            final Optional<WhitelistEntryState> optState = Optional.ofNullable(value)
+                    .filter(v -> v instanceof WhitelistEntryState)
+                    .map(v -> (WhitelistEntryState)v);
+
+            setText(optState.map(WhitelistEntryState::getMessage).orElse(null));
+            setIcon(optState.map(WhitelistEntryState::getIcon).orElse(null));
+
             return this;
         }
     }
