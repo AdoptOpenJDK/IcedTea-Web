@@ -72,6 +72,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
         final DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 final WhitelistEntryState wleState = (WhitelistEntryState) value;
                 if (wleState != null) {
                     setText(wleState.getMessage());
@@ -83,13 +84,6 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
                 } else {
                     setText(null);
                     setIcon(null);
-                }
-                if (isSelected) {
-                    setBackground(table.getSelectionBackground());
-                    setForeground(table.getSelectionForeground());
-                } else {
-                    setBackground(table.getBackground());
-                    setForeground(table.getForeground());
                 }
                 return this;
             }
