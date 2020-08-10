@@ -2,8 +2,6 @@ package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.StringUtils;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.IpUtil;
 
@@ -26,32 +24,28 @@ public class UrlWhiteListUtils {
     public static final String HTTP = "http";
     private static final String PROTOCOL_SEPARATOR = "://";
 
-    private static final Logger LOG = LoggerFactory.getLogger(UrlWhiteListUtils.class);
-
     private static List<WhitelistEntry> applicationUrlWhiteList;
-    private static final Lock whiteListLock = new ReentrantLock();
 
     public static List<WhitelistEntry> getApplicationUrlWhiteList() {
-        whiteListLock.lock();
-        try {
             if (applicationUrlWhiteList == null) {
-                applicationUrlWhiteList = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST)
-                        .stream()
-                        .filter(s -> !StringUtils.isBlank(s))
-                        .map(UrlWhiteListUtils::validateWhitelistUrl)
-                        .collect(Collectors.toList());
+                applicationUrlWhiteList = whitelistPropertyName(KEY_SECURITY_SERVER_WHITELIST);
             }
             return applicationUrlWhiteList;
-        } finally {
-            whiteListLock.unlock();
-        }
+    }
+
+    public static List<WhitelistEntry> whitelistPropertyName(String whitelistPropertyName) {
+        return JNLPRuntime.getConfiguration().getPropertyAsList(whitelistPropertyName)
+                .stream()
+                .filter(s -> !StringUtils.isBlank(s))
+                .map(UrlWhiteListUtils::validateWhitelistUrl)
+                .collect(Collectors.toList());
     }
 
     public static boolean isUrlInApplicationUrlWhitelist(final URL url) {
         return isUrlInWhitelist(url, getApplicationUrlWhiteList());
     }
 
-    static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
+    public static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
         Assert.requireNonNull(url, "url");
         Assert.requireNonNull(whiteList, "whiteList");
 
