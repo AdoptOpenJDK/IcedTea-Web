@@ -25,7 +25,6 @@ public class UrlWhiteListUtils {
     private static final String PROTOCOL_SEPARATOR = "://";
 
     private static List<WhitelistEntry> applicationUrlWhiteList;
-    private static final Lock whiteListLock = new ReentrantLock();
 
     public static List<WhitelistEntry> getApplicationUrlWhiteList() {
             if (applicationUrlWhiteList == null) {
@@ -35,16 +34,11 @@ public class UrlWhiteListUtils {
     }
 
     public static List<WhitelistEntry> whitelistPropertyName(String whitelistPropertyName) {
-        whiteListLock.lock();
-        try {
         return JNLPRuntime.getConfiguration().getPropertyAsList(whitelistPropertyName)
                 .stream()
                 .filter(s -> !StringUtils.isBlank(s))
                 .map(UrlWhiteListUtils::validateWhitelistUrl)
                 .collect(Collectors.toList());
-        } finally {
-            whiteListLock.unlock();
-        }
     }
 
     public static boolean isUrlInApplicationUrlWhitelist(final URL url) {
