@@ -46,6 +46,8 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 @SuppressWarnings("serial")
 public class ServerWhitelistPanel extends NamedBorderPanel {
 
+    private static final ImageIcon WARNING_ICON = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warn16.png");
+
     /**
      * This creates a new instance of the server white list panel.
      *
@@ -68,26 +70,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
         colModel.getColumn(0).setPreferredWidth(100);
         colModel.getColumn(1).setPreferredWidth(250);
 
-        final ImageIcon icon = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warn16.png");
-        final DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                final WhitelistEntryState wleState = (WhitelistEntryState) value;
-                if (wleState != null) {
-                    setText(wleState.getMessage());
-                    if (!wleState.isValid()) {
-                        setIcon(icon);
-                    } else {
-                        setIcon(null);
-                    }
-                } else {
-                    setText(null);
-                    setIcon(null);
-                }
-                return this;
-            }
-        };
+        final DefaultTableCellRenderer cellRenderer = new EffectiveWhitelistCellRenderer();
         table.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
         cellRenderer.setIconTextGap(5);
         cellRenderer.setVerticalTextPosition(SwingConstants.CENTER);
@@ -141,6 +124,26 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
 
         public String getMessage() {
             return isValid() ? entry.getEffectiveWhitelistEntry() : R("SWPINVALIDWLURL") + ": " + entry.getErrorMessage();
+        }
+    }
+
+    private static class EffectiveWhitelistCellRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            final WhitelistEntryState wleState = (WhitelistEntryState) value;
+            if (wleState != null) {
+                setText(wleState.getMessage());
+                if (!wleState.isValid()) {
+                    setIcon(WARNING_ICON);
+                } else {
+                    setIcon(null);
+                }
+            } else {
+                setText(null);
+                setIcon(null);
+            }
+            return this;
         }
     }
 }
