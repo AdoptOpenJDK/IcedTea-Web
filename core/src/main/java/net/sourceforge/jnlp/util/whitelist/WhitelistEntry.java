@@ -56,20 +56,20 @@ public class WhitelistEntry {
             // ignore invalid url or whitelist entries
             return false;
         } else {
-            return isUrlProtocolMatching(effectiveWhitelistEntry, url) && isUrlHostMatching(effectiveWhitelistEntry, url) && isUrlPortMatching(effectiveWhitelistEntry, url);
+            return isProtocolMatching(url) && isHostMatching(url) && isPortMatching(url);
         }
     }
-    private static boolean isUrlProtocolMatching(URL url1, URL url2) {
-        return Objects.equals(url1.getProtocol(), url2.getProtocol());
+    private boolean isProtocolMatching(URL url) {
+        return Objects.equals(effectiveWhitelistEntry.getProtocol(), url.getProtocol());
     }
 
-    private static boolean isUrlHostMatching(URL wlUrl, URL url) {
+    private boolean isHostMatching(URL url) {
         // proto://*:port
-        if (Objects.equals(wlUrl.getHost(), WILDCARD)) {
+        if (Objects.equals(effectiveWhitelistEntry.getHost(), WILDCARD)) {
             return true;
         }
 
-        final String[] wlUrlHostParts = wlUrl.getHost().split(HOST_PART_REGEX);
+        final String[] wlUrlHostParts = effectiveWhitelistEntry.getHost().split(HOST_PART_REGEX);
         final String[] urlHostParts = url.getHost().split(HOST_PART_REGEX);
 
         if (wlUrlHostParts.length != urlHostParts.length) {
@@ -84,13 +84,13 @@ public class WhitelistEntry {
         return result;
     }
 
-    private static boolean isUrlPortMatching(URL wlUrl, URL url) {
-        if (wlUrl.getPort() != -1) {
+    private boolean isPortMatching(URL url) {
+        if (effectiveWhitelistEntry.getPort() != -1) {
             // url does not have port then force default port as we do the same for whitelist url
             if (url.getPort() == -1) {
-                return wlUrl.getPort() == url.getDefaultPort();
+                return effectiveWhitelistEntry.getPort() == url.getDefaultPort();
             } else {
-                return wlUrl.getPort() == url.getPort();
+                return effectiveWhitelistEntry.getPort() == url.getPort();
             }
         }
         return true;
