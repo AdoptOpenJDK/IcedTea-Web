@@ -70,10 +70,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
         colModel.getColumn(0).setPreferredWidth(100);
         colModel.getColumn(1).setPreferredWidth(250);
 
-        final DefaultTableCellRenderer cellRenderer = new EffectiveWhitelistCellRenderer();
-        table.getColumnModel().getColumn(1).setCellRenderer(cellRenderer);
-        cellRenderer.setIconTextGap(5);
-        cellRenderer.setVerticalTextPosition(SwingConstants.CENTER);
+        table.getColumnModel().getColumn(1).setCellRenderer(new EffectiveWhitelistCellRenderer());
         final JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(scrollPane, BorderLayout.CENTER);
@@ -128,6 +125,12 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
     }
 
     private static class EffectiveWhitelistCellRenderer extends DefaultTableCellRenderer {
+
+        private EffectiveWhitelistCellRenderer() {
+            setIconTextGap(5);
+            setVerticalTextPosition(SwingConstants.CENTER);
+        }
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
