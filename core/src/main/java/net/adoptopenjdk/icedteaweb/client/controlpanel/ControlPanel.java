@@ -53,6 +53,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -231,6 +232,7 @@ public class ControlPanel extends JFrame {
 
 
         final JList<String> settingsList = new JList<>(panels.keySet().toArray(new String[0]));
+        settingsList.setFont(new Font(settingsList.getFont().getName(), Font.BOLD, settingsList.getFont().getSize()));
         settingsList.addListSelectionListener(e -> cardLayout.show(settingsPanel, settingsList.getSelectedValue()));
         settingsList.setSelectedIndex(0);
         DefaultListCellRenderer cellRenderer = new DefaultListCellRenderer() {

@@ -7,11 +7,11 @@ import java.net.URI;
 import java.net.URL;
 
 public class IpUtil {
-    public static boolean isLocalhostOrLoopback(URL url) {
+    public static boolean isLocalhostOrLoopback(final URL url) {
         return isLocalhostOrLoopback(url.getHost());
     }
 
-    public static boolean isLocalhostOrLoopback(URI uri) {
+    public static boolean isLocalhostOrLoopback(final URI uri) {
         return isLocalhostOrLoopback(uri.getHost());
     }
 
@@ -20,7 +20,7 @@ public class IpUtil {
      * @return true if the given host string is blank or represents or resolves to the hostname or the IP address
      * of localhost or the loopback address.
      */
-    static boolean isLocalhostOrLoopback(String host) {
+    static boolean isLocalhostOrLoopback(final String host) {
         if (StringUtils.isBlank(host)) {
             return true; // java.net.InetAddress.getByName(host).isLoopbackAddress() returns true
         }
