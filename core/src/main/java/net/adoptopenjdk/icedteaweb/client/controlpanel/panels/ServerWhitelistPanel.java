@@ -105,7 +105,7 @@ public class ServerWhitelistPanel extends NamedBorderPanel {
                     case 1:
                         return new WhitelistEntryState(whitelistEntry);
                     default:
-                        throw new IllegalArgumentException();
+                        throw new IllegalArgumentException("column index > 1 - this should not happen");
                 }
             }
         };
