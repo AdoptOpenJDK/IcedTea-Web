@@ -423,6 +423,9 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     private boolean isTrustedTsa(CertPath certPath) {
+        if (certPath == null) {
+            return false;
+        }
         final List<KeyStore> caKeyStores = KeyStores.getCAKeyStores();
         // Check entire cert path for a trusted CA
         for (final Certificate c : certPath.getCertificates()) {
