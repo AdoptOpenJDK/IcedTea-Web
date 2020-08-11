@@ -27,13 +27,14 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.AppContextFactory;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.classloader.DelegatingClassLoader;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
-import sun.awt.SunToolkit;
 
 import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
@@ -436,6 +437,9 @@ public class Launcher {
             }
         }
 
+        //inject classloader into edt delegating classloader
+        DelegatingClassLoader.getInstance().setClassLoader(classLoader);
+
     }
 
     /**
@@ -643,8 +647,7 @@ public class Launcher {
             try {
                 // Do not create new AppContext if we're using NetX and icedteaplugin.
                 // The plugin needs an AppContext too, but it has to be created earlier.
-                SunToolkit.createNewAppContext();
-
+                AppContextFactory.createNewAppContext();
                 doPerApplicationAppContextHacks();
 
                 if (file.isApplication()) {
