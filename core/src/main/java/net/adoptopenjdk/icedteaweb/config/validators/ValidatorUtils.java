@@ -50,6 +50,7 @@ public class ValidatorUtils {
 
     public static List<String> splitCombination(final String value) {
         return Optional.ofNullable(value)
+                .map(String::trim)
                 .map(v -> v.split("\\s*" + Pattern.quote(Character.toString(DELIMITER)) + "\\s*"))
                 .map(Arrays::asList)
                 .orElseGet(Collections::emptyList);

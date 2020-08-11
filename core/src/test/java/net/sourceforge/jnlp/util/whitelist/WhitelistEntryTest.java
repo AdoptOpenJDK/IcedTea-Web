@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import java.net.URL;
 
-import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.validateWhitelistUrl;
+import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.parseEntry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -12,7 +12,7 @@ public class WhitelistEntryTest {
 
     @Test
     public void invalidEntryShouldMatchNothing() throws Exception {
-        final WhitelistEntry invalidEntry = validateWhitelistUrl("");
+        final WhitelistEntry invalidEntry = parseEntry("");
 
         assertInvalid(invalidEntry);
 
@@ -23,7 +23,7 @@ public class WhitelistEntryTest {
 
     @Test
     public void exactEntryShouldOnlyMatchExactUrl() throws Exception {
-        final WhitelistEntry validEntry = validateWhitelistUrl("http://test.com:88");
+        final WhitelistEntry validEntry = parseEntry("http://test.com:88");
 
         assertMatch(validEntry, "http://test.com:88");
 
@@ -34,10 +34,10 @@ public class WhitelistEntryTest {
 
     @Test
     public void defaultPortShouldMatchExplicitAndAbsentValue() throws Exception {
-        final WhitelistEntry explicitHttpEntry = validateWhitelistUrl("http://test.com:80");
-        final WhitelistEntry implicitHttpEntry = validateWhitelistUrl("http://test.com");
-        final WhitelistEntry explicitHttpsEntry = validateWhitelistUrl("https://test.com:443");
-        final WhitelistEntry implicitHttpsEntry = validateWhitelistUrl("https://test.com");
+        final WhitelistEntry explicitHttpEntry = parseEntry("http://test.com:80");
+        final WhitelistEntry implicitHttpEntry = parseEntry("http://test.com");
+        final WhitelistEntry explicitHttpsEntry = parseEntry("https://test.com:443");
+        final WhitelistEntry implicitHttpsEntry = parseEntry("https://test.com");
 
         assertMatch(explicitHttpEntry, "http://test.com:80");
         assertMatch(explicitHttpEntry, "http://test.com");
@@ -58,7 +58,7 @@ public class WhitelistEntryTest {
 
     @Test
     public void wildcardPortShouldMatchAnyPort() throws Exception {
-        final WhitelistEntry validEntry = validateWhitelistUrl("http://test.com:*");
+        final WhitelistEntry validEntry = parseEntry("http://test.com:*");
 
         assertMatch(validEntry, "http://test.com");
         assertMatch(validEntry, "http://test.com:80");
@@ -72,7 +72,7 @@ public class WhitelistEntryTest {
 
     @Test
     public void wildcardHostPartShouldMatchAnyPrefix() throws Exception {
-        final WhitelistEntry validEntry = validateWhitelistUrl("http://*.test.com");
+        final WhitelistEntry validEntry = parseEntry("http://*.test.com");
 
         assertMatch(validEntry, "http://sub.test.com");
         // FIXME: assertMatch(validEntry, "http://sub.sub.test.com");
@@ -83,7 +83,7 @@ public class WhitelistEntryTest {
 
     @Test
     public void wildcardHostShouldMatchAnyHost() throws Exception {
-        final WhitelistEntry validEntry = validateWhitelistUrl("https://*:456");
+        final WhitelistEntry validEntry = parseEntry("https://*:456");
 
         assertMatch(validEntry, "https://test.com:456");
         assertMatch(validEntry, "https://probe.net:456");
@@ -91,7 +91,7 @@ public class WhitelistEntryTest {
 
     @Test
     public void defaultProtocolShouldMatchOnlyHttps() throws Exception {
-        final WhitelistEntry validEntry = validateWhitelistUrl("test.com");
+        final WhitelistEntry validEntry = parseEntry("test.com");
 
         assertMatch(validEntry, "https://test.com");
 
