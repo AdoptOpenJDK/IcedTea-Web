@@ -351,9 +351,10 @@ public class JarCertVerifier implements CertVerifier {
                     final ZonedDateTime notBefore = zonedDateTime(((X509Certificate) cert).getNotBefore());
                     final ZonedDateTime notAfter = zonedDateTime(((X509Certificate) cert).getNotAfter());
 
-                    final Optional<Timestamp> optionalSignatureTimestamp = Optional.ofNullable(codeSigners.get(certPath))
+                    final Optional<Timestamp> optionalTsa = Optional.ofNullable(codeSigners.get(certPath))
                             .map(CodeSigner::getTimestamp);
-                    final X509Certificate tsaCertificate = (X509Certificate) optionalSignatureTimestamp
+
+                    final X509Certificate tsaCertificate = (X509Certificate) optionalTsa
                             .map(Timestamp::getSignerCertPath)
                             .map(CertPath::getCertificates)
                             .filter(certs -> !certs.isEmpty())
@@ -361,12 +362,18 @@ public class JarCertVerifier implements CertVerifier {
                             .filter(c -> c instanceof X509Certificate)
                             .orElse(null);
 
-                    if (tsaCertificate != null) {
+                    final CertPath tsaCertPath = optionalTsa
+                            .map(Timestamp::getSignerCertPath)
+                            .orElse(null);
+
+                    final Date tsaDate = optionalTsa
+                            .map(Timestamp::getTimestamp)
+                            .orElse(null);
+
+                    if (tsaCertificate != null && isTrustedTsa(tsaCertPath)) {
                         final ZonedDateTime tsaNotBefore = zonedDateTime(tsaCertificate.getNotBefore());
                         final ZonedDateTime tsaNotAfter = zonedDateTime(tsaCertificate.getNotAfter());
-                        final ZonedDateTime signedAt = zonedDateTime(optionalSignatureTimestamp
-                                .orElseThrow(() -> new RuntimeException("timestamp is null even tough we have a tsa certificate"))
-                                .getTimestamp());
+                        final ZonedDateTime signedAt = zonedDateTime(tsaDate);
 
                         if (signedAt.isBefore(tsaNotBefore) || now.isBefore(tsaNotBefore)) {
                             certInfo.setNotYetValidCert();
@@ -415,6 +422,23 @@ public class JarCertVerifier implements CertVerifier {
         return result;
     }
 
+    private boolean isTrustedTsa(CertPath certPath) {
+        if (certPath == null) {
+            return false;
+        }
+        final List<KeyStore> caKeyStores = KeyStores.getCAKeyStores();
+        // Check entire cert path for a trusted CA
+        for (final Certificate c : certPath.getCertificates()) {
+            if (c instanceof X509Certificate) {
+                final X509Certificate x509 = (X509Certificate) c;
+                if (CertificateUtils.inKeyStores(x509, caKeyStores)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private VerifyResult verifySigners(final Map<CertPath, Integer> jarSignCount) {
         for (CertPath entryCertPath : jarSignCount.keySet()) {
             if (certs.containsKey(entryCertPath) && !certs.get(entryCertPath).hasSigningIssues()) {
@@ -426,6 +450,9 @@ public class JarCertVerifier implements CertVerifier {
     }
 
     private ZonedDateTime zonedDateTime(final Date date) {
+        if (date == null) {
+            return ZonedDateTime.now();
+        }
         return date.toInstant().atZone(ZoneId.systemDefault());
     }
 
