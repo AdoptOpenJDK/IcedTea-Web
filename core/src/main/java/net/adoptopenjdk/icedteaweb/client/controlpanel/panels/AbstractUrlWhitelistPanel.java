@@ -49,12 +49,21 @@ public abstract class AbstractUrlWhitelistPanel extends NamedBorderPanel {
     private static final ImageIcon WARNING_ICON = SunMiscLauncher.getSecureImageIcon("net/sourceforge/jnlp/resources/warn16.png");
 
     /**
-     * This creates a new instance of the server white list panel.
+     * This creates a new instance of the server url white list panel without title.
      *
      * @param config Loaded DeploymentConfiguration file.
      */
     public AbstractUrlWhitelistPanel(final DeploymentConfiguration config) {
-        super(Translator.R("CPServerWhitelist"), new BorderLayout());
+        this(config, "");
+    }
+    /**
+     * This creates a new instance of the server url white list panel with title.
+     *
+     * @param config Loaded DeploymentConfiguration file.
+     * @param borderTitle Title for the Named Border Panel.
+     */
+    public AbstractUrlWhitelistPanel(final DeploymentConfiguration config, final String borderTitle) {
+        super(borderTitle, new BorderLayout());
 
         Assert.requireNonNull(config, "config");
 

@@ -17,6 +17,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
 import net.sourceforge.jnlp.util.whitelist.WhitelistEntry;
@@ -35,7 +36,7 @@ public class ServerWhitelistPanel extends AbstractUrlWhitelistPanel {
      * @param config Loaded DeploymentConfiguration file.
      */
     public ServerWhitelistPanel(DeploymentConfiguration config) {
-        super(config);
+        super(config, Translator.R("CPServerWhitelist"));
     }
 
     @Override

@@ -33,7 +33,7 @@ public class UrlWhiteListUtils {
             return applicationUrlWhiteList;
     }
 
-    public static List<WhitelistEntry> whitelistPropertyName(String whitelistPropertyName) {
+    public static List<WhitelistEntry> whitelistPropertyName(final String whitelistPropertyName) {
         return JNLPRuntime.getConfiguration().getPropertyAsList(whitelistPropertyName)
                 .stream()
                 .filter(s -> !StringUtils.isBlank(s))
