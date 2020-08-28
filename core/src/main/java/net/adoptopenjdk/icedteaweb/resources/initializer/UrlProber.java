@@ -32,6 +32,7 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version. */
 package net.adoptopenjdk.icedteaweb.resources.initializer;
 
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
@@ -39,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.http.HttpUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.IOException;
 import java.net.URL;
@@ -66,11 +68,23 @@ class UrlProber {
              * See http://docs.oracle.com/javase/1.5.0/docs/guide/net/http-keepalive.html */
             HttpUtils.consumeAndCloseConnectionSilently(connection);
 
+            final int responseCode;
+            try {
+                responseCode = connection.getResponseCode();
+            } catch (final IOException ioEx) {
+                if (ioEx.getMessage().toLowerCase().contains("proxy")) {
+                    // TODO Need a better dialog - one similar to OWS
+                    BasicExceptionDialog.show(ioEx);
+                    JNLPRuntime.exit(-1);
+                }
+                throw ioEx;
+            }
+
             LOG.debug("URL connection '{}' header fields: {}", url, connection.getHeaderFields());
 
             return new UrlRequestResult(
                     connection.getURL(),
-                    connection.getResponseCode(),
+                    responseCode,
                     connection.getLocationHeaderFieldUrl(),
                     getJnlpVersionHeader(connection),
                     connection.getLastModified(),
