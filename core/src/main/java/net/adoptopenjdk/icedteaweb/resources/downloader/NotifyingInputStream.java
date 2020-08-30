@@ -3,28 +3,23 @@ package net.adoptopenjdk.icedteaweb.resources.downloader;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 /**
  * ...
  */
 class NotifyingInputStream extends FilterInputStream {
-    private final List<Consumer<Long>> downloadListener = new CopyOnWriteArrayList<>();
+    private final Consumer<Long> downloadListener;
     private final long updateChunkSize;
 
     private long downloaded = 0;
     private long nextUpdateSize;
 
-    public NotifyingInputStream(final InputStream inputStream, final long totalSize) {
+    public NotifyingInputStream(final InputStream inputStream, final long totalSize, final Consumer<Long> downloadListener) {
         super(inputStream);
+        this.downloadListener = downloadListener;
         this.updateChunkSize = totalSize > 0 ? totalSize / 1000 : 1000;
         this.nextUpdateSize = updateChunkSize;
-    }
-
-    public void addListener(Consumer<Long> listener) {
-        downloadListener.add(listener);
     }
 
     @Override
@@ -35,7 +30,7 @@ class NotifyingInputStream extends FilterInputStream {
                 final long currentSize = ++downloaded;
                 if (nextUpdateSize <= currentSize) {
                     nextUpdateSize = currentSize + updateChunkSize;
-                    downloadListener.forEach(l -> l.accept(currentSize));
+                    downloadListener.accept(currentSize);
                 }
             }
         } catch (Exception ignored) {

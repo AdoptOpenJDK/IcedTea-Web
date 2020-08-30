@@ -94,7 +94,6 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             }
 
             resource.setSize(downloadDetails.totalSize);
-            downloadDetails.inputStream.addListener(resource::setTransferred);
             final long bytesTransferred = tryDownloading(downloadDetails);
 
             resource.setStatus(DOWNLOADED);
@@ -148,7 +147,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
             final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
             final long totalSize = connection.getContentLength();
-            final NotifyingInputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize);
+            final InputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize, resource::setTransferred);
 
             if (!String.valueOf(connection.getResponseCode()).startsWith("2")) {
                 throw new IllegalStateException("Request returned " + connection.getResponseCode() + " for URL " + connection.getURL());
@@ -182,7 +181,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final String version = headerMap.get(VERSION_ID_HEADER);
         final String contentType = headerMap.get(CONTENT_TYPE_HEADER);
         final String contentEncoding = headerMap.get(CONTENT_ENCODING_HEADER);
-        final NotifyingInputStream inputStream = new NotifyingInputStream(new ByteArrayInputStream(body), body.length);
+        final InputStream inputStream = new NotifyingInputStream(new ByteArrayInputStream(body), body.length, resource::setTransferred);
 
         return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified, body.length);
     }
