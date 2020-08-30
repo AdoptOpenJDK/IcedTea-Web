@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.util.function.Consumer;
 
 /**
- * ...
+ * Input stream which notifies a listener about its progress.
  */
 class NotifyingInputStream extends FilterInputStream {
     private final Consumer<Long> downloadListener;
@@ -18,23 +18,34 @@ class NotifyingInputStream extends FilterInputStream {
     public NotifyingInputStream(final InputStream inputStream, final long totalSize, final Consumer<Long> downloadListener) {
         super(inputStream);
         this.downloadListener = downloadListener;
-        this.updateChunkSize = totalSize > 0 ? totalSize / 1000 : 1000;
+        this.updateChunkSize = calculateChunkSize(totalSize);
         this.nextUpdateSize = updateChunkSize;
+    }
+
+    private long calculateChunkSize(long totalSize) {
+        if (totalSize <= 0) {
+            return 1000;
+        }
+
+        return Long.max(totalSize / 1000, 100);
     }
 
     @Override
     public int read() throws IOException {
         final int value = super.read();
-        try {
-            if (value >= 0) {
-                final long currentSize = ++downloaded;
-                if (nextUpdateSize <= currentSize) {
-                    nextUpdateSize = currentSize + updateChunkSize;
-                    downloadListener.accept(currentSize);
-                }
+        if (value >= 0) {
+            if (nextUpdateSize <= ++downloaded) {
+                nextUpdateSize = downloaded + updateChunkSize;
+                notifyListener(downloaded);
             }
-        } catch (Exception ignored) {
         }
         return value;
+    }
+
+    private void notifyListener(final long value) {
+        try {
+            downloadListener.accept(value);
+        } catch (Exception ignored) {
+        }
     }
 }
