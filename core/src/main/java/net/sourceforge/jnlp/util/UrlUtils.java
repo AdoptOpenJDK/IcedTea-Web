@@ -536,9 +536,9 @@ public class UrlUtils {
         try (final Socket s = UrlUtils.createSocketFromUrl(url)) {
             writeRequest(s.getOutputStream(), url);
             //StringBuilder do not have endsWith method. Check on that are more expensive then recreations
-            String head = new String();
+            String head = "";
             byte[] body = new byte[0];
-            //we can't use bufferedreader, otherwise buffer consume also part of body
+            //we can't use buffered reader, otherwise buffer consume also part of body
             try (InputStream is = s.getInputStream()) {
                 while (true) {
                     int readChar = is.read();

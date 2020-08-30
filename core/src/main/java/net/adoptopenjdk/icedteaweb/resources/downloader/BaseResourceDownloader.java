@@ -93,10 +93,8 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 throw new RuntimeException("Server error: " + serverResponse);
             }
 
-            downloadDetails.addListener((current, total) -> {
-                resource.setSize(total);
-                resource.setTransferred(current);
-            });
+            resource.setSize(downloadDetails.totalSize);
+            downloadDetails.inputStream.addListener(resource::setTransferred);
             final long bytesTransferred = tryDownloading(downloadDetails);
 
             resource.setStatus(DOWNLOADED);
@@ -145,14 +143,12 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private DownloadDetails getDownloadDetails(final CloseableConnection connection) throws IOException {
         final URL downloadFrom = connection.getURL();
         try {
-            // TODO handle redirect and 511 and not successful...
-
             final long lastModified = connection.getLastModified();
             final String version = connection.getHeaderField(VERSION_ID_HEADER);
             final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
             final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
-            final InputStream inputStream = connection.getInputStream();
             final long totalSize = connection.getContentLength();
+            final NotifyingInputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize);
 
             if (!String.valueOf(connection.getResponseCode()).startsWith("2")) {
                 throw new IllegalStateException("Request returned " + connection.getResponseCode() + " for URL " + connection.getURL());
@@ -186,7 +182,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final String version = headerMap.get(VERSION_ID_HEADER);
         final String contentType = headerMap.get(CONTENT_TYPE_HEADER);
         final String contentEncoding = headerMap.get(CONTENT_ENCODING_HEADER);
-        final InputStream inputStream = new ByteArrayInputStream(body);
+        final NotifyingInputStream inputStream = new NotifyingInputStream(new ByteArrayInputStream(body), body.length);
 
         return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified, body.length);
     }
