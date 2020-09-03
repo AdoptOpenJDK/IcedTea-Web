@@ -784,6 +784,8 @@ public class JNLPFile {
      */
     public boolean needsNewVM() {
 
+        // TODO: github #322 - should check VM args here
+
         return !getNewVMArgs().isEmpty();
     }
 

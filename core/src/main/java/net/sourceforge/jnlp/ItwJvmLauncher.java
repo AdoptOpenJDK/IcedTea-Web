@@ -40,6 +40,8 @@ public class ItwJvmLauncher implements JvmLauncher {
         requireNonNull(jnlpFile, "JNLPFile must not be null.");
         requireNonNull(args, "args must not be null.");
 
+        // TODO: github #322 - should check VM args here
+
         launchExternal(jnlpFile.getNewVMArgs(), args);
     }
 
