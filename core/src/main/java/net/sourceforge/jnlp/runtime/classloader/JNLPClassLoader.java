@@ -97,6 +97,8 @@ import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.sourceforge.jnlp.LaunchException.FATAL;
+import static net.sourceforge.jnlp.cache.NativeLibraryStorage.NATIVE_LIB_EXT_DYLIB;
+import static net.sourceforge.jnlp.cache.NativeLibraryStorage.NATIVE_LIB_EXT_JNILIB;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
 
@@ -1294,6 +1296,17 @@ public class JNLPClassLoader extends URLClassLoader {
     @Override
     protected String findLibrary(String lib) {
         String syslib = System.mapLibraryName(lib);
+        final String nativeLibrary = findNativeLibrary(lib, syslib);
+        // required for macOS, as of
+        // https://bugs.openjdk.java.net/browse/JDK-8127215
+        // https://bugs.java.com/bugdatabase/view_bug.do?bug_id=7158157
+        if (nativeLibrary == null && syslib.endsWith(NATIVE_LIB_EXT_DYLIB)) {
+            return findNativeLibrary(lib, "lib" + lib + NATIVE_LIB_EXT_JNILIB);
+        }
+        return nativeLibrary;
+    }
+
+    private String findNativeLibrary(final String lib, final String syslib) {
         File libFile = nativeLibraryStorage.findLibrary(syslib);
 
         if (libFile != null) {
