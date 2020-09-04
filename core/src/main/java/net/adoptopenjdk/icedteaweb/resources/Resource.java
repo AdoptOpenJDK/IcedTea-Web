@@ -60,7 +60,7 @@ public class Resource {
     public enum Status {
         INCOMPLETE,
         DOWNLOADED,
-        ERROR
+        ERROR,
     }
 
     /** the remote location of the resource */
@@ -228,7 +228,7 @@ public class Resource {
      * @param flag a status flag
      * @return true iff the flag is set
      */
-    public boolean isSet(Status flag) {
+    boolean isSet(Status flag) {
         return status == flag;
     }
 

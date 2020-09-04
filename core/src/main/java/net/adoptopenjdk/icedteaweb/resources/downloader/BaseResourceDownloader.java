@@ -63,7 +63,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         // TODO:
         // would be nice if we could run the different urls in parallel.
         // this would require to write content to temporary file and only on success move the file into the cache.
-        downloadUrls.stream()
+        return downloadUrls.stream()
                 .map(this::downloadFrom)
                 .map(this::futureToOptional)
                 .filter(Optional::isPresent)
@@ -72,20 +72,19 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .orElseGet(() -> {
                     LOG.error("could not download resource {} from any of theses urls {}", resource, downloadUrls);
                     resource.setStatus(ERROR);
+                    checkForProxyError();
                     return resource;
                 });
+    }
 
-        // if all urls failed then check for proxy error
-        // TODO : should we flag any other exception?
-        if (resource.isSet(ERROR)) {
-            for(Exception excp : downLoadExceptions) {
-                if (excp.getCause() instanceof IOException && excp.getMessage().toLowerCase().contains("proxy")) {
-                    BasicExceptionDialog.show(excp);
-                    JNLPRuntime.exit(-1);
-                }
+    private void checkForProxyError() {
+        for (final Exception excp : downLoadExceptions) {
+            final Throwable cause = excp.getCause();
+            if (cause instanceof IOException && cause.getMessage().toLowerCase().contains("proxy")) {
+                BasicExceptionDialog.show((IOException) cause);
+                JNLPRuntime.exit(-1);
             }
         }
-        return resource;
     }
 
     private CompletableFuture<Resource> downloadFrom(final URL url) {
