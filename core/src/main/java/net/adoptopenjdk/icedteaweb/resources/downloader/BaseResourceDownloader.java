@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -19,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -109,10 +111,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 throw new RuntimeException("Server error: " + serverResponse);
             }
 
-            downloadDetails.addListener((current, total) -> {
-                resource.setSize(total);
-                resource.setTransferred(current);
-            });
+            resource.setSize(downloadDetails.totalSize);
             final long bytesTransferred = tryDownloading(downloadDetails);
 
             resource.setStatus(DOWNLOADED);
@@ -161,14 +160,12 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private DownloadDetails getDownloadDetails(final CloseableConnection connection) throws IOException {
         final URL downloadFrom = connection.getURL();
         try {
-            // TODO handle redirect and 511 and not successful...
-
             final long lastModified = connection.getLastModified();
             final String version = connection.getHeaderField(VERSION_ID_HEADER);
             final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
             final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
-            final InputStream inputStream = connection.getInputStream();
             final long totalSize = connection.getContentLength();
+            final InputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize, resource::setTransferred);
 
             if (!String.valueOf(connection.getResponseCode()).startsWith("2")) {
                 throw new IllegalStateException("Request returned " + connection.getResponseCode() + " for URL " + connection.getURL());
@@ -186,7 +183,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     }
 
     private DownloadDetails getInputStreamFromDirectSocket(final URL url) throws IOException {
-        final Object[] result = UrlUtils.loadUrlWithInvalidHeaderBytes(url);
+        final Object[] result = loadUrlWithInvalidHeaderBytes(url);
         final String head = (String) result[0];
         final byte[] body = (byte[]) result[1];
         LOG.debug("Header of: {} ({})", url, resource);
@@ -205,6 +202,35 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final InputStream inputStream = new ByteArrayInputStream(body);
 
         return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified, body.length);
+    }
+
+    private Object[] loadUrlWithInvalidHeaderBytes(final URL url) throws IOException {
+        try (final Socket s = UrlUtils.createSocketFromUrl(url)) {
+            UrlUtils.writeRequest(s.getOutputStream(), url);
+            String head = "";
+            byte[] body = new byte[0];
+            //we can't use buffered reader, otherwise buffer consume also part of body
+            try (InputStream is = s.getInputStream()) {
+                while (true) {
+                    int readChar = is.read();
+                    if (readChar < 0) {
+                        break;
+                    }
+                    head = head + ((char) readChar);
+                    if (endsWithBlankLine(head)) {
+                        body = IOUtils.readContent(new NotifyingInputStream(is, -1, resource::setTransferred));
+                    }
+                }
+            }
+            return new Object[]{head, body};
+        }
+    }
+
+    private static boolean endsWithBlankLine(String head) {
+        return head.endsWith("\n\n")
+                || head.endsWith("\r\n\r\n")
+                || head.endsWith("\n\r\n\r")
+                || head.endsWith("\r\r");
     }
 
     private long parseLong(final String s, final long defaultValue) {
