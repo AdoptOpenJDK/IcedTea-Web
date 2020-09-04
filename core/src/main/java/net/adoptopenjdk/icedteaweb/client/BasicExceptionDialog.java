@@ -98,6 +98,7 @@ public class BasicExceptionDialog {
         final BoxLayout layoutButtons = new BoxLayout(quickInfoPanelButtons, BoxLayout.X_AXIS);
         quickInfoPanelAll.setLayout(layoutAll);
         quickInfoPanelMessage.setLayout(layoutMessage);
+        quickInfoPanelMessage.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
         quickInfoPanelButtons.setLayout(layoutButtons);
         mainPanel.add(quickInfoPanelAll, BorderLayout.PAGE_START);
         quickInfoPanelAll.add(quickInfoPanelMessage);
