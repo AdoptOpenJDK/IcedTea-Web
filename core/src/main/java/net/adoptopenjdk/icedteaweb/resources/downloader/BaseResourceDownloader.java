@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
 import net.adoptopenjdk.icedteaweb.StreamUtils;
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.http.HttpMethod;
@@ -11,6 +12,7 @@ import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.DownloadInfo;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.ByteArrayInputStream;
@@ -18,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +50,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
     protected final Resource resource;
     private final List<URL> downloadUrls;
+    private final List<Exception> downLoadExceptions = new ArrayList<>();
 
     BaseResourceDownloader(final Resource resource, final List<URL> downloadUrls) {
         this.resource = resource;
@@ -55,10 +59,11 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
     @Override
     public Resource download() {
+        downLoadExceptions.clear();
         // TODO:
         // would be nice if we could run the different urls in parallel.
         // this would require to write content to temporary file and only on success move the file into the cache.
-        return downloadUrls.stream()
+        downloadUrls.stream()
                 .map(this::downloadFrom)
                 .map(this::futureToOptional)
                 .filter(Optional::isPresent)
@@ -69,6 +74,18 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                     resource.setStatus(ERROR);
                     return resource;
                 });
+
+        // if all urls failed then check for proxy error
+        // TODO : should we flag any other exception?
+        if (resource.isSet(ERROR)) {
+            for(Exception excp : downLoadExceptions) {
+                if (excp.getCause() instanceof IOException && excp.getMessage().toLowerCase().contains("proxy")) {
+                    BasicExceptionDialog.show(excp);
+                    JNLPRuntime.exit(-1);
+                }
+            }
+        }
+        return resource;
     }
 
     private CompletableFuture<Resource> downloadFrom(final URL url) {
@@ -203,6 +220,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         try {
             return Optional.ofNullable(future.get());
         } catch (InterruptedException | ExecutionException e) {
+            downLoadExceptions.add(e);
             return Optional.empty();
         }
     }
@@ -212,5 +230,4 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         LOG.debug("Invalidating resource in cache: {} / {}", location, version);
         Cache.replaceExistingCacheFile(location, version);
     }
-
 }
