@@ -27,13 +27,13 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.AppContextFactory;
 import net.sourceforge.jnlp.runtime.AppletInstance;
 import net.sourceforge.jnlp.runtime.ApplicationExecutor;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
-import sun.awt.SunToolkit;
 
 import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
@@ -70,19 +70,13 @@ public class Launcher {
 
     // defines class Launcher.BgRunner, Launcher.TgThread
 
-    /**
-     * shared thread group
-     */
+    /** shared thread group */
     private static final ThreadGroup mainGroup = new ThreadGroup(R("LAllThreadGroup"));
 
-    /**
-     * the handler
-     */
+    /** the handler */
     private final LaunchHandler handler = JNLPRuntime.getDefaultLaunchHandler();
 
-    /**
-     * the update policy
-     */
+    /** the update policy */
     private final UpdatePolicy updatePolicy = JNLPRuntime.getDefaultUpdatePolicy();
 
     private ParserSettings parserSettings = new ParserSettings();
@@ -92,8 +86,8 @@ public class Launcher {
     private final ApplicationExecutor applicationExecutor = new ApplicationExecutor();
 
     /**
-     * @param settings the parser settings to use when the Launcher initiates parsing of
-     *                 a JNLP file.
+     * @param settings  the parser settings to use when the Launcher initiates parsing of
+     * a JNLP file.
      */
     public void setParserSettings(ParserSettings settings) {
         parserSettings = settings;
@@ -102,10 +96,9 @@ public class Launcher {
     /**
      * Set a map to use when trying to extract extra information, including
      * arguments, properties and parameters, to be merged into the main JNLP
-     *
      * @param input a map containing extra information to add to the main JNLP.
-     *              the values for keys "arguments", "parameters", and "properties" are
-     *              used.
+     * the values for keys "arguments", "parameters", and "properties" are
+     * used.
      */
     public void setInformationToMerge(Map<String, List<String>> input) {
         this.extra = input;
@@ -161,7 +154,7 @@ public class Launcher {
         try {
             // Do not create new AppContext if we're using NetX and icedteaplugin.
             // The plugin needs an AppContext too, but it has to be created earlier.
-            SunToolkit.createNewAppContext();
+            AppContextFactory.createNewAppContext();
 
             doPerApplicationAppContextHacks();
 
@@ -454,7 +447,6 @@ public class Launcher {
                 thread.setContextClassLoader(classLoader);
             }
         }
-
     }
 
     /**

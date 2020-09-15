@@ -532,35 +532,6 @@ public class UrlUtils {
         return all.toString();
     }
 
-    public static Object[] loadUrlWithInvalidHeaderBytes(final URL url) throws IOException {
-        try (final Socket s = UrlUtils.createSocketFromUrl(url)) {
-            writeRequest(s.getOutputStream(), url);
-            //StringBuilder do not have endsWith method. Check on that are more expensive then recreations
-            String head = new String();
-            byte[] body = new byte[0];
-            //we can't use bufferedreader, otherwise buffer consume also part of body
-            try (InputStream is = s.getInputStream()) {
-                while (true) {
-                    int readChar = is.read();
-                    if (readChar < 0) {
-                        break;
-                    }
-                    head = head + ((char) readChar);
-                    if (endsWithBlankLine(head)) {
-                        body = IOUtils.readContent(is);
-                    }
-                }
-            }
-            return new Object[]{head, body};
-        }
-    }
-
-    private static boolean endsWithBlankLine(String head) {
-        return head.endsWith("\n\n")
-                || head.endsWith("\r\n\r\n")
-                || head.endsWith("\n\r\n\r")
-                || head.endsWith("\r\r");
-    }
 
     public static String[] loadUrlWithInvalidHeader(final URL url) throws IOException {
         return loadUrlWithInvalidHeader(url, StandardCharsets.US_ASCII);
@@ -590,7 +561,7 @@ public class UrlUtils {
         }
     }
 
-    private static void writeRequest(final OutputStream s, final URL url) throws IOException {
+    public static void writeRequest(final OutputStream s, final URL url) throws IOException {
         final Writer w = new OutputStreamWriter(s, StandardCharsets.US_ASCII);
         String file = url.getFile();
         if (file.isEmpty()) {
@@ -606,7 +577,7 @@ public class UrlUtils {
         w.flush();
     }
 
-    private static Socket createSocketFromUrl(final URL url) throws IOException {
+    public static Socket createSocketFromUrl(final URL url) throws IOException {
         Objects.requireNonNull(url);
         int p = url.getPort();
         if (p < 0) {

@@ -28,7 +28,9 @@ public class NativeLibraryStorage {
     private static final Logger LOG = LoggerFactory.getLogger(NativeLibraryStorage.class);
 
     private static final Random RANDOM = new Random();
-    static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", ".dylib", ".jnilib", ".framework", ".dll"};
+    public static final String NATIVE_LIB_EXT_DYLIB = ".dylib";
+    public static final String NATIVE_LIB_EXT_JNILIB = ".jnilib";
+    static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", NATIVE_LIB_EXT_DYLIB, NATIVE_LIB_EXT_JNILIB, ".framework", ".dll"};
 
     private final ResourceTracker tracker;
     private final List<File> nativeSearchDirectories = new ArrayList<>();

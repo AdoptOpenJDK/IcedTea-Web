@@ -70,7 +70,6 @@ public class JREDesc {
     private final String maximumHeapSize;
 
     /** args to pass to the vm */
-    private final String vmArgs;
     private final List<String> parsedArguments;
 
     /** list of ResourceDesc objects */
@@ -94,7 +93,6 @@ public class JREDesc {
         this.version = version;
         this.vendor = vendor;
         this.location = location;
-        this.vmArgs = vmArgs;
         this.parsedArguments = parseArguments(vmArgs);
         this.initialHeapSize = checkHeapSize(initialHeapSize);
         this.maximumHeapSize = checkHeapSize(maximumHeapSize);
@@ -156,14 +154,6 @@ public class JREDesc {
     }
 
     /**
-     * @return the additional arguments to pass to the Java VM
-     * Can be null
-     */
-    public String getVMArgs() {
-        return vmArgs;
-    }
-
-    /**
      * @return a list of vm arguments which can be passed to a new java process.
      */
     public List<String> getAllVmArgs() {
@@ -178,7 +168,7 @@ public class JREDesc {
         return result;
     }
 
-    private List<String> parseArguments(String args) throws ParseException {
+    private List<String> parseArguments(final String args) throws ParseException {
         if (StringUtils.isBlank(args)) {
             return emptyList();
         }
@@ -206,7 +196,7 @@ public class JREDesc {
         }
 
         if (inQuotes) {
-            throw new ParseException("failed to parse vmArgs " + vmArgs);
+            throw new ParseException("failed to parse vmArgs " + args);
         }
 
         if (next.length() > 0) {

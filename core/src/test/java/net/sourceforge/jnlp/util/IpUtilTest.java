@@ -1,5 +1,7 @@
 package net.sourceforge.jnlp.util;
 
+import inet.ipaddr.HostNameException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.net.MalformedURLException;

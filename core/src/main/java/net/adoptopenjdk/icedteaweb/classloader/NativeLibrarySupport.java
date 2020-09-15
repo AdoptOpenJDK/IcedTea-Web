@@ -31,13 +31,18 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Stream;
 
+import static net.sourceforge.jnlp.cache.NativeLibraryStorage.NATIVE_LIB_EXT_DYLIB;
+import static net.sourceforge.jnlp.cache.NativeLibraryStorage.NATIVE_LIB_EXT_JNILIB;
+
 /**
  * Handles loading and access of native code loading through a JNLP application.
  * Stores native code in a temporary folder.
  */
  class NativeLibrarySupport {
 
-    private static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", ".dylib", ".jnilib", ".framework", ".dll"};
+    private static final String NATIVE_LIB_EXT_DYLIB = ".dylib";
+    private static final String NATIVE_LIB_EXT_JNILIB = ".jnilib";
+    private static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", NATIVE_LIB_EXT_DYLIB, NATIVE_LIB_EXT_JNILIB, ".framework", ".dll"};
 
     private final File nativeSearchDirectory;
 
@@ -46,11 +51,23 @@ import java.util.stream.Stream;
     }
 
     public Optional<String> findLibrary(final String libname) {
-        final File target = new File(nativeSearchDirectory, System.mapLibraryName(libname));
-        if (target.exists()) {
-            return Optional.of(target.getPath());
+        final String syslib = System.mapLibraryName(libname);
+        final String nativeLibrary = findNativeLibrary(syslib);
+        // required for macOS, as of
+        // https://bugs.openjdk.java.net/browse/JDK-8127215
+        // https://bugs.java.com/bugdatabase/view_bug.do?bug_id=7158157
+        if (nativeLibrary == null && syslib.endsWith(NATIVE_LIB_EXT_DYLIB)) {
+            return Optional.ofNullable(findNativeLibrary("lib" + libname + NATIVE_LIB_EXT_JNILIB));
         }
-        return Optional.empty();
+        return Optional.ofNullable(nativeLibrary);
+    }
+
+    private String findNativeLibrary(String syslib) {
+        final File target = new File(nativeSearchDirectory, syslib);
+        if (target.exists()) {
+            return target.getPath();
+        }
+        return null;
     }
 
     public void addSearchJar(final URL jarLocation) {

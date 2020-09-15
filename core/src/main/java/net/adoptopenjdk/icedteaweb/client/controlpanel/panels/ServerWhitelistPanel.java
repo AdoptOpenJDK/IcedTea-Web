@@ -17,38 +17,30 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 package net.adoptopenjdk.icedteaweb.client.controlpanel.panels;
 
-import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.client.controlpanel.NamedBorderPanel;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
+import net.sourceforge.jnlp.util.whitelist.WhitelistEntry;
 
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import java.awt.BorderLayout;
 import java.util.List;
-import java.util.Vector;
-
-import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 /**
  * This provides a way for the user to display the server white list defined in <code>deployment.properties</code>.
  */
 @SuppressWarnings("serial")
-public class ServerWhitelistPanel extends NamedBorderPanel {
+public class ServerWhitelistPanel extends AbstractUrlWhitelistPanel {
 
     /**
      * This creates a new instance of the server white list panel.
      *
      * @param config Loaded DeploymentConfiguration file.
      */
-    public ServerWhitelistPanel(final DeploymentConfiguration config) {
-        super(Translator.R("CPServerWhitelist"), new BorderLayout());
+    public ServerWhitelistPanel(DeploymentConfiguration config) {
+        super(config, Translator.R("CPServerWhitelist"));
+    }
 
-        Assert.requireNonNull(config, "config");
-
-        final List<String> whitelist = config.getPropertyAsList(KEY_SECURITY_SERVER_WHITELIST);
-        final JList<String> jList = new JList<>(new Vector<>(whitelist));
-        jList.setFixedCellHeight(20);
-        add(new JScrollPane(jList), BorderLayout.CENTER);
+    @Override
+    protected List<WhitelistEntry> getUrlWhitelist() {
+        return UrlWhiteListUtils.getApplicationUrlWhiteList();
     }
 }
