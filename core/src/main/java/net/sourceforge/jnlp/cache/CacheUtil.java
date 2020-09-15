@@ -111,7 +111,7 @@ public class CacheUtil {
      * if not, then URLConnection.openStream can be used to obtain
      * the contents.
      *
-     * @param source  the url of resource
+     * @param source the url of resource
      * @return whether this resource can be cached
      */
     public static boolean isCacheable(URL source) {
@@ -120,14 +120,13 @@ public class CacheUtil {
     }
 
 
-
     /**
      * Converts a URL into a local path string within the given directory. For
      * example a url with subdirectory /tmp/ will
      * result in a File that is located somewhere within /tmp/
      *
      * @param location the url
-     * @param root   the subdirectory
+     * @param root     the subdirectory
      * @return the file
      */
     public static File urlToPath(URL location, String root) {

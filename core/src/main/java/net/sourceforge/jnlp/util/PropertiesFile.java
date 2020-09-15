@@ -233,7 +233,7 @@ public class PropertiesFile {
         try {
             lockableFile.lock();
         } catch (final IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Error while trying to lock file " + lockableFile.getFile().getName(), e);
         }
     }
 
