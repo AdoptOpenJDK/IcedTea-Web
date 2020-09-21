@@ -286,4 +286,5 @@ public interface ConfigurationConstants {
      * CSV
      */
     String KEY_SECURITY_SERVER_WHITELIST = "deployment.security.whitelist";
+    String KEY_JVM_ARGS_WHITELIST = "deployment.jvm.arguments.whitelist";
 }

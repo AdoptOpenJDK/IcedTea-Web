@@ -1,5 +1,7 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -18,13 +21,14 @@ import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_LOCATION;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_JVM_ARGS_WHITELIST;
 
 public class JvmUtils {
     private static final Set<String> VALID_VM_ARGUMENTS = unmodifiableSet(new HashSet<>(asList(getValidVMArguments())));
     private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
     private static final List<String> VALID_STARTING_JAVA_MODULES_ARGUMENTS = unmodifiableList(asList(getValidStartingJavaModuleVMArguments()));
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
-
+    private static final List<String> CONFIG_JVM_ARGS = unmodifiableList(JNLPRuntime.getConfiguration().getPropertyAsList(KEY_JVM_ARGS_WHITELIST));
     /**
      * Check that the VM args are valid and safe.
      * <p>
@@ -51,7 +55,8 @@ public class JvmUtils {
         return VALID_VM_ARGUMENTS.contains(argument)
                 || isValidStartingArgument(argument)
                 || isSecurePropertyAValidJVMArg(argument)
-                || isValidStartingJavaModulesArgument(argument);
+                || isValidStartingJavaModulesArgument(argument)
+                || isValidConfigArgument(argument);
     }
 
     /**
@@ -96,6 +101,17 @@ public class JvmUtils {
             return true;
         }
         return VALID_SECURE_PROPERTIES.contains(argument);
+    }
+
+    // Arguments that are specified in deployment.jvm.arguments.whitelist in deployment.config
+    private static boolean isValidConfigArgument(final String argument) {
+        final String[] argParts = argument.split("=");
+        for (String configArgument : CONFIG_JVM_ARGS) {
+            if (Objects.equals(argParts[0], configArgument)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
