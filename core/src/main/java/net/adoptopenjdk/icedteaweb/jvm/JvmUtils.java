@@ -1,9 +1,5 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
-import net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +24,6 @@ public class JvmUtils {
     private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
     private static final List<String> VALID_STARTING_JAVA_MODULES_ARGUMENTS = unmodifiableList(asList(getValidStartingJavaModuleVMArguments()));
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
-    private static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
-    private static final VersionId JVM_VERSION = VersionId.fromString(System.getProperty(JavaSystemPropertiesConstants.JAVA_VERSION));
 
     /**
      * Check that the VM args are valid and safe.
@@ -41,29 +35,23 @@ public class JvmUtils {
      * @throws IllegalArgumentException if the VM arguments are invalid or dangerous
      */
     public static void checkVMArgs(final String vmArgs) throws IllegalArgumentException {
-        final boolean isJava9orGreater = JAVA_9_OR_GREATER.contains(JVM_VERSION);
-        checkVMArgs(vmArgs, isJava9orGreater);
-    }
-
-    // visible for testing
-    static void checkVMArgs(final String vmArgs, final boolean isJava9orGreater) {
-        if (isBlank(vmArgs)) {
+       if (isBlank(vmArgs)) {
             return;
         }
 
         final String[] arguments = vmArgs.trim().split("\\s+");
         for (String argument : arguments) {
-            if (!isValidArgument(argument, isJava9orGreater)) {
+            if (!isValidArgument(argument)) {
                 throw new IllegalArgumentException(argument);
             }
         }
     }
 
-    private static boolean isValidArgument(final String argument, final boolean isJava9orGreater) {
+    private static boolean isValidArgument(final String argument) {
         return VALID_VM_ARGUMENTS.contains(argument)
                 || isValidStartingArgument(argument)
                 || isSecurePropertyAValidJVMArg(argument)
-                || (isJava9orGreater && isValidStartingJavaModulesArgument(argument));
+                || isValidStartingJavaModulesArgument(argument);
     }
 
     /**

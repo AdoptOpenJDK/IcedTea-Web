@@ -102,40 +102,28 @@ public class JvmUtilsTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testJava9JavaVMArgsWithJava8() {
+    @Test
+    public void testJava9JavaVMArgs() {
         final String javaVMArgs = "--add-modules=java.scripting,java.sql --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.base/sun.security.x509=ALL-UNNAMED --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.spi=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.plugins.jpeg=ALL-UNNAMED --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports=jdk.deploy/com.sun.deploy.config=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.desktop/javax.imageio.spi=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED";
-        JvmUtils.checkVMArgs(javaVMArgs, JAVA_8);
+        try {
+            JvmUtils.checkVMArgs(javaVMArgs);
+        } catch (IllegalArgumentException ile) {
+            fail(ile.getMessage());
+        }
     }
 
     @Test
-    public void testJava9JavaVMArgsWithJava9() {
-        final String javaVMArgs = "--add-modules=java.scripting,java.sql --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.base/sun.security.x509=ALL-UNNAMED --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.spi=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.plugins.jpeg=ALL-UNNAMED --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports=jdk.deploy/com.sun.deploy.config=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.desktop/javax.imageio.spi=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED";
+    public void testVoltaVMArgs() {
+        final String java_vm_args = "-Dsun.java2d.d3d=false -Dsun.java2d.dpiaware=false --add-opens=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.swing=ALL-UNNAMED --add-exports=java.desktop/sun.swing.table=ALL-UNNAMED --add-exports=java.desktop/sun.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED --add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED --add-opens=java.desktop/java.awt.event=ALL-UNNAMED --add-exports=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED --add-exports=java.desktop/sun.awt.shell=ALL-UNNAMED --add-exports=java.desktop/com.sun.awt=ALL-UNNAMED --add-exports=java.base/sun.security.action=ALL-UNNAMED";
         try {
-            JvmUtils.checkVMArgs(javaVMArgs, JAVA_9);
+            JvmUtils.checkVMArgs(java_vm_args);
         } catch (IllegalArgumentException ile) {
             fail(ile.getMessage());
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testJava9JavaVMArgsVoltaWithJava8() {
-        final String java_vm_args = "-Dsun.java2d.d3d=false -Dsun.java2d.dpiaware=false --add-opens=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.swing=ALL-UNNAMED --add-exports=java.desktop/sun.swing.table=ALL-UNNAMED --add-exports=java.desktop/sun.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED --add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED --add-opens=java.desktop/java.awt.event=ALL-UNNAMED --add-exports=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED --add-exports=java.desktop/sun.awt.shell=ALL-UNNAMED --add-exports=java.desktop/com.sun.awt=ALL-UNNAMED --add-exports=java.base/sun.security.action=ALL-UNNAMED";
-        JvmUtils.checkVMArgs(java_vm_args, JAVA_8);
-    }
-
-    @Test
-    public void testJava9JavaVMArgsVoltaWithJava9() {
-        final String java_vm_args = "-Dsun.java2d.d3d=false -Dsun.java2d.dpiaware=false --add-opens=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.swing=ALL-UNNAMED --add-exports=java.desktop/sun.swing.table=ALL-UNNAMED --add-exports=java.desktop/sun.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED --add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED --add-opens=java.desktop/java.awt.event=ALL-UNNAMED --add-exports=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED --add-exports=java.desktop/sun.awt.shell=ALL-UNNAMED --add-exports=java.desktop/com.sun.awt=ALL-UNNAMED --add-exports=java.base/sun.security.action=ALL-UNNAMED";
-        try {
-            JvmUtils.checkVMArgs(java_vm_args, JAVA_9);
-        } catch (IllegalArgumentException ile) {
-            fail(ile.getMessage());
-        }
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testJava9JavaBadVMArgs() {
+    public void testJava9BadVMArgs() {
         final String java_vm_bad_args = "-Dsun.java2d.d3d=false -Dsun.java2d.dpiaware=false  --add-opens=java.desktop/sun.print=ALL-UNNAMED --list-modules --add-exports=java.desktop/sun.print=ALL-UNNAMED --add-exports=java.desktop/sun.swing=ALL-UNNAMED --add-exports=java.desktop/sun.swing.table=ALL-UNNAMED --add-exports=java.desktop/sun.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.synth=ALL-UNNAMED --add-opens=java.desktop/javax.swing.plaf.basic=ALL-UNNAMED --add-opens=java.desktop/javax.swing=ALL-UNNAMED --add-opens=java.desktop/javax.swing.tree=ALL-UNNAMED --add-opens=java.desktop/java.awt.event=ALL-UNNAMED --add-exports=java.desktop/com.sun.java.swing.plaf.windows=ALL-UNNAMED --add-exports=java.desktop/sun.awt.shell=ALL-UNNAMED --add-exports=java.desktop/com.sun.awt=ALL-UNNAMED --add-exports=java.base/sun.security.action=ALL-UNNAMED";
         JvmUtils.checkVMArgs(java_vm_bad_args);
     }
@@ -143,7 +131,6 @@ public class JvmUtilsTest {
 
     @Test
     public void testPredefModuleVMArgs() {
-
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(Collections.emptyList());
 
         assertEquals(JvmUtils.getPredefinedJavaModulesVMArgumentsMap().size(), result.size());
@@ -153,7 +140,6 @@ public class JvmUtilsTest {
 
     @Test
     public void testMergeJavaModuleVMArgs() {
-
         final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx"};
         final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
 
@@ -166,7 +152,6 @@ public class JvmUtilsTest {
 
     @Test
     public void testMergeDuplicateJavaModuleVMArgs() {
-
         final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx", "--add-reads=java.base=ALL-UNNAMED,java.yyy"};
         final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
 
@@ -192,45 +177,36 @@ public class JvmUtilsTest {
         assertTrue(result.contains("--patch-module=java.base=java.ccc"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidJavaModuleVMArgsWithJava8() {
-        final String javaVMArgs = "-Dsun.java2d.d3d=true --add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy --module-path=java.base=java.xxx --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
-        JvmUtils.checkVMArgs(javaVMArgs, JAVA_8);
-    }
-
     @Test
-    public void testValidJavaModuleVMArgsWithJava9() {
+    public void testValidJavaModuleVMArgs() {
         final String javaVMArgs = "-Dsun.java2d.d3d=true --add-reads=java.base=ALL-UNNAMED,java.desktop,java.yyy --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
         try {
-            JvmUtils.checkVMArgs(javaVMArgs, JAVA_9);
+            JvmUtils.checkVMArgs(javaVMArgs);
         } catch (IllegalArgumentException ile) {
             fail(ile.getMessage());
         }
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testValidJavaModuleVMArgsGithubIssueWithJava8() {
-        final String java_vm_args = "-Djnlp.ccc=ccc -XX:SurvivorRatio=6 -Xmx512m -Xms128m -XX:NewSize=96m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 --add-modules=java.scripting,java.sql --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.base/sun.security.x509=ALL-UNNAMED --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.spi=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.plugins.jpeg=ALL-UNNAMED --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports=jdk.deploy/com.sun.deploy.config=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.desktop/javax.imageio.spi=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED";
-        JvmUtils.checkVMArgs(java_vm_args, JAVA_8);
     }
 
     @Test
-    public void testValidJavaModuleVMArgsGithubIssueWithJava9() {
+    public void testVMArgsFromGithubIssue() {
         final String java_vm_args = "-Djnlp.ccc=ccc -XX:SurvivorRatio=6 -Xmx512m -Xms128m -XX:NewSize=96m -XX:MinHeapFreeRatio=20 -XX:MaxHeapFreeRatio=30 --add-modules=java.scripting,java.sql --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.base/sun.security.x509=ALL-UNNAMED --add-exports=java.desktop/com.apple.eawt=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.spi=ALL-UNNAMED --add-exports=java.desktop/com.sun.imageio.plugins.jpeg=ALL-UNNAMED --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED --add-exports=jdk.deploy/com.sun.deploy.config=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.desktop/javax.imageio.spi=ALL-UNNAMED --add-opens=java.desktop/javax.swing.text.html=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED";
         try {
-            JvmUtils.checkVMArgs(java_vm_args,JAVA_9);
+            JvmUtils.checkVMArgs(java_vm_args);
         } catch (IllegalArgumentException ile) {
             fail(ile.getMessage());
         }
     }
 
-    /**
-     * Test with Java 9+
-     */
     @Test(expected = IllegalArgumentException.class)
-    public void testInvaldiJavaModuleVMArgs() {
-        final String usrArgs = "-Dsun.java2d.d3d=true --list-module=java.base=ALL-UNNAMED,java.xxx --add-reads=java.base=ALL-UNNAMED,java.yyy";
+    public void testListModuleVMArg() {
+        final String usrArgs = "--list-module=java.base=ALL-UNNAMED,java.xxx --add-reads=java.base=ALL-UNNAMED,java.yyy";
         JvmUtils.checkVMArgs(usrArgs);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testModulePathVMArg() {
+        final String javaVMArgs = "--module-path=java.base=java.xxx --add-opens=java.base=java.aaa --add-modules=java.base=java.bbb --patch-module=java.base=java.ccc";
+        JvmUtils.checkVMArgs(javaVMArgs);
     }
 
     @Test
