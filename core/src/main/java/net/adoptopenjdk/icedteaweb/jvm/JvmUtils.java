@@ -212,7 +212,9 @@ public class JvmUtils {
                 "-XX:MaxMetaspaceSize",                 /* Sets an upper limit on memory used for class metadata */
                 "-XX:StringDeduplicationAgeThreshold",
                 "-XX:GCTimeLimit",
-                "-XX:GCHeapFreeLimit"
+                "-XX:GCHeapFreeLimit",
+                "-XX:+UseParNewGC",
+                "-XX:+CMSParallelRemarkEnabled"
         };
     }
 
