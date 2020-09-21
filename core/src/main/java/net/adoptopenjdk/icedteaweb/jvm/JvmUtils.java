@@ -266,7 +266,9 @@ public class JvmUtils {
                 "sun.java2d.win.uiScaleX",
                 "sun.java2d.win.uiScaleY",
                 "sun.java2d.uiScale",
-                "prism.allowhidpi" // for JavaFX
+                "prism.allowhidpi", // for JavaFX
+                "sun.net.client.defaultConnectTimeout",
+                "sun.net.client.defaultReadTimeout"
         };
     }
 

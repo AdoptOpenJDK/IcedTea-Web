@@ -218,4 +218,14 @@ public class JvmUtilsTest {
             fail(ile.getMessage());
         }
     }
+
+    @Test
+    public void testSomeNewArgs() {
+        final String java_vm_args = "-XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -Dsun.net.client.defaultConnectTimeout=5000 -Dsun.net.client.defaultReadTimeout=500";
+        try {
+            JvmUtils.checkVMArgs(java_vm_args);
+        } catch (IllegalArgumentException ile) {
+            fail(ile.getMessage());
+        }
+    }
 }
