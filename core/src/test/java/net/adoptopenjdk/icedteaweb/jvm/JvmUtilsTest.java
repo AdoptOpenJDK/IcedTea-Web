@@ -1,7 +1,7 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -16,11 +16,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class JvmUtilsTest {
-
-    @BeforeClass
-    public static void setup() {
-        JNLPRuntime.getConfiguration().setProperty(KEY_JVM_ARGS_WHITELIST, "-Daaa, -Dccc, -Dee, -Dff, -XX:GCprop");
-    }
 
     @Test
     public void testValidProperty() {
@@ -145,7 +140,7 @@ public class JvmUtilsTest {
 
     @Test
     public void testMergeJavaModuleVMArgs() {
-        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx" };
+        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx"};
         final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
 
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(usrDefArgs);
@@ -157,7 +152,7 @@ public class JvmUtilsTest {
 
     @Test
     public void testMergeDuplicateJavaModuleVMArgs() {
-        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx", "--add-reads=java.base=ALL-UNNAMED,java.yyy" };
+        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx", "--add-reads=java.base=ALL-UNNAMED,java.yyy"};
         final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
 
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(usrDefArgs);
@@ -169,7 +164,7 @@ public class JvmUtilsTest {
 
     @Test
     public void testNonPredefJavaModuleVMArgs() {
-        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--module-path=java.base=java.xxx", "--add-opens=java.base=java.aaa", "--add-modules=java.base=java.bbb", "--patch-module=java.base=java.ccc", "--add-reads=java.base=ALL-UNNAMED,java.yyy" };
+        final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--module-path=java.base=java.xxx", "--add-opens=java.base=java.aaa", "--add-modules=java.base=java.bbb", "--patch-module=java.base=java.ccc", "--add-reads=java.base=ALL-UNNAMED,java.yyy"};
         final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
 
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(usrDefArgs);
@@ -234,9 +229,14 @@ public class JvmUtilsTest {
         }
     }
 
+    @Before
+    public void setConfigJvmArgs() {
+        JNLPRuntime.getConfiguration().setProperty(KEY_JVM_ARGS_WHITELIST, "-Darg1, -Darg2, -XX:arg");
+    }
+
     @Test
     public void testConfigArgs() {
-        final String java_vm_args = "-Daaa=bbb -Dccc=ddd -XX:GCprop";
+        final String java_vm_args = "-Darg1=bbb -Darg2=ddd -XX:arg";
         try {
             JvmUtils.checkVMArgs(java_vm_args);
         } catch (IllegalArgumentException ile) {
@@ -246,7 +246,7 @@ public class JvmUtilsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidConfigArgs() {
-        final String java_vm_args = "-Deee=bb -Dfff=gg";
+        final String java_vm_args = "-Darg3=bb -Darg4=gg";
         JvmUtils.checkVMArgs(java_vm_args);
     }
 }
