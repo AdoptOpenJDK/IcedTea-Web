@@ -1,12 +1,12 @@
 dist: trusty
 language: java
-jdk: oraclejdk8
+#jdk: oraclejdk8
 
 before_install:
   - sudo apt-get update && sudo apt-get install -y gnupg2
   - sudo apt-get install wget
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-  - apt-get install -y software-properties-common
+  - sudo apt-get install -y software-properties-common
   - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
   - sudo apt-get install adoptopenjdk-8-hotspot
 
