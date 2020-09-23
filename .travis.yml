@@ -5,6 +5,8 @@ language: java
 before_install:
   - sudo apt-get update && sudo apt-get install -y gnupg2
   - sudo apt-get install wget
+  - sudo rm -rf /var/lib/apt/lists/*
+  - sudo rm -rf /etc/apt/sources.list.d/*
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
   - echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ bionic main" | sudo tee /etc/apt/sources.list.d/adoptopenjdk.list
   - sudo apt update
