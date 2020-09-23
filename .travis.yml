@@ -6,9 +6,10 @@ before_install:
   - sudo apt-get update && sudo apt-get install -y gnupg2
   - sudo apt-get install wget
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-  - sudo apt-get install -y software-properties-common
-  - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+  - sudo tee /etc/apt/sources.list.d/adoptopenjdk.list
+  - sudo apt update
   - sudo apt-get install adoptopenjdk-8-hotspot
+  - java -version
 
 addons:
   apt:
