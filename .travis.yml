@@ -12,6 +12,7 @@ before_install:
   - sudo apt update
   - sudo apt-get install adoptopenjdk-8-hotspot
   - java -version
+  - echo $JAVA_HOME
 
 addons:
   apt:
