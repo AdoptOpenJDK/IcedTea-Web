@@ -3,8 +3,8 @@ language: java
 jdk: oraclejdk8
 
 before_install:
-  - apt-get update && apt-get install -y gnupg2
-  - apt-get install wget
+  - sudo apt-get update && sudo apt-get install -y gnupg2
+  - sudo apt-get install wget
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
   - apt-get install -y software-properties-common
   - sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
