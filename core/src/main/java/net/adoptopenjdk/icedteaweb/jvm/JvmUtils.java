@@ -289,8 +289,7 @@ public class JvmUtils {
                 "sun.java2d.uiScale",
                 "prism.allowhidpi", // for JavaFX
                 "sun.net.client.defaultConnectTimeout",
-                "sun.net.client.defaultReadTimeout",
-                "java.locale.providers"
+                "sun.net.client.defaultReadTimeout"
         };
     }
 
