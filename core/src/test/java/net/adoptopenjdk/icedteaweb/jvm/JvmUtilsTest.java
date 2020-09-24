@@ -17,6 +17,12 @@ import static org.junit.Assert.fail;
 
 public class JvmUtilsTest {
 
+    // Needed for jvmargs whitelist test
+    @Before
+    public void setConfigJvmArgs() {
+        JNLPRuntime.getConfiguration().setProperty(KEY_JVM_ARGS_WHITELIST, "-Darg1, -Darg2, -XX:arg");
+    }
+
     @Test
     public void testValidProperty() {
         final String property = "sun.java2d.d3d";
@@ -227,11 +233,6 @@ public class JvmUtilsTest {
         } catch (IllegalArgumentException ile) {
             fail(ile.getMessage());
         }
-    }
-
-    @Before
-    public void setConfigJvmArgs() {
-        JNLPRuntime.getConfiguration().setProperty(KEY_JVM_ARGS_WHITELIST, "-Darg1, -Darg2, -XX:arg");
     }
 
     @Test
