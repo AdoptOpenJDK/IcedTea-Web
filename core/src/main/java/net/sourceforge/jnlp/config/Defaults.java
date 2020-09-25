@@ -554,6 +554,12 @@ public class Defaults {
                     ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST,
                     null,
                     null
+            ),
+
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_JVM_ARGS_WHITELIST,
+                    null,
+                    null
             )
     );
 

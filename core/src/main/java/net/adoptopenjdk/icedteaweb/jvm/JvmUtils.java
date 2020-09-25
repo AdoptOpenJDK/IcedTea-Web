@@ -1,8 +1,6 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
-import net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -22,14 +21,16 @@ import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_LOCATION;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.ITW_BIN_NAME;
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_JVM_ARGS_WHITELIST;
 
 public class JvmUtils {
     private static final Set<String> VALID_VM_ARGUMENTS = unmodifiableSet(new HashSet<>(asList(getValidVMArguments())));
     private static final List<String> VALID_STARTING_ARGUMENTS = unmodifiableList(asList(getValidStartingVMArguments()));
     private static final List<String> VALID_STARTING_JAVA_MODULES_ARGUMENTS = unmodifiableList(asList(getValidStartingJavaModuleVMArguments()));
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
-    private static final VersionString JAVA_9_OR_GREATER = VersionString.fromString("9+");
-    private static final VersionId JVM_VERSION = VersionId.fromString(System.getProperty(JavaSystemPropertiesConstants.JAVA_VERSION));
+    private static final String WHITESPACE_REGEX = "\\s+";
+    private static final String KEY_VALUE_SEPARATOR = "=";
+    private static List<String> configJvmArgs = null;
 
     /**
      * Check that the VM args are valid and safe.
@@ -41,29 +42,24 @@ public class JvmUtils {
      * @throws IllegalArgumentException if the VM arguments are invalid or dangerous
      */
     public static void checkVMArgs(final String vmArgs) throws IllegalArgumentException {
-        final boolean isJava9orGreater = JAVA_9_OR_GREATER.contains(JVM_VERSION);
-        checkVMArgs(vmArgs, isJava9orGreater);
-    }
-
-    // visible for testing
-    static void checkVMArgs(final String vmArgs, final boolean isJava9orGreater) {
         if (isBlank(vmArgs)) {
             return;
         }
 
-        final String[] arguments = vmArgs.trim().split("\\s+");
+        final String[] arguments = vmArgs.trim().split(WHITESPACE_REGEX);
         for (String argument : arguments) {
-            if (!isValidArgument(argument, isJava9orGreater)) {
+            if (!isValidArgument(argument)) {
                 throw new IllegalArgumentException(argument);
             }
         }
     }
 
-    private static boolean isValidArgument(final String argument, final boolean isJava9orGreater) {
+    private static boolean isValidArgument(final String argument) {
         return VALID_VM_ARGUMENTS.contains(argument)
                 || isValidStartingArgument(argument)
                 || isSecurePropertyAValidJVMArg(argument)
-                || (isJava9orGreater && isValidStartingJavaModulesArgument(argument));
+                || isValidStartingJavaModulesArgument(argument)
+                || isValidConfigArgument(argument);
     }
 
     /**
@@ -73,7 +69,7 @@ public class JvmUtils {
      */
     static boolean isSecurePropertyAValidJVMArg(String argument) {
         if (argument.startsWith("-D") && argument.length() > 2) {
-            final int indexOfEqual = argument.indexOf('=');
+            final int indexOfEqual = argument.indexOf(KEY_VALUE_SEPARATOR.charAt(0));
             final int lastIndex = indexOfEqual == -1 ? argument.length() : indexOfEqual;
             return isValidSecureProperty(argument.substring(2, lastIndex));
         }
@@ -108,6 +104,19 @@ public class JvmUtils {
             return true;
         }
         return VALID_SECURE_PROPERTIES.contains(argument);
+    }
+
+    private static  List<String> getConfigJvmArgs() {
+        if (configJvmArgs == null) {
+            configJvmArgs = unmodifiableList(JNLPRuntime.getConfiguration().getPropertyAsList(KEY_JVM_ARGS_WHITELIST));
+        }
+        return configJvmArgs;
+    }
+
+    // Arguments that are specified in deployment.jvm.arguments.whitelist in deployment.config
+    private static boolean isValidConfigArgument(final String argument) {
+        final String[] argParts = argument.split(KEY_VALUE_SEPARATOR);
+        return getConfigJvmArgs().stream().anyMatch(configArgument ->Objects.equals(argParts[0], configArgument));
     }
 
     /**
@@ -224,7 +233,9 @@ public class JvmUtils {
                 "-XX:MaxMetaspaceSize",                 /* Sets an upper limit on memory used for class metadata */
                 "-XX:StringDeduplicationAgeThreshold",
                 "-XX:GCTimeLimit",
-                "-XX:GCHeapFreeLimit"
+                "-XX:GCHeapFreeLimit",
+                "-XX:+UseParNewGC",
+                "-XX:+CMSParallelRemarkEnabled"
         };
     }
 
@@ -276,7 +287,9 @@ public class JvmUtils {
                 "sun.java2d.win.uiScaleX",
                 "sun.java2d.win.uiScaleY",
                 "sun.java2d.uiScale",
-                "prism.allowhidpi" // for JavaFX
+                "prism.allowhidpi", // for JavaFX
+                "sun.net.client.defaultConnectTimeout",
+                "sun.net.client.defaultReadTimeout"
         };
     }
 
@@ -340,7 +353,7 @@ public class JvmUtils {
      * Java Module VM arguments specified by app developer in jnlp file.
      * ITW adds its own set of jvm args either through {@link #getPredefinedJavaModulesVMArgumentsMap()}
      * or the itw-modularjdk.args file. These are required for the execution of ITW.
-     *
+     * <p>
      * Note:
      * --module-path is not accepted by ITW as it would circumvent the classloader and security.
      */
@@ -359,7 +372,7 @@ public class JvmUtils {
      */
     static Map<String, Set<String>> getPredefinedJavaModulesVMArgumentsMap() {
         return new HashMap<String, Set<String>>() {{
-            put("--add-reads=java.base", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED","java.desktop")));
+            put("--add-reads=java.base", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED", "java.desktop")));
             put("--add-reads=java.desktop", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED", "java.naming")));
             put("--add-reads=java.naming", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
 
@@ -388,16 +401,16 @@ public class JvmUtils {
      */
     public static List<String> mergeJavaModulesVMArgs(final List<String> vmArgs) {
 
-       final List<String> mergedVMArgs = new ArrayList<>();
-       final Map<String, Set<String>> moduleArgMap = new LinkedHashMap<>(getPredefinedJavaModulesVMArgumentsMap());
+        final List<String> mergedVMArgs = new ArrayList<>();
+        final Map<String, Set<String>> moduleArgMap = new LinkedHashMap<>(getPredefinedJavaModulesVMArgumentsMap());
 
-       vmArgs.forEach(arg -> {
+        vmArgs.forEach(arg -> {
             if (isValidStartingJavaModulesArgument(arg)) { // it is a Java Module VM arg
                 final int vmArgEndIndex = arg.lastIndexOf("=");
                 String predefArgKey = arg.substring(0, vmArgEndIndex);
                 Set<String> predefArgSet = moduleArgMap.get(predefArgKey);
                 if (predefArgSet != null) { // this vm arg is a predef arg so need to merge its values
-                    String vmArgValues = arg.substring(vmArgEndIndex+1);
+                    String vmArgValues = arg.substring(vmArgEndIndex + 1);
                     String[] vmArgValueStrs = vmArgValues.split(",");
                     predefArgSet.addAll(Arrays.asList(vmArgValueStrs));
                     moduleArgMap.put(predefArgKey, predefArgSet);
