@@ -10,7 +10,8 @@ before_install:
   - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
   - echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ bionic main" | sudo tee /etc/apt/sources.list.d/adoptopenjdk.list
   - sudo apt update
-  - sudo apt-get install adoptopenjdk-8-hotspot
+
+after_install:
   - java -version
   - echo $JAVA_HOME
 
@@ -20,10 +21,13 @@ addons:
       - xvfb
 
 install:
+  - sudo apt-get install adoptopenjdk-8-hotspot
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 before_script:
+  - export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/
+  - export PATH=$JAVA_HOME/bin:$PATH
   - java -version
   - echo $JAVA_HOME
 
