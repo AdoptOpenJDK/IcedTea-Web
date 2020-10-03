@@ -3,8 +3,8 @@ language: java
 
 before_install:
   - curl -s "https://get.sdkman.io" | bash
-  - source "$HOME/.sdkman/bin/sdkman-init.sh”
-  -
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
+
 addons:
   apt:
     packages:
