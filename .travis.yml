@@ -2,27 +2,21 @@ dist: trusty
 language: java
 
 before_install:
-  - sudo apt-get update && sudo apt-get install -y gnupg2
-  - sudo apt-get install wget
-  - sudo rm -rf /var/lib/apt/lists/*
-  - sudo rm -rf /etc/apt/sources.list.d/*
-  - wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
-  - echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ bionic main" | sudo tee /etc/apt/sources.list.d/adoptopenjdk.list
-  - sudo apt update
-
+  - curl -s "https://get.sdkman.io" | bash
+  - source "$HOME/.sdkman/bin/sdkman-init.sh”
+  -
 addons:
   apt:
     packages:
       - xvfb
 
 install:
-  - sudo apt-get install adoptopenjdk-8-hotspot
+  - sdk install java 8.0.265.hs-adpt
+  - sdk use java 8.0.265.hs-adpt
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 
 before_script:
-  - export JAVA_HOME=/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/
-  - export PATH=$JAVA_HOME/bin:$PATH
   - java -version
   - echo $JAVA_HOME
 
