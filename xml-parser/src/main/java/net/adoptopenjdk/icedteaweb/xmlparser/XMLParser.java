@@ -48,7 +48,7 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.NORMAL;
 
 /**
  * A gateway to the actual implementation of the parsers.
- *
+ * <p>
  * Used by net.sourceforge.jnlp.Parser
  */
 public class XMLParser {

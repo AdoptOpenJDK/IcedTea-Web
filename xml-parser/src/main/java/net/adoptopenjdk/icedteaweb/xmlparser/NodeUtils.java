@@ -56,7 +56,7 @@ public class NodeUtils {
      * false, sequences of whitespace characters are turned into a single space
      * character.
      *
-     * @param node the node with text under it
+     * @param node            the node with text under it
      * @param preserveSpacing if true, preserve whitespace
      */
     public static String getSpanText(final XmlNode node, final boolean preserveSpacing) {
@@ -75,12 +75,11 @@ public class NodeUtils {
     }
 
     /**
+     * @param node         the node
+     * @param name         the attribute
+     * @param defaultValue default if no such attribute
      * @return an attribute or the specified defaultValue if there is no such
      * attribute.
-     *
-     * @param node the node
-     * @param name the attribute
-     * @param defaultValue default if no such attribute
      */
     public static String getAttribute(final XmlNode node, final String name, final String defaultValue) {
         Assert.requireNonNull(node, "node");
@@ -95,13 +94,12 @@ public class NodeUtils {
     }
 
     /**
+     * @param node         the node
+     * @param name         the attribute
+     * @param defaultValue default value
      * @return the same result as getAttribute except that if strict mode is
      * enabled or the default value is null a parse exception is thrown instead
      * of returning the default value.
-     *
-     * @param node the node
-     * @param name the attribute
-     * @param defaultValue default value
      * @throws ParseException if the attribute does not exist or is empty
      */
     public static String getRequiredAttribute(final XmlNode node, final String name, final String defaultValue, final boolean strict) throws ParseException {
@@ -109,7 +107,7 @@ public class NodeUtils {
 
         if (result == null || result.length() == 0) {
             if (strict || defaultValue == null) {
-                throw new ParseException("The "+node.getNodeName()+" element must specify a "+name+" attribute.");
+                throw new ParseException("The " + node.getNodeName() + " element must specify a " + name + " attribute.");
             }
         }
 
@@ -121,12 +119,11 @@ public class NodeUtils {
     }
 
     /**
-     * @return the same result as getURL except that a ParseException is thrown
-     * if the attribute is null or empty.
-     *
      * @param node the node
      * @param name the attribute containing an href
      * @param base the base URL
+     * @return the same result as getURL except that a ParseException is thrown
+     * if the attribute is null or empty.
      * @throws ParseException if the JNLP file is invalid
      */
     public static URL getRequiredURL(final XmlNode node, final String name, final URL base, final boolean strict) throws ParseException {
@@ -138,13 +135,12 @@ public class NodeUtils {
     }
 
     /**
-     * @return a URL object from a href string relative to the code base. If the
-     * href denotes a relative URL, it must reference a location that is a
-     * subdirectory of the codebase.
-     *
      * @param node the node
      * @param name the attribute containing an href
      * @param base the base URL
+     * @return a URL object from a href string relative to the code base. If the
+     * href denotes a relative URL, it must reference a location that is a
+     * subdirectory of the codebase.
      * @throws ParseException if the JNLP file is invalid
      */
     public static URL getURL(final XmlNode node, final String name, final URL base, final boolean strict) throws ParseException {
@@ -183,7 +179,7 @@ public class NodeUtils {
                 // check for going above the codebase
                 if (!result.toString().startsWith(base.toString()) && !base.toString().startsWith(result.toString())) {
                     if (strict) {
-                        throw new ParseException("Relative URL does not specify a subdirectory of the codebase. (node="+nodeName+", href="+href+", base="+base+")");
+                        throw new ParseException("Relative URL does not specify a subdirectory of the codebase. (node=" + nodeName + ", href=" + href + ", base=" + base + ")");
                     }
                 }
                 return result;
@@ -191,9 +187,9 @@ public class NodeUtils {
 
         } catch (MalformedURLException ex) {
             if (base == null) {
-                throw new ParseException("Invalid non-relative URL (node="+nodeName+", href="+href+")");
+                throw new ParseException("Invalid non-relative URL (node=" + nodeName + ", href=" + href + ")");
             } else {
-                throw new ParseException("Invalid relative URL (node="+nodeName+", href="+href+", base="+base+")");
+                throw new ParseException("Invalid relative URL (node=" + nodeName + ", href=" + href + ", base=" + base + ")");
             }
         }
     }
