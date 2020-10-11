@@ -110,7 +110,7 @@ public class ProcessAssassin extends Thread {
       to main thread with all information recorded until now. You will be
       able to listen to std out from listeners still
      */
-                                        destroyProcess();
+                                    destroyProcess();
                                 } catch (final Throwable ex) {
                                     if (p.deadlyException == null) {
                                         p.deadlyException = ex;
@@ -169,7 +169,6 @@ public class ProcessAssassin extends Thread {
     }
 
 
-
     private static void destroyProcess(final ThreadedProcess pp, final ReactingProcess reactingProcess) {
         final Process p = pp.getP();
         try {
@@ -177,7 +176,7 @@ public class ProcessAssassin extends Thread {
             f.setAccessible(true);
             final String pid = (f.get(p)).toString();
 //            sigInt(pid);
-                sigTerm(pid);
+            sigTerm(pid);
         } catch (final Exception ex) {
             ServerAccess.logException(ex);
         } finally {

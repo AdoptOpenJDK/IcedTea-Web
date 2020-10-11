@@ -56,6 +56,7 @@ import static org.junit.Assert.assertEquals;
 public class FileTestUtils {
 
     private static final ObjectName OS;
+
     static {
         try {
             OS = new ObjectName("java.lang:type=OperatingSystem");

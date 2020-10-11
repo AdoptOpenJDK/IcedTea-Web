@@ -33,7 +33,7 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.testing.closinglisteners;
 
-public interface Rule<S,T> {
+public interface Rule<S, T> {
 
     boolean evaluate(T upon);
 

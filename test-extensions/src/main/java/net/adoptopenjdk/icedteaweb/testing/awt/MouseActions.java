@@ -40,20 +40,20 @@ import java.awt.Robot;
 import java.awt.event.InputEvent;
 
 /**
- * class MouseActions 
- * 
+ * class MouseActions
+ * <p>
  * static methods for manipulating the mouse via AWT robot
  */
 public class MouseActions {
     private static final int defaultDelay = 250;
-    
+
     /**
      * method click presses and releases given mouse keys
      * with reasonable delay before the event
      *
      * @param robot
      */
-    private static void click(final Robot robot){
+    private static void click(final Robot robot) {
         robot.delay(defaultDelay);
         robot.mousePress(InputEvent.BUTTON1_MASK);
         robot.delay(defaultDelay);
@@ -61,19 +61,18 @@ public class MouseActions {
     }
 
     /**
-     * 
      * @param rectangle
      * @param robot
      */
-    private static void moveMouseToMiddle(final Rectangle rectangle, final Robot robot){
+    private static void moveMouseToMiddle(final Rectangle rectangle, final Robot robot) {
         robot.delay(defaultDelay);
-        final int x = rectangle.x + (rectangle.width/2);
-        final int y = rectangle.y + (rectangle.height/2);
-        robot.mouseMove(x,y);
+        final int x = rectangle.x + (rectangle.width / 2);
+        final int y = rectangle.y + (rectangle.height / 2);
+        robot.mouseMove(x, y);
     }
 
 
-    public static void clickInside(final Rectangle rectangle, final Robot robot){
+    public static void clickInside(final Rectangle rectangle, final Robot robot) {
         moveMouseToMiddle(rectangle, robot);
         robot.delay(defaultDelay);
         click(robot);

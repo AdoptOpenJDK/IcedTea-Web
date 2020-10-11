@@ -50,13 +50,13 @@ import java.lang.annotation.Target;
  * implemented.
  * </p>
  * <p>
- * The meaning of optional parameter failsIn is either a list of 
+ * The meaning of optional parameter failsIn is either a list of
  * browsers where the test fails, or a default value - an empty array {},
  * default value means that the test fails always.
  * </p>
  */
 
-@Target({ElementType.METHOD,ElementType.TYPE})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface KnownToFail {
 }

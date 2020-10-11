@@ -46,7 +46,6 @@ import java.nio.channels.FileChannel;
 
 /**
  * This class is able to backup and restore firefox profiles.
- *
  */
 public class FirefoxProfilesOperator {
 

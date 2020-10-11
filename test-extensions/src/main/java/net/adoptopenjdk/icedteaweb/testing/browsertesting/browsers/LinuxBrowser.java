@@ -38,18 +38,17 @@ import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
 
 
-public abstract class LinuxBrowser implements Browser{
-      public static final String DEFAULT_PLUGIN_NAME="libjavaplugin.so";
-      public static final String DEFAULT_BIN_PATH="/usr/bin/";
+public abstract class LinuxBrowser implements Browser {
+    public static final String DEFAULT_PLUGIN_NAME = "libjavaplugin.so";
+    public static final String DEFAULT_BIN_PATH = "/usr/bin/";
 
-      private final String bin;
-      protected String fsdir="unknown";
+    private final String bin;
+    protected String fsdir = "unknown";
 
     public LinuxBrowser(final String bin) {
         this.bin = bin;
     }
 
-      
 
     @Override
     public String getBin() {
@@ -59,8 +58,10 @@ public abstract class LinuxBrowser implements Browser{
 
     @Override
     public boolean equals(final Object obj) {
-        if (!(obj instanceof Browser)) return false;
-        final Browser b=(Browser) obj;
+        if (!(obj instanceof Browser)) {
+            return false;
+        }
+        final Browser b = (Browser) obj;
         return b.getBin().equals(getBin());
     }
 
@@ -71,26 +72,26 @@ public abstract class LinuxBrowser implements Browser{
         return hash;
     }
 
-      @Override
+    @Override
     public String getDefaultPluginExpectedLocation() {
         if (JavaSystemProperties.getOsArch().contains("64")) {
-            return "/usr/lib64/"+fsdir+"/plugins";
+            return "/usr/lib64/" + fsdir + "/plugins";
         } else {
-            return "/usr/lib/"+fsdir+"/plugins";
+            return "/usr/lib/" + fsdir + "/plugins";
 
         }
     }
 
     @Override
     public void beforeProcess(String s) {
-        
+
     }
 
 
     @Override
     public void afterKill(String s) {
-       
+
     }
 
-    
+
 }

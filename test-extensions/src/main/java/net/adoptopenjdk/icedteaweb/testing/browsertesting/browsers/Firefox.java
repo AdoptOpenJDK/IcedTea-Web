@@ -46,6 +46,7 @@ public class Firefox extends MozillaFamilyLinuxBrowser {
     public Firefox(final String bin) {
         super(bin);
     }
+
     private final String[] cs = {"-new-tab"};
 
     @Override
