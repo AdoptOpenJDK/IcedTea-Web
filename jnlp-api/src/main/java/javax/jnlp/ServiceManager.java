@@ -14,20 +14,23 @@ public final class ServiceManager {
     }
 
     public static java.lang.Object lookup(java.lang.String name) throws UnavailableServiceException {
-        if (stub == null)
+        if (stub == null) {
             throw new UnavailableServiceException("service stub not set.");
+        }
 
         synchronized (lookupTable) {
             Object result = lookupTable.get(name);
 
             if (result == null) {
                 result = stub.lookup(name);
-                if (result != null)
+                if (result != null) {
                     lookupTable.put(name, result);
+                }
             }
 
-            if (result == null)
+            if (result == null) {
                 throw new UnavailableServiceException("service not available (stub returned null).");
+            }
 
             return result;
         }
@@ -35,15 +38,17 @@ public final class ServiceManager {
 
     public static java.lang.String[] getServiceNames() {
         // should this return the required ones even though no stub??
-        if (stub == null)
+        if (stub == null) {
             return new String[0];
+        }
 
         return stub.getServiceNames();
     }
 
     public static void setServiceManagerStub(ServiceManagerStub stub) {
-        if (ServiceManager.stub == null)
+        if (ServiceManager.stub == null) {
             ServiceManager.stub = stub;
+        }
     }
 
 }

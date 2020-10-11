@@ -25,7 +25,6 @@ import java.io.IOException;
  * files.
  *
  * @author <a href="mailto:omajid@redhat.com">Omair Majid</a>
- *
  */
 public interface ExtendedService {
 
