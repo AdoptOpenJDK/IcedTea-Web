@@ -29,12 +29,12 @@ import static net.adoptopenjdk.icedteaweb.integration.common.ManagedApplicationF
  * in JSR-56, section 5.1 Launch Sequence for details).
  *
  * <p></p>
- *
+ * <p>
  * The basic functionality of this class is intended to test the proper download, update and execution according
  * to the definitions in the JNLP files used by the integration tests.
  *
  * <p></p>
- *
+ * <p>
  * Functionality provided:
  * <ul>
  * <li> store the system properties to a file using {@link PersistenceService} </li>
@@ -51,7 +51,7 @@ public class SimpleJavaApplication {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Simple Java application install and launched by Iced-Tea Web");
-        System.out.println("Arguments: " +  Arrays.toString(args));
+        System.out.println("Arguments: " + Arrays.toString(args));
 
         writeFile(SYSTEM_PROPERTIES_FILE, System.getProperties());
         writeFile(SYSTEM_ENVIRONMENT_FILE, asProperties(System.getenv()));

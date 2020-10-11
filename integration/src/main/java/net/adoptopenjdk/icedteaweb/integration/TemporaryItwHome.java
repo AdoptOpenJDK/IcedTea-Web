@@ -94,8 +94,9 @@ public class TemporaryItwHome implements TestRule {
                 try {
                     Path d = dest.resolve(src.relativize(s));
                     if (Files.isDirectory(s)) {
-                        if (!Files.exists(d))
+                        if (!Files.exists(d)) {
                             Files.createDirectory(d);
+                        }
                         return;
                     }
                     Files.copy(s, d, options);
@@ -133,7 +134,7 @@ public class TemporaryItwHome implements TestRule {
 
     public void createDeploymentProps(Map<String, String> deployment) throws IOException {
         Set<Map.Entry<String, String>> values = deployment.entrySet();
-        for (Map.Entry<String, String> e: values) {
+        for (Map.Entry<String, String> e : values) {
             JNLPRuntime.getConfiguration().setProperty(e.getKey(), e.getValue());
         }
         JNLPRuntime.getConfiguration().save();

@@ -9,7 +9,7 @@ public class AppletDescMainClassWithClass extends Applet {
     public void init() {
         System.out.println("init AppletDescMainClassWithClass");
         try {
-           // writeFile(ID, writer -> writer.write("init AppletDescMainClassWithClass"));
+            // writeFile(ID, writer -> writer.write("init AppletDescMainClassWithClass"));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -18,7 +18,7 @@ public class AppletDescMainClassWithClass extends Applet {
     public void start() {
         System.out.println("start AppletDescMainClassWithClass");
         try {
-           // writeFile(ID , writer -> writer.write("start AppletDescMainClassWithClass"));
+            // writeFile(ID , writer -> writer.write("start AppletDescMainClassWithClass"));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

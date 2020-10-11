@@ -50,8 +50,7 @@ public class WireMockConfigBuilder implements
         HeadRequestConfigBuilder3,
         GetRequestConfigBuilder1,
         GetRequestConfigBuilder2,
-        ResourceServer
-{
+        ResourceServer {
 
     private static final String PORT = "PORT";
     private static final String MAIN_CLASS = "MAIN_CLASS";

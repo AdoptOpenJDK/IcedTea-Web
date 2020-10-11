@@ -14,7 +14,7 @@ public class MissingCodebases extends Applet {
     public void init() {
         System.out.println("init MissingCodebases");
         try {
-           // writeFile(ID, writer -> writer.write("init MissingCodebases"));
+            // writeFile(ID, writer -> writer.write("init MissingCodebases"));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -23,7 +23,7 @@ public class MissingCodebases extends Applet {
     public void start() {
         System.out.println("start MissingCodebases");
         try {
-           // writeFile(ID , writer -> writer.write("start MissingCodebases"));
+            // writeFile(ID , writer -> writer.write("start MissingCodebases"));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

@@ -13,5 +13,5 @@
         <jar href="resources/App-ExtensionResourceManagedApplication.jar" main="true"/>
     </resources>
 
-    <component-desc />
+    <component-desc/>
 </jnlp>

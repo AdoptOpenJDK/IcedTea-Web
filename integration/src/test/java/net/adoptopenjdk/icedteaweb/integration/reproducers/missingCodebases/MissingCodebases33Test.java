@@ -43,8 +43,8 @@ public class MissingCodebases33Test implements IntegrationTest {
 
         tmpItwHome.createTrustSettings(jnlpUrl);
         Map<String, String> deplyment = new HashMap<>();
-        deplyment.put(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK,"NONE" );
-        deplyment.put(ConfigurationConstants.KEY_SECURITY_LEVEL,"ALLOW_UNSIGNED" );
+        deplyment.put(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
+        deplyment.put(ConfigurationConstants.KEY_SECURITY_LEVEL, "ALLOW_UNSIGNED");
         tmpItwHome.createDeploymentProps(deplyment);
 
         // when
