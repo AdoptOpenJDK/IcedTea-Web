@@ -53,7 +53,7 @@ public class YesCancelSkip extends YesCancel {
         return new YesCancelSkip(Primitive.valueOf(s));
     }
 
-    private  YesCancelSkip(Primitive valueOf) {
+    private YesCancelSkip(Primitive valueOf) {
         super(valueOf);
     }
 

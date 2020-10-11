@@ -13,6 +13,7 @@ public class OsUtil {
 
     /**
      * Returns {@code true} if we are on windows.
+     *
      * @return {@code true} if we are on windows.
      */
     public static boolean isWindows() {

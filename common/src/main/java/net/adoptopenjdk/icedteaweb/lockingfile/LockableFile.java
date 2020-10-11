@@ -127,6 +127,7 @@ public class LockableFile {
 
     /**
      * Lock access to the file.Lock is reentrant.
+     *
      * @throws java.io.IOException if an I/O error occurs.
      */
     public void lock() throws IOException {
@@ -160,7 +161,7 @@ public class LockableFile {
         if (this.file.exists()) {
             this.randomAccessFile = new RandomAccessFile(this.file, isReadOnly() ? "r" : "rws");
             this.fileChannel = randomAccessFile.getChannel();
-            if (!isReadOnly()){
+            if (!isReadOnly()) {
                 this.processLock = this.fileChannel.lock();
             }
         }
@@ -168,6 +169,7 @@ public class LockableFile {
 
     /**
      * Unlock access to the file.Lock is reentrant. Does not do anything if not holding the lock.
+     *
      * @throws java.io.IOException if an I/O error occurs.
      */
     public void unlock() throws IOException {

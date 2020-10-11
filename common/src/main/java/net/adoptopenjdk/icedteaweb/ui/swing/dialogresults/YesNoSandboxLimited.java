@@ -39,7 +39,6 @@ import java.util.EnumSet;
  * Special case for AppTrustWarningPanel extensions.
  * Its behaviour is same as YesNo, but if some extension Need sandbox, it can safely use
  * YesNoSandbox, and it will be correctly eaten.
- * 
  */
 
 public class YesNoSandboxLimited extends YesNoSandbox {

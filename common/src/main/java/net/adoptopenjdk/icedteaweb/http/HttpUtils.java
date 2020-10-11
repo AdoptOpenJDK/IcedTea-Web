@@ -54,6 +54,7 @@ public class HttpUtils {
     /**
      * Ensure a CloseableHttpConnection is fully read, required for correct behavior.
      * Any thrown IOException is consumed and logged
+     *
      * @param c the connection to be closed silently
      */
     public static void consumeAndCloseConnectionSilently(final CloseableConnection c) {

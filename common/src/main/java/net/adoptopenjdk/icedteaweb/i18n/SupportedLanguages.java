@@ -13,8 +13,7 @@ public enum SupportedLanguages {
     SupportedLanguages(String language) {
         try {
             this.locale = new Locale(language);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new IllegalStateException("Unknown language.");
         }
     }

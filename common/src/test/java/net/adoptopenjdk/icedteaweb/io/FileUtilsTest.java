@@ -110,7 +110,7 @@ public class FileUtilsTest {
             if (view.getOwner().getName().equals(ae.principal().getName())) {
                 assertFalse("Duplicate owner entry", hasOwner);
                 hasOwner = true;
-                assertEquals("Owner must have all permissions",14, ae.permissions().size());
+                assertEquals("Owner must have all permissions", 14, ae.permissions().size());
             }
         }
         assertTrue("No owner entry", hasOwner);

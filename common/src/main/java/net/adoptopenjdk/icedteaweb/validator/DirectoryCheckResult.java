@@ -6,7 +6,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Is storing result of directory validation.
- *
+ * <p>
  * validated are existence of directory
  * whether it is directory
  * if it have read/write permissions
@@ -55,7 +55,8 @@ public class DirectoryCheckResult {
 
     /**
      * count passes of this result (0-3, both inclusive).
-     * @return  how many times it passed
+     *
+     * @return how many times it passed
      */
     public int getPasses() {
         int subdirs = 0;
@@ -70,6 +71,7 @@ public class DirectoryCheckResult {
 
     /**
      * count failures of this result (0-3, both inclusive).
+     *
      * @return how many failures appeared
      */
     public int getFailures() {
@@ -85,7 +87,7 @@ public class DirectoryCheckResult {
      * Each failure by line. PAsses are not mentioned
      * The subdirectory (and it subdirectories are included to )
      *
-     * @return  string with \n, or/and ended by \n
+     * @return string with \n, or/and ended by \n
      */
     public String getMessage() {
         final StringBuilder sb = new StringBuilder();

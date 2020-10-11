@@ -150,11 +150,11 @@ public class StringUtilsTest {
         assertThat(substringBeforeLast("https://domain.com/substringtest/", "/"), equalTo("https://domain.com/substringtest"));
     }
 
-   @Test
+    @Test
     public void testSubstringBeforeLastWithNoStringMatch() {
-       assertThat(substringBeforeLast("no slash", "/"), equalTo("no slash"));
-       assertThat(substringBeforeLast("", "/"), is(blankOrNullString()));
-       assertThat(substringBeforeLast(null, "/"), is(blankOrNullString()));
+        assertThat(substringBeforeLast("no slash", "/"), equalTo("no slash"));
+        assertThat(substringBeforeLast("", "/"), is(blankOrNullString()));
+        assertThat(substringBeforeLast(null, "/"), is(blankOrNullString()));
     }
 
     @Test

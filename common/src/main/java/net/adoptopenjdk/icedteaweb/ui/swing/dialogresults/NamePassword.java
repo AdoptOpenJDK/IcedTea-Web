@@ -60,19 +60,18 @@ public class NamePassword implements DialogResult {
     //following three methods are not used by this class
     @Override
     public boolean toBoolean() {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
-    
-    
 
-     public static NamePassword readValue(String s) {
-        int  i = s.indexOf(" ");
-        return new NamePassword(s.substring(0,i), s.substring(i+1).toCharArray());
+
+    public static NamePassword readValue(String s) {
+        int i = s.indexOf(" ");
+        return new NamePassword(s.substring(0, i), s.substring(i + 1).toCharArray());
     }
 
     @Override
     public String writeValue() {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

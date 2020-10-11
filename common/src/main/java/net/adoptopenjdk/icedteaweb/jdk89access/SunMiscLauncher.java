@@ -54,7 +54,7 @@ public class SunMiscLauncher {
     public static ImageIcon getSecureImageIcon(final String resource) {
         try {
             final Class clazz = Class.forName(CLASS_SUN_MISC_LAUNCHER);
-            final Object obj  = clazz.newInstance();
+            final Object obj = clazz.newInstance();
             final Method m = clazz.getMethod(METHOD_GET_CLASS_LOADER);
             final ClassLoader cl = (ClassLoader) m.invoke(obj);
 
