@@ -15,9 +15,9 @@ import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
 
 /**
  * {@link Closeable} wrapper around a {@link URLConnection}.
- *
+ * <p>
  * Only the needed methods of URLConnection are exposed.
- *
+ * <p>
  * Additionally {@link #getResponseCode()} from {@link HttpURLConnection} is available.
  */
 public class CloseableConnection implements Closeable {

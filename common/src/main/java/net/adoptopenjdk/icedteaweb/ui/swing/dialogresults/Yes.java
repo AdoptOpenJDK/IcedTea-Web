@@ -50,7 +50,7 @@ public class Yes extends BasicDialogValue.PrimitivesSubset {
     public Yes() {
         super(Primitive.YES);
     }
-    
+
     /**
      * To allow inheritance.
      * Overriders have to override getAllowedValues to work.
@@ -74,7 +74,6 @@ public class Yes extends BasicDialogValue.PrimitivesSubset {
     public String toString() {
         return writeValue();
     }
-    
-    
+
 
 }

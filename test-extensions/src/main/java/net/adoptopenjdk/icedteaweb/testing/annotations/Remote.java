@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
 /**
  * Mark for tests running content on remote servers
  */
-@Target({ElementType.TYPE,ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Remote {
 

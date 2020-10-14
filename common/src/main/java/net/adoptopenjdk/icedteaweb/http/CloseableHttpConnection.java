@@ -6,9 +6,9 @@ import java.net.HttpURLConnection;
 
 /**
  * {@link Closeable} wrapper around a {@link HttpURLConnection}.
- *
+ * <p>
  * Only the needed methods of HttpURLConnection are exposed.
- *
+ * <p>
  * Closing the connection will trigger a disconnect on the underlying HttpUrlConnection
  */
 public class CloseableHttpConnection extends CloseableConnection {

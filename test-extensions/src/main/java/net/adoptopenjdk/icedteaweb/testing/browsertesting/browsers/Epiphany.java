@@ -40,7 +40,7 @@ import java.util.List;
 
 public class Epiphany extends MozillaFamilyLinuxBrowser {
 
-    
+
     private final String[] cs = {};
 
     public Epiphany(final String bin) {

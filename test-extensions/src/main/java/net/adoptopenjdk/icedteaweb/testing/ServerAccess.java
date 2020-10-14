@@ -44,6 +44,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+
 import net.adoptopenjdk.icedteaweb.OutputUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.Browser;
@@ -193,7 +194,6 @@ public class ServerAccess {
     }
 
 
-
     public static ServerLauncher getIndependentInstance(final String dir, final int port) {
 
 
@@ -223,7 +223,9 @@ public class ServerAccess {
      * @return - binary from where to lunch current browser
      */
     private String getBrowserLocation() {
-        if (this.currentBrowser == null) return UNSET_BROWSER;
+        if (this.currentBrowser == null) {
+            return UNSET_BROWSER;
+        }
         return this.currentBrowser.getBin();
     }
 
@@ -234,13 +236,17 @@ public class ServerAccess {
 
         final List<String> l1 = this.currentBrowser.getCompatibilitySwitches();
         final List<String> l = new ArrayList<>();
-        if (l1 != null) l.addAll(l1);
+        if (l1 != null) {
+            l.addAll(l1);
+        }
         return l;
 
     }
 
     public Browsers getCurrentBrowsers() {
-        if (currentBrowser == null) return null;
+        if (currentBrowser == null) {
+            return null;
+        }
         return currentBrowser.getID();
     }
 

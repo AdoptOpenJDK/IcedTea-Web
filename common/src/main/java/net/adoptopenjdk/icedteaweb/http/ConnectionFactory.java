@@ -32,13 +32,13 @@ public class ConnectionFactory {
 
     /**
      * Opens a connection to a URL.
-     *
+     * <p>
      * If the URL has HTTP or HTTPS as its protocol than {@link HttpURLConnection} is opened
      * and the {@code requestMethod} and {@code requestProperties} are set onto the connection.
      * Otherwise the {@code requestMethod} and {@code requestProperties} are ignored.
      *
-     * @param url the url to which to open a connection. Must have protocol HTTP or HTTPS
-     * @param requestMethod the HTTP method to use for the connection.
+     * @param url               the url to which to open a connection. Must have protocol HTTP or HTTPS
+     * @param requestMethod     the HTTP method to use for the connection.
      * @param requestProperties properties to set on the connection.
      * @return the established connection.
      * @throws IOException if an I/O exception occurs.
@@ -47,8 +47,7 @@ public class ConnectionFactory {
             final URL url,
             final HttpMethod requestMethod,
             final Map<String, String> requestProperties
-    ) throws IOException
-    {
+    ) throws IOException {
         requireNonNull(url, "url");
         requireNonNull(requestMethod, "requestMethod");
         requireNonNull(requestProperties, "requestProperties");
@@ -64,12 +63,12 @@ public class ConnectionFactory {
 
     /**
      * Opens a connection to a URL.
-     *
+     * <p>
      * If the URL has not HTTP or HTTPS as its protocol a {@link IllegalArgumentException} is thrown.
      * Otherwise the {@code requestMethod} and {@code requestProperties} are set onto the connection.
      *
-     * @param url the url to which to open a connection. Must have protocol HTTP or HTTPS
-     * @param requestMethod the HTTP method to use for the connection.
+     * @param url               the url to which to open a connection. Must have protocol HTTP or HTTPS
+     * @param requestMethod     the HTTP method to use for the connection.
      * @param requestProperties properties to set on the connection.
      * @return the established connection.
      * @throws IOException if an I/O exception occurs.
@@ -78,8 +77,7 @@ public class ConnectionFactory {
             final URL url,
             final HttpMethod requestMethod,
             final Map<String, String> requestProperties
-    ) throws IOException
-    {
+    ) throws IOException {
         requireNonNull(url, "url");
         requireNonNull(requestMethod, "requestMethod");
         requireNonNull(requestProperties, "requestProperties");
@@ -96,8 +94,8 @@ public class ConnectionFactory {
      * Create a HTTP or HTTPS connection
      * The {@code requestMethod} and {@code requestProperties} are set onto the connection.
      *
-     * @param httpConnection the connection to wrap.
-     * @param requestMethod the HTTP method to use for the connection.
+     * @param httpConnection    the connection to wrap.
+     * @param requestMethod     the HTTP method to use for the connection.
      * @param requestProperties properties to set on the connection.
      * @return the established connection.
      * @throws IOException if an I/O exception occurs.
@@ -106,9 +104,7 @@ public class ConnectionFactory {
             final HttpURLConnection httpConnection,
             final HttpMethod requestMethod,
             final Map<String, String> requestProperties
-    ) throws IOException
-    {
-
+    ) throws IOException {
         httpConnection.setRequestMethod(requestMethod.name());
 
         for (final Map.Entry<String, String> property : requestProperties.entrySet()) {

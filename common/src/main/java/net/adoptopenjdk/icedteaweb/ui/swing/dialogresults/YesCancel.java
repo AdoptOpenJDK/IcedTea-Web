@@ -40,7 +40,7 @@ public class YesCancel extends Yes {
     public static YesCancel yes() {
         return new YesCancel(Primitive.YES);
     }
- 
+
     public static YesCancel cancel() {
         return new YesCancel(Primitive.CANCEL);
     }

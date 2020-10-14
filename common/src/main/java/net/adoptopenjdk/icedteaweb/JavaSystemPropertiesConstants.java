@@ -57,15 +57,11 @@ public interface JavaSystemPropertiesConstants {
     String AWT_AA_FONT_SETTINGS = "awt.useSystemAAFontSettings";
 
 
-
-
     String SSL_TRUST_STORE = "javax.net.ssl.trustStore";
 
     String SSL_TRUST_STORE_TYPE = "javax.net.ssl.trustStoreType";
 
     String SSL_TRUST_STORE_PASSWORD = "javax.net.ssl.trustStorePassword";
-
-
 
 
     String AWT_SYNC_LWREQUESTS = "java.awt.syncLWRequests";
@@ -97,8 +93,6 @@ public interface JavaSystemPropertiesConstants {
     String SWING_NO_XP = "swing.noxp";
 
     String SWING_USE_SYSTEM_FONT = "swing.useSystemFontSettings";
-
-
 
 
     String ARRAY_LEGACY_MERGE_SORT = "java.util.Arrays.useLegacyMergeSort";

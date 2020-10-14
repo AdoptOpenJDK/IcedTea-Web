@@ -33,7 +33,7 @@ statement from your version.
  -->
 
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0" >
+<jnlp spec="1.0">
     <information>
         <title>no cb</title>
         <vendor>IcedTea</vendor>

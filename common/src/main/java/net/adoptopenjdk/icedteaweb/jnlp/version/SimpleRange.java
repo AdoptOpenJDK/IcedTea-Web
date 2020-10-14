@@ -30,7 +30,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
 /**
  * A simple-range is either a version-id, a version-id followed by a star (*) or a version-id followed by a plus sign (+).
  * The star means prefix match, the plus sign means this version or greater.
- *
+ * <p>
  * The syntax of version-strings is:
  *
  * <pre>
@@ -54,6 +54,7 @@ class SimpleRange {
 
     /**
      * Checks whether this simple-range represents a single version-id without any postfix modifiers.
+     *
      * @return {@code true} if this simple-range does not have any modifiers, {@code false} otherwise.
      */
     boolean isExactVersion() {

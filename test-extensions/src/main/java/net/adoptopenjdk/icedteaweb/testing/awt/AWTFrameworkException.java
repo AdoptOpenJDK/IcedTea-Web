@@ -35,17 +35,16 @@ statement from your version.
 package net.adoptopenjdk.icedteaweb.testing.awt;
 
 /**
- * Class AWTFrameworkException is thrown in the AWTFramework 
+ * Class AWTFrameworkException is thrown in the AWTFramework
  * whenever the framework encounters not enough data specified
- * to perform an action (for example it is impossible to ascertain 
+ * to perform an action (for example it is impossible to ascertain
  * the position of an applet in the screenshot if the width or height
- * of the applet is not known.  
- *
+ * of the applet is not known.
  */
 
 public class AWTFrameworkException extends Exception {
 
     public AWTFrameworkException(final String s) {
-        super(s); 
+        super(s);
     }
 }

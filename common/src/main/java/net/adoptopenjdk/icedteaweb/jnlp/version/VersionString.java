@@ -30,7 +30,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEX
  * a version-id followed by a star (*), a version-id followed by a plus sign (+) , or two version-ranges
  * combined using an ampersand (&amp;). The star means prefix match, the plus sign means this version or
  * greater, and the ampersand means the logical and-ing of the two version-ranges.
- *
+ * <p>
  * The syntax of version-strings is:
  *
  * <pre>
@@ -125,19 +125,19 @@ public class VersionString {
     /**
      * Compares two version-ids in the context of this version-string.
      * This implementation follows the specification of a {@link java.util.Comparator}.
-     *
+     * <p>
      * If two or more version-id match the given version-string,
      * the JNLP Client should use the one matching the earlier version-range in the version-string.
-     *
+     * <p>
      * If two or more version-id match a given version-range,
      * the JNLP Client should use the one with the highest version-id.
-     *
+     * <p>
      * See JSR-56 Specification, Appendix A.
      *
      * @param versionId1 a version-id
      * @param versionId2 a version-id
      * @return a negative int if versionId1 is less than versionId2,
-     *  a positive int if versionId1 is after than versionId2 or zero if they are equal.
+     * a positive int if versionId1 is after than versionId2 or zero if they are equal.
      */
     int compare(final VersionId versionId1, final VersionId versionId2) {
         Assert.requireNonNull(versionId1, "versionId1");

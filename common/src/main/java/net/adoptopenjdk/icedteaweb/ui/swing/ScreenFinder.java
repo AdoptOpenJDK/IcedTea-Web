@@ -56,7 +56,7 @@ public class ScreenFinder {
         return getScreenOnCoords(p);
     }
 
-    public static Rectangle  getCurrentScreenSizeWithoutBounds() {
+    public static Rectangle getCurrentScreenSizeWithoutBounds() {
         try {
             final Point p = MouseInfo.getPointerInfo().getLocation();
             return getScreenOnCoordsWithoutBounds(p);
@@ -66,10 +66,10 @@ public class ScreenFinder {
         }
     }
 
-     public static void  centerWindowsToCurrentScreen(final Window w) {
+    public static void centerWindowsToCurrentScreen(final Window w) {
         final Rectangle bounds = getCurrentScreenSizeWithoutBounds();
-        w.setLocation(bounds.x + (bounds.width - w.getWidth())/2,
-                bounds.y + (bounds.height - w.getHeight())/2);
+        w.setLocation(bounds.x + (bounds.width - w.getWidth()) / 2,
+                bounds.y + (bounds.height - w.getHeight()) / 2);
     }
 
     private static GraphicsDevice getScreenOnCoords(final Point point) {

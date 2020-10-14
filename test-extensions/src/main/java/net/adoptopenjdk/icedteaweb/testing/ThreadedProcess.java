@@ -47,7 +47,6 @@ import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- *
  * wrapper around Runtime.getRuntime().exec(...) which ensures that process is run inside its own, by us controlled, thread.
  * Process builder caused some unexpected and weird behavior :/
  */
@@ -130,7 +129,7 @@ public class ThreadedProcess extends Thread {
                 p = r.exec(args.toArray(new String[0]), variables, dir);
             }
             try {
-                if (writer != null){
+                if (writer != null) {
                     final Thread t = new Thread(() -> {
                         try (
                                 final BufferedReader br = new BufferedReader(new InputStreamReader(writer, UTF_8));
@@ -153,7 +152,7 @@ public class ThreadedProcess extends Thread {
                 ProcessUtils.waitForSafely(p);
                 exitCode = p.exitValue();
                 Thread.sleep(500); //this is giving to fast done processes's e/o readers time to read all. I would like to know better solution :-/
-                while(assassin.isKilling() && !assassin.haveKilled()){
+                while (assassin.isKilling() && !assassin.haveKilled()) {
                     Thread.sleep(100);
                 }
             } finally {
@@ -178,6 +177,6 @@ public class ThreadedProcess extends Thread {
     }
 
     void setAssassin(ProcessAssassin pa) {
-        this.assassin =pa;
+        this.assassin = pa;
     }
 }

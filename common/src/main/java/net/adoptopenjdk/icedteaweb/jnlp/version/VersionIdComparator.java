@@ -22,13 +22,13 @@ import java.util.Comparator;
 
 /**
  * Comparator to compare two version-ids in the context of a version-string.
- *
+ * <p>
  * If two or more version-id match the given version-string,
  * the JNLP Client should use the one matching the earlier version-range in the version-string.
- *
+ * <p>
  * If two or more version-id match a given version-range,
  * the JNLP Client should use the one with the highest version-id.
- *
+ * <p>
  * See JSR-56 Specification, Appendix A.
  */
 public class VersionIdComparator implements Comparator<VersionId> {

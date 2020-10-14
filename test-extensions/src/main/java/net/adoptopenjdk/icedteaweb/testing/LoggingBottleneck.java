@@ -104,9 +104,9 @@ public class LoggingBottleneck {
         }
     }
 
-   private synchronized void writeXmlLog() throws IOException {
-       writeXmlLog(Collections.unmodifiableMap(processLogs));
-   }
+    private synchronized void writeXmlLog() throws IOException {
+        writeXmlLog(Collections.unmodifiableMap(processLogs));
+    }
 
     private synchronized static void writeXmlLog(final Map<String, Map<String, TestsLogs>> processLogs) throws IOException {
         final Writer w = new OutputStreamWriter(new FileOutputStream(DEFAULT_LOG_FILE));
@@ -130,7 +130,7 @@ public class LoggingBottleneck {
         w.close();
     }
 
-    synchronized  void addToXmlLog(final String message, final boolean printToOut, final boolean printToErr, final StackTraceElement ste) {
+    synchronized void addToXmlLog(final String message, final boolean printToOut, final boolean printToErr, final StackTraceElement ste) {
         Map<String, TestsLogs> classLog = processLogs.get(ste.getClassName());
         if (classLog == null) {
             classLog = new HashMap<>(50);
@@ -156,7 +156,7 @@ public class LoggingBottleneck {
         methodLog.add(printToErr, printToOut, message);
     }
 
-   synchronized public String modifyMethodWithForBrowser(final String methodBrowseredName, final String className) {
+    synchronized public String modifyMethodWithForBrowser(final String methodBrowseredName, final String className) {
         try {
             final Class<?> clazz = Class.forName(className);
             /*
@@ -179,11 +179,11 @@ public class LoggingBottleneck {
         return methodBrowseredName;
     }
 
-   synchronized public void setLoggedBrowser(final String loggedBrowser) {
+    synchronized public void setLoggedBrowser(final String loggedBrowser) {
         this.loggedBrowser = loggedBrowser;
     }
 
-  synchronized  public void logIntoPlaintextLog(final String message, final boolean printToOut, final boolean printToErr) {
+    synchronized public void logIntoPlaintextLog(final String message, final boolean printToOut, final boolean printToErr) {
         try {
             if (printToOut) {
                 LoggingBottleneck.getDefaultLoggingBottleneck().stdout(message);
@@ -214,9 +214,9 @@ public class LoggingBottleneck {
         DEFAULT_STDLOGS_WRITER.newLine();
         DEFAULT_STDLOGS_WRITER.flush();
     }
-    
-   private synchronized static String clearChars(final String ss) {
-       final StringBuilder s = new StringBuilder(ss);
+
+    private synchronized static String clearChars(final String ss) {
+        final StringBuilder s = new StringBuilder(ss);
         for (int i = 0; i < s.length(); i++) {
             final char q = s.charAt(i);
             if (q == '\n') {
@@ -226,7 +226,7 @@ public class LoggingBottleneck {
                 continue;
             }
             final int iq = (int) q;
-            if ((iq <= 31 || iq > 65533)||(iq >= 64976 && iq <= 65007)) {
+            if ((iq <= 31 || iq > 65533) || (iq >= 64976 && iq <= 65007)) {
                 s.setCharAt(i, 'I');
                 s.insert(i + 1, "NVALID_CHAR_" + iq);
                 i--;

@@ -48,7 +48,6 @@ import java.util.Optional;
 /**
  * This class wraps execution of ThreadedProcess.
  * Add listeners and allows another setters, eg of ReactingProcess
- *
  */
 public class ProcessWrapper {
 
@@ -58,7 +57,6 @@ public class ProcessWrapper {
     private final List<ContentReaderListener> stderrl = new ArrayList<>(1);
     private String[] vars;
     private ReactingProcess reactingProcess;
-
 
 
     public ProcessWrapper(final String toBeExecuted, final List<String> otherargs, final URL u) {
@@ -73,15 +71,15 @@ public class ProcessWrapper {
         urledArgs.add(0, toBeExecuted);
         urledArgs.add(s);
         this.args = urledArgs;
-        this.vars=null;
+        this.vars = null;
     }
 
     public ProcessWrapper(final String toBeExecuted, final List<String> otherargs, final URL u, final ContentReaderListener stdoutl, final ContentReaderListener stderrl, final String[] vars) {
         this(toBeExecuted, otherargs, u);
         this.addStdOutListener(stdoutl);
         this.addStdErrListener(stderrl);
-        this.vars=vars;
-    
+        this.vars = vars;
+
     }
 
     public ProcessWrapper(final List<String> args, final File dir, final ContentReaderListener stdoutl, final ContentReaderListener stderrl) {
@@ -110,7 +108,7 @@ public class ProcessWrapper {
     }
 
     public ProcessResult execute() throws Exception {
-        if (reactingProcess !=null ){
+        if (reactingProcess != null) {
             reactingProcess.beforeProcess("");
         }
         final ThreadedProcess t = new ThreadedProcess(args, dir, vars);
@@ -173,8 +171,8 @@ public class ProcessWrapper {
     private static String createConnectionMessage(final ThreadedProcess t) {
         return "Connecting " + t.getCommandLine();
     }
-    
-     void setReactingProcess(final ReactingProcess reactingProcess) {
+
+    void setReactingProcess(final ReactingProcess reactingProcess) {
         this.reactingProcess = reactingProcess;
     }
 }
