@@ -1,6 +1,7 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
 import net.adoptopenjdk.icedteaweb.Assert;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -41,6 +42,13 @@ class JarDiffUnpacker implements StreamUnpacker {
 
         final JarFile originalJar = new JarFile(cacheFile);
         final File diffJarFile = new File(TMP_DIR.getFile(), UUID.randomUUID().toString() + JARDIFF_EXTENSION);
+
+        try {
+            FileUtils.createParentDir(diffJarFile);
+        } catch (IOException e) {
+            LOG.error("Error creating tmp dir for jardiff.", e);
+        }
+
         try(final FileOutputStream outputStream = new FileOutputStream(diffJarFile)) {
             IOUtils.copy(input, outputStream);
             final JarFile diffJar = new JarFile(diffJarFile);
