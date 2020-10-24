@@ -1,6 +1,7 @@
 package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 import java.net.URL;
 
@@ -79,7 +80,7 @@ abstract class WhitelistEntryPort extends WhitelistEntryPart {
         private static final InvalidPort INSTANCE = new InvalidPort();
 
         private InvalidPort() {
-            super(false, null, "Invalid port. Must be a number or '*'");
+            super(false, null, Translator.R("WleInvalidPort"));
         }
 
         @Override

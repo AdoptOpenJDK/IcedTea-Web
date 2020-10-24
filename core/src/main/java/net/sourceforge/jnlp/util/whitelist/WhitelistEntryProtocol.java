@@ -1,6 +1,7 @@
 package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 import java.net.URL;
 
@@ -72,7 +73,7 @@ abstract class WhitelistEntryProtocol extends WhitelistEntryPart {
         private static final InvalidProtocol INSTANCE = new InvalidProtocol();
 
         private InvalidProtocol() {
-            super(false, null, "Invalid protocol. Only http and https are supported");
+            super(false, null, Translator.R("WleInvalidProtocol"));
         }
 
         @Override

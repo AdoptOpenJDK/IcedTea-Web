@@ -1,11 +1,14 @@
 package net.sourceforge.jnlp.util.whitelist;
 
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+
 import java.net.URL;
 
 /**
  * An entry where it was not possible to parse protocol, host and port.
  */
 class UnparsableWhitelistEntry implements WhitelistEntry {
+
     private final String rawWhitelistEntry;
 
     UnparsableWhitelistEntry(final String rawWhitelistEntry) {
@@ -34,6 +37,6 @@ class UnparsableWhitelistEntry implements WhitelistEntry {
 
     @Override
     public String getErrorMessage() {
-        return "Invalid entry: must be of the form [<protocol>://]host[:<port>]";
+        return Translator.R("WleUnparseableEntry");
     }
 }

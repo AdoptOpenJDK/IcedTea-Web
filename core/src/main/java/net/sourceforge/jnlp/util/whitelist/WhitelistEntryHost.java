@@ -1,6 +1,7 @@
 package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
 import java.net.URL;
 import java.util.regex.Pattern;
@@ -116,11 +117,11 @@ abstract class WhitelistEntryHost extends WhitelistEntryPart {
      * Invalid host.
      */
     private static class InvalidHost extends WhitelistEntryHost {
-        private static final InvalidHost MISSING_HOST = new InvalidHost("Invalid Host: host is missing");
-        private static final InvalidHost MISS_PLACED_WILDCARD = new InvalidHost("Invalid Host: '*' can only be the very first character of the host");
-        private static final InvalidHost MULTIPLE_WILDCARDS = new InvalidHost("Invalid Host: '*' can only be the very first character of the host");
-        private static final InvalidHost IP_WITH_WILDCARD = new InvalidHost("Invalid Host: wildcards are not allowed in IP addresses");
-        private static final InvalidHost INVALID_WILDCARD_PREFIX = new InvalidHost("Invalid Host: after '*' must follow a '.'");
+        private static final InvalidHost MISSING_HOST = new InvalidHost(Translator.R("WleMissingHost"));
+        private static final InvalidHost MISS_PLACED_WILDCARD = new InvalidHost(Translator.R("WleMissPlacedWildcard"));
+        private static final InvalidHost MULTIPLE_WILDCARDS = new InvalidHost(Translator.R("WleMultipleWildcards"));
+        private static final InvalidHost IP_WITH_WILDCARD = new InvalidHost(Translator.R("WleIpWithWildcard"));
+        private static final InvalidHost INVALID_WILDCARD_PREFIX = new InvalidHost(Translator.R("WleInvalidWildcardPrefix"));
 
         private InvalidHost(final String error) {
             super(false, null, error);
