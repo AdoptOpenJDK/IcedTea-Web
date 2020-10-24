@@ -65,4 +65,14 @@ public class IpUtilTest {
         URL url = new URL("file:/C:/OpenWebStart/../OWSFiles/AccessibleScrollDemo.jnlp");
         assertTrue(IpUtil.isLocalhostOrLoopback(url));
     }
+
+    @Test(timeout = 5000)
+    public void testPerformanceWhenGivenAHost_ok() {
+        assertFalse(IpUtil.isLocalhostOrLoopback("rfy.m-b.com"));
+    }
+
+    @Test(timeout = 5000)
+    public void testPerformanceWhenGivenAHost_slow() {
+        assertFalse(IpUtil.isLocalhostOrLoopback("rfy.m-b.org"));
+    }
 }
