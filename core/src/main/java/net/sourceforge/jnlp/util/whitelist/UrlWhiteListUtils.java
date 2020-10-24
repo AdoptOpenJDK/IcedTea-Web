@@ -17,12 +17,12 @@ public class UrlWhiteListUtils {
 
     public static List<WhitelistEntry> getApplicationUrlWhiteList() {
         if (applicationUrlWhiteList == null) {
-            applicationUrlWhiteList = whitelistPropertyName(KEY_SECURITY_SERVER_WHITELIST);
+            applicationUrlWhiteList = loadWhitelistFromConfiguration(KEY_SECURITY_SERVER_WHITELIST);
         }
         return applicationUrlWhiteList;
     }
 
-    public static List<WhitelistEntry> whitelistPropertyName(final String whitelistPropertyName) {
+    public static List<WhitelistEntry> loadWhitelistFromConfiguration(final String whitelistPropertyName) {
         return JNLPRuntime.getConfiguration().getPropertyAsList(whitelistPropertyName)
                 .stream()
                 .filter(s -> !StringUtils.isBlank(s))
@@ -44,7 +44,7 @@ public class UrlWhiteListUtils {
 
         // is it localhost or loopback
         if (IpUtil.isLocalhostOrLoopback(url)) {
-            return true; // local server need not be in whitelist
+            return true; // localhost need not be in whitelist
         }
 
         return whiteList.stream().anyMatch(wlEntry -> wlEntry.matches(url));

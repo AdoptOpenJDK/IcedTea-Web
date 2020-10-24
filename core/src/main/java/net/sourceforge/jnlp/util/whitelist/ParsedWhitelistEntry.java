@@ -8,6 +8,7 @@ import java.net.URL;
 class ParsedWhitelistEntry implements WhitelistEntry {
 
     private final String rawWhitelistEntry;
+
     private final WhitelistEntryProtocol protocol;
     private final WhitelistEntryHost host;
     private final WhitelistEntryPort port;
@@ -16,6 +17,7 @@ class ParsedWhitelistEntry implements WhitelistEntry {
 
     ParsedWhitelistEntry(final String raw, final WhitelistEntryProtocol protocol, final WhitelistEntryHost host, final WhitelistEntryPort port) {
         this.rawWhitelistEntry = raw;
+
         this.protocol = protocol;
         this.host = host;
         this.port = port;

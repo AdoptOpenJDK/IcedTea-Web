@@ -16,11 +16,15 @@ class WhiteListEntryParser {
     private static final String PORT = "([0-9*]+)";
     private static final String HOST = "([^:/?]+)";
 
-    private static final String OPTIONAL_PROTOCOL = "(?:" + PROTOCOL + "://)?";
-    private static final String OPTIONAL_PORT = "(?::" + PORT + ")?";
-    private static final String OPTIONAL_PATH_AND_QUERY = "(?:[/?].*)?";
+    private static final String OPTIONAL_PROTOCOL = OPTIONAL(PROTOCOL + "://");
+    private static final String OPTIONAL_PORT = OPTIONAL(":" + PORT);
+    private static final String OPTIONAL_PATH_AND_QUERY = OPTIONAL("[/?].*");
 
     private static final Pattern ENTRY_PATTERN = Pattern.compile("^" + OPTIONAL_PROTOCOL + HOST + OPTIONAL_PORT + OPTIONAL_PATH_AND_QUERY + "$");
+
+    private static String OPTIONAL(String s) {
+        return "(?:" + s + ")?";
+    }
 
     static WhitelistEntry parse(final String rawEntry) {
         if (StringUtils.isBlank(rawEntry)) {
@@ -37,9 +41,9 @@ class WhiteListEntryParser {
         final String hostCandidate = matcher.group(2);
         final String portCandidate = matcher.group(3);
 
-        final WhitelistEntryProtocol protocol = WhitelistEntryProtocol.get(protocolCandidate);
-        final WhitelistEntryHost host = WhitelistEntryHost.get(hostCandidate);
-        final WhitelistEntryPort port = WhitelistEntryPort.get(portCandidate, protocol);
+        final WhitelistEntryProtocol protocol = WhitelistEntryProtocol.parse(protocolCandidate);
+        final WhitelistEntryHost host = WhitelistEntryHost.parse(hostCandidate);
+        final WhitelistEntryPort port = WhitelistEntryPort.parse(portCandidate, protocol);
 
         return new ParsedWhitelistEntry(rawEntry, protocol, host, port);
     }

@@ -11,36 +11,41 @@ import java.util.regex.Pattern;
 abstract class WhitelistEntryHost extends WhitelistEntryPart {
 
     private static final char WILDCARD_CHAR = '*';
+    private static final char SUBDOMAIN_SEPARATOR = '.';
 
     private static final Pattern ALPHA_CHAR_PATTERN = Pattern.compile(".*[a-z,A-Z].*");
 
 
-    static WhitelistEntryHost get(final String candidate) {
+    static WhitelistEntryHost parse(final String candidate) {
         if (StringUtils.isBlank(candidate)) {
-            return new InvalidHost("Invalid Host: host is missing");
-        }
-        if (candidate.indexOf(WILDCARD_CHAR) == 0) {
-            final String withoutStarPrefix = candidate.substring(1);
-            if (withoutStarPrefix.isEmpty()) {
-                return AnyHost.INSTANCE;
-            }
-            if (withoutStarPrefix.indexOf(WILDCARD_CHAR) >= 0) {
-                return new InvalidHost("Invalid Host: '*' can only be the very first character of the host");
-            }
-            if (withoutStarPrefix.indexOf('.') != 0) {
-                return new InvalidHost("Invalid Host: after '*' must follow a '.'");
-            }
-            if (ALPHA_CHAR_PATTERN.matcher(withoutStarPrefix).matches()) {
-                return new WildcardHost(candidate);
-            }
-            return new InvalidHost("Invalid Host: wildcards are not allowed in IP addresses");
+            return InvalidHost.MISSING_HOST;
         }
 
-        if (candidate.indexOf(WILDCARD_CHAR) >= 0) {
-            return new InvalidHost("Invalid Host: '*' can only be the very first character of the host");
+        final int wildcardIndex = candidate.indexOf(WILDCARD_CHAR);
+
+        if (wildcardIndex < 0) {
+            return new ExactHost(candidate);
         }
 
-        return new ExactHost(candidate);
+        if (wildcardIndex > 0) {
+            return InvalidHost.MISS_PLACED_WILDCARD;
+        }
+
+        final String withoutWildcardPrefix = candidate.substring(1);
+        if (withoutWildcardPrefix.isEmpty()) {
+            return AnyHost.INSTANCE;
+        }
+        if (withoutWildcardPrefix.indexOf(WILDCARD_CHAR) >= 0) {
+            return InvalidHost.MULTIPLE_WILDCARDS;
+        }
+        if (withoutWildcardPrefix.indexOf(SUBDOMAIN_SEPARATOR) != 0) {
+            return InvalidHost.INVALID_WILDCARD_PREFIX;
+        }
+        if (!ALPHA_CHAR_PATTERN.matcher(withoutWildcardPrefix).matches()) {
+            return InvalidHost.IP_WITH_WILDCARD;
+        }
+
+        return new WildcardHost(candidate);
     }
 
     private WhitelistEntryHost(final boolean valid, final String effective, final String error) {
@@ -111,6 +116,12 @@ abstract class WhitelistEntryHost extends WhitelistEntryPart {
      * Invalid host.
      */
     private static class InvalidHost extends WhitelistEntryHost {
+        private static final InvalidHost MISSING_HOST = new InvalidHost("Invalid Host: host is missing");
+        private static final InvalidHost MISS_PLACED_WILDCARD = new InvalidHost("Invalid Host: '*' can only be the very first character of the host");
+        private static final InvalidHost MULTIPLE_WILDCARDS = new InvalidHost("Invalid Host: '*' can only be the very first character of the host");
+        private static final InvalidHost IP_WITH_WILDCARD = new InvalidHost("Invalid Host: wildcards are not allowed in IP addresses");
+        private static final InvalidHost INVALID_WILDCARD_PREFIX = new InvalidHost("Invalid Host: after '*' must follow a '.'");
+
         private InvalidHost(final String error) {
             super(false, null, error);
         }

@@ -11,13 +11,13 @@ abstract class WhitelistEntryPart {
     private final String effective;
     private final String error;
 
-    protected WhitelistEntryPart(final boolean valid, final String effective, final String error) {
+    WhitelistEntryPart(final boolean valid, final String effective, final String error) {
         this.valid = valid;
         this.effective = effective;
         this.error = error;
     }
 
-    public abstract boolean matches(URL url);
+    abstract boolean matches(URL url);
 
     boolean isValid() {
         return valid;

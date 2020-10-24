@@ -11,19 +11,19 @@ abstract class WhitelistEntryPort extends WhitelistEntryPart {
 
     private static final String WILDCARD = "*";
 
-    static WhitelistEntryPort get(final String candidate, final WhitelistEntryProtocol protocol) {
+    static WhitelistEntryPort parse(final String candidate, final WhitelistEntryProtocol protocol) {
         if (StringUtils.isBlank(candidate)) {
             return new ExactPort(protocol.getDefaultPort());
         }
         if (WILDCARD.equalsIgnoreCase(candidate)) {
             return Wildcard.INSTANCE;
         }
+
         try {
             final int port = Integer.parseInt(candidate);
             return new ExactPort(port);
-
         } catch (NumberFormatException ignored) {
-            return new InvalidPort("Invalid port");
+            return InvalidPort.INSTANCE;
         }
     }
 
@@ -76,8 +76,10 @@ abstract class WhitelistEntryPort extends WhitelistEntryPart {
      * Invalid port.
      */
     private static class InvalidPort extends WhitelistEntryPort {
-        private InvalidPort(final String error) {
-            super(false, null, error);
+        private static final InvalidPort INSTANCE = new InvalidPort();
+
+        private InvalidPort() {
+            super(false, null, "Invalid port. Must be a number or '*'");
         }
 
         @Override

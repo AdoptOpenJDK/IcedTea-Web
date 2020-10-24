@@ -75,7 +75,7 @@ public class WhitelistEntryTest {
         final WhitelistEntry validEntry = parseEntry("http://*.test.com");
 
         assertMatch(validEntry, "http://sub.test.com");
-        // FIXME: assertMatch(validEntry, "http://sub.sub.test.com");
+        assertMatch(validEntry, "http://sub.sub.test.com");
 
         assertNoMatch(validEntry, "http://test.com"); // missing subdomain
         assertNoMatch(validEntry, "http://sub.test2.com"); // wrong top level domain
