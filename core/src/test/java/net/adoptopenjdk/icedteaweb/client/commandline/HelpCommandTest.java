@@ -41,7 +41,7 @@ public class HelpCommandTest extends AbstractCommandTest {
 
     @Before
     public void setUp() {
-        originalEnableLogging = LogConfig.getLogConfig().isEnableLogging();
+        originalEnableLogging = LogConfig.getLogConfig().isDebugEnable();
         setEnableLogging(false);
     }
 

@@ -29,8 +29,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneCompl
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.logging.OutputController;
-import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

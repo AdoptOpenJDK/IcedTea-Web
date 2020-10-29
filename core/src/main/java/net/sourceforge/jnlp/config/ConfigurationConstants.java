@@ -181,7 +181,7 @@ public interface ConfigurationConstants {
     /*
      * Logging
      */
-    String KEY_ENABLE_LOGGING = "deployment.log"; //same as verbose or ICEDTEAPLUGIN_DEBUG=true
+    String KEY_ENABLE_DEBUG_LOGGING = "deployment.log"; //same as verbose or ICEDTEAPLUGIN_DEBUG=true
 
     String KEY_ENABLE_LOGGING_HEADERS = "deployment.log.headers"; //will add header OutputContorll.getHeader To all messages
 

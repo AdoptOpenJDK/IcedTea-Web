@@ -56,7 +56,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
     /** List of properties used by checkboxes in this panel */
     public static String[] properties = {
-            ConfigurationConstants.KEY_ENABLE_LOGGING,
+            ConfigurationConstants.KEY_ENABLE_DEBUG_LOGGING,
             ConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS,
             ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
             ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,

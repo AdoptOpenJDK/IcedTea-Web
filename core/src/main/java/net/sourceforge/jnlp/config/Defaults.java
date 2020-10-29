@@ -350,7 +350,7 @@ public class Defaults {
                     })
             ),
             Setting.createDefault(
-                    ConfigurationConstants.KEY_ENABLE_LOGGING,
+                    ConfigurationConstants.KEY_ENABLE_DEBUG_LOGGING,
                     String.valueOf(false),
                     ValidatorFactory.createBooleanValidator()
             ),

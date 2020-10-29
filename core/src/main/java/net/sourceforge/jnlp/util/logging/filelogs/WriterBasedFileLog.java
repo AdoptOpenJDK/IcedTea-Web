@@ -33,7 +33,6 @@ statement from your version. */
 package net.sourceforge.jnlp.util.logging.filelogs;
 
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.sourceforge.jnlp.util.logging.OutputControllerLevel;
 import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 

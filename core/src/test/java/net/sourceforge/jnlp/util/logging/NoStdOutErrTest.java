@@ -90,6 +90,6 @@ public class NoStdOutErrTest {
     }
 
     protected void setEnableLogging(boolean enableLogging) {
-        LogConfig.getLogConfig().setEnableLogging(enableLogging);
+        LogConfig.getLogConfig().setDebugEnabled(enableLogging);
     }
 }

@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 import static net.adoptopenjdk.icedteaweb.client.commandline.CommandLine.ERROR;
 import static net.adoptopenjdk.icedteaweb.client.commandline.CommandLine.SUCCESS;
-import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LOGGING;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_DEBUG_LOGGING;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_LEVEL;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -88,7 +88,7 @@ public class ResetCommandTest extends AbstractCommandTest {
     public void testResetAllCommand() throws IOException {
         // GIVEN -----------
         assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.name()));
-        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_ENABLE_LOGGING + "=" + "true"));
+        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_ENABLE_DEBUG_LOGGING + "=" + "true"));
 
         final String[] args = {"-reset", "all"}; // use literals for readability
 

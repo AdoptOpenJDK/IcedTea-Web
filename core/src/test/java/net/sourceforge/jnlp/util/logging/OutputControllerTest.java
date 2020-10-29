@@ -81,7 +81,7 @@ public class OutputControllerTest {
         ByteArrayOutputStream os2 = new ByteArrayOutputStream();
         OutputController oc = new OutputController(os1, os2);
         JNLPRuntime.setDebug(false);
-        LogConfig.getLogConfig().setEnableLogging(false);
+        LogConfig.getLogConfig().setDebugEnabled(false);
         LogConfig.getLogConfig().setLogToFile(false);
         LogConfig.getLogConfig().setLogToStreams(true);
         LogConfig.getLogConfig().setLogToSysLog(false);
@@ -97,7 +97,7 @@ public class OutputControllerTest {
         oc.flush();
         Assert.assertTrue((os2.toString(UTF_8).contains(line1)));
 
-        LogConfig.getLogConfig().setEnableLogging(true);
+        LogConfig.getLogConfig().setDebugEnabled(true);
         oc.log(msg(OutputControllerLevel.DEBUG, line2));
         oc.flush();
         Assert.assertTrue((os1.toString(UTF_8).contains(line2)));
@@ -111,12 +111,12 @@ public class OutputControllerTest {
         Assert.assertTrue((os1.toString(UTF_8).contains(line3)));
         Assert.assertFalse((os2.toString(UTF_8).contains(line3)));
 
-        LogConfig.getLogConfig().setEnableLogging(false);
+        LogConfig.getLogConfig().setDebugEnabled(false);
         oc.log(msg(OutputControllerLevel.WARN, line5));
         oc.flush();
         Assert.assertTrue((os1.toString(UTF_8).contains(line5)));
         Assert.assertTrue((os2.toString(UTF_8).contains(line5)));
-        LogConfig.getLogConfig().setEnableLogging(true);
+        LogConfig.getLogConfig().setDebugEnabled(true);
     }
 
     private MessageWithHeader msg(OutputControllerLevel level, String msg) {
@@ -164,7 +164,7 @@ public class OutputControllerTest {
     @Test
     @Ignore("hangs regularly on integration server")
     public void isParallelLoggingWorking() throws Exception {
-        LogConfig.getLogConfig().setEnableLogging(true);
+        LogConfig.getLogConfig().setDebugEnabled(true);
         LogConfig.getLogConfig().setLogToStreams(true);
         LogConfig.getLogConfig().setLogToSysLog(false);
         //this was tested with  1-100 iterations and 100 threads. But can cause OutOfMemoryError
@@ -235,7 +235,7 @@ public class OutputControllerTest {
 
     @Test
     public void isChangingOfStreamsWorking() throws Exception {
-        LogConfig.getLogConfig().setEnableLogging(true);
+        LogConfig.getLogConfig().setDebugEnabled(true);
         LogConfig.getLogConfig().setLogToFile(false);
         LogConfig.getLogConfig().setLogToStreams(true);
         LogConfig.getLogConfig().setLogToSysLog(false);
@@ -287,7 +287,7 @@ public class OutputControllerTest {
     public void isFileLoggerWorking() throws Exception {
         String s1;
         String s2;
-        LogConfig.getLogConfig().setEnableLogging(true);
+        LogConfig.getLogConfig().setDebugEnabled(true);
         LogConfig.getLogConfig().setLogToFile(false);
         LogConfig.getLogConfig().setLogToStreams(false);
         LogConfig.getLogConfig().setLogToSysLog(false);

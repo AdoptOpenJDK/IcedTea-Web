@@ -32,7 +32,7 @@ import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_CONSOLE_STA
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_CREATE_DESKTOP_SHORTCUT;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG;
-import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LOGGING;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_DEBUG_LOGGING;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS;
@@ -141,7 +141,7 @@ public class ListCommandTest extends AbstractCommandTest {
 
         // Logging related settings
         assertThat(getOutContent(), containsString(KEY_USER_LOG_DIR));
-        assertThat(getOutContent(), containsString(KEY_ENABLE_LOGGING));
+        assertThat(getOutContent(), containsString(KEY_ENABLE_DEBUG_LOGGING));
         assertThat(getOutContent(), containsString(KEY_ENABLE_LOGGING_HEADERS));
         assertThat(getOutContent(), containsString(KEY_ENABLE_LOGGING_TOFILE));
         assertThat(getOutContent(), containsString(KEY_ENABLE_LOGGING_TOSTREAMS));
