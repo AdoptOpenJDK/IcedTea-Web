@@ -531,11 +531,7 @@ public class JNLPFile {
                 .map(JREDesc::getJnlpResources)
                 .map(jnlpResources -> jnlpResources.filterResources(defaultLocale, defaultOS, defaultArch))
                 .map(JNLPResources::all)
-                .orElseThrow(() -> new IllegalStateException(
-                        String.format("Could not locate a suitable JRE description in the JNLP file for" +
-                                        " the underlying execution environment. The system properties detected" +
-                                        " are as follows: (locale: %s, OS: %s, OS arch: %s, Java version: %s)",
-                                defaultLocale, defaultOS, defaultArch, defaultJavaVersion)));
+                .orElse(emptyList());
     }
 
     /**
