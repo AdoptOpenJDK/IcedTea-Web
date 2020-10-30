@@ -1,6 +1,9 @@
 dist: trusty
 language: java
-jdk: oraclejdk8
+
+before_install:
+  - curl -s "https://get.sdkman.io" | bash
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 addons:
   apt:
@@ -8,8 +11,14 @@ addons:
       - xvfb
 
 install:
+  - sdk install java 8.0.265.hs-adpt
+  - sdk use java 8.0.265.hs-adpt
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+
+before_script:
+  - java -version
+  - echo $JAVA_HOME
 
 cache:
   directories:
