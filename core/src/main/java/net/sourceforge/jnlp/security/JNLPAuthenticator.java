@@ -33,10 +33,16 @@ statement from your version. */
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
+
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class JNLPAuthenticator extends Authenticator {
 
@@ -53,11 +59,71 @@ public class JNLPAuthenticator extends Authenticator {
         int port = getRequestingPort();
         String prompt = getRequestingPrompt();
 
+        final CacheKey key = new CacheKey(host, port, prompt, type);
+        final PasswordAuthentication cached = ShortTermCache.getCached(key);
+        if (cached != null) {
+            return cached;
+        }
+
         NamePassword response = SecurityDialogs.showAuthenticationPrompt(host, port, prompt, type);
         if (response == null) {
             return null;
         } else {
-            return new PasswordAuthentication(response.getName(), response.getPassword());
+            final PasswordAuthentication result = new PasswordAuthentication(response.getName(), response.getPassword());
+            ShortTermCache.putIntoCacheForFiveSeconds(key, result);
+            return result;
+        }
+    }
+
+    private static class ShortTermCache {
+
+        private static final Map<CacheKey, PasswordAuthentication> store = new HashMap<>();
+
+        static PasswordAuthentication getCached(final CacheKey key) {
+            return store.get(key);
+        }
+
+        static void putIntoCacheForFiveSeconds(final CacheKey key, final PasswordAuthentication value) {
+            store.put(key, value);
+
+            CachedDaemonThreadPoolProvider.getThreadPool().submit(() -> {
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (InterruptedException ignored) {
+                    // do nothing
+                }
+                store.remove(key);
+            });
+        }
+    }
+
+    private static final class CacheKey {
+        private final String host;
+        private final int port;
+        private final String prompt;
+        private final String type;
+
+        private CacheKey(final String host, final int port, final String prompt, final String type) {
+            this.host = host;
+            this.port = port;
+            this.prompt = prompt;
+            this.type = type;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CacheKey cacheKey = (CacheKey) o;
+            return port == cacheKey.port &&
+                    Objects.equals(host, cacheKey.host) &&
+                    Objects.equals(prompt, cacheKey.prompt) &&
+                    Objects.equals(type, cacheKey.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(host, port, prompt, type);
         }
     }
 
