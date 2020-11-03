@@ -2,7 +2,11 @@ dist: trusty
 language: java
 
 before_install:
+  # adding $HOME/.sdkman to cache creates an empty directory, which interferes with the initial installation
+  - "[[ -d /home/travis/.sdkman/ ]] && [[ -d /home/travis/.sdkman/bin/ ]] || rm -rf /home/travis/.sdkman/"
   - curl -s "https://get.sdkman.io" | bash
+  - echo sdkman_auto_answer=true > $HOME/.sdkman/etc/config
+  - echo sdkman_auto_selfupdate=true >> $HOME/.sdkman/etc/config
   - source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 addons:
