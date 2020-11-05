@@ -422,14 +422,13 @@ public class CacheUtil {
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the source is not cacheable
      */
-    public static boolean isCurrent(URL source, Version version, long lastModifed) {
+    public static boolean isCurrent(URL source, Version version, long lastModifed, CacheEntry entry, File cachedFile) {
 
         if (!isCacheable(source, version))
             throw new IllegalArgumentException(R("CNotCacheable", source));
 
         try {
-            CacheEntry entry = new CacheEntry(source, version); // could pool this
-            boolean result = entry.isCurrent(lastModifed);
+            boolean result = entry.isCurrent(lastModifed, cachedFile);
 
             OutputController.getLogger().log("isCurrent: " + source + " = " + result);
 
@@ -796,6 +795,8 @@ public class CacheUtil {
             }
             URL undownloaded[] = urlList.toArray(new URL[urlList.size()]);
 
+            final int maxUrls = Integer.parseInt(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_MAX_URLS_DOWNLOAD_INDICATOR));
+
             listener = indicator.getListener(app, title, undownloaded);
 
             do {
@@ -810,20 +811,30 @@ public class CacheUtil {
 
                 int percent = (int) ((100 * read) / Math.max(1, total));
 
+                int urlCounter = 0;
                 for (URL url : undownloaded) {
+                    if (urlCounter > maxUrls) {
+                        break;
+                    }
                     listener.progress(url, "version",
                                       tracker.getAmountRead(url),
                                       tracker.getTotalSize(url),
                                       percent);
+                    urlCounter += 1;
                 }
             } while (!tracker.waitForResources(resources, indicator.getUpdateRate()));
 
             // make sure they read 100% until indicator closes
+            int urlCounter = 0;
             for (URL url : undownloaded) {
+                if (urlCounter > maxUrls) {
+                    break;
+                }
                 listener.progress(url, "version",
                                   tracker.getTotalSize(url),
                                   tracker.getTotalSize(url),
                                   100);
+                urlCounter += 1;
             }
         } catch (InterruptedException ex) {
             OutputController.getLogger().log(ex);

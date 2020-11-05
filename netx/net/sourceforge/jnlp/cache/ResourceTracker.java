@@ -28,10 +28,7 @@ import static net.sourceforge.jnlp.cache.Resource.Status.PROCESSING;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.Version;
@@ -105,6 +102,7 @@ public class ResourceTracker {
 
     /** the resources known about by this resource tracker */
     private final List<Resource> resources = new ArrayList<>();
+    private final HashMap<String, Resource> resourcesMap = new HashMap<>();
 
     /** download listeners for this tracker */
     private final List<DownloadListener> listeners = new ArrayList<>();
@@ -155,6 +153,7 @@ public class ResourceTracker {
                 return;
             resource.addTracker(this);
             resources.add(resource);
+            resourcesMap.put(location.toString(), resource);
         }
 
         if (options == null) {
@@ -190,6 +189,7 @@ public class ResourceTracker {
 
             if (resource != null) {
                 resources.remove(resource);
+                resourcesMap.remove(location.toString());
                 resource.removeTracker(this);
             }
 
@@ -508,7 +508,7 @@ public class ResourceTracker {
      * @param resource  resource to be download
      */
     protected void startDownloadThread(Resource resource) {
-        CachedDaemonThreadPoolProvider.DAEMON_THREAD_POOL.execute(new ResourceDownloader(resource, lock));
+        CachedDaemonThreadPoolProvider.getThreadPool().execute(new ResourceDownloader(resource, lock));
     }
 
     static Resource selectByFilter(Collection<Resource> source, Filter<Resource> filter) {
@@ -569,6 +569,12 @@ public class ResourceTracker {
      */
     private Resource getResource(URL location) {
         synchronized (resources) {
+            if (null != location) {
+                Resource res = resourcesMap.get(location.toString());
+                if (null != res && UrlUtils.urlEquals(res.getLocation(), location)) {
+                    return res;
+                }
+            }
             for (Resource resource : resources) {
                 if (UrlUtils.urlEquals(resource.getLocation(), location))
                     return resource;

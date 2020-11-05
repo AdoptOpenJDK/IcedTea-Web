@@ -250,7 +250,10 @@ public final class DeploymentConfiguration {
     public static final String KEY_SMALL_SIZE_OVERRIDE_TRESHOLD = "deployment.small.size.treshold";
     public static final String KEY_SMALL_SIZE_OVERRIDE_WIDTH = "deployment.small.size.override.width";
     public static final String KEY_SMALL_SIZE_OVERRIDE_HEIGHT = "deployment.small.size.override.height";
-    
+    public static final String KEY_ENABLE_CACHE_FSYNC = "deployment.enable.cache.fsync";
+    public static final String KEY_BACKGROUND_THREADS_COUNT = "deployment.background.threads.count";
+    public static final String KEY_MAX_URLS_DOWNLOAD_INDICATOR = "deployment.max.urls.download.indicator";
+
     public static final String TRANSFER_TITLE = "Legacy configuration and cache found. Those will be now transported to new locations";
     
     private ConfigurationException loadingException = null;

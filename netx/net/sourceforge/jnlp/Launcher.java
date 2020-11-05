@@ -552,7 +552,7 @@ public class Launcher {
             }
 
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, "Starting application [" + mainName + "] ...");
-            
+
             Class<?> mainClass = app.getClassLoader().loadClass(mainName);
 
             Method main = mainClass.getMethod("main", new Class<?>[] { String[].class });
@@ -572,6 +572,7 @@ public class Launcher {
 
             main.setAccessible(true);
 
+            JNLPRuntime.addStartupTrackingEntry("invoking main()");
             OutputController.getLogger().log("Invoking main() with args: " + Arrays.toString(args));
             main.invoke(null, new Object[] { args });
 

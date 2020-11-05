@@ -709,7 +709,9 @@ public class JNLPClassLoader extends URLClassLoader {
             fillInPartJars(initialJars); // add in each initial part's lazy jars
         }
 
+        JNLPRuntime.addStartupTrackingEntry("JARs download enter");
         waitForJars(initialJars); //download the jars first.
+        JNLPRuntime.addStartupTrackingEntry("JARs download complete");
 
         //A ZipException will propagate later on if the jar is invalid and not checked here
         if (shouldFilterInvalidJars()) {

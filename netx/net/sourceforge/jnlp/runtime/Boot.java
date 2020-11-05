@@ -107,6 +107,10 @@ public final class Boot implements PrivilegedAction<Void> {
 
         optionParser = new OptionParser(argsIn, OptionsDefinitions.getJavaWsOptions());
 
+        if (optionParser.hasOption(OptionsDefinitions.OPTIONS.STARTUP_TRACKER)) {
+            JNLPRuntime.initStartupTracker();
+        }
+
         if (optionParser.hasOption(OptionsDefinitions.OPTIONS.VERBOSE)) {
             JNLPRuntime.setDebug(true);
         }
