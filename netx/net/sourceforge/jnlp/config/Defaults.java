@@ -466,6 +466,21 @@ public class Defaults {
                         BasicValueValidators.getRangedIntegerValidator(0, 1000),
                         String.valueOf(10)// treshold when applet is considered as too small
                 },
+                {
+                        DeploymentConfiguration.KEY_ENABLE_CACHE_FSYNC,
+                        BasicValueValidators.getBooleanValidator(),
+                        String.valueOf(false)
+                },
+                {
+                        DeploymentConfiguration.KEY_BACKGROUND_THREADS_COUNT,
+                        BasicValueValidators.getRangedIntegerValidator(1, 16),
+                        String.valueOf(3)
+                },
+                {
+                        DeploymentConfiguration.KEY_MAX_URLS_DOWNLOAD_INDICATOR,
+                        BasicValueValidators.getRangedIntegerValidator(1, 1024),
+                        String.valueOf(16)
+                },
                 //**************
                 //* Native (rust) only - beggin
                 //**************

@@ -153,7 +153,12 @@ public class ResourceDownloader implements Runnable {
             URLConnection connection = ConnectionFactory.getConnectionFactory().openConnection(location.URL); // this won't change so should be okay not-synchronized
             connection.addRequestProperty("Accept-Encoding", "pack200-gzip, gzip");
 
-            File localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+            File localFile = null;
+            if (resource.getRequestVersion() == resource.getDownloadVersion()) {
+                localFile = entry.getLocalFile();
+            } else {
+                localFile = CacheUtil.getCacheFile(resource.getLocation(), resource.getDownloadVersion());
+            }
             Long size = location.length;
             if (size == null) {
                 size = connection.getContentLengthLong();
@@ -162,7 +167,7 @@ public class ResourceDownloader implements Runnable {
             if (lm == null) {
                 lm = connection.getLastModified();
             }
-            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
+            boolean current = CacheUtil.isCurrent(resource.getLocation(), resource.getRequestVersion(), lm, entry, localFile) && resource.getUpdatePolicy() != UpdatePolicy.FORCE;
             if (!current) {
                 if (entry.isCached()) {
                     entry.markForDelete();

@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.lockingfile.LockedFile;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
@@ -168,7 +170,9 @@ public class PropertiesFile extends Properties {
                 store(s, header);
 
                 // fsync()
-                s.getChannel().force(true);
+                if (Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(DeploymentConfiguration.KEY_ENABLE_CACHE_FSYNC))) {
+                    s.getChannel().force(true);
+                }
                 lastStore = file.lastModified();
             } finally {
                 if (s != null) s.close();

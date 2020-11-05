@@ -39,15 +39,18 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
 
 import net.sourceforge.jnlp.JARDesc;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.cache.CachedDaemonThreadPoolProvider;
 import net.sourceforge.jnlp.cache.ResourceTracker;
 import net.sourceforge.jnlp.runtime.JNLPClassLoader.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
@@ -226,42 +229,66 @@ public class JarCertVerifier implements CertVerifier {
     private void verifyJars(List<JARDesc> jars, ResourceTracker tracker)
             throws Exception {
 
+        List<String> filesToVerify = new ArrayList<>();
         for (JARDesc jar : jars) {
+            File jarFile = tracker.getCacheFile(jar.getLocation());
 
-            try {
+            // some sort of resource download/cache error. Nothing to add
+            // in that case ... but don't fail here
+            if (jarFile == null) {
+                continue;
+            }
 
-                File jarFile = tracker.getCacheFile(jar.getLocation());
+            String localFile = jarFile.getAbsolutePath();
+            if (verifiedJars.contains(localFile)
+                    || unverifiedJars.contains(localFile)) {
+                continue;
+            }
 
-                // some sort of resource download/cache error. Nothing to add
-                // in that case ... but don't fail here
-                if (jarFile == null) {
-                    continue;
-                }
+            filesToVerify.add(localFile);
+        }
 
-                String localFile = jarFile.getAbsolutePath();
-                if (verifiedJars.contains(localFile)
-                        || unverifiedJars.contains(localFile)) {
-                    continue;
-                }
+        List<VerifiedJarFile> verified = verifyJarsParallel(filesToVerify);
 
-                VerifyResult result = verifyJar(localFile);
-
-                if (result == VerifyResult.UNSIGNED) {
-                    unverifiedJars.add(localFile);
-                } else if (result == VerifyResult.SIGNED_NOT_OK) {
-                    verifiedJars.add(localFile);
-                } else if (result == VerifyResult.SIGNED_OK) {
-                    verifiedJars.add(localFile);
-                }
-            } catch (Exception e) {
-                // We may catch exceptions from using verifyJar()
-                // or from checkTrustedCerts
-                throw e;
+        for (VerifiedJarFile vjf : verified) {
+            VerifyResult result = verifyJarEntryCerts(vjf.file, vjf.hasManifest, vjf.entriesVec);
+            String localFile = vjf.file;
+            if (result == VerifyResult.UNSIGNED) {
+                unverifiedJars.add(localFile);
+            } else if (result == VerifyResult.SIGNED_NOT_OK) {
+                verifiedJars.add(localFile);
+            } else if (result == VerifyResult.SIGNED_OK) {
+                verifiedJars.add(localFile);
             }
         }
 
         for (CertPath certPath : certs.keySet())
             checkTrustedCerts(certPath);
+    }
+
+    private List<VerifiedJarFile> verifyJarsParallel(List<String> files) throws Exception {
+        JNLPRuntime.addStartupTrackingEntry("JARs verification enter");
+        List<Callable<VerifiedJarFile>> callables = new ArrayList<>(files.size());
+        for (final String fi : files) {
+            callables.add(new Callable<VerifiedJarFile>() {
+                @Override
+                public VerifiedJarFile call() throws Exception {
+                    return verifyJar(fi);
+                }
+            });
+        }
+        List<Future<VerifiedJarFile>> futures = CachedDaemonThreadPoolProvider.getThreadPool().invokeAll(callables);
+        List<VerifiedJarFile> results = new ArrayList<>(files.size());
+        try {
+            for (Future<VerifiedJarFile> fu : futures) {
+                results.add(fu.get());
+            }
+        } catch (Exception e) {
+            OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
+            throw e;
+        }
+        JNLPRuntime.addStartupTrackingEntry("JARs verification complete");
+        return results;
     }
 
     /**
@@ -273,15 +300,15 @@ public class JarCertVerifier implements CertVerifier {
      * @throws Exception
      *             Will be thrown if there are any problems with the jar.
      */
-    private VerifyResult verifyJar(String jarName) throws Exception {
+    private VerifiedJarFile verifyJar(String jarName) throws Exception {
         try (JarFile jarFile = new JarFile(jarName, true)) {
-            Vector<JarEntry> entriesVec = new Vector<JarEntry>();
+            List<JarEntry> entriesVec = new ArrayList<>();
             byte[] buffer = new byte[8192];
 
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry je = entries.nextElement();
-                entriesVec.addElement(je);
+                entriesVec.add(je);
 
                 InputStream is = jarFile.getInputStream(je);
                 try {
@@ -295,8 +322,7 @@ public class JarCertVerifier implements CertVerifier {
                     }
                 }
             }
-            return verifyJarEntryCerts(jarName, jarFile.getManifest() != null,
-                    entriesVec);
+            return new VerifiedJarFile(jarName, null != jarFile.getManifest(), entriesVec);
 
         } catch (Exception e) {
             OutputController.getLogger().log(OutputController.Level.ERROR_ALL, e);
@@ -318,7 +344,7 @@ public class JarCertVerifier implements CertVerifier {
      *             Will be thrown if there are issues with entries.
      */
     VerifyResult verifyJarEntryCerts(String jarName, boolean jarHasManifest,
-            Vector<JarEntry> entries) throws Exception {
+            List<JarEntry> entries) throws Exception {
         // Contains number of entries the cert with this CertPath has signed.
         Map<CertPath, Integer> jarSignCount = new HashMap<>();
         int numSignableEntriesInJar = 0;
@@ -628,5 +654,17 @@ public class JarCertVerifier implements CertVerifier {
             sum += value;
         }
         return sum;
+    }
+
+    private static class VerifiedJarFile {
+        final String file;
+        final boolean hasManifest;
+        private final List<JarEntry> entriesVec;
+
+        private VerifiedJarFile(String file, boolean hasManifest, List<JarEntry> entriesVec) {
+            this.file = file;
+            this.hasManifest = hasManifest;
+            this.entriesVec = entriesVec;
+        }
     }
 }
