@@ -384,6 +384,9 @@ public final class DeploymentConfiguration {
      * @return the location of system-level deployment.config file, or null if none can be found
      */
     private URL findSystemConfigFile() throws MalformedURLException {
+        if (PathsAndFiles.ITW_SYSTEM_DEPLOYMENT_CFG.getFile().isFile()) {
+            return PathsAndFiles.ITW_SYSTEM_DEPLOYMENT_CFG.getUrl();
+        }
         if (PathsAndFiles.ETC_DEPLOYMENT_CFG.getFile().isFile()) {
             return PathsAndFiles.ETC_DEPLOYMENT_CFG.getUrl();
         }
