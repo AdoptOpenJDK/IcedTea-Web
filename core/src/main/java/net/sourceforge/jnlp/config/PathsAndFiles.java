@@ -1,4 +1,4 @@
-/* 
+/*
    Copyright (C) 2008 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -63,16 +63,16 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor OPERA_64 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib64/opera/plugins/", "",  "FILEopera64", Target.PLUGIN);
 
     public static final InfrastructureFileDescriptor OPERA_32 = new InfrastructureFileDescriptor(ConfigurationConstants.ICEDTEA_SO, "/usr/lib/opera/plugins/", "",  "FILEopera32", Target.PLUGIN);
-    
+
     public static final InfrastructureFileDescriptor CACHE_DIR = new ItwCacheFileDescriptor("cache", "FILEcache", Target.JAVAWS, Target.ITWEB_SETTINGS) {
-    
+
         @Override
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_USER_CACHE_DIR;
         }
 
     };
-    
+
 
     // this one is depending on CACHE_DIR, so initialize it lazily
     public static InfrastructureFileDescriptor getRecentlyUsedFile() {
@@ -86,10 +86,10 @@ public class PathsAndFiles {
             public String getFullPath() {
                 return clean(CACHE_DIR.getFullPath()+File.separator+this.getFileName());
             }
-          
+
         };
     }
-    
+
     public static final InfrastructureFileDescriptor PCACHE_DIR = new ItwCacheFileDescriptor("pcache", "FILEappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
 
         @Override
@@ -103,8 +103,8 @@ public class PathsAndFiles {
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_USER_LOG_DIR;
         }
-    
-        
+
+
     };
     //javaws is saving here, itweb-settings may modify them
     public static final InfrastructureFileDescriptor ICONS_DIR = new ItwConfigFileDescriptor("icons", "FILEicons", Target.JAVAWS, Target.ITWEB_SETTINGS);
@@ -113,14 +113,15 @@ public class PathsAndFiles {
     public static final InfrastructureFileDescriptor MENUS_DIR = new MenuFileDescriptor(Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_USER = new ItwConfigFileDescriptor(ConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasuser", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor APPLET_TRUST_SETTINGS_SYS = new SystemDeploymentConfigFileDescriptor(ConfigurationConstants.APPLET_TRUST_SETTINGS, "FILEextasadmin", Target.JAVAWS, Target.ITWEB_SETTINGS);
+    public static final InfrastructureFileDescriptor ITW_SYSTEM_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor ETC_DEPLOYMENT_CFG = new SystemDeploymentConfigFileDescriptor(ConfigurationConstants.DEPLOYMENT_CONFIG_FILE, "FILEglobaldp", Target.JAVAWS, Target.ITWEB_SETTINGS);
     public static final InfrastructureFileDescriptor TMP_DIR = new ItwCacheFileDescriptor("tmp", "FILEtmpappdata", Target.JAVAWS, Target.ITWEB_SETTINGS){
-        
+
         @Override
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_USER_TMP_DIR;
         }
-        
+
     };
     public static final InfrastructureFileDescriptor LOCKS_DIR = new TmpUsrFileDescriptor("locks", "netx", "FILElocksdir") {
 
@@ -128,7 +129,7 @@ public class PathsAndFiles {
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_USER_LOCKS_DIR;
         }
-        
+
     };
     public static final InfrastructureFileDescriptor MAIN_LOCK = new TmpUsrFileDescriptor("netx_running", "netx" + File.separator + "locks", "FILEmainlock") {
 
@@ -136,7 +137,7 @@ public class PathsAndFiles {
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_USER_NETX_RUNNING_FILE;
         }
-        
+
     };
     public static final InfrastructureFileDescriptor JAVA_POLICY = new UserSecurityConfigFileDescriptor("java.policy", "FILEpolicy", Target.JAVAWS, Target.POLICY_EDITOR){
 
@@ -186,15 +187,15 @@ public class PathsAndFiles {
 
     };
     public static final InfrastructureFileDescriptor SYS_CACERT = new SystemJavaSecurityFileDescriptor("cacerts") {
-        
+
         @Override
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_SYSTEM_TRUSTED_CA_CERTS;
         }
-        
+
     };
     public static final InfrastructureFileDescriptor SYS_JSSECAC = new SystemJavaSecurityFileDescriptor("jssecacerts") {
-      
+
         @Override
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CA_CERTS;
@@ -213,7 +214,7 @@ public class PathsAndFiles {
         public String getPropertiesKey() {
             return ConfigurationConstants.KEY_SYSTEM_TRUSTED_JSSE_CERTS;
         }
-        
+
     };
     public static final InfrastructureFileDescriptor SYS_CLIENTCERT = new SystemJavaSecurityFileDescriptor("trusted.clientcerts") {
 
@@ -229,7 +230,7 @@ public class PathsAndFiles {
         public String getDescription() {
              return Translator.R(getDescriptionKey(), ConfigurationConstants.KEY_JRE_DIR);
         }
-        
+
     };
     public static final InfrastructureFileDescriptor USER_DEPLOYMENT_FILE = new ItwConfigFileDescriptor(ConfigurationConstants.DEPLOYMENT_PROPERTIES, "FILEuserdp", Target.JAVAWS, Target.ITWEB_SETTINGS);
 
@@ -360,7 +361,7 @@ public class PathsAndFiles {
         }
 
     }
-    
+
     private static class DataFileDescriptor extends InfrastructureFileDescriptor {
 
         private DataFileDescriptor(String fileName, Target... target) {

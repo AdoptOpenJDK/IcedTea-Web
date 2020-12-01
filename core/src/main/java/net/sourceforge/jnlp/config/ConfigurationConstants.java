@@ -5,6 +5,7 @@ import java.nio.channels.FileLock;
 public interface ConfigurationConstants {
 
     String DEPLOYMENT_CONFIG_FILE = "deployment.config";
+    String ITW_DEPLOYMENT_CONFIG_FILE = "itw-deployment.config";
 
     String DEPLOYMENT_PROPERTIES = "deployment.properties";
 
