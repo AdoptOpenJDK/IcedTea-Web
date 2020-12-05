@@ -31,12 +31,11 @@ public class LazyLoaded<T> implements Supplier<T> {
     private volatile T instance;
 
     /**
-     * @param supplier
-     *      supplier to load the value lazy upon first request.
-     *      Must not be {@code null} and should not return {@code null}.
+     * @param supplier supplier to load the value lazy upon first request.
+     *                 Must not be {@code null} and should not return {@code null}.
      */
     public LazyLoaded(final Supplier<T> supplier) {
-        this.supplier =  Objects.requireNonNull(supplier, "Null \"supplier\" argument passed to LazyLoaded constructor");
+        this.supplier = Objects.requireNonNull(supplier, "Null \"supplier\" argument passed to LazyLoaded constructor");
     }
 
     /**

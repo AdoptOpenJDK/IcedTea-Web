@@ -566,7 +566,7 @@ public class JNLPRuntime {
      * should be printed.
      */
     public static boolean isDebug() {
-        return isSetDebug() ||  isPluginDebug() || LogConfig.getLogConfig().isEnableLogging();
+        return isSetDebug() ||  isPluginDebug() || LogConfig.getLogConfig().isDebugEnable();
     }
 
      public static boolean isSetDebug() {

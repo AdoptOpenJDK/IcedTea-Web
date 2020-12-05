@@ -37,7 +37,6 @@ package net.adoptopenjdk.icedteaweb.ui.swing.dialogresults;
  * Note - this interface do not force return type, otherwise we will end with Object again.
  * It is just pointing out, that what is returned, is DialogResult, so it can be traced via code.
  * Also it gathers some most used methods  on various implementations. Feel free to enlarge the list!
- * 
  */
 public interface DialogResult {
 
@@ -50,6 +49,7 @@ public interface DialogResult {
 
     /**
      * Simplified decision model whether dialog was approved or not.
+     *
      * @return true only and only if dialog was approved
      */
     boolean toBoolean();

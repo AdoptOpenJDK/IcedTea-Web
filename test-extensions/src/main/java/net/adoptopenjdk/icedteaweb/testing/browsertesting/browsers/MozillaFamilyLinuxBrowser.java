@@ -36,13 +36,13 @@ package net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers;
 
 import java.util.List;
 
-public  abstract class MozillaFamilyLinuxBrowser  extends LinuxBrowser{
+public abstract class MozillaFamilyLinuxBrowser extends LinuxBrowser {
 
     public MozillaFamilyLinuxBrowser(final String bin) {
         super(bin);
-        fsdir="mozilla";
+        fsdir = "mozilla";
     }
- 
+
 
     @Override
     public List<String> getCompatibilitySwitches() {
@@ -51,7 +51,7 @@ public  abstract class MozillaFamilyLinuxBrowser  extends LinuxBrowser{
 
     @Override
     public String getUserDefaultPluginExpectedLocation() {
-        return   System.getProperty("user.home")+"/.mozilla/plugins";
+        return System.getProperty("user.home") + "/.mozilla/plugins";
     }
 
 

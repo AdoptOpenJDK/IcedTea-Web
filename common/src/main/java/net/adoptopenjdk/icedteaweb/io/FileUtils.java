@@ -72,15 +72,25 @@ public final class FileUtils {
      * along with a general failure case
      */
     public enum OpenFileResult {
-        /** The file was successfully opened */
+        /**
+         * The file was successfully opened
+         */
         SUCCESS,
-        /** The file could not be opened, for non-specified reasons */
+        /**
+         * The file could not be opened, for non-specified reasons
+         */
         FAILURE,
-        /** The file could not be opened because it did not exist and could not be created */
+        /**
+         * The file could not be opened because it did not exist and could not be created
+         */
         CANT_CREATE,
-        /** The file can be opened but in read-only */
+        /**
+         * The file can be opened but in read-only
+         */
         CANT_WRITE,
-        /** The specified path pointed to a non-file filesystem object, ie a directory */
+        /**
+         * The specified path pointed to a non-file filesystem object, ie a directory
+         */
         NOT_FILE;
     }
 
@@ -176,9 +186,10 @@ public final class FileUtils {
      * Tries to create the ancestor directories of file f. Throws
      * an IOException if it can't be created (but not if it was
      * already there).
-     * @param f file to provide parent directory
+     *
+     * @param f    file to provide parent directory
      * @param eMsg - the message to use for the exception. null
-     * if the file name is to be used.
+     *             if the file name is to be used.
      * @throws IOException if the directory can't be created and doesn't exist.
      */
     public static void createParentDir(File f, String eMsg) throws IOException {
@@ -199,6 +210,7 @@ public final class FileUtils {
      * Tries to create the ancestor directories of file f. Throws
      * an IOException if it can't be created (but not if it was
      * already there).
+     *
      * @param f file which parent will be created
      * @throws IOException if the directory can't be created and doesn't exist.
      */
@@ -210,9 +222,10 @@ public final class FileUtils {
      * Tries to delete file f. If the file exists but couldn't be deleted,
      * print an error message to stderr with the file name, or eMsg if eMsg
      * is not null.
-     * @param f the file to be deleted
+     *
+     * @param f    the file to be deleted
      * @param eMsg the message to print on failure (or null to print the
-     * the file name).
+     *             the file name).
      */
     public static void deleteWithErrMesg(File f, String eMsg) {
         if (f.exists()) {
@@ -225,6 +238,7 @@ public final class FileUtils {
     /**
      * Tries to delete file f. If the file exists but couldn't be deleted,
      * print an error message to stderr with the file name.
+     *
      * @param f the file to be deleted
      */
     public static void deleteWithErrMesg(File f) {
@@ -330,8 +344,7 @@ public final class FileUtils {
             if (!tempFile.renameTo(file)) {
                 throw new IOException("Cannot rename " + tempFile + " to " + file);
             }
-        }
-        finally {
+        } finally {
             if (tempFile.exists()) {
                 FileUtils.deleteWithErrMesg(tempFile, "Could not delete [" + tempFile + "]");
             }
@@ -341,7 +354,8 @@ public final class FileUtils {
     /**
      * Ensure that the parent directory of the file exists and that we are
      * able to create and access files within this directory
-     * @param file the {@link File} representing a Java Policy file to test
+     *
+     * @param file    the {@link File} representing a Java Policy file to test
      * @param isDebug output debug information
      * @return a {@link DirectoryCheckResults} object representing the results of the test
      */
@@ -366,7 +380,8 @@ public final class FileUtils {
 
     /**
      * Verify that a given file object points to a real, accessible plain file.
-     * @param file the {@link File} to verify
+     *
+     * @param file    the {@link File} to verify
      * @param isDebug output debug information
      * @return an {@link OpenFileResult} representing the accessibility level of the file
      */
@@ -381,8 +396,9 @@ public final class FileUtils {
         }
         final DirectoryCheckResults dcr = FileUtils.testDirectoryPermissions(file, isDebug);
         if (dcr != null && dcr.getFailures() == 0) {
-            if (file.isDirectory())
+            if (file.isDirectory()) {
                 return OpenFileResult.NOT_FILE;
+            }
             try {
                 if (!file.exists() && !file.createNewFile()) {
                     return OpenFileResult.CANT_CREATE;
@@ -391,12 +407,13 @@ public final class FileUtils {
                 return OpenFileResult.CANT_CREATE;
             }
             final boolean read = file.canRead(), write = file.canWrite();
-            if (read && write)
+            if (read && write) {
                 return OpenFileResult.SUCCESS;
-            else if (read)
+            } else if (read) {
                 return OpenFileResult.CANT_WRITE;
-            else
+            } else {
                 return OpenFileResult.FAILURE;
+            }
         }
         return OpenFileResult.FAILURE;
     }
@@ -418,9 +435,9 @@ public final class FileUtils {
      * paths to users. If the path is longer than visibleChars, it is truncated
      * in a display-friendly way
      *
-     * @param path a path that should be shorted
+     * @param path         a path that should be shorted
      * @param visibleChars the maximum number of characters that path should fit
-     *        into. Also the length of the returned string
+     *                     into. Also the length of the returned string
      * @return a shortened path that contains limited number of chars
      */
     public static String displayablePath(String path, int visibleChars) {
@@ -459,10 +476,10 @@ public final class FileUtils {
      * directories
      *
      * @param file the file object representing what to delete. Can be either a
-     *        file or a directory.
+     *             file or a directory.
      * @param base the directory under which the file and its subdirectories must be located
      * @throws IOException on an io exception or if trying to delete something
-     *         outside the base
+     *                     outside the base
      */
     public static void recursiveDelete(File file, File base) throws IOException {
         LOG.debug("Deleting: {}", file);
@@ -494,10 +511,10 @@ public final class FileUtils {
     /**
      * This will return a lock to the file specified.
      *
-     * @param path File path to file we want to lock.
-     * @param shared Specify if the lock will be a shared lock.
+     * @param path       File path to file we want to lock.
+     * @param shared     Specify if the lock will be a shared lock.
      * @param allowBlock Specify if we should block when we can not get the
-     *            lock. Getting a shared lock will always block.
+     *                   lock. Getting a shared lock will always block.
      * @return FileLock if we were successful in getting a lock, otherwise null.
      * @throws FileNotFoundException If the file does not exist.
      */

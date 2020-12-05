@@ -41,11 +41,10 @@ import java.io.File;
 /**
  * When all represent all configured browser, one represents one random
  * (the first found) configured browser. Each other represents individual browsers
- * 
  */
 public enum Browsers {
 
-   none, all, one, opera, googleChrome, chromiumBrowser, firefox, midori,epiphany;
+    none, all, one, opera, googleChrome, chromiumBrowser, firefox, midori, epiphany;
 
     private static final String CHROMIUM;
 
@@ -80,16 +79,19 @@ public enum Browsers {
     }
 
     @Override
-     public String toString() {
-        if (toExec()!=null) return  toExec();
+    public String toString() {
+        if (toExec() != null) {
+            return toExec();
+        }
         switch (this) {
             case all:
                 return "all";
             case one:
                 return "one";
-             case none:
+            case none:
                 return "unset_browser";
-           default:  return "unknown";
+            default:
+                return "unknown";
 
         }
     }

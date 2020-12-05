@@ -148,12 +148,12 @@ public class BrowserTestRunner extends BlockJUnit4ClassRunner {
                          final RunNotifier notifier, final boolean ignore) {
         final EachTestNotifier eachNotifier = new EachTestNotifier(notifier, description);
         eachNotifier.fireTestStarted();
-          if (ignore) {
-                eachNotifier.fireTestIgnored();
-                return;
-            }
+        if (ignore) {
+            eachNotifier.fireTestIgnored();
+            return;
+        }
         try {
-          statement.evaluate();
+            statement.evaluate();
         } catch (final AssumptionViolatedException e) {
             eachNotifier.addFailedAssumption(e);
         } catch (final Throwable e) {

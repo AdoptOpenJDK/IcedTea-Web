@@ -117,10 +117,11 @@ public class SupportedLanguagesTest {
 
     /**
      * Retrieve a localized message from resource file
+     *
      * @param locale the localization of Messages.properties to search
      * @param key
      * @return the message corresponding to the given key from the specified localization
-     *
+     * <p>
      * can throw wrapped IOException if the specified Messages localization is unavailable
      */
     private String getMessage(final Locale locale, final String key) {

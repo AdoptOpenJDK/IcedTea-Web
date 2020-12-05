@@ -54,9 +54,10 @@ public class CodeSignerCreator {
 
     /**
      * Create an X509 Certificate signed using SHA1withRSA with a 2048 bit key.
-     * @param dname Domain Name to represent the certificate
+     *
+     * @param dname     Domain Name to represent the certificate
      * @param notBefore The date by which the certificate starts being valid. Cannot be null.
-     * @param validity The number of days the certificate is valid after notBefore.
+     * @param validity  The number of days the certificate is valid after notBefore.
      * @return An X509 certificate setup with properties using the specified parameters.
      * @throws Exception
      */
@@ -66,12 +67,15 @@ public class CodeSignerCreator {
         final String keyAlgName = "RSA";
         final String sigAlgName = "SHA1withRSA";
 
-        if (dname == null)
+        if (dname == null) {
             throw new Exception("Required DN is null. Please specify cert Domain Name via dname");
-        if (notBefore == null)
+        }
+        if (notBefore == null) {
             throw new Exception("Required start date is null. Please specify the date at which the cert is valid via notBefore");
-        if (validity < 0)
+        }
+        if (validity < 0) {
             throw new Exception("Required validity is negative. Please specify the number of days for which the cert is valid after the start date.");
+        }
 
         // KeyTool#doGenKeyPair
         final X500Name x500Name = new X500Name(dname);
@@ -87,14 +91,14 @@ public class CodeSignerCreator {
         final X509CertInfo certInfo = (X509CertInfo) certImpl.get(X509CertImpl.NAME
                 + "." + X509CertImpl.INFO);
 
-        final Date notAfter = new Date(notBefore.getTime() + validity*1000L*24L*60L*60L);
+        final Date notAfter = new Date(notBefore.getTime() + validity * 1000L * 24L * 60L * 60L);
 
         final CertificateValidity interval = new CertificateValidity(notBefore,
                 notAfter);
 
         certInfo.set(X509CertInfo.VALIDITY, interval);
         certInfo.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(
-                    new java.util.Random().nextInt() & 0x7fffffff));
+                new java.util.Random().nextInt() & 0x7fffffff));
         certInfo.set(X509CertInfo.SUBJECT + "." + CertificateSubjectName.DN_NAME, x500Name);
         certInfo.set(X509CertInfo.ISSUER + "." + CertificateIssuerName.DN_NAME, x500Name);
 
@@ -104,7 +108,7 @@ public class CodeSignerCreator {
         // outer sigalg and use it to set the inner sigalg
         final X509CertImpl newCert = new X509CertImpl(certInfo);
         newCert.sign(privKey, sigAlgName);
-        final AlgorithmId sigAlgid = (AlgorithmId)newCert.get(X509CertImpl.SIG_ALG);
+        final AlgorithmId sigAlgid = (AlgorithmId) newCert.get(X509CertImpl.SIG_ALG);
         certInfo.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, sigAlgid);
 
         certInfo.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
@@ -126,9 +130,10 @@ public class CodeSignerCreator {
 
     /**
      * Create a new code signer with the specified information.
+     *
      * @param domainName Domain Name to represent the certificate
-     * @param notBefore The date by which the certificate starts being valid. Cannot be null.
-     * @param validity The number of days the certificate is valid after notBefore.
+     * @param notBefore  The date by which the certificate starts being valid. Cannot be null.
+     * @param validity   The number of days the certificate is valid after notBefore.
      * @return A code signer with the properties passed through its parameters.
      */
     public static CodeSigner getOneCodeSigner(final String domainName, final Date notBefore, final int validity)
@@ -197,9 +202,9 @@ public class CodeSignerCreator {
         private String getCertAndKeyGenClass() {
             final String javaVersion = JavaSystemProperties.getJavaVersion();
             if (javaVersion.startsWith("1.7")) {
-                return  "sun.security.x509.CertAndKeyGen";
+                return "sun.security.x509.CertAndKeyGen";
             } else if (javaVersion.startsWith("1.8") || javaVersion.startsWith("1.9")) {
-                return  "sun.security.tools.keytool.CertAndKeyGen";
+                return "sun.security.tools.keytool.CertAndKeyGen";
             } else {
                 throw new AssertionError("Unrecognized Java Version");
             }

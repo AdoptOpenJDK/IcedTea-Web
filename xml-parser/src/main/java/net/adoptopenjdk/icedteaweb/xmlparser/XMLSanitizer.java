@@ -24,8 +24,8 @@ class XMLSanitizer {
      * Reads an xml file and removes the comments, leaving only relevant
      * xml code.
      *
-     * @param in  The reader of the containing the xml.
-     * @return  A new reader for the sanitized xml
+     * @param in The reader of the containing the xml.
+     * @return A new reader for the sanitized xml
      */
     static String sanitizeXml(final Reader in) {
         try {

@@ -120,10 +120,10 @@ public class ServerLauncher implements Runnable {
 
     private String sanitizeResource(final String resource) {
         if (resource == null) {
-            return  "";
+            return "";
         }
         if (resource.trim().length() > 0 && !resource.startsWith("/")) {
-            return  "/" + resource;
+            return "/" + resource;
         }
         return resource;
     }

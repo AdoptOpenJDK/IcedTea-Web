@@ -37,10 +37,10 @@ public class XmlNodeImpl implements XmlNode, Comparable<XmlNode> {
         final Map<Element, XmlNodeImpl> mappedChildren = new HashMap<>();
         for (int i = childrenElements.size() - 1; i >= 0; i--) {
             final Element element = childrenElements.get(i);
-            if(i != childrenElements.size() - 1) {
-                final Element nextElement = childrenElements.get(i+1);
+            if (i != childrenElements.size() - 1) {
+                final Element nextElement = childrenElements.get(i + 1);
                 final XmlNodeImpl nextChildNode = mappedChildren.get(nextElement);
-                if(nextChildNode == null) {
+                if (nextChildNode == null) {
                     throw new RuntimeException("Error in XML parsing!");
                 }
                 mappedChildren.put(element, new XmlNodeImpl(element, nextChildNode));
@@ -67,7 +67,7 @@ public class XmlNodeImpl implements XmlNode, Comparable<XmlNode> {
 
     @Override
     public String getNodeValue() {
-        if(children.size() == 0) {
+        if (children.size() == 0) {
             return internalElement.getTextContent();
         } else {
             return "";

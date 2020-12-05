@@ -63,7 +63,9 @@ public final class SwingUtils {
     // internals:
     private static boolean DO_SETUP = true;
 
-    /** main thread group (initialized at startup) */
+    /**
+     * main thread group (initialized at startup)
+     */
     private static final ThreadGroup MAIN_GROUP = Thread.currentThread().getThreadGroup();
 
     /* shared Window owner */

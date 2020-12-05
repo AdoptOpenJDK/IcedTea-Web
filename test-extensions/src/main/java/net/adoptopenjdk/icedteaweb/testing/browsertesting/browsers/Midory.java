@@ -47,6 +47,5 @@ public class Midory extends MozillaFamilyLinuxBrowser {
         return Browsers.midori;
     }
 
-     
-    
+
 }

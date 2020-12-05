@@ -13,9 +13,10 @@ public class Assert {
 
     /**
      * Checks that the specified {@code value} is null and throws {@link java.lang.NullPointerException} with a customized error message if it is.
-     * @param value the value to be checked.
+     *
+     * @param value        the value to be checked.
      * @param argumentName the name of the argument to be used in the error message.
-     * @param <T> type of the value
+     * @param <T>          type of the value
      * @return the {@code value}.
      */
     public static <T> T requireNonNull(final T value, final String argumentName) {

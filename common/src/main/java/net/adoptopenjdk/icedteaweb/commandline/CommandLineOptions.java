@@ -6,7 +6,7 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 public enum CommandLineOptions {
     //javaws undocumented switches
-    TRUSTALL("-Xtrustall","BOTrustall"),
+    TRUSTALL("-Xtrustall", "BOTrustall"),
     //javaws control-options
     ABOUT("-about", "BOAbout"),
     VIEWER("-viewer", "BOViewer"),
@@ -31,10 +31,10 @@ public enum CommandLineOptions {
     NOFORK("-Xnofork", "BXnofork"),
     NOHEADERS("-Xignoreheaders", "BXignoreheaders"),
     OFFLINE("-Xoffline", "BXoffline"),
-    TRUSTNONE("-Xtrustnone","BOTrustnone"),
-    JNLP("-jnlp","BOJnlp", NumberOfArguments.ONE),
+    TRUSTNONE("-Xtrustnone", "BOTrustnone"),
+    JNLP("-jnlp", "BOJnlp", NumberOfArguments.ONE),
     BROWSER("-browser", "BrowserArg", NumberOfArguments.ONE_OR_MORE),
-    NOSPLASH("-Xnosplash","BXNoSplash"),
+    NOSPLASH("-Xnosplash", "BXNoSplash"),
     //itweb settings
     LIST("-list", "IBOList"),
     GET("-get", "name", "IBOGet", NumberOfArguments.ONE_OR_MORE),

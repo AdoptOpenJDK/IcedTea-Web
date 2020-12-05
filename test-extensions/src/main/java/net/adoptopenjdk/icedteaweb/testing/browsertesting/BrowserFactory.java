@@ -117,7 +117,7 @@ public class BrowserFactory {
     }
 
     private Browser getRandom() {
-        if (configuredBrowsers.isEmpty()){
+        if (configuredBrowsers.isEmpty()) {
             return null;
         }
         return configuredBrowsers.get(oneGenerator.nextInt(configuredBrowsers.size()));
@@ -132,26 +132,26 @@ public class BrowserFactory {
     }
 
     public List<Browsers> getBrowsers(final Browsers[] testIn) {
-         final List<Browser> q = translateAnnotationSilently(testIn);
-         if (q==null || q.isEmpty()){
-             final List<Browsers> qq = new ArrayList<>(0);
-               qq.add(Browsers.none);
-               return qq;
-            }
-         final List<Browsers> qq = new ArrayList<>(q.size());
-         for (final Browser browser : q) {
-             qq.add(browser.getID());
-         }
-         return qq;
+        final List<Browser> q = translateAnnotationSilently(testIn);
+        if (q == null || q.isEmpty()) {
+            final List<Browsers> qq = new ArrayList<>(0);
+            qq.add(Browsers.none);
+            return qq;
+        }
+        final List<Browsers> qq = new ArrayList<>(q.size());
+        for (final Browser browser : q) {
+            qq.add(browser.getID());
+        }
+        return qq;
 
-     }
+    }
+
     /**
-     *
      * @param testIn Bbrowsers which should be transformed to list of Browser
      * @return all matching browser, if browser do not exists, this is ignored and run is silently continued
      */
     private List<Browser> translateAnnotationSilently(final Browsers[] testIn) {
-        if (testIn==null) {
+        if (testIn == null) {
             return null;
         }
         final List<Browser> r = new ArrayList<>(configuredBrowsers.size());

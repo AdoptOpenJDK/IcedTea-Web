@@ -102,7 +102,7 @@ public class IOUtils {
         outputStream.flush();
     }
 
-     /**
+    /**
      * Reads the content of an input stream into a byte array.
      *
      * @param inputStream the stream to read from
@@ -132,7 +132,7 @@ public class IOUtils {
      * Reads the content of an input stream into a string.
      *
      * @param inputStream the stream to read from
-     * @param encoding the character set to use when converting the bytes to characters
+     * @param encoding    the character set to use when converting the bytes to characters
      * @return string read from the stream
      * @throws IOException if reading from the stream failed
      */

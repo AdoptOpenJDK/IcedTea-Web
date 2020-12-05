@@ -49,7 +49,7 @@ public class LogConfig {
 
     // Directory where the logs are stored.
     private String icedteaLogDir;
-    private boolean enableLogging;
+    private boolean debugEnabled;
     private final boolean enableHeaders;
     private boolean logToFile;
     private final boolean logClientAppToFile;
@@ -60,7 +60,7 @@ public class LogConfig {
     private LogConfig() {
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
         // Check whether logging and tracing is enabled.
-        enableLogging = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_ENABLE_LOGGING));
+        debugEnabled = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_ENABLE_DEBUG_LOGGING));
         //enable/disable headers
         enableHeaders = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS));
         //enable/disable individual channels
@@ -77,10 +77,10 @@ public class LogConfig {
             if (f.isDirectory() || f.mkdirs()) {
                 icedteaLogDir += File.separator;
             } else {
-                enableLogging = false;
+                debugEnabled = false;
             }
         } else {
-            enableLogging = false;
+            debugEnabled = false;
         }
     }
 
@@ -106,8 +106,8 @@ public class LogConfig {
         return icedteaLogDir;
     }
 
-    public boolean isEnableLogging() {
-        return enableLogging;
+    public boolean isDebugEnable() {
+        return debugEnabled;
     }
 
     public boolean isLogToFile() {
@@ -126,8 +126,8 @@ public class LogConfig {
         return enableHeaders;
     }
 
-    void setEnableLogging(boolean enableLogging) {
-        this.enableLogging = enableLogging;
+    void setDebugEnabled(boolean debugEnabled) {
+        this.debugEnabled = debugEnabled;
     }
 
     void setLogToFile(boolean logToFile) {

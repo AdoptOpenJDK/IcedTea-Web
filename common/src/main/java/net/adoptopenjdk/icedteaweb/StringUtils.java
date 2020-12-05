@@ -45,15 +45,15 @@ public class StringUtils {
      * Method for splitting long strings into multiple lines.
      * This is mainly used for pretty printing.
      * Whitespace characters in the input string are not handled specially.
-     *
+     * <p>
      * All lines will have the length passed as {@code maxCharsPerLine}
      * except the last one which may be shorter.
-     *
+     * <p>
      * If null is passed instead of a string then an empty list is returned.
      * If zero or a negative maxCharsPerLine is passed then a list containing
      * the input string as the only element is returned.
      *
-     * @param s the string to be split into multiple lines
+     * @param s               the string to be split into multiple lines
      * @param maxCharsPerLine the maximum characters a line may contain.
      * @return a list of strings with the maximal length as specified.
      */
@@ -76,14 +76,13 @@ public class StringUtils {
     }
 
     /**
-     *  If a candidate is a prefix of the heyStack, then this is a match. If no candidates are specified, it matches any heyStack.
+     * If a candidate is a prefix of the heyStack, then this is a match. If no candidates are specified, it matches any heyStack.
      *
-     * @implSpec See <b>JSR-56, Section 4. Application Resources - Overview</b>
-     * for a detailed specification of this use case.
-     *
-     * @param heyStack the string to match candidates against
+     * @param heyStack   the string to match candidates against
      * @param candidates the strings to test as possible prefixes
      * @return true if the any of the candidates is a prefix match of the heystack or if there are no candidates.
+     * @implSpec See <b>JSR-56, Section 4. Application Resources - Overview</b>
+     * for a detailed specification of this use case.
      */
     public static boolean hasPrefixMatch(final String heyStack, final String... candidates) {
         Assert.requireNonBlank(heyStack, "heyStack");

@@ -33,11 +33,11 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.testing.closinglisteners;
 
-public abstract class StringRule<T>  implements Rule<String, T>{
+public abstract class StringRule<T> implements Rule<String, T> {
     protected final String rule;
 
     public StringRule(final String rule) {
-        this.rule=rule;
+        this.rule = rule;
     }
 
     @Override

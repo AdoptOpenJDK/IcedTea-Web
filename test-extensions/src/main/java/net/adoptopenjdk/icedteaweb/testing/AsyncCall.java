@@ -4,14 +4,14 @@ import java.util.concurrent.Callable;
 
 /**
  * A call that runs on a separate thread, with an optional timeout. It takes a runnable and allows
- * joining. 
- * 
+ * joining.
+ * <p>
  * On join, throws any exceptions that occurred within the call, or a TimeOutException if
  * it did not finish. Returns the value from the call.
  */
 public class AsyncCall<T> {
 
-    static public class TimeOutException extends RuntimeException  {
+    static public class TimeOutException extends RuntimeException {
         public TimeOutException() {
             super("Call did not finish within the allocated time.");
         }

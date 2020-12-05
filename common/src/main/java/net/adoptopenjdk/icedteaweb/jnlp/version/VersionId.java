@@ -35,7 +35,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.JNLPVersionPatterns.REGEX
  *     separator  ::= "." | "-" | "_"
  *     modifier   ::=  "+" | "*"
  * </pre>
- *
+ * <p>
  * See JSR-56 Specification, Appendix A.
  *
  * @see JNLPVersionPatterns
@@ -206,7 +206,7 @@ public class VersionId implements Comparable<VersionId> {
     /**
      * Normalizes a tuple to compare two version-ids. The tuple is padded with 0 (zero element) entries at the end.
      * For example, to compare the tuples T1(1, 4) and T2(1, 4, 1) you need to normalize T2 to (1, 4, 0) first.
-     *
+     * <p>
      * NOTE: Package visible for testing - do not use this method outside of VersionId.
      *
      * @param normalizationLength the tuple length to normalize to
@@ -218,8 +218,7 @@ public class VersionId implements Comparable<VersionId> {
             System.arraycopy(tuple, 0, normalizedTuple, 0, tuple.length);
             Arrays.fill(normalizedTuple, tuple.length, normalizedTuple.length, ZERO_ELEMENT);
             return normalizedTuple;
-        }
-        else {
+        } else {
             return Arrays.copyOf(tuple, tuple.length);
         }
     }
@@ -242,8 +241,7 @@ public class VersionId implements Comparable<VersionId> {
     private static Object prepareForComparison(final String tupleValue) {
         try {
             return Integer.valueOf(tupleValue); // numeric, so return as integer
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             return tupleValue; // not numeric, as not parsable as Java int, so return as string
         }
     }

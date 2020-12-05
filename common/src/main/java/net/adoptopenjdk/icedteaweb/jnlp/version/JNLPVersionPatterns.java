@@ -3,7 +3,7 @@ package net.adoptopenjdk.icedteaweb.jnlp.version;
 /**
  * This interface specifies regular expressions to define version ids and version strings
  * according to JSR-56, Appendix A.
- *
+ * <p>
  * In case of mental regexp overflow https://regex101.com/ might help.
  */
 public interface JNLPVersionPatterns {

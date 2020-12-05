@@ -39,7 +39,7 @@ import net.adoptopenjdk.icedteaweb.testing.closinglisteners.RulesFollowingClosin
 import java.awt.AWTException;
 import java.awt.Robot;
 
-public abstract class AWTHelper extends RulesFollowingClosingListener implements Runnable{
+public abstract class AWTHelper extends RulesFollowingClosingListener implements Runnable {
 
     //attributes possibly set by user
     private String initStr = null;
@@ -49,49 +49,47 @@ public abstract class AWTHelper extends RulesFollowingClosingListener implements
     private boolean actionStarted = false;
     private final Robot robot;
 
-   
-    
+
     //several constructors
+
     /**
      * the minimal constructor - use:
-     *  - if we do not want to find the bounds of applet area first
-     *  - searching for buttons and other components is then done in the whole
-     *    screen, confusion with other icons on display is then possible
-     *  - less effective, deprecated (better bound the area first) 
+     * - if we do not want to find the bounds of applet area first
+     * - searching for buttons and other components is then done in the whole
+     *   screen, confusion with other icons on display is then possible
+     * - less effective, deprecated (better bound the area first)
      */
     @Deprecated
     public AWTHelper() {
         try {
             this.robot = new Robot();
         } catch (final AWTException e) {
-            throw new RuntimeException("AWTHelper could not create its Robot instance.",e);
+            throw new RuntimeException("AWTHelper could not create its Robot instance.", e);
         }
     }
-    
+
     /**
      * the minimal constructor with initStr - use:
-     *  - we want to know from stdout that the applet (or sth else) is ready
-     *  - if we do not want to find the bounds of applet area first
-     *  - searching for buttons and other components is then done in the whole
-     *    screen, confusion with other icons on display is then possible
-     *  - less effective, deprecated (better bound the area first) 
+     * - we want to know from stdout that the applet (or sth else) is ready
+     * - if we do not want to find the bounds of applet area first
+     * - searching for buttons and other components is then done in the whole
+     *   screen, confusion with other icons on display is then possible
+     * - less effective, deprecated (better bound the area first)
      */
     @Deprecated
-    public AWTHelper(final String initStr){
+    public AWTHelper(final String initStr) {
         this();
-        
+
         this.initStr = initStr;
     }
 
     /**
      * override of method charRead (from RulesFollowingClosingListener)
-     * 
+     * <p>
      * waiting for the applet, when applet is ready run action thread
      * (if initStr==null, do not check and do not call run)
-     * 
+     * <p>
      * when all the wanted strings are in the stdout, applet can be closed
-     * 
-     * @param ch 
      */
     @Override
     public void charRead(final char ch) {
@@ -99,18 +97,17 @@ public abstract class AWTHelper extends RulesFollowingClosingListener implements
         //is applet ready to start clicking?
         //check and run applet only if initStr is not null
         if ((initStr != null) && !actionStarted && appletIsReady(sb.toString())) {
-            try{
-                actionStarted = true; 
+            try {
+                actionStarted = true;
                 this.findAndActivateApplet();
                 this.run();
-            } catch (final AWTFrameworkException e2){
-                throw new RuntimeException("AWTHelper problems with unset attributes.",e2);
+            } catch (final AWTFrameworkException e2) {
+                throw new RuntimeException("AWTHelper problems with unset attributes.", e2);
             }
         }
         //is all the wanted output in stdout?
         super.charRead(ch);
     }
-    
 
 
     /**
@@ -121,57 +118,55 @@ public abstract class AWTHelper extends RulesFollowingClosingListener implements
 
     /**
      * method getInitStrAsRule returns the initStr in the form
-     * of Contains rule that can be evaluated on a string 
-     * 
-     * @return
+     * of Contains rule that can be evaluated on a string
      */
-    private Rule<String, String> getInitStrAsRule(){
-    	if( initStr != null ){
+    private Rule<String, String> getInitStrAsRule() {
+        if (initStr != null) {
             return new ContainsRule(this.initStr);
-    	}else{
-    		return v -> true;
-    	}
+        } else {
+            return v -> true;
+        }
     }
-    
+
     //boolean controls getters
     private boolean appletIsReady(final String content) {
         return this.getInitStrAsRule().evaluate(content);
     }
 
 
-
     //creating screenshots, searching for applet
+
     /**
      * method captureScreenAndFindAppletByIcon
      * 1. checks that all needed attributes of AWTHelper are given
      *    (marker, its position and applet width and height)
-     * 2. captures screen, 
+     * 2. captures screen,
      * 3. finds the rectangle where applet is and saves it to the attribute
-     *    actionArea 
+     *    actionArea
      * 4. sets screenCapture indicator to true (after tryKTimes unsuccessful
      *    tries an exception "ComponentNotFound" will be raised)
-     * 
+     *
      * @throws AWTFrameworkException
-     * @throws AWTFrameworkException 
+     * @throws AWTFrameworkException
      */
     private void captureScreenAndFindAppletByIcon() throws AWTFrameworkException {
         throw new AWTFrameworkException("AWTFramework cannot find applet without dimension or marker!");
     }
 
     /**
-     * method findAndActivateApplet finds the applet by icon 
+     * method findAndActivateApplet finds the applet by icon
      * and clicks in the middle of applet area
-     * 
+     *
      * @throws AWTFrameworkException
      */
-    private void findAndActivateApplet() throws AWTFrameworkException
-    {
+    private void findAndActivateApplet() throws AWTFrameworkException {
         captureScreenAndFindAppletByIcon();
         clickInTheMiddleOfApplet();
     }
 
 
     //methods for clicking and typing 
+
     /**
      * method clickInTheMiddleOfApplet focuses the applet by clicking in the
      * middle of its location rectangle
@@ -179,6 +174,4 @@ public abstract class AWTHelper extends RulesFollowingClosingListener implements
     private void clickInTheMiddleOfApplet() {
         MouseActions.clickInside(null, this.robot);
     }
-    
-
- }
+}

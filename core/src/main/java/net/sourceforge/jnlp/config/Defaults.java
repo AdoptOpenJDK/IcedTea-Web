@@ -350,7 +350,7 @@ public class Defaults {
                     })
             ),
             Setting.createDefault(
-                    ConfigurationConstants.KEY_ENABLE_LOGGING,
+                    ConfigurationConstants.KEY_ENABLE_DEBUG_LOGGING,
                     String.valueOf(false),
                     ValidatorFactory.createBooleanValidator()
             ),
@@ -552,6 +552,12 @@ public class Defaults {
 
             Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST,
+                    null,
+                    null
+            ),
+
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_JVM_ARGS_WHITELIST,
                     null,
                     null
             )

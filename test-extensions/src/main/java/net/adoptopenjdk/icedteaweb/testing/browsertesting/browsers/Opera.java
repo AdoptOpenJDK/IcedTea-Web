@@ -42,7 +42,7 @@ public class Opera extends LinuxBrowser {
 
     public Opera(final String bin) {
         super(bin);
-        fsdir="opera";
+        fsdir = "opera";
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Opera extends LinuxBrowser {
     }
 
 
-    private final String[] cs={"-nosession", "-nomail", "-nolirc", "-newtab"};
+    private final String[] cs = {"-nosession", "-nomail", "-nolirc", "-newtab"};
 
     @Override
     public List<String> getCompatibilitySwitches() {

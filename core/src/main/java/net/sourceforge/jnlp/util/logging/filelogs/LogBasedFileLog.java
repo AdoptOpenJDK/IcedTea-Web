@@ -32,7 +32,6 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version. */
 package net.sourceforge.jnlp.util.logging.filelogs;
 
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.logging.SingleStreamLogger;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 
@@ -64,7 +63,7 @@ public final class LogBasedFileLog implements SingleStreamLogger {
         try {
             File futureFile = new File(fileName);
             if (!futureFile.exists()) {
-                FileUtils.createRestrictedFile(futureFile);
+                futureFile.createNewFile();
             }
             fh = new FileHandler(fileName, append);
             fh.setFormatter(new Formatter() {

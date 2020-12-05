@@ -174,6 +174,7 @@ public class DefaultDialogFactory implements DialogFactory {
      */
     @Override
     public NamePassword showAuthenticationPrompt(String host, int port, String prompt, String type) {
+        LOG.debug("Showing dialog for basic auth for {}:{} with name {} of type {}", host, port, prompt, type);
 
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -188,7 +189,6 @@ public class DefaultDialogFactory implements DialogFactory {
         message.extras = new Object[]{host, port, prompt, type};
 
         DialogResult response = getUserResponse(message);
-        LOG.debug("Decided action for matching alaca at  was {}", response);
         return (NamePassword) response;
     }
 

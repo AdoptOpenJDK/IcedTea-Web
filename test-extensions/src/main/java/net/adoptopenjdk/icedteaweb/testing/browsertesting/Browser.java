@@ -39,10 +39,14 @@ import java.util.List;
 /**
  * interface which represents individual browsers
  */
-public interface Browser extends ReactingProcess{
+public interface Browser extends ReactingProcess {
     String getDefaultPluginExpectedLocation();
+
     String getBin();
+
     String getUserDefaultPluginExpectedLocation();
+
     Browsers getID();
+
     List<String> getCompatibilitySwitches();
 }

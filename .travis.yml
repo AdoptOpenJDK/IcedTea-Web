@@ -1,6 +1,17 @@
 dist: trusty
 language: java
-jdk: oraclejdk8
+
+env:
+  global:
+    - JAVA_VERSION=8.0.272.hs-adpt
+
+before_install:
+  # adding $HOME/.sdkman to cache creates an empty directory, which interferes with the initial installation
+  - "[[ -d /home/travis/.sdkman/ ]] && [[ -d /home/travis/.sdkman/bin/ ]] || rm -rf /home/travis/.sdkman/"
+  - curl -s "https://get.sdkman.io" | bash
+  - echo sdkman_auto_answer=true > $HOME/.sdkman/etc/config
+  - echo sdkman_auto_selfupdate=true >> $HOME/.sdkman/etc/config
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 addons:
   apt:
@@ -8,12 +19,19 @@ addons:
       - xvfb
 
 install:
+  - sdk install java $JAVA_VERSION
+  - sdk use java $JAVA_VERSION
   - export DISPLAY=':99.0'
   - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+
+before_script:
+  - java -version
+  - echo $JAVA_HOME
 
 cache:
   directories:
     - $HOME/.m2
+    - $HOME/.sdkman
 
 script:
   - mvn clean verify -e

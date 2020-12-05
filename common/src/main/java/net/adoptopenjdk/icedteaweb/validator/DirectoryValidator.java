@@ -15,11 +15,11 @@ public class DirectoryValidator {
     private final static Logger LOG = LoggerFactory.getLogger(DirectoryValidator.class);
 
     private final List<File> dirsToCheck;
-    
+
     /**
      * Creates DirectoryValidator to ensure given directories
-     * 
-     * @param dirsToCheck dirs to check 
+     *
+     * @param dirsToCheck dirs to check
      */
     public DirectoryValidator(final List<File> dirsToCheck) {
         this.dirsToCheck = new ArrayList<>(dirsToCheck);
@@ -27,7 +27,7 @@ public class DirectoryValidator {
 
     /**
      * This method is ensuring, that specified directories will exists after
-     * call and will have enough permissions. 
+     * call and will have enough permissions.
      * <p>
      * This methods is trying to create the directories if they are not present
      * and is testing if can be written inside. All checks are done in bulk. If
@@ -36,8 +36,9 @@ public class DirectoryValidator {
      * (both gui and headless) should not stop to work, but continue to run with
      * hope that corrupted dirs will not be necessary
      * </p>
-     * @return  result of directory checks
+     *
      * @param isDebug output debug information
+     * @return result of directory checks
      */
     public DirectoryCheckResults ensureDirs(boolean isDebug) {
         return ensureDirs(dirsToCheck, isDebug);

@@ -5,6 +5,7 @@ import java.nio.channels.FileLock;
 public interface ConfigurationConstants {
 
     String DEPLOYMENT_CONFIG_FILE = "deployment.config";
+    String ITW_DEPLOYMENT_CONFIG_FILE = "itw-deployment.config";
 
     String DEPLOYMENT_PROPERTIES = "deployment.properties";
 
@@ -181,7 +182,7 @@ public interface ConfigurationConstants {
     /*
      * Logging
      */
-    String KEY_ENABLE_LOGGING = "deployment.log"; //same as verbose or ICEDTEAPLUGIN_DEBUG=true
+    String KEY_ENABLE_DEBUG_LOGGING = "deployment.log"; //same as verbose or ICEDTEAPLUGIN_DEBUG=true
 
     String KEY_ENABLE_LOGGING_HEADERS = "deployment.log.headers"; //will add header OutputContorll.getHeader To all messages
 
@@ -286,4 +287,5 @@ public interface ConfigurationConstants {
      * CSV
      */
     String KEY_SECURITY_SERVER_WHITELIST = "deployment.security.whitelist";
+    String KEY_JVM_ARGS_WHITELIST = "deployment.jvm.arguments.whitelist";
 }

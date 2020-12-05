@@ -25,6 +25,7 @@ import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -232,12 +233,12 @@ public class JNLPPolicy extends Policy {
             try {
                 final URI policyUri;
                 if (policyLocation.startsWith("file://")) {
-                    policyUri = new File(policyLocation).toURI();
+                    policyUri = new URL(policyLocation).toURI();
                 } else {
                     policyUri = new URI(policyLocation.replace("\\", "/"));
                 }
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
-            } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException e) {
+            } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException  | MalformedURLException e) {
                 LOG.error("Failed to get policy from url " + policyLocation, e);
             }
         }

@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
 @RunWith(value = BrowserTestRunner.class)
 public abstract class BrowserTest {
 
-    private static Browsers browser=null;
+    private static Browsers browser = null;
     public static final ServerAccess server = new ServerAccess();
 
     public static void setBrowser(final Browsers b) {

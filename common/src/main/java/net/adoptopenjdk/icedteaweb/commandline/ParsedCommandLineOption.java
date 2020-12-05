@@ -38,7 +38,6 @@ import java.util.Collections;
 import java.util.List;
 
 
-
 public class ParsedCommandLineOption {
 
     private final CommandLineOptions option;

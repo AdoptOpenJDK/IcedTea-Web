@@ -73,8 +73,6 @@ class IcoHeaderEntry {
         return colorCount;
     }
 
-    /**
-     */
     void resetColorCount() {
         this.colorCount = 0;
     }
