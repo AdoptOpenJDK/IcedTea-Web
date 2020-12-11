@@ -11,6 +11,7 @@ import net.sourceforge.jnlp.DownloadOptions;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static net.adoptopenjdk.icedteaweb.resources.initializer.ResourceUrlCreator.getUrl;
 import static net.adoptopenjdk.icedteaweb.resources.initializer.ResourceUrlCreator.getVersionedUrl;
@@ -92,6 +93,7 @@ class ExactVersionedResourceInitializer extends BaseResourceInitializer {
 
     private VersionId getExistingVersionFromCache() {
         return Cache.getAllVersionsInCache(resource.getLocation()).stream()
+                .filter(Objects::nonNull)
                 .filter(cachedVersion -> cachedVersion.compareTo(versionId) < 0)
                 .max(VersionId::compareTo)
                 .orElse(null);
