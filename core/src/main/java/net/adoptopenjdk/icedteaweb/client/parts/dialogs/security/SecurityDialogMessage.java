@@ -81,5 +81,6 @@ public final class SecurityDialogMessage {
     public Semaphore lock;
     //if dialog slip out of awt thread, fake modal dialog is created. This is keeping it.
     public JDialog toDispose;
+    public boolean showInTaskBar;
 
 }

@@ -51,6 +51,8 @@ import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.JDialog;
+
+import java.awt.Dialog;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -58,6 +60,8 @@ import java.net.NetPermission;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.cert.X509Certificate;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -92,6 +96,7 @@ public class SecurityDialogs {
         UNSIGNED_WARNING, /* requires confirmation with 'high-security' setting */
         APPLET_WARNING,
         AUTHENTICATION,
+        CLIENT_CERT_SELECTION,
         UNSIGNED_EAS_NO_PERMISSIONS_WARNING, /* when Extended applet security is at High Security and no permission attribute is find, */
         MISSING_ALACA, /*alaca - Application-Library-Allowable-Codebase Attribute*/
         MATCHING_ALACA,
@@ -203,7 +208,6 @@ public class SecurityDialogs {
      * permissions.
      */
     public static NamePassword showAuthenticationPrompt(String host, int port, String prompt, String type) {
-        LOG.debug("Showing dialog for basic auth for {}:{} with name {} of type {}", host, port, prompt, type);
 
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
@@ -218,7 +222,20 @@ public class SecurityDialogs {
         message.extras = new Object[]{host, port, prompt, type};
 
         DialogResult response = getUserResponse(message);
+        LOG.debug("Decided action for matching alaca at  was {}", response);
         return (NamePassword) response;
+    }
+    
+    public static DialogResult showClientCertSelectionPrompt(LinkedHashMap<String, X509Certificate> aliases) {
+
+       final SecurityDialogMessage message = new SecurityDialogMessage(null);
+       message.dialogType = DialogType.CLIENT_CERT_SELECTION;
+       message.extras = new Object[] {aliases};
+       message.showInTaskBar = true;
+
+       DialogResult response = getUserResponse(message);
+       LOG.debug("Decided action for selecting client certificate was {}", response);
+       return response;
     }
 
     public static boolean showMissingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {

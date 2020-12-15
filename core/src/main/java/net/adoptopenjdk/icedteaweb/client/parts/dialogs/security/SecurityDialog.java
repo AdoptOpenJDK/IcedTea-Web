@@ -98,8 +98,8 @@ public class SecurityDialog {
     private boolean requiresSignedJNLPWarning;
 
     SecurityDialog(SecurityDialogs.DialogType dialogType, AccessType accessType,
-                   JNLPFile file, CertVerifier JarCertVerifier, X509Certificate cert, Object[] extras) {
-        this.viwableDialog = new ViwableDialog();
+                   JNLPFile file, CertVerifier JarCertVerifier, X509Certificate cert, Object[] extras, boolean showInTaskBar) {
+        this.viwableDialog = new ViwableDialog(showInTaskBar);
         this.dialogType = dialogType;
         this.accessType = accessType;
         this.file = file;
@@ -114,6 +114,11 @@ public class SecurityDialog {
         initDialog();
     }
 
+    SecurityDialog(SecurityDialogs.DialogType dialogType, AccessType accessType,
+        JNLPFile file, CertVerifier JarCertVerifier, X509Certificate cert, Object[] extras) {
+       this(dialogType, accessType, file, JarCertVerifier, cert, extras, false);
+    }
+    
     /**
      * Construct a SecurityDialog to display some sort of access warning
      */
@@ -204,7 +209,7 @@ public class SecurityDialog {
      * @param parent the parent pane.
      */
     public static void showSingleCertInfoDialog(X509Certificate c,
-                        Window parent) {
+                        Component parent) {
         SecurityDialog dialog = new SecurityDialog(SecurityDialogs.DialogType.SINGLE_CERT_INFO, c);
         dialog.getViwableDialog().setLocationRelativeTo(parent);
         dialog.getViwableDialog().setModalityType(ModalityType.APPLICATION_MODAL);
@@ -281,7 +286,7 @@ public class SecurityDialog {
             dialogTitle = "Applet Warning";
         else if (dtype == SecurityDialogs.DialogType.PARTIALLY_SIGNED_WARNING)
             dialogTitle = "Security Warning";
-        else if (dtype == SecurityDialogs.DialogType.AUTHENTICATION)
+        else if (dtype == SecurityDialogs.DialogType.AUTHENTICATION || dtype == SecurityDialogs.DialogType.CLIENT_CERT_SELECTION)
             dialogTitle = "Authentication Required";
         return dialogTitle;
     }
@@ -336,6 +341,8 @@ public class SecurityDialog {
             lpanel = AppTrustWarningDialog.unsigned(sd, sd.file); // Only necessary for applets on 'high security' or above
         } else if (type == SecurityDialogs.DialogType.AUTHENTICATION) {
             lpanel = new PasswordAuthenticationPane(sd, sd.extras);
+        } else if (type == SecurityDialogs.DialogType.CLIENT_CERT_SELECTION) {
+           lpanel = new ClientCertSelectionPane(sd, sd.extras);
         } else if (type == SecurityDialogs.DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING) {
             lpanel = new MissingPermissionsAttributePanel(sd, sd.file.getTitle(), sd.file.getNotNullProbableCodeBase().toExternalForm());
         } else if (type == SecurityDialogs.DialogType.MISSING_ALACA) {
