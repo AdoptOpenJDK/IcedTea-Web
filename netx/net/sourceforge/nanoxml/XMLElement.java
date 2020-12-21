@@ -1002,7 +1002,8 @@ public class XMLElement {
         }
         if (buf.length() == 0) {
             while (ch != '/') {
-                if (ch == '!') {
+                // jnlp files from a MFSys25  contain '<?-- JViewerVersion 3.30a -->', Treat as a comment
+                if (ch == '!' || ch == '?') {
                     ch = this.readChar();
                     if (ch != '-') {
                         throw this.expectedInput("Comment or Element");
