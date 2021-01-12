@@ -320,17 +320,6 @@ public class JavaConsole implements ObservableMessagesProvider {
             }
         });
 
-        final JButton systemPropertiesButton = new JButton(R("CONSOLEsystemProperties"));
-        buttonPanel.add(systemPropertiesButton);
-        systemPropertiesButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                printSystemProperties();
-                updateModel();
-            }
-        });
-
         final JButton classloadersButton = new JButton(R("CONSOLEclassLoaders"));
         buttonPanel.add(classloadersButton);
         classloadersButton.addActionListener(new ActionListener() {
@@ -349,6 +338,17 @@ public class JavaConsole implements ObservableMessagesProvider {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 printThreadInfo();
+                updateModel();
+            }
+        });
+
+        final JButton systemPropertiesButton = new JButton(R("CONSOLEsystemProperties"));
+        buttonPanel.add(systemPropertiesButton);
+        systemPropertiesButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                printSystemProperties();
                 updateModel();
             }
         });
@@ -413,6 +413,17 @@ public class JavaConsole implements ObservableMessagesProvider {
             }
         });
 
+        final JButton configButton = new JButton("Configuration");
+        buttonPanel.add(configButton);
+        configButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                printConfig();
+                updateModel();
+            }
+        });
+
         initialized = true;
     }
 
@@ -450,13 +461,27 @@ public class JavaConsole implements ObservableMessagesProvider {
     }
 
     private void printSystemProperties() {
-
         LOG.info(" ----");
         LOG.info("System Properties:");
         LOG.info("");
         final Properties p = System.getProperties();
-        for (Object key : p.keySet()) {
-            LOG.info(key.toString() + ": " + p.get(key));
+        final List<String> sortedKeys = new ArrayList<>(p.stringPropertyNames());
+        Collections.sort(sortedKeys);
+        for (String key : sortedKeys) {
+            LOG.info(key + ": " + p.getProperty(key));
+        }
+        LOG.info(" ----");
+    }
+
+    private void printConfig() {
+        LOG.info(" ----");
+        LOG.info("Configuration:");
+        LOG.info("");
+        final DeploymentConfiguration config = JNLPRuntime.getConfiguration();
+        final List<String> sortedKeys = new ArrayList<>(config.getAllPropertyNames());
+        Collections.sort(sortedKeys);
+        for (String key : sortedKeys) {
+            LOG.info(key + ": " + config.getProperty(key));
         }
         LOG.info(" ----");
     }
