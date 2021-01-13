@@ -68,7 +68,8 @@ class XMLSanitizer {
                         charInBuffer--;
                     }
                 } else {
-                    if (buffer[0] == '<' && buffer[1] == '!' && buffer[2] == '-' && buffer[3] == '-') {
+                    // jnlp files from a MFSys25  contain '<?-- JViewerVersion 3.30a -->' therefore we must treat ! and ? equally
+                    if (buffer[0] == '<' && (buffer[1] == '!' || buffer[1] == '?') && buffer[2] == '-' && buffer[3] == '-') {
                         // start of comment
                         // prepare buffer for refilling
                         charInBuffer = 0;
