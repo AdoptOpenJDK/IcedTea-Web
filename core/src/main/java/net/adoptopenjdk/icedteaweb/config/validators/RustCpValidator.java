@@ -6,7 +6,7 @@ public class RustCpValidator implements ValueValidator {
 
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
+    public void validate(final String value) throws IllegalArgumentException {
         //can't be wrong...
         //but we need that getPossibleValues description
     }

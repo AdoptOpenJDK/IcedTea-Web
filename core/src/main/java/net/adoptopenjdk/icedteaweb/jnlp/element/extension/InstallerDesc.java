@@ -57,15 +57,6 @@ public class InstallerDesc implements EntryPoint {
      * Creates an installer descriptor element.
      *
      * @param mainClass the fully qualified name of the class containing the main method of the application
-     */
-    public InstallerDesc(final String mainClass) {
-        this(mainClass, null);
-    }
-
-    /**
-     * Creates an installer descriptor element.
-     *
-     * @param mainClass the fully qualified name of the class containing the main method of the application
      * @param progressClass the fully qualified name of the class containing an implementation of the
      * {@link javax.jnlp.DownloadServiceListener} interface
      */

@@ -34,6 +34,7 @@ statement from your version.
 
 package net.sourceforge.jnlp.security;
 
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -218,5 +219,21 @@ public class CertificateUtils {
         keyStore.load(null, null);
         keyStore.setKeyEntry(alias, key, password, certChain);
         keyStore.store(bos, password);
+    }
+
+    public static void saveCertificate(final X509Certificate certificate) {
+        File keyStoreFile = null;
+        try {
+            KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CERTS).getKs();
+            addToKeyStore(certificate, ks);
+            keyStoreFile = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CERTS).getFile();
+            if (!keyStoreFile.isFile()) {
+                FileUtils.createRestrictedFile(keyStoreFile);
+            }
+            SecurityUtil.storeKeyStore(ks, keyStoreFile);
+            LOG.debug("Certificate is now permanently trusted.");
+        } catch (Exception ex) {
+            LOG.error(String.format("Error while add certificate '%s' to keystore '%s'.", certificate, keyStoreFile), ex);
+        }
     }
 }

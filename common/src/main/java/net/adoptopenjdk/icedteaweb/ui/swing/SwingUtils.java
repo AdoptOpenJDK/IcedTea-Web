@@ -36,6 +36,7 @@ import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
+import javax.swing.JLabel;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
 import java.awt.Component;
@@ -178,5 +179,16 @@ public final class SwingUtils {
             });
         }
         return window;
+    }
+
+    /**
+     * Some Swing components such as {@link JLabel} needs their text to be wrapped as HTML to get word wrap working.
+     * This method allows to wrap a given text with an html tag.
+     *
+     * @param s string to be wrapped to html tag
+     * @return
+     */
+    public static String htmlWrap(String s) {
+        return "<html>" + s + "</html>";
     }
 }

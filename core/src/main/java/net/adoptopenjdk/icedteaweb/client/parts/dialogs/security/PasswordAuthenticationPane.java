@@ -38,11 +38,9 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -54,8 +52,9 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
  * Modal non-minimizable dialog to request http authentication credentials
+ * @deprecated will be replaced by new security dialogs
  */
-
+@Deprecated
 public class PasswordAuthenticationPane extends SecurityDialogPanel {
 
     private final JTextField jtfUserName = new JTextField();
@@ -74,7 +73,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         type = (String) extras[3];
 
         addComponents();
-     }
+    }
 
     /**
      * Initialized the dialog components
@@ -83,12 +82,12 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
     public final void addComponents() {
 
         JLabel jlInfo = new JLabel("");
-        jlInfo.setText("<html>" + R("SAuthenticationPrompt", type, host, prompt)  + "</html>");
+        jlInfo.setText("<html>" + R("SAuthenticationPrompt", type, host, prompt) + "</html>");
 
         setLayout(new GridBagLayout());
 
-        JLabel jlUserName = new JLabel(R("Username"));
-        JLabel jlPassword = new JLabel(R("Password"));
+        JLabel jlUserName = new JLabel(R("Username") + ":");
+        JLabel jlPassword = new JLabel(R("Password") + ":");
         JButton jbOK = new JButton(R("ButOk"));
         JButton jbCancel = new JButton(R("ButCancel"));
 
@@ -153,8 +152,8 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
         setMaximumSize(new Dimension(1024, 150));
 
         setSize(400, 150);
-        if (parent!=null){
-            parent.getViwableDialog().setLocationRelativeTo(null);
+        if (parent != null) {
+            parent.getViewableDialog().setLocationRelativeTo(null);
         }
         initialFocusComponent = jtfUserName;
 
@@ -162,7 +161,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(new NamePassword(jtfUserName.getText(), jpfPassword.getPassword()));
-                parent.getViwableDialog().dispose();
+                parent.getViewableDialog().dispose();
             }
         };
 
@@ -170,7 +169,7 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 parent.setValue(null);
-                parent.getViwableDialog().dispose();
+                parent.getViewableDialog().dispose();
             }
         };
 
@@ -204,15 +203,4 @@ public class PasswordAuthenticationPane extends SecurityDialogPanel {
     public String helpToStdIn() {
         return Translator.R("PAPstdinInfo");
     }
-    
-    
-    public static void main(String[] args) {
-        PasswordAuthenticationPane w = new PasswordAuthenticationPane(null, new Object[]{"host",666,"prompt","type"});
-        JFrame f = new JFrame();
-        f.setSize(400, 200);
-        f.add(w, BorderLayout.CENTER);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-    }
-
 }

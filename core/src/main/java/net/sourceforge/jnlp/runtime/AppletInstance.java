@@ -16,15 +16,16 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
+import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.util.WeakList;
 
 import java.applet.Applet;
-import java.awt.Container;
-import java.awt.Frame;
+import java.awt.Window;
+import java.util.Optional;
 
 /**
  * Represents a launched application instance created from a JNLP
@@ -36,7 +37,7 @@ import java.awt.Frame;
  */
 public class AppletInstance extends ApplicationInstance {
 
-    private final static Logger LOG = LoggerFactory.getLogger(AppletInstance.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AppletInstance.class);
 
     /** whether the applet's stop and destroy methods have been called */
     private boolean appletStopped = false;
@@ -45,20 +46,20 @@ public class AppletInstance extends ApplicationInstance {
     private Applet applet;
 
     /** the applet environment */
-    final private AppletEnvironment environment;
+    private final AppletEnvironment environment;
+
+    /**
+     * weak list of windows opened by the application
+     */
+    private final WeakList<Window> weakWindows = new WeakList<>();
 
     /**
      * Create a New Task based on the Specified URL
      * @param file pluginbridge to build instance on
-     * @param group thread group of this instance
-     * @param loader classloader for this instance
-     * @param applet applet of this instance
+     *
      */
-    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet) {
-        super(file, group, loader);
-
-        this.applet = applet;
-
+    public AppletInstance(JNLPFile file, final ThreadGroup threadGroup) throws LaunchException {
+        super(file, threadGroup);
         this.environment = new AppletEnvironment(file, this);
     }
 
@@ -75,50 +76,6 @@ public class AppletInstance extends ApplicationInstance {
     }
 
     /**
-     * Create a New Task based on the Specified URL
-     * @param file pluginbridge to build instance on
-     * @param group thread group of this instance
-     * @param loader classloader for this instance
-     * @param applet applet of this instance
-     * @param cont Container where to place applet
-     */
-    public AppletInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader, Applet applet, Container cont) {
-        super(file, group, loader);
-        this.applet = applet;
-        this.environment = new AppletEnvironment(file, this, cont);
-    }
-
-    /**
-     * Sets whether the applet is resizable or not.  Applets default
-     * to being not resizable.
-     * @param resizable boolean to allow resizing
-     */
-    public void setResizable(boolean resizable) {
-        Container c = environment.getAppletFrame();
-        if (c instanceof Frame)
-            ((Frame) c).setResizable(resizable);
-    }
-
-    /**
-     * @return whether the applet is resizable.
-     */
-    public boolean isResizable() {
-        Container c = environment.getAppletFrame();
-        if (c instanceof Frame)
-            return ((Frame) c).isResizable();
-
-        return false;
-    }
-
-    /**
-     * @return the application title.
-     */
-    @Override
-    public String getTitle() {
-        return getJNLPFile().getApplet().getName();
-    }
-
-    /**
      * @return the applet environment.
      */
     public AppletEnvironment getAppletEnvironment() {
@@ -132,11 +89,16 @@ public class AppletInstance extends ApplicationInstance {
         return applet;
     }
 
+    @Override
+    protected String determineMainClass(JNLPFile file, ResourceTracker tracker) {
+        return null;
+    }
+
     /**
      * Stop the application and destroy its resources.
      */
     @Override
-    public void destroy() {
+    public synchronized void destroy() {
         if (appletStopped)
             return;
 
@@ -146,12 +108,26 @@ public class AppletInstance extends ApplicationInstance {
             applet.stop();
             applet.destroy();
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Exception while destroying AppletInstance", ex);
         }
 
         environment.destroy();
 
+        weakWindows.forEach(w -> Optional.ofNullable(w).ifPresent(win -> win.dispose()));
+        weakWindows.clear();
+
         super.destroy();
+    }
+
+    /**
+     * Adds a window that this application opened.  When the
+     * application is disposed, these windows will also be disposed.
+     *
+     * @param window to be added
+     */
+    void addWindow(Window window) {
+        weakWindows.add(window);
+        weakWindows.trimToSize();
     }
 
 }

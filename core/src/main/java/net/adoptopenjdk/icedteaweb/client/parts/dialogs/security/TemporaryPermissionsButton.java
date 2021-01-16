@@ -40,7 +40,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import sun.security.provider.PolicyParser;
 
 import javax.swing.AbstractButton;
@@ -71,7 +71,6 @@ public class TemporaryPermissionsButton extends JButton {
     private final JButton linkedButton;
     private PolicyEditor.PolicyEditorWindow policyEditorWindow = null;
     private final JNLPFile file;
-    private final SecurityDelegate securityDelegate;
     private final Collection<Permission> temporaryPermissions = new HashSet<>();
 
     public TemporaryPermissionsButton(final JNLPFile file, final SecurityDelegate securityDelegate, final JButton linkedButton) {
@@ -84,7 +83,6 @@ public class TemporaryPermissionsButton extends JButton {
         this.menu = createPolicyPermissionsMenu();
         this.linkedButton = linkedButton;
         this.file = file;
-        this.securityDelegate = securityDelegate;
 
         if (file == null || securityDelegate == null || linkedButton == null) {
             this.setEnabled(false);

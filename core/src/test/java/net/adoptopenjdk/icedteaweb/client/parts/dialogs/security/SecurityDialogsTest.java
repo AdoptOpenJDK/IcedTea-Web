@@ -33,6 +33,7 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.impl.UnsignedAppletActionStorageImpl;
@@ -216,11 +217,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogs(ExpectedResults.PositiveResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(true, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -241,11 +242,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogsNullResults();
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             System.setIn(backup);
             resetQueue();
@@ -264,11 +265,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogs(ExpectedResults.PositiveResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(true, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -286,11 +287,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             testAllDialogs(ExpectedResults.NegativeResults);
             checkUnsignedActing(true);
             setAS(AppletSecurityLevel.ASK_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -298,76 +299,55 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
 
     private void testAllDialogs(ExpectedResults r) throws MalformedURLException {
         //anything but shortcut
-        AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r1 = Dialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         Assert.assertEquals(r.p, r1.getRegularReturn().getValue());
         //shortcut
-        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r2 = Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
-        YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
-        Assert.assertEquals(r.ea, r3);
         //can't emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
         //Assert.assertEquals(r.ea, r5);
-        NamePassword r6 = SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
+        NamePassword r6 = Dialogs.showAuthenticationPrompt(null, 123456, null, null);
         Assert.assertEquals(r.np, r6);
-        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
+        boolean r7 = Dialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
         Assert.assertEquals(r.b, r7);
-        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+        boolean r8 = Dialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
         Assert.assertEquals(r.b, r8);
-        boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
+        boolean r9 = Dialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         Assert.assertEquals(r.b, r9);
     }
 
     private void testAllDialogsNullResults() throws MalformedURLException {
         //anything but  shortcut
-        AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r1 = Dialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         Assert.assertEquals(null, r1);
         //shortcut
-        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r2 = Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(null, r2);
-        YesNo r3 = SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
-        Assert.assertEquals(null, r3);
         //can't emulate security delegate now
         //YesNoSandbox r4 = SecurityDialogs.showCertWarningDialog(SecurityDialogs.AccessType.UNVERIFIED, crtJnlpF(), null, null);
         //Assert.assertEquals(r.p, r4.getValue());
         //YesNo r5 = SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
         //Assert.assertEquals(r.ea, r5);
-        NamePassword r6 = SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
+        NamePassword r6 = Dialogs.showAuthenticationPrompt(null, 123456, null, null);
         Assert.assertEquals(null, r6);
-        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
+        boolean r7 = Dialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
         Assert.assertEquals(false, r7);
-        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+        boolean r8 = Dialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
         Assert.assertEquals(false, r8);
-        boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
+        boolean r9 = Dialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         Assert.assertEquals(false, r9);
-    }
-
-    private void checkUnsignedActing(Boolean b) throws MalformedURLException {
-        checkUnsignedActing(b, b);
     }
 
     /*
      *  testPartiallySignedBehaviour(); needs security delegate to set sandbox, so sometimes results are strange
      */
-    private void checkUnsignedActing(Boolean b1, Boolean b2) throws MalformedURLException {
-        if (b1 != null) {
-            boolean r10 = testUnsignedBehaviour();
-            Assert.assertEquals(b1.booleanValue(), r10);
-        }
+    private void checkUnsignedActing(Boolean b2) throws MalformedURLException {
         if (b2 != null) {
             boolean r11 = testPartiallySignedBehaviour();
             Assert.assertEquals(b2.booleanValue(), r11);
-        }
-    }
-
-    private boolean testUnsignedBehaviour() throws MalformedURLException {
-        try {
-            UnsignedAppletTrustConfirmation.checkUnsignedWithUserIfRequired(crtJnlpF());
-            return true;
-        } catch (LaunchException ex) {
-            return false;
         }
     }
 
@@ -398,56 +378,50 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         try {
             metcounter++;
             //anything but  shortcut
-            SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
+            Dialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
         try {
             metcounter++;
             //shortcut
-            SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
+            Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
         try {
             metcounter++;
-            SecurityDialogs.showUnsignedWarningDialog(crtJnlpF());
+            Dialogs.showCertWarningDialog(AccessType.UNVERIFIED, crtJnlpF(), null, null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
         try {
             metcounter++;
-            SecurityDialogs.showCertWarningDialog(AccessType.UNVERIFIED, crtJnlpF(), null, null);
+            Dialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
         try {
             metcounter++;
-            SecurityDialogs.showPartiallySignedWarningDialog(crtJnlpF(), null, null);
+            Dialogs.showAuthenticationPrompt(null, 123456, null, null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
         try {
             metcounter++;
-            SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
+            Dialogs.showMissingALACAttributePanel(crtJnlpF(), null, null);
         } catch (NullPointerException ex) {
             npecounter++;
         }
         try {
             metcounter++;
-            SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, null);
+            Dialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
         } catch (NullPointerException ex) {
             npecounter++;
         }
         try {
             metcounter++;
-            SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
-        } catch (NullPointerException ex) {
-            npecounter++;
-        }
-        try {
-            metcounter++;
-            SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
+            Dialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         } catch (NullPointerException ex) {
             npecounter++;
         }
@@ -465,7 +439,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         int metcounter = 0;
         int maxcount = 0;
         boolean ex1 = false;
-        boolean ex2 = false;
         if (b1 != null) {
             maxcount++;
             try {
@@ -475,21 +448,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
                 ex1 = true;
             }
         }
-        if (b2 != null) {
-            maxcount++;
-            try {
-                metcounter++;
-                testUnsignedBehaviour();
-            } catch (NullPointerException ex) {
-                ex2 = true;
-            }
-        }
         Assert.assertEquals(maxcount, metcounter);
         if (b1 != null) {
             Assert.assertEquals(b1.booleanValue(), ex1);
-        }
-        if (b2 != null) {
-            Assert.assertEquals(b2.booleanValue(), ex2);
         }
     }
 
@@ -525,11 +486,11 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
         try {
             fakeQueue();
-            checkUnsignedActing(true, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_ALL);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            checkUnsignedActing(false, null);
+            checkUnsignedActing(null);
         } finally {
             resetQueue();
         }
@@ -542,8 +503,6 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         JNLPRuntime.setTrustNone(true);
         setPrompt(true); //ignored
         setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        boolean r10 = testUnsignedBehaviour();
-        Assert.assertEquals(true, r10);
         checkUnsignedNPE(false);
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
         try {
@@ -551,42 +510,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
 //            Assert.assertEquals(false, r11);
             checkUnsignedNPE(true);
             setAS(AppletSecurityLevel.DENY_ALL);
-            boolean r12 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r12);
             checkUnsignedNPE(true, false);
             setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            boolean r13 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r13);
             checkUnsignedNPE(true, false);
-        } finally {
-            resetQueue();
-        }
-    }
-
-    @Test(timeout = 10000)//if gui pops up
-    public void testUnsignedDialogsNotHeadlessTrustNoneTrustAllPrompt() throws Exception {
-        JNLPRuntime.setHeadless(false);
-        JNLPRuntime.setTrustAll(true);
-        JNLPRuntime.setTrustNone(true);
-        setPrompt(true); //ignored
-        setAS(AppletSecurityLevel.ALLOW_UNSIGNED);
-        boolean a = testUnsignedBehaviour();
-        Assert.assertTrue(a);
-        checkUnsignedNPE(false);
-        setAS(AppletSecurityLevel.ASK_UNSIGNED);
-        try {
-            fakeQueue();
-            boolean r10 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r10);
-            checkUnsignedNPE(null, false);
-            setAS(AppletSecurityLevel.DENY_ALL);
-            boolean r11 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r11);
-            checkUnsignedNPE(null, false);
-            setAS(AppletSecurityLevel.DENY_UNSIGNED);
-            boolean r12 = testUnsignedBehaviour();
-            Assert.assertEquals(false, r12);
-            checkUnsignedNPE(null, false);
         } finally {
             resetQueue();
         }
@@ -603,12 +529,8 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         setAS(AppletSecurityLevel.ASK_UNSIGNED);
         checkUnsignedNPE(true, true);
         setAS(AppletSecurityLevel.DENY_ALL);
-        boolean r11 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r11);
         checkUnsignedNPE(true, false);
         setAS(AppletSecurityLevel.DENY_UNSIGNED);
-        boolean r12 = testUnsignedBehaviour();
-        Assert.assertEquals(false, r12);
         checkUnsignedNPE(true, false);
     }
 
@@ -628,20 +550,18 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             + ".* \\Q" + urlstr + "\\E ";
 
     private void runRememeberableClasses(ExpectedResults r) throws MalformedURLException {
-        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
+        boolean r7 = Dialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
         Assert.assertEquals(r.b, r7);
-        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+        boolean r8 = Dialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
         Assert.assertEquals(r.b, r8);
-        boolean r9 = testUnsignedBehaviour();
-        Assert.assertEquals(r.b, r9);
         //skipping this one, ahrd to mock certVerifier
         // boolean r5 = testPartiallySignedBehaviour();
         //Assert.assertEquals(r.b, r5);
-        boolean r6 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
+        boolean r6 = Dialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         Assert.assertEquals(r.b, r6);
-        AccessWarningPaneComplexReturn r1 = SecurityDialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r1 = Dialogs.showAccessWarningDialog(AccessType.PRINTER, crtJnlpF(), null);
         Assert.assertEquals(r.p, r1.getRegularReturn().getValue());
-        AccessWarningPaneComplexReturn r2 = SecurityDialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
+        AccessWarningPaneComplexReturn r2 = Dialogs.showAccessWarningDialog(AccessType.CREATE_DESKTOP_SHORTCUT, crtJnlpF(), null);
         Assert.assertEquals(r.p, r2.getRegularReturn().getValue());
 
     }

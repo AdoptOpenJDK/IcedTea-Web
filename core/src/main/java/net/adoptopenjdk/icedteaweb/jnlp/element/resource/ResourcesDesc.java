@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 
@@ -242,33 +243,10 @@ public class ResourcesDesc {
      * @return all resources of the specified type.
      */
     public <T> List<T> getResources(final Class<T> type) {
-        final List<T> result = new ArrayList<>();
-        for (final Object resource : resources) {
-            if (resource instanceof JREDesc) {
-                final JREDesc jre = (JREDesc) resource;
-                final List<ResourcesDesc> descs = jre.getResourcesDesc();
-                for (final ResourcesDesc desc : descs) {
-                    result.addAll(desc.getResources(type));
-                }
-            }
-            if (isWontedResource(resource, type)) {
-                result.add(getWontedResource(resource, type));
-            }
-        }
-
-        return result;
-    }
-
-    private static <T> boolean isWontedResource(final Object resource, final Class<T> type) {
-        final T l = getWontedResource(resource, type);
-        return l != null;
-    }
-
-    private static <T> T getWontedResource(final Object resource, final Class<T> type) {
-        if (type.isAssignableFrom(resource.getClass())) {
-            return type.cast(resource);
-        }
-        return null;
+        return resources.stream()
+                .filter(resource -> type.isAssignableFrom(resource.getClass()))
+                .map(type::cast)
+                .collect(Collectors.toList());
     }
 
     /**

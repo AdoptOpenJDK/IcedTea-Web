@@ -33,7 +33,7 @@ statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.AppletSecurityActions;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.ExecuteAppletAction;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
@@ -42,11 +42,10 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
+import net.sourceforge.jnlp.runtime.SecurityDelegate;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -196,28 +195,6 @@ public class UnsignedAppletTrustConfirmation {
         return result;
     }
 
-    public static void checkUnsignedWithUserIfRequired(JNLPFile file) throws LaunchException {
-
-        if (unsignedAppletsAreForbidden()) {
-            LOG.debug("Not running unsigned applet at {} because unsigned applets are disallowed by security policy.", file.getCodeBase());
-            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was unsigned.", "The applet was unsigned.PolicyDenied");
-        }
-
-        if (!unsignedConfirmationIsRequired()) {
-            LOG.debug("Running unsigned applet at {} does not require confirmation according to security policy.", file.getCodeBase());
-            return;
-        }
-
-        YesNo warningResponse = SecurityDialogs.showUnsignedWarningDialog(file);
-
-        LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
-
-        if (warningResponse == null || !warningResponse.compareValue(Primitive.YES)) {
-            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was unsigned.", "The applet was unsigned.UserDenied");
-        }
-
-    }
-
     public static void checkPartiallySignedWithUserIfRequired(SecurityDelegate securityDelegate, JNLPFile file,
             CertVerifier certVerifier) throws LaunchException {
 
@@ -226,12 +203,12 @@ public class UnsignedAppletTrustConfirmation {
             return;
         }
 
-        YesNoSandbox warningResponse = SecurityDialogs.showPartiallySignedWarningDialog(file, certVerifier, securityDelegate);
+        YesNoSandbox warningResponse = Dialogs.showPartiallySignedWarningDialog(file, certVerifier, securityDelegate);
 
         LOG.debug("Decided action for unsigned applet at {} was {}", file.getCodeBase(), warningResponse);
 
         if (warningResponse == null || warningResponse.compareValue(Primitive.NO)) {
-            throw new LaunchException(file, null, FATAL, "Application Error", "The applet was partially signed.", "The applet was partially signed.UserDenied");
+            throw new LaunchException(file, null, FATAL, "Application Error", "The application was partially signed.", "The application was partially signed.UserDenied");
         }
 
         //this is due to possible YesNoSandboxLimited

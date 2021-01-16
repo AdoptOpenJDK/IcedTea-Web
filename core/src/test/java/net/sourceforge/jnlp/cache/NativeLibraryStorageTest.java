@@ -35,6 +35,7 @@ statement from your version.
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils;
@@ -83,7 +84,7 @@ public class NativeLibraryStorageTest {
 
     /* Creates a NativeLibraryStorage object, caching the given URLs */
     private static NativeLibraryStorage nativeLibraryStorageWithCache(URL... urlsToCache) {
-        ResourceTracker tracker = new ResourceTracker();
+        ResourceTracker tracker = new DefaultResourceTracker();
         for (URL urlToCache : urlsToCache) {
             tracker.addResource(urlToCache, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
         }

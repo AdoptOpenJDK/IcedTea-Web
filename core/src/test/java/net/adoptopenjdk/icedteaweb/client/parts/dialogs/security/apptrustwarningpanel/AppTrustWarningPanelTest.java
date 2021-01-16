@@ -1,8 +1,7 @@
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.apptrustwarningpanel;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
-import net.sourceforge.jnlp.PluginParameters;
 import net.adoptopenjdk.icedteaweb.testing.browsertesting.browsers.firefox.FirefoxProfilesOperator;
+import net.sourceforge.jnlp.PluginParameters;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -16,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -120,7 +120,7 @@ public class AppTrustWarningPanelTest {
     public void testHtmlWrap() throws Exception {
         final String testText = "This is some text";
         final String expectedResult = "<html>This is some text</html>";
-        final String actualResult = SecurityDialogPanel.htmlWrap(testText);
+        final String actualResult = htmlWrap(testText);
         assertEquals("htmlWrap should properly wrap text with HTML tags", expectedResult, actualResult);
     }
 

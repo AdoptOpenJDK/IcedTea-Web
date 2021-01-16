@@ -70,12 +70,12 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.security.AllPermission;
 import java.security.KeyStore;
-import java.security.Policy;
 import java.security.Security;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
@@ -103,7 +103,7 @@ import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
  */
 public class JNLPRuntime {
 
-    private final static Logger LOG = LoggerFactory.getLogger(JNLPRuntime.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JNLPRuntime.class);
 
     /**
      * java-abrt-connector can print out specific application String method, it is good to save visited urls for reproduce purposes.
@@ -112,12 +112,6 @@ public class JNLPRuntime {
      * have caused the crash. That's why the individual urls are added, not replaced.
      */
     private static String history = "";
-
-    /** the security manager */
-    private static JNLPSecurityManager security;
-
-    /** the security policy */
-    private static JNLPPolicy policy;
 
     /** handles all security message to show appropriate security dialogs */
     private static SecurityDialogMessageHandler securityDialogMessageHandler;
@@ -152,9 +146,6 @@ public class JNLPRuntime {
      */
     private static Boolean pluginDebug = null;
 
-    /** mutex to wait on, for initialization */
-    public static Object initMutex = new Object();
-
     /** set to NEVER to indicate another JVM should not be spawned, even if necessary */
     private static ForkingStrategy forkingStrategy = IF_JNLP_REQUIRES;
 
@@ -165,7 +156,7 @@ public class JNLPRuntime {
     private static boolean trustNone = false;
 
     /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/
-    private static boolean allowRedirect = false;;
+    private static boolean allowRedirect = false;
 
     /** when this is true, ITW will not attempt any inet connections and will work only with what is in cache*/
     private static boolean offlineForced = false;
@@ -255,15 +246,7 @@ public class JNLPRuntime {
 
         ServiceManager.setServiceManagerStub(new XServiceManagerStub()); // ignored if we're running under Web Start
 
-        policy = new JNLPPolicy();
-        security = new JNLPSecurityManager(); // side effect: create JWindow
-
         doMainAppContextHacks();
-
-        if (securityEnabled && forkingStrategy.mayRunManagedApplication()) {
-            Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
-            System.setSecurityManager(security);
-        }
 
         securityDialogMessageHandler = startSecurityThreads();
 
@@ -298,18 +281,13 @@ public class JNLPRuntime {
 
     }
 
-    public static void reloadPolicy() {
-        policy.refresh();
-
-    }
-
     /**
      * Returns a TrustManager ideal for the running VM.
      *
      * @return TrustManager the trust manager to use for verifying https certificates
      */
     private static TrustManager getSSLSocketTrustManager() throws
-                                ClassNotFoundException, IllegalAccessException, InstantiationException, InvocationTargetException {
+                                IllegalAccessException, InstantiationException, InvocationTargetException {
 
         try {
 
@@ -576,32 +554,11 @@ public class JNLPRuntime {
     }
 
     /**
-     * Set a class that can exit the JVM; if not set then any class
-     * can exit the JVM.
-     *
-     * @param exitClass a class that can exit the JVM
-     * @throws IllegalStateException if caller is not the exit class
-     */
-    public static void setExitClass(Class<?> exitClass) {
-        checkExitClass();
-        security.setExitClass(exitClass);
-    }
-
-    /**
-     * Disables applets from calling exit.
-     *
-     * Once disabled, exit cannot be re-enabled for the duration of the JVM instance
-     */
-    public static void disableExit() {
-        security.disableExit();
-    }
-
-    /**
      * @return the current Application, or null if none can be
      * determined.
      */
-    public static ApplicationInstance getApplication() {
-        return security.getApplication();
+    public static Optional<ApplicationInstance> getApplication() {
+        return ApplicationManager.getApplication();
     }
 
     /**
@@ -624,7 +581,6 @@ public class JNLPRuntime {
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDebug(boolean enabled) {
-        checkExitClass();
         debug = enabled;
     }
 
@@ -636,7 +592,6 @@ public class JNLPRuntime {
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDefaultUpdatePolicy(UpdatePolicy policy) {
-        checkExitClass();
         updatePolicy = policy;
     }
 
@@ -645,15 +600,6 @@ public class JNLPRuntime {
      */
     public static UpdatePolicy getDefaultUpdatePolicy() {
         return updatePolicy;
-    }
-
-    /**
-     * Sets the default launch handler.
-     * @param handler default handler
-     */
-    public static void setDefaultLaunchHandler(LaunchHandler handler) {
-        checkExitClass();
-        JNLPRuntime.handler = handler;
     }
 
     /**
@@ -671,8 +617,6 @@ public class JNLPRuntime {
      * @throws IllegalStateException if caller is not the exit class
      */
     public static void setDefaultDownloadIndicator(DownloadIndicator indicator) {
-        LOG.debug("Trying to set download indicator");
-        checkExitClass();
         LOG.debug("Setting download indicator to " + indicator);
         JNLPRuntime.indicator = indicator;
     }
@@ -706,16 +650,6 @@ public class JNLPRuntime {
     private static void checkInitialized() {
         if (initialized)
             throw new IllegalStateException("JNLPRuntime already initialized.");
-    }
-
-    /**
-     * Throws an exception if called with security enabled but a caller is not
-     * the exit class and the runtime has been initialized.
-     */
-    private static void checkExitClass() {
-        if (securityEnabled && initialized)
-            if (!security.isExitClass())
-                throw new IllegalStateException("Caller is not the exit class");
     }
 
     /**
@@ -908,19 +842,11 @@ public class JNLPRuntime {
     }
 
     /**
-     * Used by java-abrt-connector via reflection
-     * @return history
+     * @param showWebSplash show splash screen at start of webstart application
      */
-    private static String getHistory() {
-        return history;
+    public static void setShowWebSplash(boolean showWebSplash) {
+        JNLPRuntime.showWebSplash = showWebSplash;
     }
-
-	/**
-	 * @param showWebSplash show splash screen at start of webstart application
-	 */
-	public static void setShowWebSplash(boolean showWebSplash) {
-		JNLPRuntime.showWebSplash = showWebSplash;
-	}
 
     /**
      * @return show splash screen at start of webstart application

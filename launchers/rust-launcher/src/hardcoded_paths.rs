@@ -14,6 +14,7 @@ const RHINO_JAR: Option<&'static str> = option_env!("RHINO_JAR");
 const ITW_LIBS: Option<&'static str> = option_env!("ITW_LIBS");
 const MODULARJDK_ARGS_LOCATION: Option<&'static str> = option_env!("MODULARJDK_ARGS_LOCATION");
 const MSLINKS_JAR: Option<&'static str> = option_env!("MSLINKS_JAR");
+const GSON_JAR: Option<&'static str> = option_env!("GSON_JAR");
 const IPADDRESS_JAR: Option<&'static str> = option_env!("IPADDRESS_JAR");
 
 
@@ -38,6 +39,8 @@ pub fn get_tagsoup() -> Option<&'static str> { sanitize(TAGSOUP_JAR) }
 pub fn get_rhino() -> Option<&'static str> { sanitize(RHINO_JAR) }
 
 pub fn get_mslinks() -> Option<&'static str> { sanitize(MSLINKS_JAR) }
+
+pub fn get_gson() -> Option<&'static str> { sanitize(GSON_JAR) }
 
 pub fn get_ipaddress() -> Option<&'static str> { sanitize(IPADDRESS_JAR) }
 

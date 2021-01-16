@@ -118,6 +118,11 @@ if [ "x$MSLINKS_SRC" == "x" ] ; then
 else
   readonly MSLINKS_SRC=$MSLINKS_SRC
 fi
+if [ "x$GSON_SRC" == "x" ] ; then
+  readonly GSON_SRC=`getJar "gson"`
+else
+  readonly GSON_SRC=$GSON_SRC
+fi
 if [ "x$IPADDRESS_SRC" == "x" ] ; then
   readonly IPADDRESS_SRC=`getJar "ipaddress"`
 else

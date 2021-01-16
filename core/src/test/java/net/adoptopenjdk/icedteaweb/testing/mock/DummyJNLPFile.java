@@ -34,7 +34,7 @@ statement from your version.
 package net.adoptopenjdk.icedteaweb.testing.mock;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.sourceforge.jnlp.JNLPFile;
 
@@ -58,7 +58,7 @@ public class DummyJNLPFile extends JNLPFile {
     }
 
     {
-        this.security = new SecurityDesc(this, AppletPermissionLevel.NONE, SecurityDesc.SANDBOX_PERMISSIONS, null);
+        this.security = new SecurityDesc(ApplicationEnvironment.SANDBOX);
     }
 
     @Override

@@ -34,10 +34,11 @@ statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
-import net.sourceforge.jnlp.security.CertVerifier;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Yes;
+import net.sourceforge.jnlp.security.CertVerifier;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -53,13 +54,17 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * Provides the panel for the More Info dialog. This dialog shows details about an
  * application's signing status.
  *
  * @author <a href="mailto:jsumali@redhat.com">Joshua Sumali</a>
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class MoreInfoPane extends SecurityDialogPanel {
 
     private final boolean showSignedJNLPWarning;
@@ -119,7 +124,7 @@ public class MoreInfoPane extends SecurityDialogPanel {
     private class CertInfoButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            SecurityDialog.showCertInfoDialog(parent.getCertVerifier(),
+            Dialogs.showCertInfoDialog(parent.getCertVerifier(),
                                 parent.getSecurityDialogPanel());
         }
     }

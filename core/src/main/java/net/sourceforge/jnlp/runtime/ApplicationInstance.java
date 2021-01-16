@@ -16,24 +16,38 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.classloader.JnlpApplicationClassLoader;
+import net.adoptopenjdk.icedteaweb.classloader.PartExtractor;
+import net.adoptopenjdk.icedteaweb.classloader.PartsHandler;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTrackerFactory;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.adoptopenjdk.icedteaweb.resources.ResourceTrackerFactory;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
+import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
-import net.sourceforge.jnlp.util.WeakList;
+import net.sourceforge.jnlp.services.PartsCache;
+import net.sourceforge.jnlp.util.JarFile;
 import sun.awt.AppContext;
 
-import javax.swing.event.EventListenerList;
-import java.awt.Window;
+import java.io.File;
 import java.io.IOException;
 import java.security.AccessControlContext;
 import java.security.AccessController;
 import java.security.CodeSource;
+import java.security.PermissionCollection;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.jar.Attributes;
+import java.util.stream.Stream;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.ALL;
+import static net.sourceforge.jnlp.LaunchException.FATAL;
 
 /**
  * Represents a running instance of an application described in a
@@ -53,65 +67,72 @@ public class ApplicationInstance {
     // todo: should attempt to unload the environment variables
     // installed by the application.
 
-    /** the file */
     private final JNLPFile file;
-
-    /** the thread group */
+    private final String mainClass;
     private final ThreadGroup group;
+    private final PartsHandler partsHandler;
+    private final JnlpApplicationClassLoader loader;
+    private final ApplicationPermissions applicationPermissions;
 
-    /** the classloader */
-    private final JNLPClassLoader loader;
-
-    /** whether the application has stopped running */
+    /**
+     * whether the application has stopped running
+     */
     private boolean stopped = false;
 
-    /** weak list of windows opened by the application */
-    private final WeakList<Window> weakWindows = new WeakList<>();
+    private ApplicationEnvironment applicationEnvironment;
 
-    /** list of application listeners  */
-    private final EventListenerList listeners = new EventListenerList();
-
-    /** whether or not this application is signed */
-    private boolean isSigned;
 
     /**
      * Create an application instance for the file. This should be done in the
      * appropriate {@link ThreadGroup} only.
+     *
      * @param file jnlpfile for which the instance do exists
-     * @param group thread group to which it belongs
-     * @param loader loader for this application
      */
-    public ApplicationInstance(JNLPFile file, ThreadGroup group, JNLPClassLoader loader) {
-        this.file = file;
-        this.group = group;
-        this.loader = loader;
-        this.isSigned = loader.getSigning();
-        AppContext.getAppContext();
+    public ApplicationInstance(final JNLPFile file, final ThreadGroup applicationThreadGroup) {
+        this(file, new DefaultResourceTrackerFactory(), applicationThreadGroup);
     }
 
     /**
-     * Notify listeners that the application has been terminated.
+     * Visible for testing. For productive code please use {@link #ApplicationInstance(JNLPFile, ThreadGroup)} (JNLPFile)}.
      */
-    private void fireDestroyed() {
-        Object[] list = listeners.getListenerList();
-        ApplicationEvent event = null;
+    public ApplicationInstance(final JNLPFile file, ResourceTrackerFactory trackerFactory, final ThreadGroup applicationThreadGroup) {
+        this.file = file;
+        this.applicationEnvironment = file.getSecurity().getApplicationEnvironment();
+        this.group = applicationThreadGroup;
+        final ResourceTracker tracker = trackerFactory.create(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        this.applicationPermissions = new ApplicationPermissions(tracker);
+        final JNLPFileFactory fileFactory = new JNLPFileFactory();
+        final PartExtractor extractor = new PartExtractor(file, fileFactory);
 
-        for (int i = list.length - 1; i > 0; i -= 2) { // last to first required
-            if (event == null)
-                event = new ApplicationEvent(this);
+        this.partsHandler = new PartsHandler(extractor.getParts(), file, tracker);
+        this.loader = new JnlpApplicationClassLoader(partsHandler);
 
-            ((ApplicationListener) list[i]).applicationDestroyed(event);
-        }
+        this.mainClass = determineMainClass(file, tracker);
     }
 
     /**
      * Initialize the application's environment (installs
      * environment variables, etc).
      */
-    public void initialize() {
+    public void initialize() throws LaunchException {
+
+        ApplicationManager.addApplication(this);
+
+        loader.initializeEagerJars();
+
+        AppContext.getAppContext();
+
+        installSandboxIfRequested();
+
         installEnvironment();
-        final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
-        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
+        installShortcutsIfRequested();
+    }
+
+    private void installSandboxIfRequested() throws LaunchException {
+        if (JNLPRuntime.isSecurityEnabled() && applicationEnvironment != ALL) {
+            throw new LaunchException(file, null, FATAL, "Not Supported", "Sandbox not supported",
+                    "Currently Icedtea-Web does not support sandboxing of a managed application");
+        }
     }
 
     /**
@@ -135,10 +156,8 @@ public class ApplicationInstance {
         if (!(props.length == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
-            final JNLPClassLoader loader = this.loader;
-            final SecurityDesc s = loader.getSecurity();
-            final ProtectionDomain pd = new ProtectionDomain(cs, s.getPermissions(cs), null, null);
-            final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
+            final ProtectionDomain pd = new ProtectionDomain(cs, PermissionsManager.getPermissions(file, cs, applicationEnvironment), null, null);
+            final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[]{pd});
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
                 for (PropertyDesc propDesc : props) {
@@ -156,68 +175,57 @@ public class ApplicationInstance {
         System.setProperty(DEPLOYMENT_SYSPROP, DEPLOYMENT_SYSPROP_VALUE);
     }
 
+    private void installShortcutsIfRequested() {
+        final DeploymentConfiguration configuration = JNLPRuntime.getConfiguration();
+        JNLPRuntime.getExtensionPoint().createMenuAndDesktopIntegration(configuration).addMenuAndDesktopEntries(file);
+    }
+
     /**
      * Returns the jnlpfile on which is this application based
+     *
      * @return JNLP file for this task.
      */
     public JNLPFile getJNLPFile() {
         return file;
     }
 
-    /**
-     * Returns the application title.
-     * @return the title of this application
-     */
-    public String getTitle() {
-        return file.getTitle();
+    public PartsCache getPartsCache() {
+        return partsHandler;
     }
 
     /**
-     * Returns whether the application is running.
-     * @return state of application
+     * @return the environment for the application to run in.
      */
-    public boolean isRunning() {
-        return !stopped;
+    public ApplicationEnvironment getApplicationEnvironment() {
+        return applicationEnvironment;
+    }
+
+    public void setApplicationEnvironment(ApplicationEnvironment applicationEnvironment) {
+        this.applicationEnvironment = applicationEnvironment;
     }
 
     /**
      * Stop the application and destroy its resources.
      */
-    @SuppressWarnings("deprecation")
-    public void destroy() {
+    public synchronized void destroy() {
         if (stopped)
             return;
 
         try {
-            // destroy resources
-            for (Window w : weakWindows) {
-                if (w != null)
-                    w.dispose();
-            }
-
-            weakWindows.clear();
-
-            // interrupt threads
             Thread[] threads = new Thread[group.activeCount() * 2];
-            int nthreads = group.enumerate(threads);
-            for (int i = 0; i < nthreads; i++) {
-                LOG.info("Interrupt thread: {}", threads[i]);
-                threads[i].interrupt();
-            }
+            group.enumerate(threads);
+            Stream.of(threads).forEach(t -> {
+                try {
+                    t.interrupt();
+                } catch (final Exception e) {
+                    LOG.error("Unable to interrupt application Thread '" + t.getName() + "'", e);
+                }
+            });
 
-            // then stop
-            Thread.yield();
-            nthreads = group.enumerate(threads);
-            for (int i = 0; i < nthreads; i++) {
-                LOG.info("Stop thread: {}", threads[i]);
-                threads[i].stop();
-            }
-
-            // then destroy - except Thread.destroy() not implemented in jdk
-
+        } catch (final Exception e) {
+            LOG.error("ERROR IN DESTROYING APP!", e);
         } finally {
             stopped = true;
-            fireDestroyed();
         }
     }
 
@@ -228,8 +236,9 @@ public class ApplicationInstance {
      * @throws IllegalStateException if the app is not running
      */
     public ThreadGroup getThreadGroup() throws IllegalStateException {
-        if (stopped)
+        if (stopped) {
             throw new IllegalStateException();
+        }
 
         return group;
     }
@@ -240,40 +249,41 @@ public class ApplicationInstance {
      * @return the classloader of this application, unless it is stopped
      * @throws IllegalStateException if the app is not running
      */
-    public JNLPClassLoader getClassLoader() throws IllegalStateException {
-        if (stopped)
+    public ClassLoader getClassLoader() throws IllegalStateException {
+        if (stopped) {
             throw new IllegalStateException();
+        }
 
         return loader;
     }
 
-    public String getMainClassName() throws IOException {
-        String mainName = file.getApplication().getMainClass();
+
+    public PermissionCollection getPermissions(CodeSource cs) {
+        return applicationPermissions.getPermissions(file, cs);
+    }
+
+    public String getMainClassName() {
+        return mainClass;
+    }
+
+    protected String determineMainClass(JNLPFile file, ResourceTracker tracker) {
+        final String mainName = file.getApplication().getMainClass();
 
         // When the application-desc field is empty, we should take a
         // look at the main jar for the main class.
-        if (mainName == null) {
-            mainName = getClassLoader().getMainClassNameFromManifest(file.getResources().getMainJAR());
+        if (mainName != null) {
+            return mainName;
         }
 
-        return mainName;
-    }
+        final File f = tracker.getCacheFile(file.getResources().getMainJAR().getLocation());
+        if (f != null) {
+            try (final JarFile mainJar = new JarFile(f)) {
+                return mainJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
-    /**
-     * Adds a window that this application opened.  When the
-     * application is disposed, these windows will also be disposed.
-     * @param window to be added
-     */
-    void addWindow(Window window) {
-        weakWindows.add(window);
-        weakWindows.trimToSize();
+        return null;
     }
-
-    /**
-     * @return whether or not this application is signed.
-     */
-    public boolean isSigned() {
-        return isSigned;
-    }
-
 }

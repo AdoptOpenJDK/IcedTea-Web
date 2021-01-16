@@ -111,10 +111,10 @@ public abstract class JNLPProxySelector extends ProxySelector {
                 .filter(s -> !StringUtils.isBlank(s))
                 .collect(Collectors.toList());
 
-        bypassLocal = Boolean.valueOf(config
+        bypassLocal = Boolean.parseBoolean(config
                 .getProperty(ConfigurationConstants.KEY_PROXY_BYPASS_LOCAL));
 
-        sameProxy = Boolean.valueOf(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME));
+        sameProxy = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_PROXY_SAME));
 
         proxyHttpHost = getHost(config, ConfigurationConstants.KEY_PROXY_HTTP_HOST);
         proxyHttpPort = getPort(config, ConfigurationConstants.KEY_PROXY_HTTP_PORT);

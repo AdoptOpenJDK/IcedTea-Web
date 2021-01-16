@@ -17,24 +17,17 @@
 package net.sourceforge.jnlp.cache;
 
 import net.adoptopenjdk.icedteaweb.StringUtils;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
-import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DummyDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
-import javax.jnlp.DownloadServiceListener;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,7 +38,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.JAR_PROTOCOL;
@@ -75,7 +67,7 @@ public class CacheUtil {
      */
     public static File downloadAndGetCacheFile(final URL location, final VersionString version) {
         try {
-            final ResourceTracker rt = new ResourceTracker();
+            final ResourceTracker rt = new DefaultResourceTracker();
             rt.addResource(location, version);
             return rt.getCacheFile(location);
         } catch (Exception ex) {
@@ -224,58 +216,5 @@ public class CacheUtil {
         return hexString.toString();
     }
 
-    /**
-     * Waits until the resources are downloaded, while showing a
-     * progress indicator.
-     *
-     * @param jnlpClassLoader the classloader
-     * @param tracker         the resource tracker
-     * @param resources       the resources to wait for
-     * @param title           name of the download
-     */
-    public static void waitForResources(final JNLPClassLoader jnlpClassLoader, final ResourceTracker tracker, final URL[] resources, final String title) {
-        try {
-            final DownloadIndicator indicator = Optional.ofNullable(JNLPRuntime.getDefaultDownloadIndicator())
-                    .orElseGet(() -> new DummyDownloadIndicator());
-            final DownloadServiceListener listener = getDownloadServiceListener(jnlpClassLoader, title, resources, indicator);
-            try {
-                for (URL url : resources) {
-                    tracker.addDownloadListener(url, resources, listener);
-                }
-                tracker.waitForResources(resources);
-            } finally {
-                indicator.disposeListener(listener);
-            }
-        } catch (Exception ex) {
-            LOG.error("Downloading of resources ended with error", ex);
-        }
-    }
 
-    private static DownloadServiceListener getDownloadServiceListener(final JNLPClassLoader jnlpClassLoader, final String title, final URL[] undownloaded, final DownloadIndicator indicator) {
-        final EntryPoint entryPoint = jnlpClassLoader.getJNLPFile().getEntryPointDesc();
-        String progressClass = null;
-
-        if (entryPoint instanceof ApplicationDesc) {
-            final ApplicationDesc applicationDesc = (ApplicationDesc) entryPoint;
-            progressClass = applicationDesc.getProgressClass();
-        } else if (entryPoint instanceof AppletDesc) {
-            final AppletDesc appletDesc = (AppletDesc) entryPoint;
-            progressClass = appletDesc.getProgressClass();
-        } else if (entryPoint instanceof InstallerDesc) {
-            final InstallerDesc installerDesc = (InstallerDesc) entryPoint;
-            progressClass = installerDesc.getProgressClass();
-        }
-
-        if (progressClass != null) {
-            try {
-                final Class<?> downloadProgressIndicatorClass = jnlpClassLoader.loadClass(progressClass);
-                return (DownloadServiceListener) downloadProgressIndicatorClass.newInstance();
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
-                LOG.warn(format("Could not load progress class '%s' specified in JNLP file, " +
-                        "use default download progress indicator instead.", progressClass), ex);
-            }
-        }
-
-        return indicator.getListener(title, undownloaded);
-    }
 }

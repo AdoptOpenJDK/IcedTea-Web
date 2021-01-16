@@ -16,14 +16,13 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -42,6 +41,7 @@ import java.security.Policy;
 import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
+import java.util.Optional;
 
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
@@ -76,22 +76,25 @@ public class JNLPPolicy extends Policy {
 
     private final URI jreExtDir;
 
+    private final JNLPSecurityManager securityManager;
+
     /**
      * the system level policy for jnlps
      */
-    private Policy systemJnlpPolicy = null;
+    private final Policy systemJnlpPolicy;
 
     /**
      * the user-level policy for jnlps
      */
-    private Policy userJnlpPolicy = null;
+    private final Policy userJnlpPolicy;
 
-    protected JNLPPolicy() {
+    protected JNLPPolicy(final JNLPSecurityManager securityManager) {
+        this.securityManager = securityManager;
         shellSource = JNLPPolicy.class.getProtectionDomain().getCodeSource();
         systemSource = Policy.class.getProtectionDomain().getCodeSource();
         systemPolicy = Policy.getPolicy();
 
-        systemJnlpPolicy = getPolicyFromConfig(ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY);
+        systemJnlpPolicy = getSystemSecurityPolicyFromConfig();
         userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
 
         String jre = JavaSystemProperties.getJavaHome();
@@ -99,8 +102,7 @@ public class JNLPPolicy extends Policy {
     }
 
     /**
-     * Return a mutable, heterogeneous-capable permission collection
-     * for the source.
+     * Return a mutable, heterogeneous-capable permission collection for the source.
      */
     public PermissionCollection getPermissions(CodeSource source) {
         if (source.equals(systemSource) || source.equals(shellSource))
@@ -112,45 +114,42 @@ public class JNLPPolicy extends Policy {
 
         // if we check the SecurityDesc here then keep in mind that
         // code can add properties at runtime to the ResourcesDesc!
-        if (JNLPRuntime.getApplication() != null) {
-            if (JNLPRuntime.getApplication().getClassLoader() instanceof JNLPClassLoader) {
-                JNLPClassLoader cl = (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
+        final Optional<ApplicationInstance> application = securityManager.getApplication();
+        if (application.isPresent()) {
+            final PermissionCollection clPermissions = application.get().getPermissions(source);
 
-                PermissionCollection clPermissions = cl.getPermissions(source);
+            Enumeration<Permission> e;
+            final JNLPFile jnlpFile = application.get().getJNLPFile();
+            CodeSource appletCS = new CodeSource(jnlpFile.getSourceLocation(), (java.security.cert.Certificate[]) null);
 
-                Enumeration<Permission> e;
-                CodeSource appletCS = new CodeSource(JNLPRuntime.getApplication().getJNLPFile().getSourceLocation(), (java.security.cert.Certificate[]) null);
+            // systempolicy permissions need to be accounted for as well
+            e = systemPolicy.getPermissions(appletCS).elements();
+            while (e.hasMoreElements()) {
+                clPermissions.add(e.nextElement());
+            }
 
-                // systempolicy permissions need to be accounted for as well
-                e = systemPolicy.getPermissions(appletCS).elements();
+            // and so do permissions from the jnlp-specific system policy
+            if (systemJnlpPolicy != null) {
+                e = systemJnlpPolicy.getPermissions(appletCS).elements();
+                while (e.hasMoreElements()) {
+                    clPermissions.add(e.nextElement());
+                }
+            }
+
+            // and permissions from jnlp-specific user policy too
+            if (userJnlpPolicy != null) {
+                e = userJnlpPolicy.getPermissions(appletCS).elements();
                 while (e.hasMoreElements()) {
                     clPermissions.add(e.nextElement());
                 }
 
-                // and so do permissions from the jnlp-specific system policy
-                if (systemJnlpPolicy != null) {
-                    e = systemJnlpPolicy.getPermissions(appletCS).elements();
-                    while (e.hasMoreElements()) {
-                        clPermissions.add(e.nextElement());
-                    }
+                CodeSource appletCodebaseSource = new CodeSource(jnlpFile.getCodeBase(), (java.security.cert.Certificate[]) null);
+                e = userJnlpPolicy.getPermissions(appletCodebaseSource).elements();
+                while (e.hasMoreElements()) {
+                    clPermissions.add(e.nextElement());
                 }
-
-                // and permissions from jnlp-specific user policy too
-                if (userJnlpPolicy != null) {
-                    e = userJnlpPolicy.getPermissions(appletCS).elements();
-                    while (e.hasMoreElements()) {
-                        clPermissions.add(e.nextElement());
-                    }
-
-                    CodeSource appletCodebaseSource = new CodeSource(JNLPRuntime.getApplication().getJNLPFile().getCodeBase(), (java.security.cert.Certificate[]) null);
-                    e = userJnlpPolicy.getPermissions(appletCodebaseSource).elements();
-                    while (e.hasMoreElements()) {
-                        clPermissions.add(e.nextElement());
-                    }
-                }
-
-                return clPermissions;
             }
+            return clPermissions;
         }
 
         // delegate to original Policy object; required to run under WebStart
@@ -214,12 +213,11 @@ public class JNLPPolicy extends Policy {
     /**
      * Constructs a delegate policy based on a config setting
      *
-     * @param key a KEY_* in DeploymentConfiguration
      * @return a policy based on the configuration set by the user
      */
-    private Policy getPolicyFromConfig(String key) {
+    private Policy getSystemSecurityPolicyFromConfig() {
         DeploymentConfiguration config = JNLPRuntime.getConfiguration();
-        String policyLocation = config.getProperty(key);
+        String policyLocation = config.getProperty(ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY);
         return getPolicyFromUrl(policyLocation);
     }
 
@@ -241,7 +239,7 @@ public class JNLPPolicy extends Policy {
                 }
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
             } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException  | MalformedURLException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                LOG.error("Failed to get policy from url " + policyLocation, e);
             }
         }
         return policy;

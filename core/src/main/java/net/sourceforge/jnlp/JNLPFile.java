@@ -17,7 +17,6 @@
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
@@ -26,18 +25,17 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.ComponentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.extension.InstallerDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.InformationDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JNLPResources;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader;
+import net.adoptopenjdk.icedteaweb.security.PermissionsManager;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
@@ -46,9 +44,9 @@ import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.security.PermissionCollection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,6 +57,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
@@ -95,12 +94,6 @@ public class JNLPFile {
     public static final String CODEBASE_ATTRIBUTE = "codebase";
 
     public static final String SPEC_VERSION_DEFAULT = "1.0+";
-
-    // todo: save the update policy, then if file was not updated
-    // then do not check resources for being updated.
-    //
-    // todo: currently does not filter resources by jvm version.
-    //
 
     /**
      * the location this JNLP file was created from
@@ -149,7 +142,7 @@ public class JNLPFile {
     /**
      * resources
      */
-    protected List<ResourcesDesc> resources;
+    protected JNLPResources resources;
 
     /**
      * additional resources not in JNLP file (from command line)
@@ -172,6 +165,11 @@ public class JNLPFile {
     protected SecurityDesc security;
 
     /**
+     * the default Java version
+     */
+    protected String defaultJavaVersion = null;
+
+    /**
      * the default JVM locale
      */
     protected Locale defaultLocale = null;
@@ -189,34 +187,23 @@ public class JNLPFile {
     /**
      * A signed JNLP file is missing from the main jar
      */
-    private boolean missingSignedJNLP = false;
-
-    /**
-     * JNLP file contains special properties
-     */
-    private boolean containsSpecialProperties = false;
+    private boolean isSigned = false;
 
     /**
      * List of acceptable properties (not-special)
      */
-    final private String[] generalProperties = SecurityDesc.getJnlpRIAPermissions();
+    private final PermissionCollection generalProperties = PermissionsManager.getJnlpRiaPermissions();
 
-    /**
-     * important manifests' attributes
-     */
-    private final ManifestAttributesReader manifestAttributesReader = new ManifestAttributesReader(this);
-
-    private static final String TITLE_NOT_FOUND = "Application title was not found in manifest. Check with application vendor";
     private static final String FAKE_TITLE = "Corrupted or missing title. Do not trust this application!";
 
 
     { // initialize defaults if security allows
         try {
             defaultLocale = Locale.getDefault();
+            defaultJavaVersion = JavaSystemProperties.getJavaVersion();
             defaultOS = JavaSystemProperties.getOsName();
             defaultArch = JavaSystemProperties.getOsArch();
-        }
-        catch (SecurityException ex) {
+        } catch (SecurityException ex) {
             // FIXME: how should we proceed if the default values are not available??
         }
     }
@@ -225,69 +212,26 @@ public class JNLPFile {
      * Empty stub, allowing child classes to override the constructor
      */
     // only used for tests
-    protected JNLPFile() {
+    public JNLPFile() {
         this.parserSettings = null;
         this.fileLocation = null;
         this.uniqueKey = null;
     }
 
-    /**
-     * Create a JNLPFile from a URL and a version, checking for updates
-     * using the specified policy.
-     *
-     * @param location      the location of the JNLP file
-     * @param settings      the parser settings to use while parsing the file
-     * @throws IOException    if an IO exception occurred
-     * @throws ParseException if the JNLP file was invalid
-     */
-    JNLPFile(final InputStream input,
-             final URL location,
-             final ParserSettings settings,
-             final String uniqueKey
-    ) throws IOException, ParseException {
+    public JNLPFile(final InputStream input, final URL location, final URL codebase, final ParserSettings settings, final String uniqueKey) throws ParseException {
         this.parserSettings = settings;
         this.fileLocation = location;
         this.uniqueKey = uniqueKey;
-
-        parse(input, location, null);
+        parse(input, location, codebase);
 
         final String httpAgent = getResources().getPropertiesMap().get(HTTP_AGENT);
-        if (! StringUtils.isBlank(httpAgent)) {
+        if (!StringUtils.isBlank(httpAgent)) {
             System.setProperty(HTTP_AGENT, httpAgent);
             if (!HttpURLConnection.userAgent.contains(httpAgent)) {
                 LOG.warn("Cannot set HTTP User-Agent as a connection has been opened before reading the JNLP file");
             }
         }
     }
-
-    /**
-     * Create a JNLPFile from an input stream.
-     *
-     * @param input    input stream from which create jnlp file
-     * @param settings settings of parser
-     * @throws ParseException if the JNLP file was invalid
-     */
-    // only used for tests
-    public JNLPFile(final InputStream input, final ParserSettings settings) throws ParseException {
-        this(input, null, settings);
-    }
-
-    /**
-     * Create a JNLPFile from an input stream.
-     *
-     * @param input    input stream of JNLP file.
-     * @param codebase codebase to use if not specified in JNLP file..
-     * @param settings the {@link ParserSettings} to use when parsing
-     * @throws ParseException if the JNLP file was invalid
-     */
-    // only used for tests
-    public JNLPFile(final InputStream input, final URL codebase, final ParserSettings settings) throws ParseException {
-        this.parserSettings = settings;
-        this.fileLocation = null;
-        this.uniqueKey = null;
-        parse(input, null, codebase);
-    }
-
 
     /**
      * @return the JNLP file's best localized title. This method returns the same
@@ -299,14 +243,13 @@ public class JNLPFile {
     public String getTitle() {
         try {
             return getTitle(false);
-        }
-        catch (MissingTitleException cause) {
+        } catch (MissingTitleException cause) {
             throw new RuntimeException(cause);
         }
     }
 
     public String getTitle(boolean kill) throws MissingTitleException {
-        final String title = getTitleImpl();
+        final String title = getTitleFromJnlp();
 
         if (StringUtils.isBlank(title)) {
             LOG.warn("The title section has not been specified for your locale nor does a default value exist in the JNLP file. and Missing Title");
@@ -320,39 +263,12 @@ public class JNLPFile {
         return title;
     }
 
-    private String getTitleImpl() {
-        String jnlpTitle = getTitleFromJnlp();
-        String manifestTitle = getTitleFromManifest();
-        if (jnlpTitle != null && manifestTitle != null) {
-            if (jnlpTitle.equals(manifestTitle)) {
-                return jnlpTitle;
-            }
-            return jnlpTitle + " (" + manifestTitle + ")";
-        }
-        if (jnlpTitle != null && manifestTitle == null) {
-            return jnlpTitle;
-        }
-        if (jnlpTitle == null && manifestTitle != null) {
-            return manifestTitle;
-        }
-        String mainClass = getManifestAttributesReader().getMainClass();
-        return mainClass;
-    }
-
     /**
      * @return the JNLP file's best localized title. This method returns the
      * same value as InformationDesc.getTitle().
      */
     public String getTitleFromJnlp() {
         return getInformation().getTitle();
-    }
-
-    public String getTitleFromManifest() {
-        String inManifestTitle = getManifestAttributesReader().getApplicationName();
-        if (inManifestTitle == null && getManifestAttributesReader().isLoader()) {
-            LOG.warn(TITLE_NOT_FOUND);
-        }
-        return inManifestTitle;
     }
 
     /**
@@ -362,8 +278,7 @@ public class JNLPFile {
     public String getVendor() {
         try {
             return getVendor(false);
-        }
-        catch (MissingVendorException cause) {
+        } catch (MissingVendorException cause) {
             throw new RuntimeException(cause);
         }
     }
@@ -380,8 +295,7 @@ public class JNLPFile {
             LOG.warn("The vendor section has not been specified for your locale nor does a default value exist in the JNLP file.");
             vendor = "Corrupted or missing vendor. Do not trust this application!";
             LOG.warn("However there is to many applications known to suffer this issue, so providing fake:" + "vendor" + ": " + vendor);
-        }
-        else {
+        } else {
             LOG.info("Acceptable vendor tag found, contains: {}", vendor);
         }
         return vendor;
@@ -458,9 +372,8 @@ public class JNLPFile {
         }
         try {
             return UrlUtils.removeFileName(getSourceLocation());
-        }
-        catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+        } catch (Exception ex) {
+            LOG.error("Exception while removing file name from URL", ex);
         }
         return getSourceLocation();
     }
@@ -500,7 +413,7 @@ public class JNLPFile {
         final Map<String, List<Object>> mergedItems = new HashMap<>();
 
         infos.stream()
-                .filter(infoDesc -> localeMatches(infoDesc.getLocales(), locale))
+                .filter(infoDesc -> localeMatches(locale, infoDesc.getLocales()))
                 .filter(infoDesc -> hasPrefixMatch(os, infoDesc.getOs()))
                 .filter(infoDesc -> hasPrefixMatch(arch, infoDesc.getArch()))
                 .peek(infoDesc -> {
@@ -511,7 +424,7 @@ public class JNLPFile {
                 .flatMap(infoDesc -> infoDesc.getItems().entrySet().stream())
                 .forEach(itemEntry -> {
                     final List<Object> newValues = itemEntry.getValue().stream()
-                            .filter(v -> v != null)
+                            .filter(Objects::nonNull)
                             .filter(v -> !StringUtils.isBlank(v.toString()))
                             .collect(toList());
 
@@ -522,7 +435,7 @@ public class JNLPFile {
             @Override
             public List<Object> getItems(String key) {
                 final List<Object> result = mergedItems.get(key);
-                return result == null ? Collections.emptyList() : result;
+                return result == null ? emptyList() : result;
             }
 
             @Override
@@ -549,15 +462,8 @@ public class JNLPFile {
     /**
      * @return the requested security level of the application represented by this JNLP file.
      */
-    public ApplicationPermissionLevel getApplicationPermissionLevel() {
-        return this.security.getApplicationPermissionLevel();
-    }
-
-    /**
-     * @return the requested security level of the applet represented by this JNLP file.
-     */
-    public AppletPermissionLevel getAppletPermissionLevel() {
-        return this.security.getAppletPermissionLevel();
+    public ApplicationEnvironment getApplicationEnvironment() {
+        return this.security.getApplicationEnvironment();
     }
 
     /**
@@ -566,22 +472,11 @@ public class JNLPFile {
      * properties.
      */
     public ResourcesDesc getResources() {
-        return getResources(defaultLocale, defaultOS, defaultArch);
-    }
-
-    /**
-     * @param locale preferred locale of resource
-     * @param os     preferred os of resource
-     * @param arch   preferred arch of resource
-     * @return the resources section of the JNLP file for the
-     * specified locale, os, and arch.
-     */
-    public ResourcesDesc getResources(final Locale locale, final String os, final String arch) {
-        return new ResourcesDesc(this, new Locale[]{locale}, new String[]{os}, new String[]{arch}) {
+        return new ResourcesDesc(this, new Locale[]{defaultLocale}, new String[]{defaultOS}, new String[]{defaultArch}) {
 
             @Override
             public <T> List<T> getResources(Class<T> launchType) {
-                final List<T> result = getResourcesDescs(locale, os, arch).stream()
+                final List<T> result = getResourcesDescs().stream()
                         .flatMap(resDesc -> resDesc.getResources(launchType).stream())
                         .collect(toList());
 
@@ -590,12 +485,18 @@ public class JNLPFile {
                 return result;
             }
 
+            /**
+             * Only called from Launcher to add propery descriptions from command line.
+             */
             @Override
             public void addResource(Object resource) {
-                // todo: honor the current locale, os, arch values
                 sharedResources.addResource(resource);
             }
         };
+    }
+
+    public JNLPResources getJnlpResources() {
+        return new JNLPResources(getResourcesDescs());
     }
 
     /**
@@ -605,16 +506,32 @@ public class JNLPFile {
      * XXX: Before overriding this method or changing its implementation,
      * read the comment in JNLPFile.getDownloadOptionsForJar(JARDesc).
      */
-    public ResourcesDesc[] getResourcesDescs() {
-        return getResourcesDescs(defaultLocale, defaultOS, defaultArch).toArray(new ResourcesDesc[0]);
+    public List<ResourcesDesc> getResourcesDescs() {
+        final JNLPResources resourcesOutsideOfJreDesc = getResourcesOutsideOfJreDesc();
+        final List<ResourcesDesc> jreResources = getResourcesOfJreDesc(resourcesOutsideOfJreDesc);
+
+        final List<ResourcesDesc> result = new ArrayList<>();
+        result.addAll(resourcesOutsideOfJreDesc.all());
+        result.addAll(jreResources);
+        return result;
     }
 
-    private List<ResourcesDesc> getResourcesDescs(Locale locale, String os, String arch) {
-        return resources.stream()
-                .filter(rescDesc -> hasPrefixMatch(os, rescDesc.getOS()))
-                .filter(rescDesc -> hasPrefixMatch(arch, rescDesc.getArch()))
-                .filter(rescDesc -> localeMatches(rescDesc.getLocales(), locale))
-                .collect(toList());
+    private JNLPResources getResourcesOutsideOfJreDesc() {
+        return resources.filterResources(defaultLocale, defaultOS, defaultArch);
+    }
+
+    private List<ResourcesDesc> getResourcesOfJreDesc(JNLPResources resourcesOutsideOfJreDesc) {
+        final List<JREDesc> jres = resourcesOutsideOfJreDesc.getJREs();
+        if (jres.isEmpty()) {
+            return emptyList();
+        }
+        return jres.stream()
+                .filter(jreDesc -> jreDesc.getVersion().contains(defaultJavaVersion))
+                .findFirst()
+                .map(JREDesc::getJnlpResources)
+                .map(jnlpResources -> jnlpResources.filterResources(defaultLocale, defaultOS, defaultArch))
+                .map(JNLPResources::all)
+                .orElse(emptyList());
     }
 
     /**
@@ -698,22 +615,6 @@ public class JNLPFile {
     }
 
     /**
-     * Sets the default view of the JNLP file returned by
-     * getInformation, getResources, etc.  If unset, the defaults
-     * are the properties os.name, os.arch, and the locale returned
-     * by Locale.getDefault().
-     *
-     * @param os     preferred os of resource
-     * @param arch   preferred arch of resource
-     * @param locale preferred locale of resource
-     */
-    public void setDefaults(String os, String arch, Locale locale) {
-        defaultOS = os;
-        defaultArch = arch;
-        defaultLocale = locale;
-    }
-
-    /**
      * Initialize the JNLPFile fields. Private because it's called
      * from the constructor.
      *
@@ -736,19 +637,17 @@ public class JNLPFile {
             infos = parser.getInformationDescs(root);
             parser.checkForInformation();
             update = parser.getUpdate(root);
-            resources = parser.getResources(root, false); // false == not a j2se/java resources section
+            resources = new JNLPResources(parser.getResources(root, false)); // false == not a j2se/java resources section
             entryPointDesc = parser.getEntryPointDesc(root);
             component = parser.getComponent(root);
             security = parser.getSecurity(root);
 
             checkForSpecialProperties();
 
-        }
-        catch (ParseException ex) {
+        } catch (ParseException ex) {
             throw ex;
-        }
-        catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+        } catch (Exception ex) {
+            LOG.error("Exception while parsing JNLP file", ex);
             throw new RuntimeException(ex.toString());
         }
     }
@@ -756,26 +655,10 @@ public class JNLPFile {
     /**
      * Inspects the JNLP file to check if it contains any special properties
      */
-    private void checkForSpecialProperties() {
+    private boolean checkForSpecialProperties() {
+        final Map<String, String> props = getJnlpResources().getPropertiesMap();
 
-        for (ResourcesDesc res : resources) {
-            for (PropertyDesc propertyDesc : res.getProperties()) {
-
-                for (int i = 0; i < generalProperties.length; i++) {
-                    String property = propertyDesc.getKey();
-
-                    if (property.equals(generalProperties[i])) {
-                        break;
-                    }
-                    else if (!property.equals(generalProperties[i])
-                            && i == generalProperties.length - 1) {
-                        containsSpecialProperties = true;
-                        return;
-                    }
-                }
-
-            }
-        }
+        return Collections.list(generalProperties.elements()).stream().anyMatch(gp -> !props.containsKey(gp.getName()));
     }
 
     /**
@@ -809,15 +692,9 @@ public class JNLPFile {
      * @return the download options to use for downloading jars listed in this jnlp file.
      */
     public DownloadOptions getDownloadOptions() {
-        boolean usePack = false;
-        boolean useVersion = false;
-        ResourcesDesc desc = getResources();
-        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
-            usePack = true;
-        }
-        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
-            useVersion = true;
-        }
+        final ResourcesDesc desc = getResources();
+        final boolean usePack = Boolean.parseBoolean(desc.getPropertiesMap().get("jnlp.packEnabled"));
+        final boolean useVersion = Boolean.parseBoolean(desc.getPropertiesMap().get("jnlp.versionEnabled"));
         return new DownloadOptions(usePack, useVersion);
     }
 
@@ -828,18 +705,21 @@ public class JNLPFile {
      * @return true if a warning should be displayed; otherwise false
      */
     public boolean requiresSignedJNLPWarning() {
-        return (missingSignedJNLP && containsSpecialProperties);
+        return (isUnsigend() && checkForSpecialProperties());
+    }
+
+    /**
+     * Marks this file as signed. I.e. the file is matched by an entry in the main jar.
+     */
+    public void markFileAsSigned() {
+        isSigned = true;
     }
 
     /**
      * Informs that a signed JNLP file is missing in the main jar
      */
-    public void setSignedJNLPAsMissing() {
-        missingSignedJNLP = true;
-    }
-
-    public ManifestAttributesReader getManifestAttributesReader() {
-        return manifestAttributesReader;
+    public boolean isUnsigend() {
+        return !isSigned;
     }
 
     private String createShortcutNameFromLocation() {

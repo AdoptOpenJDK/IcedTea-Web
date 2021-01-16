@@ -14,15 +14,14 @@ public class StringValueValidator implements ValueValidator {
     }
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
-        if (!(value instanceof String)) {
-            throw new IllegalArgumentException("Must be a string");
+    public void validate(final String value) throws IllegalArgumentException {
+        if (value == null) {
+            throw new IllegalArgumentException("Must not be null");
         }
 
-        String stringVal = (String) value;
         boolean found = false;
         for (String knownVal : options) {
-            if (knownVal.equals(stringVal)) {
+            if (knownVal.equals(value)) {
                 found = true;
                 break;
             }

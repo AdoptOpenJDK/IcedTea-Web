@@ -44,6 +44,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.awt.AppContext;
 
@@ -52,6 +53,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -128,7 +130,7 @@ public class SecurityDialogMessageHandler implements Runnable {
         } else {
 
             if (!shouldPromptUser()) {
-                message.userResponse =  dialog.getDefaultNegativeAnswer();
+                message.userResponse =  dialog.getSecurityDialogPanel().getDefaultNegativeAnswer();
                 unlockMessagesClient(message);
             } else if (isHeadless()) {
                 processMessageInHeadless(dialog, message);
@@ -141,12 +143,12 @@ public class SecurityDialogMessageHandler implements Runnable {
 
     private boolean processAutomatedAnswers(final SecurityDialogMessage message, final SecurityDialog dialog) {
         if (isXtrustNone()) {
-            message.userResponse =  dialog.getDefaultNegativeAnswer();
+            message.userResponse =  dialog.getSecurityDialogPanel().getDefaultNegativeAnswer();
             unlockMessagesClient(message);
             return true;
         }
         if (isXtrustAll()) {
-            message.userResponse =  dialog.getDefaultPositiveAnswer();
+            message.userResponse =  dialog.getSecurityDialogPanel().getDefaultPositiveAnswer();
             unlockMessagesClient(message);
             return true;
         }
@@ -154,7 +156,7 @@ public class SecurityDialogMessageHandler implements Runnable {
     }
 
     private void processMessageInGui(final SecurityDialog dialog, final RememberableDialog found, final SecurityDialogMessage message) {
-        dialog.getViwableDialog().addActionListener(new ActionListener() {
+        dialog.getViewableDialog().addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -168,7 +170,7 @@ public class SecurityDialogMessageHandler implements Runnable {
             }
 
         });
-        dialog.getViwableDialog().show();
+        dialog.getViewableDialog().show();
     }
 
     private void processMessageInHeadless(final SecurityDialog dialog, final SecurityDialogMessage message) {
@@ -178,10 +180,10 @@ public class SecurityDialogMessageHandler implements Runnable {
             do {
                 try {
                     if (repeatAll){
-                        OutputController.getLogger().printOutLn(dialog.getText());
+                        OutputController.getLogger().printOutLn(dialog.getSecurityDialogPanel().getText());
                     }
                     OutputController.getLogger().printOutLn(Translator.R("HeadlessDialogues"));
-                    OutputController.getLogger().printOutLn(dialog.helpToStdIn());
+                    OutputController.getLogger().printOutLn(dialog.getSecurityDialogPanel().helpToStdIn());
                     String s = OutputController.getLogger().readLine();
                     if (s == null) {
                          throw new IOException("Stream closed");
@@ -200,7 +202,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                         remember = true;
                         s=s.substring(2);
                     }
-                    message.userResponse = dialog.readFromStdIn(s);
+                    message.userResponse = dialog.getSecurityDialogPanel().readFromStdIn(s);
                     keepGoing = false;
                     try {
                         String value = "";
@@ -210,7 +212,7 @@ public class SecurityDialogMessageHandler implements Runnable {
                         if (dialog.getSecurityDialogPanel() instanceof CertWarningPane) {
                             CertWarningPane cp = (CertWarningPane) (dialog.getSecurityDialogPanel());
                             if (remember) {
-                                cp.saveCert();
+                                CertificateUtils.saveCertificate((X509Certificate) dialog.getCertVerifier().getPublisher(null));
                             }
                         }
                         RememberDialog.getInstance().setOrUpdateRememberedState(dialog, codebase, new SavedRememberAction(RememberDialog.createAction(remember, message.userResponse), value));

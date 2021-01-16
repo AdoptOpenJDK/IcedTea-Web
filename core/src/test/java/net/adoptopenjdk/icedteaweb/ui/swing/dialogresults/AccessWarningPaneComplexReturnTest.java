@@ -78,8 +78,8 @@ public class AccessWarningPaneComplexReturnTest {
     @Test
     public void AccessWarningPaneComplexReturnTestReadWrite3() {
         AccessWarningPaneComplexReturn aw1 = new AccessWarningPaneComplexReturn(true);
-        aw1.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult(true));
-        aw1.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult(false));
+        aw1.setDesktop(new ShortcutResult(true));
+        aw1.setMenu(new ShortcutResult(false));
         String s1 = aw1.writeValue();
         AccessWarningPaneComplexReturn aw11 = AccessWarningPaneComplexReturn.readValue(s1);
         Assert.assertEquals(aw1.getRegularReturn().getValue(), aw11.getRegularReturn().getValue());
@@ -94,8 +94,8 @@ public class AccessWarningPaneComplexReturnTest {
      @Test
     public void AccessWarningPaneComplexReturnTestReadWrite4() {
         AccessWarningPaneComplexReturn aw1 = new AccessWarningPaneComplexReturn(true);
-        aw1.setDesktop(new AccessWarningPaneComplexReturn.ShortcutResult("b1", true, AccessWarningPaneComplexReturn.Shortcut.BROWSER, false));
-        aw1.setMenu(new AccessWarningPaneComplexReturn.ShortcutResult("b2",false, AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML, true));
+        aw1.setDesktop(new ShortcutResult("b1", true, AccessWarningPaneComplexReturn.Shortcut.BROWSER, false));
+        aw1.setMenu(new ShortcutResult("b2",false, AccessWarningPaneComplexReturn.Shortcut.JAVAWS_HTML, true));
         String s1 = aw1.writeValue();
         AccessWarningPaneComplexReturn aw11 = AccessWarningPaneComplexReturn.readValue(s1);
         Assert.assertEquals(aw1.getRegularReturn().getValue(), aw11.getRegularReturn().getValue());

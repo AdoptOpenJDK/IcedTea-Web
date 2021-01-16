@@ -51,11 +51,9 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 public class CertInformation {
 
-    private final static Logger LOG = LoggerFactory.getLogger(CertInformation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CertInformation.class);
 
     private boolean hasExpiredCert = false;
-    private boolean hasExpiringCert = false;
-
     private boolean isNotYetValidCert = false;
 
     /* Code signer properties of the certificate. */
@@ -66,7 +64,7 @@ public class CertInformation {
     private boolean alreadyTrustPublisher = false;
     private boolean rootInCacerts = false;
 
-    static enum Detail {
+    enum Detail {
         TRUSTED (R("STrustedCertificate")),
         UNTRUSTED (R("SUntrustedCertificate")),
         RUN_WITHOUT_RESTRICTIONS(R("SRunWithoutRestrictions")),
@@ -90,7 +88,7 @@ public class CertInformation {
     private EnumSet<Detail> details = EnumSet.noneOf(Detail.class);
 
     /** The jars and their number of entries this cert has signed. */
-    private HashMap<String, Integer> signedJars = new HashMap<String, Integer>();
+    private HashMap<String, Integer> signedJars = new HashMap<>();
 
     /**
      * Return if there are signing issues with this certificate.
@@ -144,14 +142,6 @@ public class CertInformation {
         removeFromDetails(Detail.UNTRUSTED);
         removeFromDetails(Detail.TRUSTED);
     }
-    /**
-     * Check if this cert is the signer of a jar.
-     * @param jarName The absolute path of the jar this certificate has signed.
-     * @return {@code true} if this cert has signed the jar found at {@code jarName}.
-     */
-    public boolean isSignerOfJar(String jarName) {
-        return signedJars.containsKey(jarName);
-    }
 
     /**
      * Add a jar to the list of jars this certificate has signed along with the
@@ -169,15 +159,6 @@ public class CertInformation {
     }
 
     /**
-     * Find the number of entries this cert has signed in the specified jar.
-     * @param jarName The absolute path of the jar this certificate has signed.
-     * @return The number of entries this cert has signed in {@code jarName}.
-     */
-    public int getNumJarEntriesSigned(String jarName) {
-        return signedJars.get(jarName);
-    }
-
-    /**
      * Get all the jars this cert has signed along with the number of entries
      * in each jar.
      * @return a {link Map} of jars and their number of entries this cert has signed
@@ -192,7 +173,7 @@ public class CertInformation {
      * @return A list of all the details/issues with this app.
      */
     public List<String> getDetailsAsStrings() {
-        List<String> detailsToStr = new ArrayList<String>();
+        List<String> detailsToStr = new ArrayList<>();
         for (Detail issue : details) {
             detailsToStr.add(issue.message());
         }
@@ -223,17 +204,8 @@ public class CertInformation {
      * the list of details.
      */
     public void setHasExpiringCert() {
-        hasExpiringCert = true;
         details.add(Detail.RUN_WITHOUT_RESTRICTIONS);
         details.add(Detail.EXPIRING);
-    }
-
-    /**
-     * Get whether or not this cert will expire within 6 months.
-     * @return {@code true} if the cert will be expired after 6 months.
-     */
-    public boolean hasExpiringCert() {
-        return hasExpiringCert;
     }
 
     /**

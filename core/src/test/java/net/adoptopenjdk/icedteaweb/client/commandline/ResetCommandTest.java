@@ -16,8 +16,8 @@
 
 package net.adoptopenjdk.icedteaweb.client.commandline;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import net.adoptopenjdk.icedteaweb.security.SecurityLevel;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,14 +45,14 @@ public class ResetCommandTest extends AbstractCommandTest {
         super.beforeEach();
 
         // prepare some custom settings so that we have something to reset
-        getCommandLine(new String[]{"-set", "deployment.security.level", "ALLOW_UNSIGNED"}).handle();
+        getCommandLine(new String[]{"-set", "deployment.security.level", "VERY_HIGH"}).handle();
         getCommandLine(new String[]{"-set", "deployment.log", "true"}).handle();
     }
 
     @Test
     public void testResetCommand() throws IOException {
         // GIVEN -----------
-        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.name()));
+        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_SECURITY_LEVEL + "=" + SecurityLevel.VERY_HIGH.name()));
 
         final String[] args = {"-reset", "deployment.security.level"}; // use literals for readability
 
@@ -64,13 +64,13 @@ public class ResetCommandTest extends AbstractCommandTest {
 
         // THEN ------------
         assertEquals(SUCCESS, status);
-        assertThat(getUserDeploymentPropertiesFileContent(), not(containsString(AppletSecurityLevel.ALLOW_UNSIGNED.name())));
+        assertThat(getUserDeploymentPropertiesFileContent(), not(containsString(SecurityLevel.VERY_HIGH.name())));
     }
 
     @Test
     public void testResetCommandWithUnknownProperty() throws IOException {
         // GIVEN -----------
-        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.name()));
+        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_SECURITY_LEVEL + "=" + SecurityLevel.VERY_HIGH.name()));
 
         final String[] args = {"-reset", "unknown.setting.name"}; // use literals for readability
 
@@ -87,7 +87,7 @@ public class ResetCommandTest extends AbstractCommandTest {
     @Test
     public void testResetAllCommand() throws IOException {
         // GIVEN -----------
-        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_SECURITY_LEVEL + "=" + AppletSecurityLevel.ALLOW_UNSIGNED.name()));
+        assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_SECURITY_LEVEL + "=" + SecurityLevel.VERY_HIGH.name()));
         assertThat(getUserDeploymentPropertiesFileContent(), containsString(KEY_ENABLE_DEBUG_LOGGING + "=" + "true"));
 
         final String[] args = {"-reset", "all"}; // use literals for readability
@@ -100,7 +100,7 @@ public class ResetCommandTest extends AbstractCommandTest {
 
         // THEN ------------
         assertEquals(SUCCESS, status);
-        assertThat(getUserDeploymentPropertiesFileContent(), not(containsString(AppletSecurityLevel.ALLOW_UNSIGNED.name())));
+        assertThat(getUserDeploymentPropertiesFileContent(), not(containsString(SecurityLevel.VERY_HIGH.name())));
         assertThat(getUserDeploymentPropertiesFileContent(), not(containsString("true")));
     }
 }

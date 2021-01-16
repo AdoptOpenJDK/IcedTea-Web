@@ -252,7 +252,7 @@ public class OutputController implements BasicOutputController {
 
         private static SingleStreamLogger initSystemLogger() {
             if (OsUtil.isWindows()) {
-                return new WinSystemLog();
+                return new DummyLogger();
             } else {
                 return new UnixSystemLog();
             }

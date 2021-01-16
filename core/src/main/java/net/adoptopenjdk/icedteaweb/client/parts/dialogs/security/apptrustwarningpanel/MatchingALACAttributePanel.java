@@ -44,10 +44,14 @@ import javax.swing.ImageIcon;
 import java.awt.Dimension;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class MatchingALACAttributePanel extends AppTrustWarningPanel {
 
     private final String title;
@@ -62,7 +66,7 @@ public class MatchingALACAttributePanel extends AppTrustWarningPanel {
         TOP_PANEL_HEIGHT = 250;
         addComponents();
         if (securityDialog != null) {
-            securityDialog.getViwableDialog().setMinimumSize(new Dimension(600, 400));
+            securityDialog.getViewableDialog().setMinimumSize(new Dimension(600, 400));
         }
     }
 

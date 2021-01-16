@@ -18,6 +18,7 @@ package net.adoptopenjdk.icedteaweb.client.commandline;
 
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
+import org.junit.Ignore;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import org.junit.After;
 import org.junit.Before;
@@ -49,11 +50,12 @@ public class HelpCommandTest extends AbstractCommandTest {
     public void tearDown() {
         setEnableLogging(originalEnableLogging);
     }
-    
+
     /**
      * Test whether the {@code -help}, command executes and terminates with {@link CommandLine#SUCCESS}.
      */
     @Test
+    @Ignore
     public void testHelpCommand() {
         // GIVEN -----------
         final String[] args = {"-help"}; // use literals for readability

@@ -52,7 +52,7 @@ public interface ValueValidator {
      * @param value The object to validate
      * @throws IllegalArgumentException if the value is invalid
      */
-    void validate(Object value) throws IllegalArgumentException;
+    void validate(String value) throws IllegalArgumentException;
 
     /**
      * Returns a string describing possible values in human-readable form that

@@ -32,8 +32,6 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.client.controlpanel.desktopintegrationeditor;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogPanel;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -44,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 public class Panels {
 
@@ -108,7 +107,7 @@ public class Panels {
                     .append(model.getFile()).append("</li><br>" + "<li>")
                     .append(model.toString()).append("</li><br>" + "<li>")
                     .append(tooltip).append("</ul>");
-            String tt = SecurityDialogPanel.htmlWrap(sb.toString());
+            String tt = htmlWrap(sb.toString());
             return tt;
         }
         return null;

@@ -1,6 +1,5 @@
 package net.sourceforge.jnlp.services;
 
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.ParserSettings;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
@@ -17,9 +16,10 @@ public final class SingleInstanceLockTest extends NoStdOutErrTest {
 
     @Test
     public void testCreateWithPort() throws Exception {
+        URL codeBase = new URL("http://icedtea.classpath.org");
         final URL url = this.getClass().getClassLoader().getResource("net/sourceforge/jnlp/basic.jnlp");
         assertNotNull(url);
-        final JNLPFile jnlpFile = new JNLPFile(url.openStream(), url, new ParserSettings(false, false, false));
+        final JNLPFile jnlpFile = new JNLPFile(url.openStream(), url, codeBase, new ParserSettings(false, false, false), null);
         assertNotNull(jnlpFile);
 
         final SingleInstanceLock sil = new SingleInstanceLock(jnlpFile);

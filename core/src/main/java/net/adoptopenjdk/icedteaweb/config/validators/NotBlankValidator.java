@@ -10,12 +10,8 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 public class NotBlankValidator implements ValueValidator {
 
     @Override
-    public void validate(final Object value) throws IllegalArgumentException {
-        if (!(value instanceof String)) {
-            throw new IllegalArgumentException("Must be a string");
-        }
-
-        if (StringUtils.isBlank((String) value)) {
+    public void validate(final String value) throws IllegalArgumentException {
+        if (StringUtils.isBlank(value)) {
             throw new IllegalArgumentException("Must not be blank");
         }
     }

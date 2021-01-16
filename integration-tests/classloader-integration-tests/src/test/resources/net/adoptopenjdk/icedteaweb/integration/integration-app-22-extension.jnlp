@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp spec="6.0+" codebase=".">
+    <information>
+        <title>Extension</title>
+        <vendor>AdoptOpenJDK</vendor>
+    </information>
+    <resources>
+        <jar download="lazy" part="lazy-package" href="classloader-integration-tests-module-2.jar"/>
+        <package name="net.adoptopenjdk.integration.ClassB" part="lazy-package" recursive="true" />
+    </resources>
+</jnlp>

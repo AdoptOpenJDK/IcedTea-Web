@@ -24,6 +24,7 @@ package net.sourceforge.jnlp;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.resources.DefaultResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
@@ -64,6 +65,21 @@ public class JNLPFileFactory {
     }
 
     /**
+     * Create a JNLPFile from a URL checking for updates using the
+     * default policy.
+     *
+     * @param location the location of the JNLP file
+     * @param version  the version of the JNLP file
+     * @param settings the parser settings to use while parsing the file
+     * @throws IOException    if an IO exception occurred
+     * @throws ParseException if the JNLP file was invalid
+     */
+    public JNLPFile create(final URL location, final VersionString version, final ParserSettings settings) throws IOException, ParseException {
+        final String uniqueKey = Calendar.getInstance().getTimeInMillis() + "-" + ((int) (Math.random() * Integer.MAX_VALUE)) + "-" + location;
+        return create(location, uniqueKey, version, settings, JNLPRuntime.getDefaultUpdatePolicy());
+    }
+
+    /**
      * Create a JNLPFile from a URL, parent URLm a version and checking for
      * updates using the specified policy.
      *
@@ -77,7 +93,7 @@ public class JNLPFileFactory {
      */
     public JNLPFile create(final URL location, final String uniqueKey, final VersionString version, final ParserSettings settings, final UpdatePolicy policy) throws IOException, ParseException {
         try (InputStream input = openURL(location, version, policy)) {
-            return new JNLPFile(input, location, settings, uniqueKey);
+            return new JNLPFile(input, location, null, settings, uniqueKey);
         }
     }
 
@@ -97,7 +113,7 @@ public class JNLPFileFactory {
         Assert.requireNonNull(policy, "policy");
 
         try {
-            final ResourceTracker tracker = new ResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
+            final ResourceTracker tracker = new DefaultResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
             tracker.addResource(location, version);
             final File f = tracker.getCacheFile(location);
             return new FileInputStream(f);
@@ -107,4 +123,5 @@ public class JNLPFileFactory {
             throw new IOException(ex);
         }
     }
+
 }

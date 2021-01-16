@@ -91,15 +91,13 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
     private CompletableFuture<Resource> downloadFrom(final URL url) {
         LOG.debug("Will download in background: {}", url);
-        final CompletableFuture<Resource> result = new CompletableFuture<>();
-        CachedDaemonThreadPoolProvider.getThreadPool().execute(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             try {
-                result.complete(tryDownloading(url));
-            } catch (Exception e) {
-                result.completeExceptionally(e);
+                return tryDownloading(url);
+            } catch (IOException e) {
+                throw new RuntimeException("Error while downloading " + url, e);
             }
-        });
-        return result;
+        }, CachedDaemonThreadPoolProvider.getThreadPool());
     }
 
     private Resource tryDownloading(final URL downloadFrom) throws IOException {

@@ -64,7 +64,7 @@ public class ParserVersionStringTest extends NoStdOutErrTest {
 
     @Test
     public void testJnlpFileVersion() {
-        Assert.assertEquals("2.1.1-rc1", parser.getFileVersion().toString());
+        Assert.assertEquals("2.1.1-rc1", String.valueOf(parser.getFileVersion()));
     }
 
    @Test

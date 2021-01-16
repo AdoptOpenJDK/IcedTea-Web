@@ -43,7 +43,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNo;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -51,7 +50,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -65,15 +63,17 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
+
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
 
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library
+ *
+ * @deprecated will be replaced by new security dialogs
  */
+@Deprecated
 public class MissingALACAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
 
     private final static Logger LOG = LoggerFactory.getLogger(MissingALACAttributePanel.class);
@@ -88,7 +88,7 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
             throw new RuntimeException(ex);
         }
         if (x != null) {
-            x.getViwableDialog().setMinimumSize(new Dimension(600, 400));
+            x.getViewableDialog().setMinimumSize(new Dimension(600, 400));
         }
     }
 
@@ -151,19 +151,6 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
         
         add(rememberPanel);
     }
-
-    public static void main(String[] args) throws MalformedURLException {
-        Set<URL> s = new HashSet<>();
-        s.add(new URL("http:/blah.com/blah"));
-        s.add(new URL("http:/blah.com/blah/blah"));
-        MissingALACAttributePanel w = new MissingALACAttributePanel(null, "HelloWorld", "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
-        JFrame f = new JFrame();
-        f.setSize(600, 400);
-        f.add(w, BorderLayout.CENTER);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-    }
-
         
      @Override
     public RememberPanelResult getRememberAction() {

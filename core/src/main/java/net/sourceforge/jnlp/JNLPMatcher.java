@@ -34,19 +34,22 @@ statement from your version.
 
 package net.sourceforge.jnlp;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
+import net.sourceforge.jnlp.util.JarFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.jar.JarEntry;
 
 /**
  * To compare launching JNLP file with signed APPLICATION.JNLP or
@@ -59,43 +62,25 @@ public final class JNLPMatcher {
 
     private static final Logger LOG = LoggerFactory.getLogger(JNLPMatcher.class);
 
-    private final XmlNode appTemplateNode;
-    private final XmlNode launchJNLPNode;
-    private final boolean isTemplate;
+    static final String TEMPLATE = "JNLP-INF/APPLICATION_TEMPLATE.JNLP";
+    static final String APPLICATION = "JNLP-INF/APPLICATION.JNLP";
+
+    private final File mainJarFile;
+    private final File jnlpFile;
+    private final ParserSettings p;
 
     /**
      * Public constructor
      *
-     * @param appTemplate the reader stream of the signed APPLICATION.jnlp or
+     * @param mainJarFile the reader stream of the signed APPLICATION.jnlp or
      *                    APPLICATION_TEMPLATE.jnlp
-     * @param launchJNLP  the reader stream of the launching JNLP file
-     * @param isTemplate  a boolean that specifies if appTemplateFile is a template
-     * @param p           settings of parser
-     * @throws JNLPMatcherException if IOException, XMLParseException is thrown during parsing;
-     *                              Or launchJNLP/appTemplate is null
+     * @param jnlpFile    the reader stream of the launching JNLP file
+     * @param p           the parser settings for the JNLP parsing
      */
-    public JNLPMatcher(InputStream appTemplate, InputStream launchJNLP,
-                       boolean isTemplate, ParserSettings p) throws JNLPMatcherException {
-
-        if (appTemplate == null && launchJNLP == null)
-            throw new JNLPMatcherException("Template JNLP file and Launching JNLP file are both null.");
-        else if (appTemplate == null)
-            throw new JNLPMatcherException("Template JNLP file is null.");
-        else if (launchJNLP == null)
-            throw new JNLPMatcherException("Launching JNLP file is null.");
-
-        try {
-            final XMLParser xmlParser = XmlParserFactory.getParser(p.getParserType());
-            this.appTemplateNode = xmlParser.getRootNode(appTemplate);
-            this.launchJNLPNode = xmlParser.getRootNode(launchJNLP);
-            this.isTemplate = isTemplate;
-        } catch (Exception e) {
-            throw new JNLPMatcherException("Failed to create an instance of JNLPVerify with specified InputStreamReader", e);
-        } finally {
-            closeInputStream(appTemplate);
-            closeInputStream(launchJNLP);
-
-        }
+    public JNLPMatcher(File mainJarFile, File jnlpFile, ParserSettings p) {
+        this.mainJarFile = mainJarFile;
+        this.jnlpFile = jnlpFile;
+        this.p = p;
     }
 
     /**
@@ -104,9 +89,60 @@ public final class JNLPMatcher {
      * @return true if both JNLP files are 'matched', otherwise false
      */
     public boolean isMatch() {
+        try (final JarFile jarFile = new JarFile(mainJarFile)) {
+            for (JarEntry entry : Collections.list(jarFile.entries())) {
+                final String entryName = entry.getName().toUpperCase();
 
-        return matchNodes(appTemplateNode, launchJNLPNode);
+                if (entryName.equals(APPLICATION)) {
+                    LOG.debug("APPLICATION.JNLP has been located within signed JAR.");
+                    return isMatch(jarFile, entry, false);
+                } else if (entryName.equals(TEMPLATE)) {
+                    LOG.debug("APPLICATION_TEMPLATE.JNLP has been located within signed JAR. Starting verification...");
+                    return isMatch(jarFile, entry, true);
+                }
+            }
+        } catch (IOException e) {
+            LOG.error("Could not read local main jar file: {}", e.getMessage());
+        }
+        return false;
+    }
 
+    private boolean isMatch(JarFile jarFile, JarEntry entry, boolean isTemplate) {
+        try (final InputStream jnlpStream = jarFile.getInputStream(entry)) {
+            return isMatch(jnlpStream, isTemplate);
+        } catch (IOException e) {
+            LOG.error("Could not read JNLP jar entry: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean isMatch(final InputStream appTemplateStream, final boolean isTemplate) {
+        try (final InputStream launchJNLPStream = new FileInputStream(jnlpFile)) {
+            return isMatch(appTemplateStream, launchJNLPStream, isTemplate);
+        } catch (IOException e) {
+            LOG.error("Could not read local JNLP file: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean isMatch(final InputStream appTemplateStream, final InputStream launchJNLPStream, final boolean isTemplate) {
+        try {
+            final XMLParser xmlParser = XmlParserFactory.getParser(p.getParserType());
+            final XmlNode appTemplateNode = xmlParser.getRootNode(appTemplateStream);
+            final XmlNode launchJNLPNode = xmlParser.getRootNode(launchJNLPStream);
+            final boolean result = matchNodes(appTemplateNode, launchJNLPNode, isTemplate);
+
+            if (result) {
+                LOG.debug("JNLP file verification successful");
+            } else {
+                LOG.warn("Signed JNLP file in main jar does not match launching JNLP file");
+            }
+
+            return result;
+        } catch (Exception e) {
+            LOG.error("Failed to create an instance of JNLPVerify with specified InputStreamReader: {}", e.getMessage());
+            return false;
+        }
     }
 
     /**
@@ -116,18 +152,16 @@ public final class JNLPMatcher {
      * @param launchJNLP  launching JNLP file's Node
      * @return true if both Nodes are 'matched', otherwise false
      */
-    private boolean matchNodes(XmlNode appTemplate, XmlNode launchJNLP) {
+    private boolean matchNodes(XmlNode appTemplate, XmlNode launchJNLP, final boolean isTemplate) {
 
         if (appTemplate != null && launchJNLP != null) {
 
-            XmlNode templateNode = appTemplate;
-            XmlNode launchNode = launchJNLP;
             // Store children of Node
-            List<XmlNode> appTemplateChild = new LinkedList<>(Arrays.asList(templateNode.getChildNodes()));
-            List<XmlNode> launchJNLPChild = new LinkedList<>(Arrays.asList(launchNode.getChildNodes()));
+            List<XmlNode> appTemplateChild = new LinkedList<>(Arrays.asList(appTemplate.getChildNodes()));
+            List<XmlNode> launchJNLPChild = new LinkedList<>(Arrays.asList(launchJNLP.getChildNodes()));
 
             // Compare only if both Nodes have the same name, else return false
-            if (templateNode.getNodeName().equals(launchNode.getNodeName())) {
+            if (appTemplate.getNodeName().equals(launchJNLP.getNodeName())) {
 
                 if (appTemplateChild.size() == launchJNLPChild.size()) { // Compare
                     // children
@@ -136,7 +170,7 @@ public final class JNLPMatcher {
 
                     for (int i = 0; i < childLength; ) {
                         for (int j = 0; j < childLength; j++) {
-                            boolean isSame = matchNodes(appTemplateChild.get(i), launchJNLPChild.get(j));
+                            boolean isSame = matchNodes(appTemplateChild.get(i), launchJNLPChild.get(j), isTemplate);
                             if (!isSame && j == childLength - 1) {
                                 return false;
                             } else if (isSame) { // If both child matches, remove them from the list of children
@@ -148,10 +182,10 @@ public final class JNLPMatcher {
                         }
                     }
 
-                    if (!templateNode.getNodeValue().equals(launchNode.getNodeValue())) {
+                    if (!appTemplate.getNodeValue().equals(launchJNLP.getNodeValue())) {
 
                         // If it's a template and the template's value is NOT '*'
-                        if (isTemplate && !templateNode.getNodeValue().equals("*")) {
+                        if (isTemplate && !appTemplate.getNodeValue().equals("*")) {
                             return false;
                         }
                         // Else if it's not a template, then return false
@@ -160,7 +194,7 @@ public final class JNLPMatcher {
                         }
                     }
                     // Compare attributes of both Nodes
-                    return matchAttributes(templateNode, launchNode);
+                    return matchAttributes(appTemplate, launchJNLP, isTemplate);
                 }
 
             }
@@ -175,7 +209,7 @@ public final class JNLPMatcher {
      * @param launchNode   launching JNLP file's {@link XmlNode} with attributes
      * @return {@code true} if both {@link XmlNode Nodes} have 'matched' attributes, otherwise {@code false}
      */
-    private boolean matchAttributes(XmlNode templateNode, XmlNode launchNode) {
+    private boolean matchAttributes(XmlNode templateNode, XmlNode launchNode, boolean isTemplate) {
 
         if (templateNode != null && launchNode != null) {
 
@@ -212,35 +246,5 @@ public final class JNLPMatcher {
             }
         }
         return false;
-    }
-
-    /***
-     * Closes an input stream
-     *
-     * @param stream
-     *            The input stream that will be closed
-     */
-    private void closeInputStream(InputStream stream) {
-        if (stream != null)
-            try {
-                stream.close();
-            } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            }
-    }
-
-    /***
-     * Closes an output stream
-     *
-     * @param stream
-     *            The output stream that will be closed
-     */
-    private void closeOutputStream(OutputStream stream) {
-        if (stream != null)
-            try {
-                stream.close();
-            } catch (Exception e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            }
     }
 }

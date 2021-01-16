@@ -20,31 +20,34 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * This interface provides a way for the JNLP application to open specific files
- * in the client's system. It asks permission from the user before opening any
- * files.
+ * ExtendedService provides additional support to the current JNLP API,
+ * to allow applications to open a specific file or files in the client's file system.
  *
- * @author <a href="mailto:omajid@redhat.com">Omair Majid</a>
+ * @since 1.5
  */
 public interface ExtendedService {
 
     /**
-     * Open a file on the client' system and return its contents. The user must
-     * grant permission to the application for this to work.
+     * Allows the application to open the specified file, even if the application is running in the
+     * untrusted execution environment. If the application would not otherwise have permission to
+     * access the file, the JNLP CLient should warn user of the potential security risk.
+     * The contents of the file is returned as a FileContents object.
      *
-     * @param file the file to open
-     * @return the opened file as a {@link FileContents} object
-     * @throws IOException on any io problems
+     * @param file the file object
+     * @return A FileContents object with information about the opened file
+     * @throws IOException if there is any I/O error
      */
     FileContents openFile(File file) throws IOException;
 
     /**
-     * Opens multiple files on the user's system and returns their contents as a
-     * {@link FileContents} array
+     * Allows the application to open the specified files, even if the application is running in the
+     * untrusted execution environment. If the application would not otherwise have permission to
+     * access the files, the JNLP CLient should warn user of the potential security risk.
+     * The contents of each file is returned as a FileContents object in the FileContents array.
      *
-     * @param files the files to open
-     * @return an array of FileContents objects
-     * @throws IOException on any io problems
+     * @param files the array of files
+     * @return A FileContents[] object with information about each opened file
+     * @throws IOException if there is any I/O error
      */
     FileContents[] openFiles(File[] files) throws IOException;
 }

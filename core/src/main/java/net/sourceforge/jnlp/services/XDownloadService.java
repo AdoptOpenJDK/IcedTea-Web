@@ -16,37 +16,31 @@
 
 package net.sourceforge.jnlp.services;
 
-import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
+import net.adoptopenjdk.icedteaweb.classloader.Extension;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.runtime.classloader.ManageJnlpResources;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.jnlp.DownloadService;
 import javax.jnlp.DownloadServiceListener;
-import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+
+import static net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment.ALL;
 
 /**
- * The DownloadService JNLP service.
+ * The {@link DownloadService} service allows an application to control how its own resources are cached.
  *
- * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
- * @version $Revision: 1.7 $
+ * @implSpec See <b>JSR-56, Section 7.2 The DownloadService Service</b> for a details.
  */
 class XDownloadService implements DownloadService {
 
     /**
-     * Returns the {@link JNLPClassLoader} of the application
-     * @return the {@link JNLPClassLoader} of the application
-     */
-    JNLPClassLoader getClassLoader() {
-        return (JNLPClassLoader) JNLPRuntime.getApplication().getClassLoader();
-    }
-
-    /**
      * Returns a listener that will automatically display download
      * progress to the user.
+     *
      * @return always {@code null}
      */
     public DownloadServiceListener getDefaultProgressWindow() {
@@ -54,201 +48,160 @@ class XDownloadService implements DownloadService {
     }
 
     /**
-     * Returns whether the part in an extension (specified by the
-     * url and version) is cached locally.
+     * {@inheritDoc}
      */
     @Override
     public boolean isExtensionPartCached(final URL ref, final String version, final String part) {
-        boolean allCached = true;
-        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), ref, part, resourceVersion);
-
-        if (jars.length <= 0)
-            return false;
-
-        for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = Cache.isAnyCached(jars[i].getLocation(), resourceVersion);
-        }
-
-        return allCached;
+        return getApplication().getPartsCache().isPartDownloaded(part, new Extension(ref, version));
     }
 
     /**
-     * Returns whether the parts in an extension (specified by the
-     * url and version) are cached locally.
+     * {@inheritDoc}
      */
     @Override
     public boolean isExtensionPartCached(final URL ref, final String version, final String[] parts) {
-        boolean allCached = true;
-        if (parts.length <= 0)
-            return false;
-
-        for (String eachPart : parts)
-            allCached = this.isExtensionPartCached(ref, version, eachPart);
-
-        return allCached;
+        return Arrays.stream(parts).allMatch(part -> isExtensionPartCached(ref, version, part));
     }
 
     /**
-     * Returns whether the part of the calling application is cached
-     * locally.  If called by code specified by an extension
-     * descriptor, the specified part refers to the extension not
-     * the application.
+     * {@inheritDoc}
      */
     @Override
     public boolean isPartCached(final String part) {
-        boolean allCached = true;
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), null, part, null);
-
-        if (jars.length <= 0)
-            return false;
-
-        for (int i = 0; i < jars.length && allCached; i++) {
-            allCached = Cache.isAnyCached(jars[i].getLocation(), jars[i].getVersion());
-        }
-
-        return allCached;
+        return getApplication().getPartsCache().isPartDownloaded(part);
     }
 
     /**
-     * Returns whether all of the parts of the calling application
-     * are cached locally.  If called by code in an extension, the
-     * part refers the the part of the extension not the
-     * application.
+     * {@inheritDoc}
      */
     @Override
     public boolean isPartCached(final String[] parts) {
-        boolean allCached = true;
-        if (parts.length <= 0)
-            return false;
-
-        for (final String eachPart : parts)
-            allCached = this.isPartCached(eachPart);
-
-        return allCached;
+        return Arrays.stream(parts).allMatch(this::isPartCached);
     }
 
     /**
-     * Returns whether the resource is cached locally.  This method
-     * only returns true if the resource is specified by the calling
-     * application or extension.
+     * {@inheritDoc}
      */
     @Override
     public boolean isResourceCached(final URL ref, final String version) {
-        return ManageJnlpResources.isExternalResourceCached(this.getClassLoader(), ref, version);
+        final VersionString resourceVersion = getVersionString(version);
+        return Cache.isAnyCached(ref, resourceVersion) && resourceFitToJnlpDetails(ref, resourceVersion);
     }
 
     /**
-     * Downloads the parts of an extension.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void loadExtensionPart(final URL ref, final String version, final String[] parts, final DownloadServiceListener progress) throws IOException {
-        for (final String eachPart : parts)
-            this.loadExtensionPart(ref, version, eachPart, progress);
+    public void loadExtensionPart(final URL ref, final String version, final String[] parts, final DownloadServiceListener progress) {
+        for (String part : parts) {
+            this.loadExtensionPart(ref, version, part, progress);
+        }
     }
 
     /**
-     * Downloads a part of an extension.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void loadExtensionPart(final URL ref, final String version, final String part, final DownloadServiceListener progress) throws IOException {
-        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-        ManageJnlpResources.downloadJars(this.getClassLoader(), ref, part, resourceVersion);
+    public void loadExtensionPart(final URL ref, final String version, final String part, final DownloadServiceListener progress) {
+        getApplication().getPartsCache().downloadPart(part, new Extension(ref, version));
     }
 
     /**
-     * Downloads the parts.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void loadPart(final String[] parts, final DownloadServiceListener progress) throws IOException {
-        for (String eachPart : parts)
+    public void loadPart(final String[] parts, final DownloadServiceListener progress) {
+        for (String eachPart : parts) {
             this.loadPart(eachPart, progress);
+        }
     }
 
     /**
-     * Downloads the part.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void loadPart(final String part, final DownloadServiceListener progress) throws IOException {
-        ManageJnlpResources.downloadJars(this.getClassLoader(), null, part, null);
+    public void loadPart(final String part, final DownloadServiceListener progress) {
+        getApplication().getPartsCache().downloadPart(part);
     }
 
     /**
-     * Downloads a resource.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void loadResource(final URL ref, final String version, final DownloadServiceListener progress) throws IOException {
-        ManageJnlpResources.loadExternalResourceToCache(this.getClassLoader(), ref, version);
+    public void loadResource(final URL ref, final String version, final DownloadServiceListener progress) {
+        final VersionString resourceVersion = getVersionString(version);
+        if (resourceFitToJnlpDetails(ref, resourceVersion)) {
+            getApplication().getPartsCache().downloadPartContainingJar(ref, resourceVersion);
+        }
     }
 
     /**
-     * Notify the system that an extension's part is no longer
-     * important to cache.
-     *
-     * @throws IOException
+     * @return true if the resource is either mentioned in the calling applications JNLP file, or
+     * is within the codebase of the calling applications JNLP file, or
+     * if the calling application has been granted all-permissions.
+     */
+    private boolean resourceFitToJnlpDetails(final URL ref, final VersionString version) {
+        boolean isResourceAllowedToBeProcessed = getApplication().getApplicationEnvironment() == ALL;
+
+        if (!isResourceAllowedToBeProcessed) {
+            isResourceAllowedToBeProcessed = getApplication().getPartsCache().isPartContainingJar(ref, version);
+        }
+
+        if (!isResourceAllowedToBeProcessed) {
+            final URL codeBase = getApplication().getJNLPFile().getCodeBase();
+            isResourceAllowedToBeProcessed = UrlUtils.urlRelativeTo(ref, codeBase);
+        }
+
+        return isResourceAllowedToBeProcessed;
+    }
+
+
+    /**
+     * {@inheritDoc}
      */
     @Override
-    public void removeExtensionPart(final URL ref, final String version, final String part) throws IOException {
-        final VersionString resourceVersion = (version == null) ? null : VersionString.fromString(version);
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), ref, part, resourceVersion);
-        ManageJnlpResources.removeCachedJars(this.getClassLoader(), ref, jars);
+    public void removeExtensionPart(final URL ref, final String version, final String part) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
-     * Notify the system that an extension's parts are no longer
-     * important to cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void removeExtensionPart(final URL ref, final String version, final String[] parts) throws IOException {
-        for (String eachPart : parts)
-            this.removeExtensionPart(ref, version, eachPart);
+    public void removeExtensionPart(final URL ref, final String version, final String[] parts) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
-     * Notifies the system that a part  is no longer important to
-     * cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void removePart(final String part) throws IOException {
-        final JARDesc[] jars = ManageJnlpResources.findJars(this.getClassLoader(), null, part, null);
-        ManageJnlpResources.removeCachedJars(this.getClassLoader(), null, jars);
+    public void removePart(final String part) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
-     * Notifies the system that the parts  is no longer important to
-     * cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void removePart(final String[] parts) throws IOException {
-        for (String eachPart : parts)
-            this.removePart(eachPart);
+    public void removePart(final String[] parts) {
+        throw new RuntimeException("Currently not supported");
     }
 
     /**
-     * Notifies the system that the resource is no longer important
-     * to cache.
-     *
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
-    public void removeResource(final URL ref, final String version) throws IOException {
-        ManageJnlpResources.removeExternalCachedResource(this.getClassLoader(), ref, version);
+    public void removeResource(final URL ref, final String version) {
+        throw new RuntimeException("Currently not supported");
+    }
+
+    private ApplicationInstance getApplication() {
+        return JNLPRuntime.getApplication()
+                .orElseThrow(() -> new IllegalStateException("Could not find application."));
+    }
+
+    private static VersionString getVersionString(String version) {
+        return (version == null) ? null : VersionString.fromString(version);
     }
 }

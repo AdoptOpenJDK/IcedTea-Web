@@ -34,7 +34,7 @@ statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.Dialogs;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Primitive;
@@ -394,13 +394,12 @@ public final class VariableX509TrustManager {
         return AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
             @Override
             public Boolean run() {
-                YesNoSandbox r = SecurityDialogs.showCertWarningDialog(
+                YesNoSandbox r = Dialogs.showCertWarningDialog(
                         AccessType.UNVERIFIED,
                         null,
                         new HttpsCertVerifier(chain, isTrusted, hostMatched, hostName),
                         null
                 );
-
                 if (r == null) {
                     return false;
                 }

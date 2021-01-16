@@ -33,38 +33,17 @@ statement from your version.
 */
 package net.sourceforge.jnlp.runtime.classloader;
 
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
-import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletStartupSecuritySettings;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
-import net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesChecker;
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
-import net.adoptopenjdk.icedteaweb.testing.annotations.Bug;
-import net.adoptopenjdk.icedteaweb.testing.annotations.Remote;
-import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.jcip.annotations.NotThreadSafe;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.config.ConfigurationConstants;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
-import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.net.URL;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @NotThreadSafe
 @Ignore
 public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
 
-    private static AppletSecurityLevel level;
+    //TODO: How to ahndle old Classloader tests?
+
+   /* private static AppletSecurityLevel level;
     private static String macStatus;
 
     @BeforeClass
@@ -82,26 +61,19 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, macStatus);
     }
 
-    private static final String isWSA = "isWebstartApplication";
-
     static void setStaticField(Field field, Object newValue) throws Exception {
         field.setAccessible(true);
         field.set(null, newValue);
     }
 
     private void setWSA() throws Exception {
-        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), true);
     }
 
     private void setApplet() throws Exception {
-        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), false);
     }
 
     @AfterClass
     public static void tearDown() throws Exception {
-        setStaticField(JNLPRuntime.class.getDeclaredField(isWSA), false);
-
-
     }
 
     @Bug(id = {"PR895",
@@ -231,7 +203,7 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         try {
             classLoader.findClass("foo");
             assertFalse("should not happen", true);
-        } catch (ClassNotFoundException cnfe) { /* ignore */ }
+        } catch (ClassNotFoundException cnfe) { *//* ignore *//* }
 
         assertTrue(parentWasInvoked[0]);
     }
@@ -267,10 +239,10 @@ public class CodeBaseClassLoaderTest extends NoStdOutErrTest {
         JNLPFile dummyJnlpFile = new DummyJNLPFile() {
             @Override
             public SecurityDesc getSecurity() {
-                return new SecurityDesc(null, AppletPermissionLevel.NONE, SecurityDesc.SANDBOX_PERMISSIONS, null);
+                return new SecurityDesc(null, ApplicationEnvironment.SANDBOX, null);
             }
         };
         JNLPClassLoader parent = new JNLPClassLoader(dummyJnlpFile, null);
 
-    }
+    }*/
 }

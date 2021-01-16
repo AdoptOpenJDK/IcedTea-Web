@@ -22,7 +22,7 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
+import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.ShortcutResult;
 import net.sourceforge.jnlp.JNLPFile;
 
 import java.io.File;
@@ -182,7 +182,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     }
 
     @Override
-    public void createDesktopShortcuts(AccessWarningPaneComplexReturn.ShortcutResult menu, AccessWarningPaneComplexReturn.ShortcutResult desktop) {
+    public void createDesktopShortcuts(ShortcutResult menu, ShortcutResult desktop) {
         throw new UnsupportedOperationException("not supported on windows like systems");
     }
 

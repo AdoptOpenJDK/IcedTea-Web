@@ -37,12 +37,13 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.information.MenuDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.RelatedContentDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDownloadDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PackageDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
-import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationPermissionLevel;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateCheck;
 import net.adoptopenjdk.icedteaweb.jnlp.element.update.UpdateDesc;
@@ -94,7 +95,6 @@ import static net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc.
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.EAGER;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.DownloadStrategy.LAZY;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_DOWNLOAD_ELEMENT;
-import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc.EXT_PART_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.ARCH_ATTRIBUTE;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.EXTENSION_ELEMENT;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc.J2SE_ELEMENT;
@@ -129,7 +129,7 @@ public final class Parser {
 
     private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
-    private static String MAINCLASS = "main-class";
+    private static final String MAINCLASS = "main-class";
     private static final Pattern anyWhiteSpace = Pattern.compile("\\s");
 
     // defines netx.jnlp.Node class if using Tiny XML or Nano XML
@@ -553,7 +553,7 @@ public final class Parser {
             }
         }
 
-        return new JARDesc(location, versionString, part, lazy, main, nativeJar, true);
+        return new JARDesc(location, versionString, part, lazy, main, nativeJar);
 
     }
 
@@ -570,13 +570,18 @@ public final class Parser {
 
         final ExtensionDesc ext = new ExtensionDesc(name, version, location);
 
-        final XmlNode dload[] = getChildNodes(node, EXT_DOWNLOAD_ELEMENT);
-        for (XmlNode dload1 : dload) {
-            final boolean lazy = LAZY.getValue().equals(getAttribute(dload1, ExtensionDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
-            ext.addPart(getRequiredAttribute(dload1, EXT_PART_ATTRIBUTE, null, strict), getAttribute(dload1, ExtensionDesc.PART_ATTRIBUTE, null), lazy);
+        for (XmlNode downloadNode : getChildNodes(node, EXT_DOWNLOAD_ELEMENT)) {
+            ext.addDownload(getExtensionDownload(downloadNode));
         }
 
         return ext;
+    }
+
+    private ExtensionDownloadDesc getExtensionDownload(XmlNode node) throws ParseException {
+        final boolean lazy = LAZY.getValue().equals(getAttribute(node, ExtensionDownloadDesc.DOWNLOAD_ATTRIBUTE, EAGER.getValue()));
+        final String extPart = getRequiredAttribute(node, ExtensionDownloadDesc.EXT_PART_ATTRIBUTE, null, strict);
+        final String part = getAttribute(node, ExtensionDownloadDesc.PART_ATTRIBUTE, null);
+        return new ExtensionDownloadDesc(extPart, part, lazy);
     }
 
     /**
@@ -789,27 +794,18 @@ public final class Parser {
             }
         }
 
-        Object type = SecurityDesc.SANDBOX_PERMISSIONS;
-        ApplicationPermissionLevel applicationPermissionLevel = ApplicationPermissionLevel.NONE;
+        ApplicationEnvironment applicationEnvironment = ApplicationEnvironment.SANDBOX;
 
-        if (nodes.length == 0) {
-            type = SecurityDesc.SANDBOX_PERMISSIONS;
-            applicationPermissionLevel = ApplicationPermissionLevel.NONE;
-        } else if (null != getChildNode(nodes[0], ApplicationPermissionLevel.ALL.getValue())) {
-            type = SecurityDesc.ALL_PERMISSIONS;
-            applicationPermissionLevel = ApplicationPermissionLevel.ALL;
-        } else if (null != getChildNode(nodes[0], ApplicationPermissionLevel.J2EE.getValue())) {
-            type = SecurityDesc.J2EE_PERMISSIONS;
-            applicationPermissionLevel = ApplicationPermissionLevel.J2EE;
-        } else if (strict) {
-            throw new ParseException("security element specified but does not contain a permissions element.");
+        if (nodes.length == 1) {
+            if (null != getChildNode(nodes[0], ApplicationEnvironment.ALL.getValue())) {
+                applicationEnvironment = ApplicationEnvironment.ALL;
+            } else if (null != getChildNode(nodes[0], ApplicationEnvironment.J2EE.getValue())) {
+                applicationEnvironment = ApplicationEnvironment.J2EE;
+            } else if (strict) {
+                throw new ParseException("security element specified but does not contain a permissions element.");
+            }
         }
-
-        if (base != null) {
-            return new SecurityDesc(file, applicationPermissionLevel, type, base);
-        } else {
-            return new SecurityDesc(file, applicationPermissionLevel, type, null);
-        }
+        return new SecurityDesc(applicationEnvironment);
     }
 
     /**
@@ -819,8 +815,8 @@ public final class Parser {
         final XmlNode security = getChildNode(root, SECURITY_ELEMENT);
 
         if (security != null) {
-            if (getChildNode(security, ApplicationPermissionLevel.ALL.getValue()) != null
-                    || getChildNode(security, ApplicationPermissionLevel.J2EE.getValue()) != null) {
+            if (getChildNode(security, ApplicationEnvironment.ALL.getValue()) != null
+                    || getChildNode(security, ApplicationEnvironment.J2EE.getValue()) != null) {
                 return true;
             }
         }

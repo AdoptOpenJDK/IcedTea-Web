@@ -50,6 +50,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * @deprecated will be replaced by new security dialogs
+ */
+@Deprecated
 public interface RememberableDialog {
 
     RememberPanelResult getRememberAction();

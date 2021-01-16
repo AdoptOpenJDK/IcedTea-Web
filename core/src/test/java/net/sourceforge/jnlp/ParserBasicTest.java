@@ -47,6 +47,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JREDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
+import net.adoptopenjdk.icedteaweb.jnlp.element.security.ApplicationEnvironment;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFile;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
@@ -127,7 +128,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
     @Test
     public void testInformationOfflineAllowed() throws ParseException {
         InformationDesc info = parser.getInformationDescs(root).get(0);
-        Assert.assertEquals(true, info.isOfflineAllowed());
+        Assert.assertTrue(info.isOfflineAllowed());
 
     }
 
@@ -208,7 +209,7 @@ public class ParserBasicTest extends NoStdOutErrTest {
     public void testSecurity() throws ParseException {
         SecurityDesc security = parser.getSecurity(root);
         Assert.assertNotNull(security);
-        Assert.assertEquals(SecurityDesc.ALL_PERMISSIONS, security.getSecurityType());
+        Assert.assertEquals(ApplicationEnvironment.ALL, security.getApplicationEnvironment());
     }
 
     @Test
@@ -235,23 +236,6 @@ public class ParserBasicTest extends NoStdOutErrTest {
     }
 
     @Test
-    public void testResourcesInsideJava() throws ParseException {
-        ClassLoader cl = ParserBasicTest.class.getClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-        ParserSettings defaultParserSettings = new ParserSettings();
-        InputStream jnlpStream = cl.getResourceAsStream("net/sourceforge/jnlp/jarsInJreDesc.jnlp");
-        final XMLParser xmlParser = XmlParserFactory.getParser(defaultParserSettings.getParserType());
-        XmlNode omega = xmlParser.getRootNode(jnlpStream);
-        Parser omegaParser = new Parser(new DummyJNLPFile(), null, omega, defaultParserSettings);
-        ResourcesDesc resources = omegaParser.getResources(omega, false).get(0);
-        JARDesc[] r = resources.getJARs();
-        // we ensures that also in j2se hars ar eloaded.it is 7 withutt them.
-        Assert.assertTrue(r.length>30);
-    }
-
-    @Test
     public void testResourcesJar() throws ParseException {
         ResourcesDesc resources = parser.getResources(root, false).get(0);
 
@@ -261,18 +245,18 @@ public class ParserBasicTest extends NoStdOutErrTest {
 
         JARDesc[] jars = resources.getJARs();
         Assert.assertEquals(3, jars.length);
-        for (int i = 0; i < jars.length; i++) {
-            if (jars[i].isNative()) {
+        for (JARDesc jar : jars) {
+            if (jar.isNative()) {
                 foundNative = true;
-                Assert.assertEquals("http://localhost/native.jar", jars[i].getLocation().toString());
-            } else if (jars[i].isEager()) {
+                Assert.assertEquals("http://localhost/native.jar", jar.getLocation().toString());
+            } else if (jar.isEager()) {
                 foundEager = true;
-                Assert.assertEquals("http://localhost/eager.jar", jars[i].getLocation().toString());
-            } else if (jars[i].isLazy()) {
+                Assert.assertEquals("http://localhost/eager.jar", jar.getLocation().toString());
+            } else if (jar.isLazy()) {
                 foundLazy = true;
-                Assert.assertEquals("http://localhost/lazy.jar", jars[i].getLocation().toString());
+                Assert.assertEquals("http://localhost/lazy.jar", jar.getLocation().toString());
             } else {
-                Assert.assertFalse(true);
+                Assert.fail();
             }
         }
 

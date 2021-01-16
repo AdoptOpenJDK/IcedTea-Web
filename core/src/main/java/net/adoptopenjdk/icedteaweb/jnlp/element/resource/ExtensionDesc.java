@@ -21,9 +21,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The extension element.
@@ -32,14 +30,12 @@ import java.util.Map;
  * @version $Revision: 1.8 $
  */
 public class ExtensionDesc {
-    public static final String EXT_DOWNLOAD_ELEMENT = "ext-download";
-    public static final String HREF_ATTRIBUTE = "href";
-    public static final String DOWNLOAD_ATTRIBUTE = "download";
-    public static final String EXT_PART_ATTRIBUTE = "ext-part";
 
+    public static final String EXT_DOWNLOAD_ELEMENT = "ext-download";
+
+    public static final String HREF_ATTRIBUTE = "href";
     public static final String NAME_ATTRIBUTE = "name";
     public static final String VERSION_ATTRIBUTE = "version";
-    public static final String PART_ATTRIBUTE = "part";
 
     /** the extension name */
     private final String name;
@@ -52,11 +48,8 @@ public class ExtensionDesc {
     /** the location of the extension JNLP file */
     private final URL location;
 
-    /** map from ext-part to local part */
-    private final Map<String, String> extToPart = new HashMap<>();
-
     /** eager ext parts */
-    private final List<String> eagerExtParts = new ArrayList<>();
+    private final List<ExtensionDownloadDesc> downloads = new ArrayList<>();
 
     /**
      * Create an extension descriptor.
@@ -77,15 +70,14 @@ public class ExtensionDesc {
      * will be downloaded before the application is launched if the
      * lazy value is false or the part is empty or null.
      *
-     * @param extPart the part name in the extension file
-     * @param part the part name in the main file
-     * @param lazy whether to load the part before launching
+     * @param download the extension download description
      */
-    public void addPart(String extPart, String part, boolean lazy) {
-        extToPart.put(extPart, part);
+    public void addDownload(ExtensionDownloadDesc download) {
+        downloads.add(download);
+    }
 
-        if (!lazy || part == null || part.length() == 0)
-            eagerExtParts.add(extPart);
+    public List<ExtensionDownloadDesc> getDownloads() {
+        return downloads;
     }
 
     /**

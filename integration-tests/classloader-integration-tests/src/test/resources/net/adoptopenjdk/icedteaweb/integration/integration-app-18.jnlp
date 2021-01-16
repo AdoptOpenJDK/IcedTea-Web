@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp spec="6.0+" codebase=".">
+    <information>
+        <title>IcedTeaWeb Integration Test 1</title>
+        <vendor>AdoptOpenJDK</vendor>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <java version="1.8+" />
+        <nativelib download="lazy" part="lazy-package" href="classloader-integration-tests-module-native.jar"/>
+        <package name="net.adoptopenjdk.*" part="lazy-package" recursive="true" />
+    </resources>
+    <application-desc main-class="UnknownMainClass" />
+</jnlp>

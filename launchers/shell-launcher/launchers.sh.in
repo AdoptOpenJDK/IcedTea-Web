@@ -20,6 +20,7 @@ ITW_LIBS=@ITW_LIBS@
 readonly JAVAWS_SRC=@JAVAWS_JAR@
 readonly TAGSOUP_SRC=@TAGSOUP_JAR@
 readonly RHINO_SRC=@RHINO_JAR@
+readonly GSON_SRC=@GSON_JAR@
 readonly IPADDRESS_SRC=@IPADDRESS_JAR@
 # windows only: (cywin usage?); need to declare it anyway
 readonly MSLINKS_SRC=@MSLINKS_JAR@
@@ -109,6 +110,7 @@ if [ "x$ITW_LIBS" == "xBUNDLED" -o ! "x$ITW_HOME" = "x" ] ; then
   readonly RHINO_JAR=""
   readonly TAGSOUP_JAR=""
   readonly MSLINKS_JAR=""
+  readonly GSON_JAR=""
   readonly IPADDRESS_JAR=""
   echo "warning, using portable itw from $ITW_HOME"
 else
@@ -117,10 +119,11 @@ else
   readonly RHINO_JAR="$RHINO_SRC"
   readonly TAGSOUP_JAR="$TAGSOUP_SRC"
   readonly MSLINKS_JAR="$MSLINKS_SRC"
+  readonly GSON_JAR="$GSON_SRC"
   readonly IPADDRESS_JAR="$IPADDRESS_SRC"
 fi
 set -u
-LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$JAVAWS_JAR:$TAGSOUP_JAR:$RHINO_JAR:$MSLINKS_JAR:$IPADDRESS_JAR"
+LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$JAVAWS_JAR:$TAGSOUP_JAR:$RHINO_JAR:$MSLINKS_JAR:$GSON_J:$IPADDRESS_JARAR"
 
 # Fix classpaths for custom JRE:
 if [ "x$CUSTOM_JRE" != "x" ] ; then

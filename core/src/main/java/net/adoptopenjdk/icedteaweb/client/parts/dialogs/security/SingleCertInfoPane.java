@@ -43,6 +43,10 @@ import javax.swing.tree.TreeSelectionModel;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
+/**
+ * @deprecated will be replaced by new security dialogs
+ */
+@Deprecated
 public class SingleCertInfoPane extends CertsInfoPane {
 
     public SingleCertInfoPane(SecurityDialog x, CertVerifier certVerifier) {

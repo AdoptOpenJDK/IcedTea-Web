@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jnlp spec="6.0+" codebase=".">
+    <information>
+        <title>IcedTeaWeb Integration Test 1</title>
+        <vendor>AdoptOpenJDK</vendor>
+    </information>
+    <resources>
+        <java version="1.8+" />
+        <extension href="integration-app-19-extension.jnlp"/>
+    </resources>
+    <application-desc main-class="UnknownMainClass" />
+</jnlp>

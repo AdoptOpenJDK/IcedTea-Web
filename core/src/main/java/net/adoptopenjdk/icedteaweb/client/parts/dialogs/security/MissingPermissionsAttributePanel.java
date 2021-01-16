@@ -50,7 +50,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -67,6 +66,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import static net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils.htmlWrap;
+
+/**
+ * @deprecated will be replaced by new security dialogs
+ */
+@Deprecated
 public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
 
     private final static Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributePanel.class);
@@ -81,7 +86,7 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
             throw new RuntimeException(ex);
         }
         if (x != null) {
-            x.getViwableDialog().setMinimumSize(new Dimension(400, 400));
+            x.getViewableDialog().setMinimumSize(new Dimension(400, 400));
         }
     }
 
@@ -147,15 +152,6 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
 
     }
 
-    public static void main(String[] args) {
-        MissingPermissionsAttributePanel w = new MissingPermissionsAttributePanel(null, "HelloWorld", "http://nbblah.url");
-        JFrame f = new JFrame();
-        f.setSize(400, 400);
-        f.add(w, BorderLayout.CENTER);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setVisible(true);
-    }
-    
     @Override
     public RememberPanelResult getRememberAction() {
         return rememberPanel.getRememberAction();

@@ -55,7 +55,7 @@ public class JnlpInformationElementTest extends NoStdOutErrTest{
     private JNLPFile setUp(final String jnlpContent) throws ParseException, MalformedURLException {
         final URL codeBase = new URL("http://icedtea.classpath.org");
         final InputStream is = new ByteArrayInputStream(jnlpContent.getBytes());
-        return new JNLPFile(is, codeBase, new ParserSettings(false,false,false));
+        return new JNLPFile(is, null, codeBase, new ParserSettings(false,false,false), null);
     }
 
     @Test
