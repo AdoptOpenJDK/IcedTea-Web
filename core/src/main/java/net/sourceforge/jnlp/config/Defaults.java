@@ -240,6 +240,11 @@ public class Defaults {
                     String.valueOf(false),
                     ValidatorFactory.createBooleanValidator()
             ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_DISABLE_RESTRICTED_FILES,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
 
             /*
              * networking

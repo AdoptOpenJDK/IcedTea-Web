@@ -19,6 +19,7 @@ package net.sourceforge.jnlp.util;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,9 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.Boolean.parseBoolean;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_DISABLE_RESTRICTED_FILES;
 
 /**
  * This class contains a method to create restricted files.
@@ -78,17 +82,15 @@ public final class RestrictedFileUtils {
      */
     private static void createRestrictedFile(File file, boolean isDir) throws IOException {
 
-        File tempFile = new File(file.getCanonicalPath() + ".temp");
-
-        if (isDir) {
-            if (!tempFile.mkdir()) {
-                throw new IOException("Cannot create directory {} " + tempFile);
-            }
-        } else {
-            if (!tempFile.createNewFile()) {
-                throw new IOException("Cannot create file {} " + tempFile);
-            }
+        final String disableRestrictedFiles = JNLPRuntime.getConfiguration().getProperty(KEY_SECURITY_DISABLE_RESTRICTED_FILES);
+        if (parseBoolean(disableRestrictedFiles)) {
+            createFileOrDir(file, isDir);
+            return;
         }
+
+        final File tempFile = new File(file.getCanonicalPath() + ".temp");
+
+        createFileOrDir(tempFile, isDir);
 
         try {
             if (OsUtil.isWindows()) {
@@ -176,4 +178,15 @@ public final class RestrictedFileUtils {
         }
     }
 
+    private static void createFileOrDir(File file, boolean isDir) throws IOException {
+        if (isDir) {
+            if (!file.mkdir()) {
+                throw new IOException("Cannot create directory {} " + file);
+            }
+        } else {
+            if (!file.createNewFile()) {
+                throw new IOException("Cannot create file {} " + file);
+            }
+        }
+    }
 }

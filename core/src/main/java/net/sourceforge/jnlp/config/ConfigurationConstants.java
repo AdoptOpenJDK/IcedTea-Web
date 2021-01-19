@@ -138,6 +138,11 @@ public interface ConfigurationConstants {
      */
     String KEY_SECURITY_ITW_IGNORECERTISSUES = "deployment.security.itw.ignorecertissues";
 
+    /**
+     * Boolean. Create regular files instead of restricted files if true.
+     */
+    String KEY_SECURITY_DISABLE_RESTRICTED_FILES = "deployment.security.itw.disablerestrictedfiles";
+
     String KEY_STRICT_JNLP_CLASSLOADER = "deployment.jnlpclassloader.strict";
 
     /**
