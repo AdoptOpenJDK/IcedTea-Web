@@ -17,11 +17,11 @@
 package net.adoptopenjdk.icedteaweb.io;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.validator.DirectoryCheckResults;
-import net.adoptopenjdk.icedteaweb.validator.DirectoryValidator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.adoptopenjdk.icedteaweb.validator.DirectoryCheckResults;
+import net.adoptopenjdk.icedteaweb.validator.DirectoryValidator;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,20 +34,12 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.attribute.AclEntry;
-import java.nio.file.attribute.AclEntryFlag;
-import java.nio.file.attribute.AclEntryPermission;
-import java.nio.file.attribute.AclEntryType;
-import java.nio.file.attribute.AclFileAttributeView;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -64,8 +56,6 @@ public final class FileUtils {
     private static final String MD5 = "MD5";
 
     private static final String WIN_DRIVE_LETTER_COLON_WILDCHAR = "WINDOWS_VERY_SPECIFIC_DOUBLEDOT";
-
-    private static final List<String> WIN_ROOT_PRINCIPALS = Arrays.asList("NT AUTHORITY\\SYSTEM", "BUILTIN\\Administrators");
 
     /**
      * Indicates whether a file was successfully opened. If not, provides specific reasons
@@ -91,7 +81,7 @@ public final class FileUtils {
         /**
          * The specified path pointed to a non-file filesystem object, ie a directory
          */
-        NOT_FILE;
+        NOT_FILE,
     }
 
     /**
@@ -159,30 +149,6 @@ public final class FileUtils {
     }
 
     /**
-     * Creates a new directory with minimum permissions. The directory is not
-     * readable or writable by anyone other than the owner. The parent
-     * directories are not created; they must exist before this is called.
-     *
-     * @param directory directory to be created
-     * @throws IOException if IO fails
-     */
-    public static void createRestrictedDirectory(File directory) throws IOException {
-        createRestrictedFile(directory, true);
-    }
-
-    /**
-     * Creates a new file with minimum permissions. The file is not readable or
-     * writable by anyone other than the owner. If writeableByOwner is false,
-     * even the owner can not write to it.
-     *
-     * @param file path to file
-     * @throws IOException if IO fails
-     */
-    public static void createRestrictedFile(File file) throws IOException {
-        createRestrictedFile(file, false);
-    }
-
-    /**
      * Tries to create the ancestor directories of file f. Throws
      * an IOException if it can't be created (but not if it was
      * already there).
@@ -231,122 +197,6 @@ public final class FileUtils {
         if (f.exists()) {
             if (!f.delete()) {
                 LOG.error("Cannot delete file {}", eMsg == null ? f : eMsg);
-            }
-        }
-    }
-
-    /**
-     * Tries to delete file f. If the file exists but couldn't be deleted,
-     * print an error message to stderr with the file name.
-     *
-     * @param f the file to be deleted
-     */
-    public static void deleteWithErrMesg(File f) {
-        deleteWithErrMesg(f, null);
-    }
-
-    /**
-     * Creates a new file or directory with minimum permissions. The file is not
-     * readable or writable by anyone other than the owner. If writeableByOwner
-     * is false, even the owner can not write to it. If isDir is true, then the
-     * directory can be executed by the owner
-     */
-    private static void createRestrictedFile(File file, boolean isDir) throws IOException {
-
-        File tempFile = new File(file.getCanonicalPath() + ".temp");
-
-        if (isDir) {
-            if (!tempFile.mkdir()) {
-                throw new IOException("Cannot create directory {} " + tempFile);
-            }
-        } else {
-            if (!tempFile.createNewFile()) {
-                throw new IOException("Cannot create file {} " + tempFile);
-            }
-        }
-
-        try {
-            if (OsUtil.isWindows()) {
-                // prepare ACL flags
-                Set<AclEntryFlag> flags = new LinkedHashSet<>();
-                if (tempFile.isDirectory()) {
-                    flags.add(AclEntryFlag.DIRECTORY_INHERIT);
-                    flags.add(AclEntryFlag.FILE_INHERIT);
-                }
-
-                // prepare ACL permissions
-                Set<AclEntryPermission> permissions = new LinkedHashSet<>(Arrays.asList(
-                        AclEntryPermission.READ_DATA,
-                        AclEntryPermission.READ_NAMED_ATTRS,
-                        AclEntryPermission.EXECUTE,
-                        AclEntryPermission.READ_ATTRIBUTES,
-                        AclEntryPermission.READ_ACL,
-                        AclEntryPermission.SYNCHRONIZE,
-                        AclEntryPermission.WRITE_DATA,
-                        AclEntryPermission.APPEND_DATA,
-                        AclEntryPermission.WRITE_NAMED_ATTRS,
-                        AclEntryPermission.DELETE_CHILD,
-                        AclEntryPermission.WRITE_ATTRIBUTES,
-                        AclEntryPermission.DELETE,
-                        AclEntryPermission.WRITE_ACL,
-                        AclEntryPermission.WRITE_OWNER
-                ));
-
-                // filter ACL's leaving only root and owner
-                AclFileAttributeView view = Files.getFileAttributeView(tempFile.toPath(), AclFileAttributeView.class);
-                List<AclEntry> list = new ArrayList<>();
-                String owner = view.getOwner().getName();
-                for (AclEntry ae : view.getAcl()) {
-                    String principalName = ae.principal().getName();
-                    if (WIN_ROOT_PRINCIPALS.contains(principalName) || owner.equals(principalName)) {
-                        list.add(AclEntry.newBuilder()
-                                .setType(AclEntryType.ALLOW)
-                                .setPrincipal(ae.principal())
-                                .setPermissions(permissions)
-                                .setFlags(flags)
-                                .build());
-                    }
-                }
-
-                // apply ACL
-                view.setAcl(list);
-            } else {
-                // remove all permissions
-                if (!tempFile.setExecutable(false, false)) {
-                    throw new IOException("Removing execute permissions on file " + tempFile + " failed ");
-                }
-                if (!tempFile.setReadable(false, false)) {
-                    throw new IOException("Removing read permission on file " + tempFile + " failed ");
-                }
-                if (!tempFile.setWritable(false, false)) {
-                    throw new IOException("Removing write permissions on file " + tempFile + " failed ");
-                }
-
-                // allow owner to read
-                if (!tempFile.setReadable(true, true)) {
-                    throw new IOException("Acquiring read permissions on file " + tempFile + " failed");
-                }
-
-                // allow owner to write
-                if (!tempFile.setWritable(true, true)) {
-                    throw new IOException("Acquiring write permissions on file " + tempFile + " failed");
-                }
-
-                // allow owner to enter directories
-                if (isDir && !tempFile.setExecutable(true, true)) {
-                    throw new IOException("Acquiring execute permissions on file " + tempFile + " failed");
-                }
-            }
-
-            // rename this file. Unless the file is moved/renamed, any program that
-            // opened the file right after it was created might still be able to
-            // read the data.
-            if (!tempFile.renameTo(file)) {
-                throw new IOException("Cannot rename " + tempFile + " to " + file);
-            }
-        } finally {
-            if (tempFile.exists()) {
-                FileUtils.deleteWithErrMesg(tempFile, "Could not delete [" + tempFile + "]");
             }
         }
     }

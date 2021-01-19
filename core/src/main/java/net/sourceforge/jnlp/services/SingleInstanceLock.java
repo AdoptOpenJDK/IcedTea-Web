@@ -21,6 +21,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -68,7 +69,7 @@ class SingleInstanceLock {
             LOG.error("SingleInstance lock file already present - deleting it.");
             FileUtils.deleteWithErrMesg(lockFile, "Could not delete [" + lockFile + "]");
         }
-        FileUtils.createRestrictedFile(lockFile);
+        RestrictedFileUtils.createRestrictedFile(lockFile);
         lockFile.deleteOnExit();
         try (BufferedWriter lockFileWriter = new BufferedWriter(new FileWriter(lockFile, false))) {
             lockFileWriter.write(String.valueOf(localPort));
@@ -138,7 +139,7 @@ class SingleInstanceLock {
                 throw new RuntimeException("Unable to create locks directory (" + baseDir + ")");
             }
             try {
-                FileUtils.createRestrictedDirectory(baseDir);
+                RestrictedFileUtils.createRestrictedDirectory(baseDir);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to create locks directory (" + baseDir + ")");
             }

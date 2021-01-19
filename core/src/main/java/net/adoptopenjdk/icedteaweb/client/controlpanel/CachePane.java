@@ -28,6 +28,7 @@ import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -298,7 +299,7 @@ public class CachePane extends JPanel {
                     if (!netxRunningFile.exists()) {
                         try {
                             FileUtils.createParentDir(netxRunningFile);
-                            FileUtils.createRestrictedFile(netxRunningFile);
+                            RestrictedFileUtils.createRestrictedFile(netxRunningFile);
                         } catch (IOException e1) {
                             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e1);
                         }

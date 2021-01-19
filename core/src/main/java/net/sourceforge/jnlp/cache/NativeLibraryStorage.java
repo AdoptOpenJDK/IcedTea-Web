@@ -6,6 +6,7 @@ import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -132,7 +133,7 @@ public class NativeLibraryStorage {
                     if (isLibrary) {
                         final File outFile = new File(getNativeStoreDirectory(), name);
                         if (!outFile.isFile()) {
-                            FileUtils.createRestrictedFile(outFile);
+                            RestrictedFileUtils.createRestrictedFile(outFile);
                         }
                         try (FileOutputStream out = new FileOutputStream(outFile)) {
                             IOUtils.copy(jarFile.getInputStream(e), out, 4096);
@@ -165,7 +166,7 @@ public class NativeLibraryStorage {
 
         final File nativeDir = new File(parent, "netx-native-" + RANDOM.nextInt(0xFFFF));
         try {
-            FileUtils.createRestrictedDirectory(nativeDir);
+            RestrictedFileUtils.createRestrictedDirectory(nativeDir);
             return nativeDir;
         } catch (IOException e) {
             throw new RuntimeException("Exception while creating native storage directory '" + nativeDir + "'", e);

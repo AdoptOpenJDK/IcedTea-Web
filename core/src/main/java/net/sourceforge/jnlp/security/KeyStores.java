@@ -34,11 +34,11 @@ statement from your version.
 package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -333,7 +333,7 @@ public final class KeyStores {
                 if (!parent.isDirectory() && !parent.mkdirs()) {
                     throw new IOException("unable to create " + parent);
                 }
-                FileUtils.createRestrictedFile(file);
+                RestrictedFileUtils.createRestrictedFile(file);
                 LOG.debug("Created keystore file {}", file.toString());
 
                 SecurityUtil.storeKeyStore(ks, file);

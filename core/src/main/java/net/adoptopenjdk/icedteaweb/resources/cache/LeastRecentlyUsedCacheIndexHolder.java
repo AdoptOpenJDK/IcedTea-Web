@@ -5,6 +5,7 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -117,7 +118,7 @@ class LeastRecentlyUsedCacheIndexHolder {
         if (!recentlyUsedFile.exists()) {
             try {
                 FileUtils.createParentDir(recentlyUsedFile);
-                FileUtils.createRestrictedFile(recentlyUsedFile);
+                RestrictedFileUtils.createRestrictedFile(recentlyUsedFile);
             } catch (IOException e) {
                 LOG.error("Error in creating recently used cache items file.", e);
             }

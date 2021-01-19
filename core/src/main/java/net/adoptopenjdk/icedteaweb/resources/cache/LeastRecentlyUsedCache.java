@@ -46,6 +46,7 @@ import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.PropertiesFile;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import java.io.File;
@@ -147,7 +148,7 @@ class LeastRecentlyUsedCache {
     private void createInfoFile(File dir) {
         try {
             final File infoFile = new File(dir, CacheEntry.INFO_SUFFIX);
-            FileUtils.createRestrictedFile(infoFile); // Create the info file for marking later.
+            RestrictedFileUtils.createRestrictedFile(infoFile); // Create the info file for marking later.
 
             final String jnlpPath = JNLPRuntime.getJnlpPath(); //get jnlp from args passed
             if (isBlank(jnlpPath)) {
