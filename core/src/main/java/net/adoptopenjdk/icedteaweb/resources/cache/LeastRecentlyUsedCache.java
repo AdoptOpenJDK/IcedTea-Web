@@ -362,7 +362,13 @@ class LeastRecentlyUsedCache {
     }
 
     private void deleteAll(Collection<File> files) {
-        deleteAll(files.toArray(new File[0]));
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
+            deleteDir(file);
+        }
     }
 
     private void deleteAll(File... files) {
@@ -371,11 +377,15 @@ class LeastRecentlyUsedCache {
         }
 
         for (File file : files) {
-            try {
-                FileUtils.recursiveDelete(file, file);
-            } catch (IOException e) {
-                LOG.error("Failed to delete directory {} - {}", file, e.getMessage());
-            }
+            deleteDir(file);
+        }
+    }
+
+    private void deleteDir(File file) {
+        try {
+            FileUtils.recursiveDelete(file, file);
+        } catch (IOException e) {
+            LOG.error("Failed to delete directory {} - {}", file, e.getMessage());
         }
     }
 
@@ -389,32 +399,50 @@ class LeastRecentlyUsedCache {
 
         final File[] levelOneDirs = rootCacheDir.getFile().listFiles(File::isDirectory);
         if (isNullOrEmpty(levelOneDirs)) {
+            LOG.debug("found no folders in the cache dir - clear cache index");
             cacheIndex.runSynchronized(LeastRecentlyUsedCacheIndex::clear);
         } else {
-            final Set<String> entryIds = collectAllEntryIdsFromFileSystem(levelOneDirs);
+            LOG.debug("start cleaning the cache");
+            final Set<String> entryIdsFromFileSystem = collectAllEntryIdsFromFileSystem(levelOneDirs);
+            final Set<String> entryIdsFromIndex = new HashSet<>();
             cacheIndex.runSynchronized(idx -> {
 
                 final long maxSize = getMaxSizeInBytes();
                 long curSize = 0;
 
-                final List<LeastRecentlyUsedCacheEntry> toDelete = new ArrayList<>();
+                final List<LeastRecentlyUsedCacheEntry> toRemoveFromIndex = new ArrayList<>();
                 for (LeastRecentlyUsedCacheEntry entry : idx.getAllEntries()) {
-                    entryIds.remove(entry.getId());
+                    entryIdsFromIndex.add(entry.getId());
 
                     final CacheEntry infoFile = getInfoFile(entry);
                     final File cacheFile = infoFile.getCacheFile();
                     final File directory = cacheFile.getParentFile();
 
                     if (!infoFile.exists()) {
-                        toDelete.add(entry);
-                        deleteAll(directory);
+                        LOG.debug("missing info file for {}", entry.getResourceHref());
+                        toRemoveFromIndex.add(entry);
+                        deleteDir(directory);
                         continue;
                     }
 
+                    if (entry.isMarkedForDeletion()) {
+                        LOG.debug("marked for deletion {}", entry.getResourceHref());
+                        toRemoveFromIndex.add(entry);
+                        deleteDir(directory);
+                        continue;
+                    }
+                    if (!cacheFile.isFile()) {
+                        LOG.debug("missing cache file {}", entry.getResourceHref());
+                        toRemoveFromIndex.add(entry);
+                        deleteDir(directory);
+                        continue;
+                    }
                     final long size = cacheFile.length();
-                    if (entry.isMarkedForDeletion() || !cacheFile.isFile() || (maxSize >= 0 && curSize + size > maxSize)) {
-                        toDelete.add(entry);
-                        deleteAll(directory);
+                    if (maxSize >= 0 && curSize + size > maxSize) {
+                        LOG.debug("Current cache size is {} - file {} has size {} and would exceed max cache size {}",
+                                curSize, entry.getResourceHref(), size, maxSize);
+                        toRemoveFromIndex.add(entry);
+                        deleteDir(directory);
                         continue;
                     }
 
@@ -422,7 +450,8 @@ class LeastRecentlyUsedCache {
                     if (!isNullOrEmpty(cacheDirFiles)) {
                         for (File file : cacheDirFiles) {
                             if (!file.equals(cacheFile) && !file.getName().equals(CacheEntry.INFO_SUFFIX)) {
-                                deleteAll(file);
+                                LOG.debug("found unknown file {}", file);
+                                deleteDir(file);
                             }
                         }
                     }
@@ -430,21 +459,29 @@ class LeastRecentlyUsedCache {
                     curSize += size;
                 }
 
-                toDelete.forEach(idx::removeEntry);
+                toRemoveFromIndex.forEach(idx::removeEntry);
             });
 
             // delete dirs with no entry in the least recently used index
-            final List<File> dirsWithNoEntryInTheIndex = entryIds.stream()
+            entryIdsFromFileSystem.removeAll(entryIdsFromIndex);
+            final List<File> dirsWithNoEntryInTheIndex = entryIdsFromFileSystem.stream()
                     .map(this::cacheDirFromEntryId)
                     .collect(Collectors.toList());
-            deleteAll(dirsWithNoEntryInTheIndex);
+            if (dirsWithNoEntryInTheIndex.size() > 0) {
+                LOG.debug("found directories with no entry in the index");
+                deleteAll(dirsWithNoEntryInTheIndex);
+            }
 
             // delete empty level one dirs
             final List<File> emptyDirs = Arrays.stream(levelOneDirs)
                     .filter(dir -> isNullOrEmpty(dir.list()))
                     .collect(Collectors.toList());
-            deleteAll(emptyDirs);
+            if (emptyDirs.size() > 0) {
+                LOG.debug("found empty directories");
+                deleteAll(emptyDirs);
+            }
         }
+        LOG.debug("done cleaning the cache");
     }
 
     private Set<String> collectAllEntryIdsFromFileSystem(File[] levelOneDirs) {
