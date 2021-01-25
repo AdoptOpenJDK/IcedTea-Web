@@ -50,7 +50,7 @@ import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.KeyStores.Type;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -252,7 +252,7 @@ public class CertWarningPane extends SecurityDialogPanel {
         }
 
         alwaysTrust.addActionListener(new ButtonDisableListener(sandbox));
- 
+
         sandbox.setEnabled(!alwaysTrust.isSelected());
 
         run.addActionListener(SetValueHandler.createSetValueListener(parent, YesNoSandbox.yes()));
@@ -339,7 +339,7 @@ public class CertWarningPane extends SecurityDialogPanel {
             CertificateUtils.addToKeyStore(c, ks);
             File keyStoreFile = KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFile();
             if (!keyStoreFile.isFile()) {
-                FileUtils.createRestrictedFile(keyStoreFile);
+                RestrictedFileUtils.createRestrictedFile(keyStoreFile);
             }
             SecurityUtil.storeKeyStore(ks, keyStoreFile);
             LOG.debug("certificate is now permanently trusted");
@@ -359,7 +359,7 @@ public class CertWarningPane extends SecurityDialogPanel {
     public DialogResult getDefaultPositiveAnswer() {
         return YesNoSandbox.yes();
     }
-    
+
     @Override
     public DialogResult readFromStdIn(String what) {
         return YesNoSandbox.readValue(what);

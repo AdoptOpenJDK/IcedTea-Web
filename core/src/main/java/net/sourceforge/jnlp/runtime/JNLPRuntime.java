@@ -38,6 +38,7 @@ import net.sourceforge.jnlp.security.JNLPAuthenticator;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import sun.net.www.protocol.jar.URLJarFile;
@@ -793,7 +794,7 @@ public class JNLPRuntime {
             File netxRunningFile = PathsAndFiles.MAIN_LOCK.getFile();
             if (!netxRunningFile.exists()) {
                 FileUtils.createParentDir(netxRunningFile);
-                FileUtils.createRestrictedFile(netxRunningFile);
+                RestrictedFileUtils.createRestrictedFile(netxRunningFile);
                 try (FileOutputStream fos = new FileOutputStream(netxRunningFile)) {
                     fos.write(message.getBytes());
                 }

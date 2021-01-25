@@ -44,7 +44,7 @@ import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -254,11 +254,11 @@ public class CertificatePane extends JPanel {
             closeButton.addActionListener(new CloseButtonListener());
             defaultFocusComponent = closeButton;
             closePanel.add(closeButton, BorderLayout.EAST);
-            
+
             JButton openAll = new JButton(R("ButLunchFullItwSettings"));
             openAll.addActionListener(new FullSettingsButtonListener());
             closePanel.add(openAll, BorderLayout.WEST);
-            
+
             main.add(closePanel, BorderLayout.SOUTH);
         }
 
@@ -441,18 +441,18 @@ public class CertificatePane extends JPanel {
                 }
             }
         }
-        
+
         private void storeKeyStore(KeyStore ks, KeyStores.Type keyStoreType)
-                throws KeyStoreException, IOException, 
+                throws KeyStoreException, IOException,
                        NoSuchAlgorithmException, CertificateException {
             final File keyStoreFile = KeyStores.getKeyStoreLocation(
                                 currentKeyStoreLevel, keyStoreType).getFile();
             if (!keyStoreFile.isFile()) {
-                FileUtils.createRestrictedFile(keyStoreFile);
+                RestrictedFileUtils.createRestrictedFile(keyStoreFile);
             }
 
             SecurityUtil.storeKeyStore(ks, keyStoreFile);
-        }   
+        }
     }
 
     private class ExportButtonListener implements ActionListener {
@@ -527,7 +527,7 @@ public class CertificatePane extends JPanel {
                             keyStore.getKs().deleteEntry(alias);
                             File keyStoreFile = KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType).getFile();
                             if (!keyStoreFile.isFile()) {
-                                FileUtils.createRestrictedFile(keyStoreFile);
+                                RestrictedFileUtils.createRestrictedFile(keyStoreFile);
                             }
                             SecurityUtil.storeKeyStore(keyStore.getKs(), keyStoreFile);
                         }
@@ -571,14 +571,14 @@ public class CertificatePane extends JPanel {
             JNLPRuntime.exit(0);
         }
     }
-    
+
     private class FullSettingsButtonListener implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 ControlPanel.main(new String[0]);
-                parent.dispose();    
+                parent.dispose();
             } catch (Exception ex) {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 JOptionPane.showMessageDialog(parent, ex);

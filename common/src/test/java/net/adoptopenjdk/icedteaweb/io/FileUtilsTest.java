@@ -5,9 +5,6 @@ import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import org.junit.Test;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.attribute.AclEntry;
-import java.nio.file.attribute.AclFileAttributeView;
 
 import static net.adoptopenjdk.icedteaweb.io.FileUtils.INVALID_PATH;
 import static org.junit.Assert.assertEquals;
@@ -92,29 +89,4 @@ public class FileUtilsTest {
         assertTrue(testParent.isDirectory());
         assertFalse(testChild.exists());
     }
-
-    @Test
-    public void testCreateRestrictedFile() throws Exception {
-        if (!OsUtil.isWindows()) {
-            return;
-        }
-        final File tmpdir = new File(JavaSystemProperties.getJavaTempDir()), testfile = new File(tmpdir, "itw_test_create_restricted_file");
-        if (testfile.exists()) {
-            assertTrue(testfile.delete());
-        }
-        testfile.deleteOnExit();
-        FileUtils.createRestrictedFile(testfile);
-        boolean hasOwner = false;
-        AclFileAttributeView view = Files.getFileAttributeView(testfile.toPath(), AclFileAttributeView.class);
-        for (AclEntry ae : view.getAcl()) {
-            if (view.getOwner().getName().equals(ae.principal().getName())) {
-                assertFalse("Duplicate owner entry", hasOwner);
-                hasOwner = true;
-                assertEquals("Owner must have all permissions", 14, ae.permissions().size());
-            }
-        }
-        assertTrue("No owner entry", hasOwner);
-    }
-
-
 }

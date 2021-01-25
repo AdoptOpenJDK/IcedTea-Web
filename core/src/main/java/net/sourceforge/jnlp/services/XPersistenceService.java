@@ -16,13 +16,14 @@
 
 package net.sourceforge.jnlp.services;
 
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import javax.jnlp.FileContents;
 import javax.jnlp.PersistenceService;
@@ -110,7 +111,7 @@ class XPersistenceService implements PersistenceService {
         if (file.exists())
             throw new IOException("File already exists.");
 
-        FileUtils.createRestrictedFile(file);
+        RestrictedFileUtils.createRestrictedFile(file);
 
         return maxsize;
     }
