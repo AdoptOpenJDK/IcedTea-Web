@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.util;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.lockingfile.LockableFile;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -198,7 +197,7 @@ public class PropertiesFile {
          *  - current file modification timestamp has not changed since last store AND current system time equals current file modification timestamp
          *    This is necessary because some filesystems seems only to provide accuracy of the timestamp on the level of seconds!
          */
-        if (dirty || lastStore == 0 || currentStore != lastStore || (currentStore == lastStore && currentStore / 1000 == currentTime / 1000)) {
+        if (dirty || lastStore == 0 || currentStore != lastStore || currentStore / 1000 == currentTime / 1000) {
             try (InputStream s = new FileInputStream(file)) {
                 delegate.clear();
                 delegate.load(s);
@@ -206,7 +205,7 @@ public class PropertiesFile {
                 dirty = false;
                 return true;
             } catch (final IOException ex) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+                LOG.error("Failed to load", ex);
             }
         }
         return false;
@@ -216,16 +215,19 @@ public class PropertiesFile {
      * Saves the properties to the file.
      */
     public void store() {
+        if (lockableFile.isReadOnly()) {
+            LOG.warn("Cannot save properties as the file is read only");
+            return;
+        }
         final File file = lockableFile.getFile();
         try (final FileOutputStream s = new FileOutputStream(file)) {
-            file.getParentFile().mkdirs();
             delegate.store(s, header);
             // fsync()
             s.getChannel().force(true);
             lastStore = file.lastModified();
             dirty = false;
         } catch (final IOException ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
+            LOG.error("Failed to store", ex);
         }
     }
 
@@ -241,7 +243,7 @@ public class PropertiesFile {
         try {
             return lockableFile.tryLock();
         } catch (final IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Failed to tryLock", e);
         }
         return false;
     }
@@ -254,7 +256,7 @@ public class PropertiesFile {
         try {
             lockableFile.unlock();
         } catch (final IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.error("Failed to unlock", e);
         }
     }
 

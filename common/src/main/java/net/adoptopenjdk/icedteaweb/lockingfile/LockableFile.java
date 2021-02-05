@@ -33,7 +33,8 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.lockingfile;
 
-import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,18 +46,20 @@ import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Process & thread locked access to a file. Creates file if it does not already exist.
+ * Process & thread lockable access to a file. Creates file if it does not already exist.
  */
 public class LockableFile {
+
+    private static final Logger logger = LoggerFactory.getLogger(LockableFile.class);
 
     private static final Map<File, LockableFile> instanceCache = new WeakHashMap<>();
 
     /**
-     * Get a LockedFile for a given File. Ensures that we share the same
-     * instance for all threads
+     * Get a LockableFile for a given File.
+     * Ensures that we share the same instance for all threads.
      *
      * @param file the file to lock
-     * @return a LockedFile instance
+     * @return a LockableFile instance
      */
     public static LockableFile getInstance(final File file) {
         if (instanceCache.containsKey(file)) {
@@ -88,12 +91,17 @@ public class LockableFile {
     private LockableFile(final File file) {
         this.file = file;
         try {
-            //just try to create
-            this.file.createNewFile();
+            if (! file.exists()) {
+                if (! file.createNewFile()) {
+                    throw new IOException("could not create file " + file);
+                }
+            } else if (! file.isFile()) {
+                logger.error("lockable file {} is not a file but something else (maybe a directory)", file);
+            }
         } catch (final Exception ex) {
-            //intentionally silent
+            logger.error("Exception while creating lockable file", ex);
         }
-        this.readOnly = isReadOnly(this.file);
+        readOnly = isReadOnly(file);
     }
 
     private boolean isReadOnly(final File file) {
@@ -132,16 +140,18 @@ public class LockableFile {
      */
     public void lock() throws IOException {
         // Create if does not already exist, cannot lock non-existing file
-        if (!isReadOnly()) {
-            this.file.createNewFile();
+        if (!readOnly && !file.exists()) {
+            if (!file.createNewFile()) {
+                logger.error("Could not create the lockable file {}", file);
+            }
         }
 
-        this.threadLock.lock();
+        threadLock.lock();
         lockProcess();
     }
 
     public boolean tryLock() throws IOException {
-        if (this.threadLock.tryLock()) {
+        if (threadLock.tryLock()) {
             lockProcess();
             return true;
         } else {
@@ -150,19 +160,15 @@ public class LockableFile {
     }
 
     private void lockProcess() throws IOException {
-        if (OsUtil.isWindows()) {
+        if (processLock != null) {
             return;
         }
 
-        if (this.processLock != null) {
-            return;
-        }
-
-        if (this.file.exists()) {
-            this.randomAccessFile = new RandomAccessFile(this.file, isReadOnly() ? "r" : "rws");
-            this.fileChannel = randomAccessFile.getChannel();
-            if (!isReadOnly()) {
-                this.processLock = this.fileChannel.lock();
+        if (file.exists()) {
+            randomAccessFile = new RandomAccessFile(file, readOnly ? "r" : "rws");
+            fileChannel = randomAccessFile.getChannel();
+            if (!readOnly) {
+                processLock = fileChannel.lock();
             }
         }
     }
@@ -173,37 +179,33 @@ public class LockableFile {
      * @throws java.io.IOException if an I/O error occurs.
      */
     public void unlock() throws IOException {
-        if (this.threadLock.isHeldByCurrentThread()) {
+        if (threadLock.isHeldByCurrentThread()) {
             try {
-                if (this.threadLock.getHoldCount() == 1) {
+                if (threadLock.getHoldCount() == 1) {
                     unlockProcess();
                 }
             } finally {
-                this.threadLock.unlock();
+                threadLock.unlock();
             }
         }
     }
 
     private void unlockProcess() throws IOException {
-        if (OsUtil.isWindows()) {
-            return;
+        if (processLock != null) {
+            processLock.release();
         }
-
-        if (this.processLock != null) {
-            this.processLock.release();
-        }
-        this.processLock = null;
+        processLock = null;
         //necessary for read only file
-        if (this.randomAccessFile != null) {
-            this.randomAccessFile.close();
+        if (randomAccessFile != null) {
+            randomAccessFile.close();
         }
         //necessary for not existing parent directory
-        if (this.fileChannel != null) {
-            this.fileChannel.close();
+        if (fileChannel != null) {
+            fileChannel.close();
         }
     }
 
     public boolean isHeldByCurrentThread() {
-        return this.threadLock.isHeldByCurrentThread();
+        return threadLock.isHeldByCurrentThread();
     }
 }
