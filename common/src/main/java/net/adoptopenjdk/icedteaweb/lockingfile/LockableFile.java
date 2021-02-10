@@ -35,6 +35,7 @@ package net.adoptopenjdk.icedteaweb.lockingfile;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +99,11 @@ public class LockableFile {
         }
         readOnly = isReadOnly(file);
 
-        processLock = new NioFileLock();
+        if (OsUtil.isWindows()) {
+            processLock = new LockFile();
+        } else {
+            processLock = new NioFileLock();
+        }
     }
 
     private boolean isReadOnly(final File file) {
@@ -221,6 +226,36 @@ public class LockableFile {
             //necessary for not existing parent directory
             if (fileChannel != null) {
                 fileChannel.close();
+            }
+        }
+    }
+
+    private class LockFile implements InterProcessLock {
+
+        private final File lockFile = new File(file.getAbsoluteFile().getParent(), file.getName() + ".lock");
+
+        @Override
+        public void lock() throws IOException {
+            synchronized (LockFile.class) {
+                final File dir = lockFile.getParentFile();
+                if (!dir.isDirectory()) {
+                    if (!dir.mkdirs()) {
+                        logger.warn("failed to create parent directory of {}", lockFile);
+                    }
+                }
+                if (!lockFile.createNewFile()) {
+                    throw new IOException("Failed to create lock file " + lockFile.getAbsolutePath() + " because it already exists");
+                }
+                lockFile.deleteOnExit();
+            }
+        }
+
+        @Override
+        public void unlock() throws IOException {
+            if (!lockFile.delete()) {
+                if (lockFile.exists()) {
+                    logger.error("Failed to delete lock file {}", lockFile);
+                }
             }
         }
     }
