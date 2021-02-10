@@ -80,28 +80,25 @@ public class LockableFile {
     private final File file;
     private final boolean readOnly;
 
-    // internal modifiable state.
-    // these fields are not exposed but are used within this class
     private final ReentrantLock threadLock = new ReentrantLock();
-    private RandomAccessFile randomAccessFile;
-    private FileChannel fileChannel;
-    private FileLock processLock;
-
+    private final InterProcessLock processLock;
 
     private LockableFile(final File file) {
         this.file = file;
         try {
-            if (! file.exists()) {
-                if (! file.createNewFile()) {
+            if (!file.exists()) {
+                if (!file.createNewFile()) {
                     throw new IOException("could not create file " + file);
                 }
-            } else if (! file.isFile()) {
+            } else if (!file.isFile()) {
                 logger.error("lockable file {} is not a file but something else (maybe a directory)", file);
             }
         } catch (final Exception ex) {
             logger.error("Exception while creating lockable file", ex);
         }
         readOnly = isReadOnly(file);
+
+        processLock = new NioFileLock();
     }
 
     private boolean isReadOnly(final File file) {
@@ -147,30 +144,19 @@ public class LockableFile {
         }
 
         threadLock.lock();
-        lockProcess();
+        processLock.lock();
     }
 
-    public boolean tryLock() throws IOException {
-        if (threadLock.tryLock()) {
-            lockProcess();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private void lockProcess() throws IOException {
-        if (processLock != null) {
-            return;
-        }
-
-        if (file.exists()) {
-            randomAccessFile = new RandomAccessFile(file, readOnly ? "r" : "rws");
-            fileChannel = randomAccessFile.getChannel();
-            if (!readOnly) {
-                processLock = fileChannel.lock();
+    public boolean tryLock() {
+        try {
+            if (threadLock.tryLock()) {
+                processLock.lock();
+                return true;
             }
+        } catch (IOException e) {
+            logger.debug("failed to acquire lock for {} because of {}", file, e.getMessage());
         }
+        return false;
     }
 
     /**
@@ -182,7 +168,7 @@ public class LockableFile {
         if (threadLock.isHeldByCurrentThread()) {
             try {
                 if (threadLock.getHoldCount() == 1) {
-                    unlockProcess();
+                    processLock.unlock();
                 }
             } finally {
                 threadLock.unlock();
@@ -190,22 +176,52 @@ public class LockableFile {
         }
     }
 
-    private void unlockProcess() throws IOException {
-        if (processLock != null) {
-            processLock.release();
-        }
-        processLock = null;
-        //necessary for read only file
-        if (randomAccessFile != null) {
-            randomAccessFile.close();
-        }
-        //necessary for not existing parent directory
-        if (fileChannel != null) {
-            fileChannel.close();
-        }
-    }
-
     public boolean isHeldByCurrentThread() {
         return threadLock.isHeldByCurrentThread();
+    }
+
+    private interface InterProcessLock {
+        void lock() throws IOException;
+
+        void unlock() throws IOException;
+    }
+
+    private class NioFileLock implements InterProcessLock {
+        private RandomAccessFile randomAccessFile;
+        private FileChannel fileChannel;
+        private FileLock fileLock;
+
+
+        @Override
+        public void lock() throws IOException {
+            if (fileLock != null) {
+                return;
+            }
+
+            if (file.exists()) {
+                randomAccessFile = new RandomAccessFile(file, readOnly ? "r" : "rws");
+                fileChannel = randomAccessFile.getChannel();
+                if (!readOnly) {
+                    fileLock = fileChannel.lock();
+                }
+            }
+
+        }
+
+        @Override
+        public void unlock() throws IOException {
+            if (fileLock != null) {
+                fileLock.release();
+            }
+            fileLock = null;
+            //necessary for read only file
+            if (randomAccessFile != null) {
+                randomAccessFile.close();
+            }
+            //necessary for not existing parent directory
+            if (fileChannel != null) {
+                fileChannel.close();
+            }
+        }
     }
 }

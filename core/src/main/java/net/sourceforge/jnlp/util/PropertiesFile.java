@@ -240,12 +240,7 @@ public class PropertiesFile {
     }
 
     public boolean tryLock() {
-        try {
-            return lockableFile.tryLock();
-        } catch (final IOException e) {
-            LOG.error("Failed to tryLock", e);
-        }
-        return false;
+        return lockableFile.tryLock();
     }
 
     /**
