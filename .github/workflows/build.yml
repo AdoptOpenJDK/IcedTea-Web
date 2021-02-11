@@ -79,7 +79,7 @@ jobs:
           make linux-bin-dist DESTDIR="${WORKSPACE}"
           find . -name "icedtea-web-*.linux.bin.zip"
           for zip in icedtea-web-*.linux.bin.zip; do
-            shasum -a 256 "$zip" > "$zip.sha256.txt"
+            sha256sum "$zip" > "$zip.sha256.txt"
           done
 
       - uses: actions/upload-artifact@v2
