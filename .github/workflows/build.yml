@@ -1,11 +1,6 @@
 name: Build
 on:
   workflow_dispatch:
-    inputs:
-      build_distribution:
-        description: 'Build the distribution (required for release)'     
-        required: true
-        default: 'true'
   pull_request:
     branches:
       - 1.8
@@ -79,15 +74,13 @@ jobs:
       - name: Build Distribution
         run: |
           export WORKSPACE="${PWD}"
-          BUILD_DISTRIBUTION=${{ github.event.inputs.build_distribution }}
-          if [ "${BUILD_DISTRIBUTION}" = true ]; then
-            echo "Create IcedTea-Web Distribution"
-            make linux-bin-dist DESTDIR="${WORKSPACE}"
-              find . -name "icedtea-web-*.linux.bin.zip"
-              for zip in icedtea-web-*.linux.bin.zip; do
-                shasum -a 256 "$zip" > "$zip.sha256.txt"
-              done
-          fi
+          echo "Create IcedTea-Web Distribution"
+          make linux-bin-dist DESTDIR="${WORKSPACE}"
+          cd icedtea-web
+          find . -name "icedtea-web-*.linux.bin.zip"
+          for zip in icedtea-web-*.linux.bin.zip; do
+            shasum -a 256 "$zip" > "$zip.sha256.txt"
+          done
 
       - uses: actions/upload-artifact@v2
         with:
