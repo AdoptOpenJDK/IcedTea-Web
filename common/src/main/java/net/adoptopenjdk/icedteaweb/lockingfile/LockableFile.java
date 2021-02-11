@@ -237,6 +237,10 @@ public class LockableFile {
         @Override
         public void lock() throws IOException {
             synchronized (LockFile.class) {
+                if (!file.exists()) {
+                    return;
+                }
+
                 final File dir = lockFile.getParentFile();
                 if (!dir.isDirectory()) {
                     if (!dir.mkdirs()) {
