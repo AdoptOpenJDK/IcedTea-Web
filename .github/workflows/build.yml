@@ -75,8 +75,8 @@ jobs:
         run: |
           export WORKSPACE="${PWD}"
           echo "Create IcedTea-Web Distribution"
-          make linux-bin-dist DESTDIR="${WORKSPACE}"
           cd icedtea-web
+          make linux-bin-dist DESTDIR="${WORKSPACE}"
           find . -name "icedtea-web-*.linux.bin.zip"
           for zip in icedtea-web-*.linux.bin.zip; do
             shasum -a 256 "$zip" > "$zip.sha256.txt"
