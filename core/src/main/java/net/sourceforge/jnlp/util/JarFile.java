@@ -32,6 +32,7 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version. */
 package net.sourceforge.jnlp.util;
 
+import net.adoptopenjdk.icedteaweb.LazyLoaded;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.Closeable;
@@ -39,6 +40,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.Manifest;
+import java.util.zip.ZipFile;
+
+import static net.adoptopenjdk.icedteaweb.JavaSystemProperties.getJavaVersion;
 
 /**
  * A wrapper over {@link java.util.jar.JarFile} that verifies zip headers to
@@ -46,31 +55,75 @@ import java.io.InputStream;
  *
  * @see <a href="http://en.wikipedia.org/wiki/Gifar">Gifar</a>
  */
-public class JarFile extends java.util.jar.JarFile implements Closeable {
+public class JarFile implements Closeable {
 
-    public JarFile(String name) throws IOException {
-        super(name);
-        verifyZipHeader(new File(name));
-    }
+    private static final boolean JAVA9_OR_GREATER = !getJavaVersion().startsWith("1.");
 
-    public JarFile(String name, boolean verify) throws IOException {
-        super(name, verify);
-        verifyZipHeader(new File(name));
+    private final LazyLoaded<Object> runtimeVersion = new LazyLoaded<>(() -> {
+        try {
+            return java.util.jar.JarFile.class.getMethod("runtimeVersion").invoke(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+
+    private final LazyLoaded<Constructor<java.util.jar.JarFile>> constructor = new LazyLoaded<>(() -> {
+        try {
+            final Class<?>[] parameterTypes = new Class[] {File.class, boolean.class, int.class, runtimeVersion.get().getClass()};
+            return java.util.jar.JarFile.class.getConstructor(parameterTypes);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    });
+
+    private final java.util.jar.JarFile delegate;
+
+    public JarFile(String file) throws IOException {
+        this(new File(file));
     }
 
     public JarFile(File file) throws IOException {
-        super(file);
         verifyZipHeader(file);
+        if (JAVA9_OR_GREATER) {
+            delegate = createDelegate(file);
+        } else {
+            delegate = new java.util.jar.JarFile(file);
+        }
     }
 
-    public JarFile(File file, boolean verify) throws IOException {
-        super(file, verify);
-        verifyZipHeader(file);
+    private java.util.jar.JarFile createDelegate(File file) throws IOException {
+        try {
+            return constructor.get().newInstance(file, true, ZipFile.OPEN_READ, runtimeVersion.get());
+        } catch (InvocationTargetException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
+            }
+            throw new RuntimeException(cause);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public JarFile(File file, boolean verify, int mode) throws IOException {
-        super(file, verify, mode);
-        verifyZipHeader(file);
+    public Manifest getManifest() throws IOException {
+        return delegate.getManifest();
+    }
+
+    public Enumeration<JarEntry> entries() {
+        return delegate.entries();
+    }
+
+    public InputStream getInputStream(JarEntry je) throws IOException {
+        return delegate.getInputStream(je);
+    }
+
+    @Override
+    public void close() throws IOException {
+        delegate.close();
+    }
+
+    public java.util.jar.JarFile getNative() {
+        return delegate;
     }
 
     /**
@@ -87,7 +140,9 @@ public class JarFile extends java.util.jar.JarFile implements Closeable {
      *
      * @see <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP Specification</a>
      */
-    private static final byte[] ZIP_ENTRY_HEADER_SIGNATURE = new byte[] {0x50, 0x4b, 0x03, 0x04};
+    private static final byte[] ZIP_ENTRY_HEADER_SIGNATURE = new byte[]{0x50, 0x4b, 0x03, 0x04};
+
+    private static final int HEADER_LENGTH = ZIP_ENTRY_HEADER_SIGNATURE.length;
 
     /**
      * Verify the header for the zip entry.
@@ -98,43 +153,37 @@ public class JarFile extends java.util.jar.JarFile implements Closeable {
      */
     private void verifyZipHeader(File file) throws IOException {
         if (!JNLPRuntime.isIgnoreHeaders()) {
-            InputStream s = new FileInputStream(file);
-
             /*
              * Theoretically, a valid ZIP file can begin with anything. We
              * ensure it begins with a valid entry header to confirm it only
              * contains zip entries.
              */
-
-            try {
-                byte[] buffer = new byte[ZIP_ENTRY_HEADER_SIGNATURE.length];
+            try (final InputStream s = new FileInputStream(file)) {
+                final byte[] buffer = new byte[HEADER_LENGTH];
                 /*
                  * for case that new byte[] will accidentally initialize same
                  * sequence as zip header and during the read the buffer will not be filled
                  */
-                for (int i = 0; i < buffer.length; i++) {
+                for (int i = 0; i < HEADER_LENGTH; i++) {
                     buffer[i] = 0;
                 }
-                int toRead = ZIP_ENTRY_HEADER_SIGNATURE.length;
-                int readSoFar = 0;
-                int n = 0;
+
                 /*
                  * this is used instead of s.read(buffer) for case of block and
-                 * so returned not-fully-filled dbuffer
-                 */ 
-                while ((n = s.read(buffer, readSoFar, buffer.length - readSoFar)) != -1) {
+                 * so returned not-fully-filled buffer.
+                 */
+                int n;
+                int readSoFar = 0;
+                do {
+                    n = s.read(buffer, readSoFar, HEADER_LENGTH - readSoFar);
                     readSoFar += n;
-                    if (readSoFar == toRead) {
-                        break;
-                    }
-                }
-                for (int i = 0; i < buffer.length; i++) {
+                } while (n != -1 && readSoFar < HEADER_LENGTH);
+
+                for (int i = 0; i < HEADER_LENGTH; i++) {
                     if (buffer[i] != ZIP_ENTRY_HEADER_SIGNATURE[i]) {
                         throw new InvalidJarHeaderException("Jar " + file.getName() + " do not heave valid header. You can skip this check by -Xignoreheaders");
                     }
                 }
-            } finally {
-                s.close();
             }
         }
     }

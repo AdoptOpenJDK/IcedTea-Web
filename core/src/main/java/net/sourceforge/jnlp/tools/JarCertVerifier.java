@@ -269,7 +269,7 @@ public class JarCertVerifier implements CertVerifier {
      * @return The return of {@link JarCertVerifier#verifyJarEntryCerts} using the entries found in the jar located at jarName.
      */
     private VerifyResult verifyJar(final String jarPath) {
-        try (final JarFile jarFile = new JarFile(jarPath, true)) {
+        try (final JarFile jarFile = new JarFile(jarPath)) {
             final List<JarEntry> entries = new ArrayList<>();
             final byte[] buffer = new byte[8192];
 
