@@ -185,12 +185,20 @@ public class LockableFile {
         return threadLock.isHeldByCurrentThread();
     }
 
+    /**
+     * Interface for abstracting away the details of how a file is locked system wide.
+     */
     private interface InterProcessLock {
         void lock() throws IOException;
-
         void unlock() throws IOException;
     }
 
+    /**
+     * This is the recommended way to lock a file system wide (across multiple processes).
+     *
+     * Unfortunately this causes problems during unlocking in Windows.
+     * https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4715154
+     */
     private class NioFileLock implements InterProcessLock {
         private RandomAccessFile randomAccessFile;
         private FileChannel fileChannel;
@@ -230,6 +238,12 @@ public class LockableFile {
         }
     }
 
+    /**
+     * This is an alternative approach to locking a file system wide.
+     *
+     * This is not recommended as there are claims that this is not reliable.
+     * Most likly there are issues with remote file systems but the claims do not go into detail.
+     */
     private class LockFile implements InterProcessLock {
 
         private final File lockFile = new File(file.getAbsoluteFile().getParent(), file.getName() + ".lock");
