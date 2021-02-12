@@ -1,0 +1,89 @@
+name: Build
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 1.8
+jobs:
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    container: centos:7
+    steps:
+      - uses: actions/checkout@v2
+        with:
+            path: icedtea-web
+
+      - name: Install Dependencies
+        run: |
+          yum -y install autoconf bind-utils bzip2 cpio elfutils-libelf-devel gcc gcc-c++ glibc glibc-common glibc-devel \
+          gmp-devel java-1.8.0-openjdk-devel libcurl-devel make mpfr-devel perl unzip which zip
+          curl -o tagsoup-1.2.jar.zip "http://www.java2s.com/Code/JarDownload/tagsoup/tagsoup-1.2.jar.zip"
+          unzip -j tagsoup-1.2.jar.zip
+          mv tagsoup-1.2.jar tagsoup.jar
+          curl -o rhino.zip "http://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip"
+          unzip -j rhino.zip "*/js.jar"
+
+      - name: Compile rust
+        run: |
+          curl -o rust.tar.gz "https://static.rust-lang.org/dist/rust-1.34.1-x86_64-unknown-linux-gnu.tar.gz"
+          tar -zxf rust.tar.gz
+          cd rust-1.34.1-x86_64-unknown-linux-gnu
+          ./install.sh
+
+      - name: Compile pkg-config
+        run: |
+          curl -o pkg-config.tar.gz "https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
+          tar -zxf pkg-config.tar.gz
+          cd pkg-config-0.29.2
+          ./configure --with-internal-glib
+          make install
+
+      - name: Compile automake
+        run: |
+          curl -o automake-1.13.1.tar.gz "https://ftp.gnu.org/gnu/automake/automake-1.13.1.tar.gz"
+          tar -zxf automake-1.13.1.tar.gz 
+          cd automake-1.13.1
+          bash configure
+          make && make install
+          rm -rf /usr/local/bin/automake
+          ln -s /usr/local/bin/automake-1.13 /usr/local/bin/automake
+
+      - name: Build
+        run: |
+          export ICEDTEAWEB_INSTALL="/icedtea-web-image"
+          export JAVA_EXE="$(which java)"
+          export JAVA_PATH="$(readlink -e "${JAVA_EXE}")"
+          export BIN_PATH="$(dirname "${JAVA_PATH}")"
+          export JRE_PATH="$(dirname "${BIN_PATH}")"
+          export JAVA_HOME="$(dirname "${JRE_PATH}")"
+          export TAGSOUP="${PWD}/tagsoup.jar"
+          export RHINO="${PWD}/js.jar"
+          export ACLOCAL_PATH="/usr/local/share/aclocal"
+          export PATH="/usr/local/bin:${PATH}"
+          export WORKSPACE="${PWD}"
+          pkg-config --version
+          cd icedtea-web
+          echo "Invoking autogen.sh"
+          ./autogen.sh
+          echo "Incoking IcedTea-Web configure"
+          ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-itw-libs=BUNDLED --with-rhino="${RHINO}" --with-tagsoup="${TAGSOUP}" --with-jdk-home="${JAVA_HOME}"
+          echo "Build IcedTea-Web"
+          make DESTDIR="${WORKSPACE}"
+          
+      - name: Build Distribution
+        run: |
+          export WORKSPACE="${PWD}"
+          echo "Create IcedTea-Web Distribution"
+          cd icedtea-web
+          make linux-bin-dist DESTDIR="${WORKSPACE}"
+          find . -name "icedtea-web-*.linux.bin.zip"
+          for zip in icedtea-web-*.linux.bin.zip; do
+            sha256sum "$zip" > "$zip.sha256.txt"
+          done
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: icedtea-web_build_x86-64_linux
+          path: |
+            icedtea-web/icedtea-web-*.linux.bin.*
