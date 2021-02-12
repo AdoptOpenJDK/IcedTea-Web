@@ -141,27 +141,44 @@ public class LockableFile {
      * @throws java.io.IOException if an I/O error occurs.
      */
     public void lock() throws IOException {
-        // Create if does not already exist, cannot lock non-existing file
+        final boolean alreadyLocked = threadLock.isHeldByCurrentThread();
+        threadLock.lock();
+        if (alreadyLocked) {
+            // early exit: process locking may not be reentrant causing an error when trying to lock the same file twice
+            return;
+        }
+
+        createFileIfMissing();
+        processLock.lock();
+    }
+
+    public boolean tryLock() {
+        final boolean alreadyLocked = threadLock.isHeldByCurrentThread();
+        final boolean threadLocked = threadLock.tryLock();
+        if (alreadyLocked) {
+            // early exit: process locking may not be reentrant causing an error when trying to lock the same file twice
+            return true;
+        }
+
+        try {
+            createFileIfMissing();
+            final boolean processLocked = processLock.tryLock();
+            if (threadLocked && !processLocked) {
+                threadLock.unlock();
+            }
+            return threadLocked && processLocked;
+        } catch (IOException e) {
+            logger.debug("failed to acquire lock for {} because of {}", file, e.getMessage());
+            return false;
+        }
+    }
+
+    private void createFileIfMissing() throws IOException {
         if (!readOnly && !file.exists()) {
             if (!file.createNewFile()) {
                 logger.error("Could not create the lockable file {}", file);
             }
         }
-
-        threadLock.lock();
-        processLock.lock();
-    }
-
-    public boolean tryLock() {
-        try {
-            if (threadLock.tryLock()) {
-                processLock.lock();
-                return true;
-            }
-        } catch (IOException e) {
-            logger.debug("failed to acquire lock for {} because of {}", file, e.getMessage());
-        }
-        return false;
     }
 
     /**
@@ -187,9 +204,12 @@ public class LockableFile {
 
     /**
      * Interface for abstracting away the details of how a file is locked system wide.
+     * Note: the implementations may NOT be re-entrant and thus must not be called if
+     * the thread is already holding a lock for a file.
      */
     private interface InterProcessLock {
         void lock() throws IOException;
+        boolean tryLock() throws IOException;
         void unlock() throws IOException;
     }
 
@@ -204,21 +224,35 @@ public class LockableFile {
         private FileChannel fileChannel;
         private FileLock fileLock;
 
-
         @Override
         public void lock() throws IOException {
             if (fileLock != null) {
                 return;
             }
 
-            if (file.exists()) {
-                randomAccessFile = new RandomAccessFile(file, readOnly ? "r" : "rws");
-                fileChannel = randomAccessFile.getChannel();
-                if (!readOnly) {
-                    fileLock = fileChannel.lock();
-                }
+            if (!file.exists()) {
+                return;
             }
 
+            randomAccessFile = new RandomAccessFile(file, readOnly ? "r" : "rws");
+            fileChannel = randomAccessFile.getChannel();
+            fileLock = fileChannel.lock();
+        }
+
+        @Override
+        public boolean tryLock() throws IOException {
+            if (fileLock != null) {
+                return true;
+            }
+
+            if (!file.exists()) {
+                return false;
+            }
+
+            randomAccessFile = new RandomAccessFile(file, readOnly ? "r" : "rws");
+            fileChannel = randomAccessFile.getChannel();
+            fileLock = fileChannel.tryLock();
+            return fileLock != null;
         }
 
         @Override
@@ -242,7 +276,7 @@ public class LockableFile {
      * This is an alternative approach to locking a file system wide.
      *
      * This is not recommended as there are claims that this is not reliable.
-     * Most likly there are issues with remote file systems but the claims do not go into detail.
+     * Most likely there are issues with remote file systems but the claims do not go into detail.
      */
     private class LockFile implements InterProcessLock {
 
@@ -250,21 +284,41 @@ public class LockableFile {
 
         @Override
         public void lock() throws IOException {
-            synchronized (LockFile.class) {
-                if (!file.exists()) {
-                    return;
-                }
+            if (!file.exists()) {
+                return;
+            }
 
-                final File dir = lockFile.getParentFile();
-                if (!dir.isDirectory()) {
-                    if (!dir.mkdirs()) {
-                        logger.warn("failed to create parent directory of {}", lockFile);
-                    }
+            createParentDirIfMissing();
+            while (!lockFile.createNewFile()) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                if (!lockFile.createNewFile()) {
-                    throw new IOException("Failed to create lock file " + lockFile.getAbsolutePath() + " because it already exists");
+            }
+            lockFile.deleteOnExit();
+        }
+
+        @Override
+        public boolean tryLock() throws IOException {
+            if (!file.exists()) {
+                return false;
+            }
+
+            createParentDirIfMissing();
+            if (!lockFile.createNewFile()) {
+                return false;
+            }
+            lockFile.deleteOnExit();
+            return true;
+        }
+
+        private void createParentDirIfMissing() {
+            final File dir = lockFile.getParentFile();
+            if (!dir.isDirectory()) {
+                if (!dir.mkdirs()) {
+                    logger.warn("failed to create parent directory of {}", lockFile);
                 }
-                lockFile.deleteOnExit();
             }
         }
 
