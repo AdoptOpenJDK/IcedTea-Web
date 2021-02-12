@@ -12,7 +12,6 @@ import java.io.IOException;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.OS_NAME;
 
 /**
- *
  * @author jvanek
  */
 public class WindowsLockableFileTest {
@@ -57,7 +56,7 @@ public class WindowsLockableFileTest {
         parent.setReadOnly();
         LockableFile lf = LockableFile.getInstance(f);
         lf.lock();
-        lf.unlock();;
+        lf.unlock();
     }
 
     @Test
