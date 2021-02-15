@@ -252,19 +252,7 @@ public class CacheUtil {
     }
 
     private static DownloadServiceListener getDownloadServiceListener(final JNLPClassLoader jnlpClassLoader, final String title, final URL[] undownloaded, final DownloadIndicator indicator) {
-        final EntryPoint entryPoint = jnlpClassLoader.getJNLPFile().getEntryPointDesc();
-        String progressClass = null;
-
-        if (entryPoint instanceof ApplicationDesc) {
-            final ApplicationDesc applicationDesc = (ApplicationDesc) entryPoint;
-            progressClass = applicationDesc.getProgressClass();
-        } else if (entryPoint instanceof AppletDesc) {
-            final AppletDesc appletDesc = (AppletDesc) entryPoint;
-            progressClass = appletDesc.getProgressClass();
-        } else if (entryPoint instanceof InstallerDesc) {
-            final InstallerDesc installerDesc = (InstallerDesc) entryPoint;
-            progressClass = installerDesc.getProgressClass();
-        }
+        final String progressClass = getProgressClass(jnlpClassLoader);
 
         if (progressClass != null) {
             try {
@@ -277,5 +265,18 @@ public class CacheUtil {
         }
 
         return indicator.getListener(title, undownloaded);
+    }
+
+    private static String getProgressClass(JNLPClassLoader jnlpClassLoader) {
+        final EntryPoint entryPoint = jnlpClassLoader.getJNLPFile().getEntryPointDesc();
+
+        if (entryPoint instanceof ApplicationDesc) {
+            return ((ApplicationDesc) entryPoint).getProgressClass();
+        } else if (entryPoint instanceof AppletDesc) {
+            return ((AppletDesc) entryPoint).getProgressClass();
+        } else if (entryPoint instanceof InstallerDesc) {
+            return ((InstallerDesc) entryPoint).getProgressClass();
+        }
+        return null;
     }
 }
