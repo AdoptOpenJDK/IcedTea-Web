@@ -502,11 +502,12 @@ public final class Parser {
             vmArgs = null;
         }
         final String vendor = getAttribute(node, JREDesc.VENDOR_ATTRIBUTE, null);
+        final boolean require32Bit = "true".equals(getAttribute(node, JREDesc.REQUIRE_32_BIT_ATTRIBUTE, "false"));
         final String initialHeap = getAttribute(node, JREDesc.INITIAL_HEAP_SIZE_ATTRIBUTE, null);
         final String maxHeap = getAttribute(node, JREDesc.MAX_HEAP_SIZE_ATTRIBUTE, null);
         final List<ResourcesDesc> resources = getResources(node, true);
 
-        return new JREDesc(version, vendor, location, vmArgs, initialHeap, maxHeap, resources);
+        return new JREDesc(version, vendor, require32Bit, location, vmArgs, initialHeap, maxHeap, resources);
     }
 
     private static void checkJreVersionWithSystemProperty(final VersionString version, final boolean strict) {
