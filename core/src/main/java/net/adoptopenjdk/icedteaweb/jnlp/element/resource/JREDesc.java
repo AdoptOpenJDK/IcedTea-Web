@@ -47,6 +47,8 @@ public class JREDesc {
 
     public static final String VERSION_ATTRIBUTE = "version";
     public static final String VENDOR_ATTRIBUTE = "vendor";
+
+    public static final String REQUIRE_32_BIT_ATTRIBUTE = "require-32bit";
     public static final String HREF_ATTRIBUTE = "href";
     public static final String JAVA_VM_ARGS_ATTRIBUTE = "java-vm-args";
     public static final String INITIAL_HEAP_SIZE_ATTRIBUTE = "initial-heap-size";
@@ -59,6 +61,8 @@ public class JREDesc {
     private final VersionString version;
 
     private final String vendor;
+
+    private boolean require32Bit;
 
     /** the location of a JRE product or null */
     private final URL location;
@@ -75,11 +79,14 @@ public class JREDesc {
     /** list of ResourceDesc objects */
     private final List<ResourcesDesc> resources;
 
+
     /**
      * Create a JRE descriptor.
      *
      * @param version the platform version or the product version
      * if location is not null
+     * @param vendor the vendor
+     * @param require32Bit the hint whether this application requires a 32-bit JVM
      * @param location the location of a JRE product or null
      * @param vmArgs arguments to VM
      * @param initialHeapSize initial heap size
@@ -87,11 +94,12 @@ public class JREDesc {
      * @param resources list of ResourceDesc objects
      * @throws ParseException is something goes wrong
      */
-    public JREDesc(final VersionString version, final String vendor, final URL location,
+    public JREDesc(final VersionString version, final String vendor, final boolean require32Bit, final URL location,
                    final String vmArgs, final String initialHeapSize,
                    final String maximumHeapSize, final List<ResourcesDesc> resources) throws ParseException {
         this.version = version;
         this.vendor = vendor;
+        this.require32Bit = require32Bit;
         this.location = location;
         this.parsedArguments = parseArguments(vmArgs);
         this.initialHeapSize = checkHeapSize(initialHeapSize);
@@ -147,6 +155,10 @@ public class JREDesc {
      */
     public List<ResourcesDesc> getResourcesDesc() {
         return resources;
+    }
+
+    public boolean isRequire32Bit() {
+        return require32Bit;
     }
 
     /**

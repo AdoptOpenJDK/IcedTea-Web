@@ -45,50 +45,50 @@ public class JREDescTest {
 
     @Test
     public void testNulls() throws ParseException {
-        new JREDesc(null, null,null, null, null, null, null);
+        new JREDesc(null, null, false, null, null, null, null, null);
     }
 
     @Test
     public void testInitialHeapSize() throws ParseException {
-        new JREDesc(null, null,null, null, "1", null, null);
-        new JREDesc(null, null,null, null, "99999999", null, null);
-        new JREDesc(null, null,null, null, "1k", null, null);
-        new JREDesc(null, null,null, null, "1000k", null, null);
-        new JREDesc(null, null,null, null, "1K", null, null);
-        new JREDesc(null, null,null, null, "1000K", null, null);
-        new JREDesc(null, null,null, null, "1m", null, null);
-        new JREDesc(null, null,null, null, "1m", null, null);
-        new JREDesc(null, null,null, null, "1M", null, null);
-        new JREDesc(null, null,null, null, "1g", null, null);
-        new JREDesc(null, null,null, null, "1G", null, null);
-        new JREDesc(null, null,null, null, "10000G", null, null);
+        new JREDesc(null, null, false, null, null, "1", null, null);
+        new JREDesc(null, null, false, null, null, "99999999", null, null);
+        new JREDesc(null, null, false, null, null, "1k", null, null);
+        new JREDesc(null, null, false, null, null, "1000k", null, null);
+        new JREDesc(null, null, false, null, null, "1K", null, null);
+        new JREDesc(null, null, false, null, null, "1000K", null, null);
+        new JREDesc(null, null, false, null, null, "1m", null, null);
+        new JREDesc(null, null, false, null, null, "1m", null, null);
+        new JREDesc(null, null, false, null, null, "1M", null, null);
+        new JREDesc(null, null, false, null, null, "1g", null, null);
+        new JREDesc(null, null, false, null, null, "1G", null, null);
+        new JREDesc(null, null, false, null, null, "10000G", null, null);
     }
 
     @Test
     public void testMaximumHeapSize() throws ParseException {
-        new JREDesc(null, null,null, null, null, "1", null);
-        new JREDesc(null, null,null, null, null, "99999999", null);
-        new JREDesc(null, null,null, null, null, "1k", null);
-        new JREDesc(null, null,null, null, null, "1000k", null);
-        new JREDesc(null, null,null, null, null, "1K", null);
-        new JREDesc(null, null,null, null, null, "1000K", null);
-        new JREDesc(null, null,null, null, null, "1m", null);
-        new JREDesc(null, null,null, null, null, "1m", null);
-        new JREDesc(null, null,null, null, null, "1M", null);
-        new JREDesc(null, null,null, null, null, "1g", null);
-        new JREDesc(null, null,null, null, null, "1G", null);
-        new JREDesc(null, null,null, null, null, "10000G", null);
+        new JREDesc(null, null, false, null, null, null, "1", null);
+        new JREDesc(null, null, false, null, null, null, "99999999", null);
+        new JREDesc(null, null, false, null, null, null, "1k", null);
+        new JREDesc(null, null, false, null, null, null, "1000k", null);
+        new JREDesc(null, null, false, null, null, null, "1K", null);
+        new JREDesc(null, null, false, null, null, null, "1000K", null);
+        new JREDesc(null, null, false, null, null, null, "1m", null);
+        new JREDesc(null, null, false, null, null, null, "1m", null);
+        new JREDesc(null, null, false, null, null, null, "1M", null);
+        new JREDesc(null, null, false, null, null, null, "1g", null);
+        new JREDesc(null, null, false, null, null, null, "1G", null);
+        new JREDesc(null, null, false, null, null, null, "10000G", null);
     }
 
     @Test(expected = ParseException.class)
     public void testInitialHeapSizeBad() throws ParseException {
-        new JREDesc(null, null,null, null, "blah", null, null);
+        new JREDesc(null, null, false, null, null, "blah", null, null);
 
     }
 
     @Test(expected = ParseException.class)
     public void testMaximumHeapSizeBad() throws ParseException {
-        new JREDesc(null, null,null, null, null, "blah", null);
+        new JREDesc(null, null, false, null, null, null, "blah", null);
 
     }
 
@@ -133,7 +133,7 @@ public class JREDescTest {
 
     @Test
     public void parsingNoArguments() throws ParseException {
-        final JREDesc desc = new JREDesc(null, null,null, null, null, null, null);
+        final JREDesc desc = new JREDesc(null, null, false, null, null, null, null, null);
         final List<String> result = desc.getAllVmArgs();
 
         Assert.assertEquals(emptyList(), result);
@@ -141,7 +141,7 @@ public class JREDescTest {
 
     @Test
     public void parsingOnlyHeapArguments() throws ParseException {
-        final JREDesc desc = new JREDesc(null, null,null, null, "1k", "1m", null);
+        final JREDesc desc = new JREDesc(null, null, false, null, null, "1k", "1m", null);
         final List<String> result = desc.getAllVmArgs();
 
         Assert.assertEquals(Arrays.asList("-Xms1k", "-Xmx1m"), result);
@@ -149,7 +149,7 @@ public class JREDescTest {
 
     @Test
     public void parsingUnquotedArguments() throws ParseException {
-        final JREDesc desc = new JREDesc(null, null,null, "  some arguments \t\n without   quotes  ", null, null, null);
+        final JREDesc desc = new JREDesc(null, null, false, null, "  some arguments \t\n without   quotes  ", null, null, null);
         final List<String> result = desc.getAllVmArgs();
 
         Assert.assertEquals(Arrays.asList("some", "arguments", "without", "quotes"), result);
@@ -157,7 +157,7 @@ public class JREDescTest {
 
     @Test
     public void parsingQuotedArguments() throws ParseException {
-        final JREDesc desc = new JREDesc(null, null,null, "  some arguments \t\n \"with   Quotes\"  ", null, null, null);
+        final JREDesc desc = new JREDesc(null, null, false, null, "  some arguments \t\n \"with   Quotes\"  ", null, null, null);
         final List<String> result = desc.getAllVmArgs();
 
         Assert.assertEquals(Arrays.asList("some", "arguments", "with   Quotes"), result);
@@ -165,6 +165,6 @@ public class JREDescTest {
 
     @Test(expected = ParseException.class)
     public void parsingWrongQuotedArguments() throws ParseException {
-        new JREDesc(null, null,null, "  some arguments \"with   Quotes\"AndMissingSpace after quote  ", null, null, null);
+        new JREDesc(null, null, false, null, "  some arguments \"with   Quotes\"AndMissingSpace after quote  ", null, null, null);
     }
 }

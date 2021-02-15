@@ -1940,4 +1940,57 @@ public class ParserTest extends NoStdOutErrTest {
         Assert.assertEquals(1, vendors.size());
         Assert.assertEquals(null, vendors.get(0));
     }
+
+    @Test
+    public void testJ2seRequire32bit() throws Exception {
+        String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<jnlp spec=\"1.0+\" codebase=\"http://someNotExistingUrl.com\" href=\"dummy.jnlp\">" +
+                "<information><offline-allowed/></information>" +
+                "<security><all-permissions/></security>" +
+                "<resources>" +
+                "<j2se version=\"1.8+\" require-32bit=\"true\"/>" +
+                "<jar href=\"dummy.jar\"/>" +
+                "</resources>" +
+                "<application-desc main-class=\"com.karakun.DummyMain\"/>" +
+                "</jnlp>";
+
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        XmlNode root = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, defaultParser, null);
+        final List<ResourcesDesc> resources = parser.getResources(root, false);
+        final List<Boolean> require32BitHints = resources.stream().flatMap(r -> Stream.of(r.getJREs()))
+                .map(jreDesc -> jreDesc.isRequire32Bit())
+                .collect(Collectors.toList());
+
+        Assert.assertEquals(1, require32BitHints.size());
+        Assert.assertEquals(true, require32BitHints.get(0));
+    }
+
+    @Test
+    public void testJ2seNoRequire32bit() throws Exception {
+        String data = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
+                "<jnlp spec=\"1.0+\" codebase=\"http://someNotExistingUrl.com\" href=\"dummy.jnlp\">" +
+                "<information><offline-allowed/></information>" +
+                "<security><all-permissions/></security>" +
+                "<resources>" +
+                "<j2se version=\"1.8+\"/>" +
+                "<jar href=\"dummy.jar\"/>" +
+                "</resources>" +
+                "<application-desc main-class=\"com.karakun.DummyMain\"/>" +
+                "</jnlp>";
+
+        final XMLParser defaultXmlParser = XmlParserFactory.getParser(defaultParser.getParserType());
+        XmlNode root = defaultXmlParser.getRootNode(new ByteArrayInputStream(data.getBytes()));
+        MockJNLPFile file = new MockJNLPFile(LANG_LOCALE);
+        Parser parser = new Parser(file, null, root, defaultParser, null);
+        final List<ResourcesDesc> resources = parser.getResources(root, false);
+        final List<Boolean> require32BitHints = resources.stream().flatMap(r -> Stream.of(r.getJREs()))
+                .map(jreDesc -> jreDesc.isRequire32Bit())
+                .collect(Collectors.toList());
+
+        Assert.assertEquals(1, require32BitHints.size());
+        Assert.assertEquals(false, require32BitHints.get(0));
+    }
+
 }

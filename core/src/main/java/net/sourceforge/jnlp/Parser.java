@@ -72,6 +72,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Boolean.*;
 import static java.util.Arrays.asList;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 import static net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc.APPLET_DESC_ELEMENT;
@@ -502,11 +503,12 @@ public final class Parser {
             vmArgs = null;
         }
         final String vendor = getAttribute(node, JREDesc.VENDOR_ATTRIBUTE, null);
+        final boolean require32Bit = parseBoolean(getAttribute(node, JREDesc.REQUIRE_32_BIT_ATTRIBUTE, "false"));
         final String initialHeap = getAttribute(node, JREDesc.INITIAL_HEAP_SIZE_ATTRIBUTE, null);
         final String maxHeap = getAttribute(node, JREDesc.MAX_HEAP_SIZE_ATTRIBUTE, null);
         final List<ResourcesDesc> resources = getResources(node, true);
 
-        return new JREDesc(version, vendor, location, vmArgs, initialHeap, maxHeap, resources);
+        return new JREDesc(version, vendor, require32Bit, location, vmArgs, initialHeap, maxHeap, resources);
     }
 
     private static void checkJreVersionWithSystemProperty(final VersionString version, final boolean strict) {
@@ -705,13 +707,13 @@ public final class Parser {
                 addInfo(informationDesc, child, getAttribute(child, IconDesc.KIND_ATTRIBUTE, IconKind.DEFAULT.getValue()), getIcon(child));
             }
             if (InformationDesc.OFFLINE_ALLOWED_ELEMENT.equals(name)) {
-                addInfo(informationDesc, child, null, Boolean.TRUE);
+                addInfo(informationDesc, child, null, TRUE);
             }
             if ("sharing-allowed".equals(name)) {
                 if (strict && !allowExtensions) {
                     throw new ParseException("sharing-allowed element is illegal in a standard JNLP file");
                 }
-                addInfo(informationDesc, child, null, Boolean.TRUE);
+                addInfo(informationDesc, child, null, TRUE);
             }
             if (ASSOCIATION_ELEMENT.equals(name)) {
                 addInfo(informationDesc, child, null, getAssociation(child));
@@ -1035,10 +1037,10 @@ public final class Parser {
     private ShortcutDesc getShortcut(final XmlNode node) throws ParseException {
 
         final String online = getAttribute(node, ONLINE_ATTRIBUTE, "true");
-        final boolean shortcutIsOnline = Boolean.valueOf(online);
+        final boolean shortcutIsOnline = valueOf(online);
 
         final String installAttribute = getAttribute(node, INSTALL_ATTRIBUTE, "false");
-        final boolean install = Boolean.valueOf(installAttribute);
+        final boolean install = valueOf(installAttribute);
 
         boolean showOnDesktop = false;
         MenuDesc menu = null;
