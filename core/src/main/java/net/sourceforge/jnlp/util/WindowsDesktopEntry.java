@@ -19,6 +19,7 @@ import mslinks.ShellLink;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.LazyLoaded;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -28,11 +29,15 @@ import net.sourceforge.jnlp.JNLPFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.filechooser.FileSystemView;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
@@ -70,7 +75,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     }
 
     private String getDesktopLnkPath() {
-        return System.getenv("userprofile") + "/Desktop/" + getShortcutFileName();
+        return desktopPath() + "/" + getShortcutFileName();
     }
 
     @Override
@@ -204,4 +209,36 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     private String quoted(URL url) {
         return DOUBLE_QUOTE + url.toExternalForm() + DOUBLE_QUOTE;
     }
+    
+	private final static String desktopPath() {
+		final char QUOT = '"';
+		final String registryEntry = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders";
+		final String desktopProperty = "Desktop";
+
+		final ProcessBuilder pb = new ProcessBuilder("reg", "query", QUOT + registryEntry + QUOT, "/v",
+				QUOT + desktopProperty + QUOT);
+
+		try {
+			final Process p = pb.start();
+			p.waitFor(5, TimeUnit.SECONDS);
+			if (p.exitValue() == 0) {
+				try (final InputStream is = p.getInputStream()) {
+					final String output = IOUtils.readContentAsUtf8String(is);
+					if (output != null) {
+						final String typeName = "REG_SZ";
+						final int typeIndex = output.indexOf(typeName);
+						if (typeIndex != -1) {
+							final String desktopPath = output.substring(typeIndex + typeName.length());
+							if (desktopPath != null) {
+								return desktopPath.trim();
+							}
+						}
+					}
+				}
+			}
+		} catch (final Exception e) {
+			LOG.warn("Could not retrieve path to client desktop folder from registry", e);
+		}
+		return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + "/Desktop"; 
+	}
 }
