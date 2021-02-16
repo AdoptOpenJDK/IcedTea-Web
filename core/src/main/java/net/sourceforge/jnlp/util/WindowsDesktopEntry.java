@@ -121,16 +121,15 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         String pathSuffix;
         try {
             pathSuffix = file.getInformation().getShortcut().getMenu().getSubMenu();
-        }
-        catch (NullPointerException npe) {
+        } catch (NullPointerException npe) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, npe);
             pathSuffix = null;
-        }        
+        }
         if (pathSuffix == null) {
             pathSuffix = getShortcutName();
         }
-                        
-        final String path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + pathSuffix;        
+
+        final String path = System.getenv("userprofile") + "/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/" + pathSuffix;
         // check to see if menu dir exists and create if not
         final File menuDir = new File(path);
         if (!menuDir.exists()) {
@@ -209,36 +208,36 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     private String quoted(URL url) {
         return DOUBLE_QUOTE + url.toExternalForm() + DOUBLE_QUOTE;
     }
-    
-	private final static String desktopPath() {
-		final char QUOT = '"';
-		final String registryEntry = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders";
-		final String desktopProperty = "Desktop";
 
-		final ProcessBuilder pb = new ProcessBuilder("reg", "query", QUOT + registryEntry + QUOT, "/v",
-				QUOT + desktopProperty + QUOT);
+    private final static String desktopPath() {
+        final char QUOT = '"';
+        final String registryEntry = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders";
+        final String desktopProperty = "Desktop";
 
-		try {
-			final Process p = pb.start();
-			p.waitFor(5, TimeUnit.SECONDS);
-			if (p.exitValue() == 0) {
-				try (final InputStream is = p.getInputStream()) {
-					final String output = IOUtils.readContentAsUtf8String(is);
-					if (output != null) {
-						final String typeName = "REG_SZ";
-						final int typeIndex = output.indexOf(typeName);
-						if (typeIndex != -1) {
-							final String desktopPath = output.substring(typeIndex + typeName.length());
-							if (desktopPath != null) {
-								return desktopPath.trim();
-							}
-						}
-					}
-				}
-			}
-		} catch (final Exception e) {
-			LOG.warn("Could not retrieve path to client desktop folder from registry", e);
-		}
-		return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + "/Desktop"; 
-	}
+        final ProcessBuilder pb = new ProcessBuilder("reg", "query", QUOT + registryEntry + QUOT, "/v",
+                QUOT + desktopProperty + QUOT);
+
+        try {
+            final Process p = pb.start();
+            p.waitFor(5, TimeUnit.SECONDS);
+            if (p.exitValue() == 0) {
+                try (final InputStream is = p.getInputStream()) {
+                    final String output = IOUtils.readContentAsUtf8String(is);
+                    if (output != null) {
+                        final String typeName = "REG_SZ";
+                        final int typeIndex = output.indexOf(typeName);
+                        if (typeIndex != -1) {
+                            final String desktopPath = output.substring(typeIndex + typeName.length());
+                            if (desktopPath != null) {
+                                return desktopPath.trim();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (final Exception e) {
+            LOG.warn("Could not retrieve path to client desktop folder from registry", e);
+        }
+        return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
+    }
 }
