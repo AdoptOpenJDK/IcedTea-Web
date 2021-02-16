@@ -37,6 +37,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.filechooser.FileSystemView;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
 import static net.sourceforge.jnlp.util.WindowsShortcutManager.getWindowsShortcutsFile;
@@ -235,8 +237,8 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
 				}
 			}
 		} catch (final Exception e) {
-			LOG.error("Could not retrieve path to client desktop folder from registry", e);
+			LOG.warn("Could not retrieve path to client desktop folder from registry", e);
 		}
-		return System.getenv("userprofile") + "/Desktop";
+		return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + "/Desktop"; 
 	}
 }
