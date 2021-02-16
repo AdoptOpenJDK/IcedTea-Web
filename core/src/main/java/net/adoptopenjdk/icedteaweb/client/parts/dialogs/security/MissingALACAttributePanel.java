@@ -104,6 +104,7 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
         JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.CENTER);
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                 Font.BOLD, 12));
+        topLabel.setForeground(Color.BLACK);
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
