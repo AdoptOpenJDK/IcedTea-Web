@@ -33,6 +33,7 @@ jobs:
         prerelease: false
 
   linux:
+    if: always()
     needs: release
     name: Linux
     runs-on: ubuntu-latest
