@@ -152,7 +152,6 @@ jobs:
 
       - name: Install Cygwin
         run: |
-          New-Item -Path C:\ -Name 'openjdk' -ItemType 'directory'
           Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe' -OutFile 'C:\temp\cygwin.exe'
           Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,cpio,curl,gcc-core,gnupg,grep,libtool,make,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
 
@@ -198,12 +197,12 @@ jobs:
           export PATH="${PATH}:/cygdrive/c/rust/bin:${WIXPATH}"
           export JVM_HOME_SHORT="$(cygpath -d "${JAVA_HOME}")"
           export JVMPATH="$(cygpath -u ${JVM_HOME_SHORT})"
-          cd icedtea-web
           echo "Configure IcedTea-Web"
           ./autogen.sh
           ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-wix=${WIXPATH} --with-wixgen=${WIXGEN} --with-itw-libs=BUNDLED --with-jdk-home="${JVMPATH}"
           echo "Build IcedTea-Web"
           make
+        working-dir: 'D:\a\IcedTea-Web\IcedTea-Web\icedtea-web'
         shell: bash
 
       - uses: actions/upload-artifact@v2
