@@ -1,10 +1,35 @@
 name: Build
 on:
   workflow_dispatch:
+    inputs:
+        release:
+          description: 'Set to True if are running a release'     
+          required: true
+          default: 'False'
+        version:
+          description: 'If running a release, set the version e.g (icedtea-web-1.8.4)'     
+          required: true
+          default: 'icedtea-web-1.8.x'
   pull_request:
     branches:
       - 1.8
 jobs:
+  release:
+    if: github.event.inputs.release == 'True'
+    name: Create Draft release
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Draft Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: github.event.inputs.version
+        release_name: 'Official Release of ${{ github.event.inputs.version }}'
+        draft: true
+        prerelease: false
+
   linux:
     name: Linux
     runs-on: ubuntu-latest
@@ -87,3 +112,25 @@ jobs:
           name: icedtea-web_build_x86-64_linux
           path: |
             icedtea-web/icedtea-web-*.linux.bin.*
+
+      - name: Upload binary
+        uses: actions/upload-release-asset@v1.0.1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.zip
+          asset_name: ${{ github.event.inputs.version }}.linux.zip
+          asset_content_type: application/zip
+
+      - name: Upload shasum
+        uses: actions/upload-release-asset@v1.0.1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.zip.sha256.txt
+          asset_name: ${{ github.event.inputs.version }}.linux.zip.sha256.txt
+          asset_content_type: application/zip
