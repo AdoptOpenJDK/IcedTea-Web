@@ -14,10 +14,12 @@ on:
     branches:
       - 1.8
 jobs:
-  create_release:
+  release:
     if: github.event.inputs.release == 'True'
     name: Create Draft release
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.step_upload_url.outputs.upload_url }}
     steps:
     - name: Create Draft Release
       id: create_release
@@ -29,6 +31,8 @@ jobs:
         release_name: 'Official Release of ${{ github.event.inputs.version }}'
         draft: true
         prerelease: false
+    - id: step_upload_url
+      run: echo "::set-output name=upload_url::${{ steps.create_release.outputs.upload_url }}"
 
   linux:
     name: Linux
@@ -119,7 +123,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.zip
           asset_name: ${{ github.event.inputs.version }}.linux.zip
           asset_content_type: application/zip
@@ -130,7 +134,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.zip.sha256.txt
           asset_name: ${{ github.event.inputs.version }}.linux.zip.sha256.txt
           asset_content_type: application/zip
