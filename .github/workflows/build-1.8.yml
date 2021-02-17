@@ -1,0 +1,19 @@
+# See for why we need this blank file https://stackoverflow.com/a/65389878
+# This placeholder is used to trigger the actual 1.8 build workflow at https://github.com/AdoptOpenJDK/IcedTea-Web/blob/1.8/.github/workflows/build.yml
+
+# Steps to run
+# Go to Actions, select Build ITW 1.8.x and run workflow with Use workflow from set to 1.8
+
+name: Build ITW 1.8.x
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show environment
+        run: env | grep ^GITHUB
+      - name: Show ref v1
+        run: echo "===============> Version from $GITHUB_REF"
