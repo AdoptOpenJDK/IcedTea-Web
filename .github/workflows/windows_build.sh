@@ -8,7 +8,7 @@ export PATH="${PATH}:/cygdrive/c/rust/bin:${WIXPATH}"
 export JVM_HOME_SHORT="$(cygpath -d "${JAVA_HOME}")"
 export JVMPATH="$(cygpath -u ${JVM_HOME_SHORT})"
 echo "Configure IcedTea-Web"
-./autogen.sh
-./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-wix=${WIXPATH} --with-wixgen=${WIXGEN} --with-itw-libs=BUNDLED --with-jdk-home="${JVMPATH}"
+bash autogen.sh
+bash configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-wix=${WIXPATH} --with-wixgen=${WIXGEN} --with-itw-libs=BUNDLED --with-jdk-home="${JVMPATH}"
 echo "Build IcedTea-Web"
 make
