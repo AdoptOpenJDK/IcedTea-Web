@@ -14,7 +14,7 @@ on:
     branches:
       - 1.8
 jobs:
-  release:
+  create_release:
     if: github.event.inputs.release == 'True'
     name: Create Draft release
     runs-on: ubuntu-latest
