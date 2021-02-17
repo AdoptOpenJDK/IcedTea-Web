@@ -179,6 +179,7 @@ jobs:
           ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-wix=${WIXPATH} --with-wixgen=${WIXGEN} --with-itw-libs=BUNDLED --with-jdk-home="${JVMPATH}"
           echo "Build IcedTea-Web"
           make
+        shell: bash
 
       - uses: actions/upload-artifact@v2
         with:
