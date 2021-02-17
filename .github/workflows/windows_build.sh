@@ -7,8 +7,6 @@ export WIXGEN="$(cygpath -u "C:/cygwin64/usr/share/java/wixgen.jar")"
 export PATH="${PATH}:/cygdrive/c/rust/bin:${WIXPATH}"
 export JVM_HOME_SHORT="$(cygpath -d "${JAVA_HOME}")"
 export JVMPATH="$(cygpath -u ${JVM_HOME_SHORT})"
-# Fixes configure: error: cannot find install-sh, install.sh, or shtool
-autoreconf -i
 echo "Configure IcedTea-Web"
 ./autogen.sh
 ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-wix=${WIXPATH} --with-wixgen=${WIXGEN} --with-itw-libs=BUNDLED --with-jdk-home="${JVMPATH}"
