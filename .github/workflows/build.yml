@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-            path: icedtea-web
+          path: icedtea-web
 
       - name: Install Dependencies
         run: |
@@ -199,6 +199,7 @@ jobs:
           ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-wix=${WIXPATH} --with-wixgen=${WIXGEN} --with-itw-libs=BUNDLED --with-jdk-home="${JVMPATH}"
           echo "Build IcedTea-Web"
           make
+        working-directory: 'D:/a/IcedTea-Web/IcedTea-Web/icedtea-web'
         shell: bash
 
       - uses: actions/upload-artifact@v2
