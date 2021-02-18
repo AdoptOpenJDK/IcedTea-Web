@@ -19,6 +19,9 @@ echo "Create IcedTea-Web MSI"
 make win-installer
 find . -name "icedtea-web-*.msi"
 echo "Generate shasums"
-for zip in icedtea-web-*; do
+for zip in icedtea-web-*.windows.bin.zip; do
 	shasum -a 256 "$zip" > "$zip.sha256.txt"
+done
+for msi in icedtea-web-*.msi; do
+	shasum -a 256 "$msi" > "$msi.sha256.txt"
 done
