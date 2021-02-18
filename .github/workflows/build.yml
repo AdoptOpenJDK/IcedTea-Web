@@ -181,9 +181,8 @@ jobs:
           Move-Item -Path rhino1_6R7\js.jar -Destination C:\cygwin64\usr\share\java
 
       - name: Build
-        run: |
-          bash .github/workflows/windows_build.sh
-        shell: bash
+        run: bash .github/workflows/windows_build.sh
+        shell: cmd
 
       - uses: actions/upload-artifact@v2
         with:
