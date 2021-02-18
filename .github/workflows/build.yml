@@ -180,6 +180,12 @@ jobs:
           7z.exe x rhino1_6R7.zip
           Move-Item -Path rhino1_6R7\js.jar -Destination C:\cygwin64\usr\share\java
 
+      - name: Enable 8dot3 shortnames
+        run: |
+          fsutil behavior set disable8dot3 0
+          fsutil file setshortname 'c:\program files (x86)\WiX Toolset v3.11' 'WIXTOO~1.14'
+        shell: cmd
+
       - name: Build
         run: bash .github/workflows/windows_build.sh
         shell: cmd

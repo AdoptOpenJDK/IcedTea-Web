@@ -12,3 +12,9 @@ echo "Configure IcedTea-Web"
 ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-wix=${WIXPATH} --with-wixgen=${WIXGEN} --with-itw-libs=BUNDLED --with-jdk-home="${JVMPATH}"
 echo "Build IcedTea-Web"
 make
+echo "Create IcedTea-Web Distribution"
+make win-bin-dist
+find . -name "icedtea-web-*.win.bin.zip"
+echo "Create IcedTea-Web MSI"
+make win-installer
+find . -name "icedtea-web-*.msi"
