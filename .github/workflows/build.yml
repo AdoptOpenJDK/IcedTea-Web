@@ -14,10 +14,12 @@ on:
     branches:
       - 1.8
 jobs:
-  create_release:
+  release:
     if: github.event.inputs.release == 'True'
     name: Create Draft release
     runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
     - name: Create Draft Release
       id: create_release
@@ -31,6 +33,8 @@ jobs:
         prerelease: false
 
   linux:
+    if: always()
+    needs: release
     name: Linux
     runs-on: ubuntu-latest
     container: centos:7
@@ -114,23 +118,23 @@ jobs:
             icedtea-web/icedtea-web-*.linux.bin.*
 
       - name: Upload binary
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@v1
         if: github.event.inputs.release == 'True'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.zip
-          asset_name: ${{ github.event.inputs.version }}.linux.zip
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.bin.zip
+          asset_name: ${{ github.event.inputs.version }}.linux.bin.zip
           asset_content_type: application/zip
 
       - name: Upload shasum
-        uses: actions/upload-release-asset@v1.0.1
+        uses: actions/upload-release-asset@v1
         if: github.event.inputs.release == 'True'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.zip.sha256.txt
-          asset_name: ${{ github.event.inputs.version }}.linux.zip.sha256.txt
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.bin.zip.sha256.txt
+          asset_name: ${{ github.event.inputs.version }}.linux.bin.zip.sha256.txt
           asset_content_type: application/zip
