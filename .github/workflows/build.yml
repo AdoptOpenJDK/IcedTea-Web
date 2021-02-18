@@ -205,8 +205,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.event.inputs.version }}.win.zip
-          asset_name: ${{ github.event.inputs.version }}.win.zip
+          asset_path: ${{ github.event.inputs.version }}.win.bin.zip
+          asset_name: ${{ github.event.inputs.version }}.win.bin.zip
           asset_content_type: application/zip
 
       - name: Upload shasum
@@ -216,6 +216,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.event.inputs.version }}.win.zip.sha256.txt
-          asset_name: ${{ github.event.inputs.version }}.win.zip.sha256.txt
+          asset_path: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
+          asset_name: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
           asset_content_type: application/zip
