@@ -182,7 +182,7 @@ jobs:
 
       - name: Build
         run: |
-          bash .github/workflows/windows.sh
+          bash .github/workflows/windows_build.sh
         shell: bash
 
       - uses: actions/upload-artifact@v2
