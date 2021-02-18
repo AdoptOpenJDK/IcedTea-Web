@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-            path: icedtea-web
+          path: icedtea-web
 
       - name: Install Dependencies
         run: |
@@ -137,4 +137,109 @@ jobs:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: icedtea-web/${{ github.event.inputs.version }}.linux.bin.zip.sha256.txt
           asset_name: ${{ github.event.inputs.version }}.linux.bin.zip.sha256.txt
+          asset_content_type: application/zip
+
+  windows:
+    if: always()
+    needs: release
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - name: Restore cygwin packages from cache
+        id: cygwin
+        uses: actions/cache@v2
+        with:
+          path: C:\cygwin_packages
+          key: cygwin-packages-${{ runner.os }}-v1
+
+      - name: Install Cygwin
+        run: |
+          Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe' -OutFile 'C:\temp\cygwin.exe'
+          Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,cpio,curl,gcc,git,grep,libtool,make,mingw64-x86_64-gcc-core,perl,pkg-config,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
+
+      - name: Set PATH
+        run: echo "C:\cygwin64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Cygwin git configuration
+        shell: bash
+        run: mkdir $HOME && git config --system core.autocrlf false
+
+      - uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          # Create C:/cygwin64/usr/share/java if it doesn't exist
+          New-Item -Path C:\cygwin64\usr\share\java -Type Directory
+          # Retrieve tagsoup jar
+          Invoke-WebRequest -UseBasicParsing 'http://www.java2s.com/Code/JarDownload/tagsoup/tagsoup-1.2.jar.zip' -OutFile 'tagsoup-1.2.jar.zip'
+          Expand-Archive -LiteralPath 'tagsoup-1.2.jar.zip' -DestinationPath 'C:\cygwin64\usr\share\java\'
+          # Retrieve mslinks jar
+          Invoke-WebRequest -UseBasicParsing 'https://repo1.maven.org/maven2/com/github/vatbub/mslinks/1.0.5/mslinks-1.0.5.jar' -OutFile 'C:\cygwin64\usr\share\java\mslinks-1.0.5.jar'
+          # Retrieve Wixgen jar
+          Invoke-WebRequest -UseBasicParsing 'https://github.com/akashche/wixgen/releases/download/1.7/wixgen.jar' -OutFile 'C:\cygwin64\usr\share\java\wixgen.jar'
+          # Retrieve Rhino
+          Invoke-WebRequest -UseBasicParsing 'http://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip' -OutFile 'rhino1_6R7.zip'
+          7z.exe x rhino1_6R7.zip
+          Move-Item -Path rhino1_6R7\js.jar -Destination C:\cygwin64\usr\share\java
+
+      - name: Enable 8dot3 shortnames
+        run: |
+          fsutil behavior set disable8dot3 0
+          cmd /c dir /x "C:\Program Files (x86)"
+          fsutil file setshortname "C:\Program Files (x86)\WiX Toolset v3.11" "WIXTOO~1.14"
+        shell: cmd
+
+      - name: Build
+        run: bash .github/workflows/windows_build.sh
+        shell: cmd
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: icedtea-web_build_x86-64_win
+          path: |
+            icedtea-web-*.win.bin.*
+            win-installer.build/icedtea-web-*.msi*
+
+      - name: Upload binary
+        uses: actions/upload-release-asset@v1.0.1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ${{ github.event.inputs.version }}.win.bin.zip
+          asset_name: ${{ github.event.inputs.version }}.win.bin.zip
+          asset_content_type: application/zip
+
+      - name: Upload shasum
+        uses: actions/upload-release-asset@v1.0.1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
+          asset_name: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
+          asset_content_type: application/zip
+
+      - name: Upload MSI
+        uses: actions/upload-release-asset@v1.0.1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: win-installer.build/${{ github.event.inputs.version }}.msi
+          asset_name: ${{ github.event.inputs.version }}.msi
+          asset_content_type: application/zip
+
+      - name: Upload MSI shasum
+        uses: actions/upload-release-asset@v1.0.1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: win-installer.build/${{ github.event.inputs.version }}.msi.sha256.txt
+          asset_name: ${{ github.event.inputs.version }}.msi.sha256.txt
           asset_content_type: application/zip
