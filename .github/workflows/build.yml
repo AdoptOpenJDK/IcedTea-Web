@@ -140,6 +140,8 @@ jobs:
           asset_content_type: application/zip
 
   windows:
+    if: always()
+    needs: release
     name: Windows
     runs-on: windows-latest
     steps:
@@ -195,8 +197,8 @@ jobs:
         with:
           name: icedtea-web_build_x86-64_win
           path: |
-            icedtea-web-*.win.bin.zip
-            win-installer.build/icedtea-web-*.msi
+            icedtea-web-*.win.bin.*
+            win-installer.build/icedtea-web-*.msi*
 
       - name: Upload binary
         uses: actions/upload-release-asset@v1.0.1
@@ -204,7 +206,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ github.event.inputs.version }}.win.bin.zip
           asset_name: ${{ github.event.inputs.version }}.win.bin.zip
           asset_content_type: application/zip
@@ -215,7 +217,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
           asset_name: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
           asset_content_type: application/zip
@@ -226,7 +228,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: win-installer.build/${{ github.event.inputs.version }}.msi
           asset_name: ${{ github.event.inputs.version }}.msi
           asset_content_type: application/zip
@@ -237,7 +239,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: win-installer.build/${{ github.event.inputs.version }}.msi.sha256.txt
           asset_name: ${{ github.event.inputs.version }}.msi.sha256.txt
           asset_content_type: application/zip
