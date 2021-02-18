@@ -181,6 +181,10 @@ jobs:
           Invoke-WebRequest -UseBasicParsing 'http://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip' -OutFile 'rhino1_6R7.zip'
           7z.exe x rhino1_6R7.zip
           Move-Item -Path rhino1_6R7\js.jar -Destination C:\cygwin64\usr\share\java
+          # Retrieve AzureSignTool
+          New-Item -Path C:\AzureSignTool -Type Directory
+          Invoke-WebRequest -UseBasicParsing 'https://github.com/vcsjones/AzureSignTool/releases/download/1.0.1/AzureSignTool.zip' -OutFile 'AzureSignTool.zip'
+          Expand-Archive -LiteralPath 'AzureSignTool.zip' -DestinationPath 'C:\AzureSignTool'
 
       - name: Enable 8dot3 shortnames
         run: |
@@ -200,6 +204,17 @@ jobs:
             icedtea-web-*.win.bin.*
             win-installer.build/icedtea-web-*.msi*
 
+      - name: Codesign
+        run: bash .github/workflows/windows_sign.sh
+        if: github.event.inputs.release == 'True'
+        env:
+          description_url: 'https://adoptopenjdk.net'
+          key_vault_url: 'https://adoptopenjdk-codesign.vault.azure.net'
+          key_vault_certificate: 'LondonJavaCommunity'
+          key_vault_client_id: ${{ secrets.key_vault_client_id }}
+          key_vault_client_secret: ${{ secrets.key_vault_client_secret }}
+        shell: cmd
+
       - name: Upload binary
         uses: actions/upload-release-asset@v1.0.1
         if: github.event.inputs.release == 'True'
@@ -207,7 +222,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ${{ github.event.inputs.version }}.win.bin.zip
+          asset_path: release/${{ github.event.inputs.version }}.win.bin.zip
           asset_name: ${{ github.event.inputs.version }}.win.bin.zip
           asset_content_type: application/zip
 
@@ -218,7 +233,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
+          asset_path: release/${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
           asset_name: ${{ github.event.inputs.version }}.win.bin.zip.sha256.txt
           asset_content_type: application/zip
 
@@ -229,7 +244,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: win-installer.build/${{ github.event.inputs.version }}.msi
+          asset_path: release/${{ github.event.inputs.version }}.msi
           asset_name: ${{ github.event.inputs.version }}.msi
           asset_content_type: application/zip
 
@@ -240,6 +255,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: win-installer.build/${{ github.event.inputs.version }}.msi.sha256.txt
+          asset_path: release/${{ github.event.inputs.version }}.msi.sha256.txt
           asset_name: ${{ github.event.inputs.version }}.msi.sha256.txt
           asset_content_type: application/zip
