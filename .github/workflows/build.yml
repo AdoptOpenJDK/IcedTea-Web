@@ -196,7 +196,7 @@ jobs:
           name: icedtea-web_build_x86-64_win
           path: |
             icedtea-web-*.win.bin.zip
-            icedtea-web-*.msi
+            win-installer.build/icedtea-web-*.msi
 
       - name: Upload binary
         uses: actions/upload-release-asset@v1.0.1
@@ -227,7 +227,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.event.inputs.version }}.msi
+          asset_path: win-installer.build/${{ github.event.inputs.version }}.msi
           asset_name: ${{ github.event.inputs.version }}.msi
           asset_content_type: application/zip
 
@@ -238,6 +238,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.event.inputs.version }}.msi.sha256.txt
+          asset_path: win-installer.build/${{ github.event.inputs.version }}.msi.sha256.txt
           asset_name: ${{ github.event.inputs.version }}.msi.sha256.txt
           asset_content_type: application/zip
