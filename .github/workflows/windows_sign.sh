@@ -28,11 +28,10 @@ cp ${ARCHIVE_NAME} ${RELEASE_PATH}/${ARCHIVE_NAME}
 echo "Signing Installer"
 cp ${WORKSPACE}/win-installer.build/${MSI_NAME} ${TMP_PATH}/${MSI_NAME}
 
-/cygdrive/c/AzureSignTool/AzureSignTool.exe sign --file-digest sha256 --description-url "$description_url" \
---no-page-hashing --timestamp-rfc3161 http://timestamp.digicert.com --timestamp-digest sha256 \
---azure-key-vault-url "$key_vault_url" --azure-key-vault-client-id "$key_vault_client_id" \
---azure-key-vault-client-secret "$key_vault_client_secret" --azure-key-vault-certificate "$key_vault_certificate" \
---input-file-list "${TMP_PATH}/${MSI_NAME}"
+/cygdrive/c/AzureSignTool/AzureSignTool.exe sign "${MSI_NAME}" --file-digest sha256 \
+--description-url "$description_url" --no-page-hashing --timestamp-rfc3161 http://timestamp.digicert.com \
+--timestamp-digest sha256 --azure-key-vault-url "$key_vault_url" --azure-key-vault-client-id "$key_vault_client_id" \
+--azure-key-vault-client-secret "$key_vault_client_secret" --azure-key-vault-certificate "$key_vault_certificate"
 
 cp ${TMP_PATH}/${MSI_NAME} ${RELEASE_PATH}/${MSI_NAME}
 
