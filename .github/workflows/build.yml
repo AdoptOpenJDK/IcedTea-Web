@@ -153,7 +153,7 @@ jobs:
       - name: Install Cygwin
         run: |
           Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe' -OutFile 'C:\temp\cygwin.exe'
-          Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,cpio,curl,gcc-core,grep,libtool,make,mingw64-x86_64-gcc-core,pkgconf,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
+          Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,cpio,curl,git,gcc-core,grep,libtool,make,mingw64-x86_64-gcc-core,pkgconf,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
 
       - name: Set PATH
         run: echo "C:\cygwin64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -182,7 +182,7 @@ jobs:
 
       - name: Build
         run: bash .github/workflows/windows_build.sh
-        shell: cmd
+        shell: bash
 
       - uses: actions/upload-artifact@v2
         with:
