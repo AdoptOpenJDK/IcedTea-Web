@@ -183,7 +183,8 @@ jobs:
       - name: Enable 8dot3 shortnames
         run: |
           fsutil behavior set disable8dot3 0
-          fsutil file setshortname 'c:\program files (x86)\WiX Toolset v3.11' 'WIXTOO~1.14'
+          cmd /c dir /x "C:\Program Files (x86)"
+          fsutil file setshortname "C:\Program Files (x86)\WiX Toolset v3.11" "WIXTOO~1.14"
         shell: cmd
 
       - name: Build
