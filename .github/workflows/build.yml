@@ -195,7 +195,8 @@ jobs:
         with:
           name: icedtea-web_build_x86-64_win
           path: |
-            icedtea-web-*.win.bin.*
+            icedtea-web-*.win.bin.zip
+            icedtea-web-*.msi
 
       - name: Upload binary
         uses: actions/upload-release-asset@v1.0.1
