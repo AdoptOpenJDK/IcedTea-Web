@@ -48,17 +48,17 @@ jobs:
           yum -y install autoconf bind-utils bzip2 cpio elfutils-libelf-devel gcc gcc-c++ glibc glibc-common glibc-devel \
           gmp-devel java-1.8.0-openjdk-devel libcurl-devel make mpfr-devel perl unzip which zip
           curl -o tagsoup-1.2.jar.zip "http://www.java2s.com/Code/JarDownload/tagsoup/tagsoup-1.2.jar.zip"
-          shasum -a 256 tagsoup-1.2.jar.zip | awk '$1!="386cb397cadfaa1f6e43bba6bd663933e55d15029681ecad9bd853385a0a3817"{exit 1}'
+          sha256sum tagsoup-1.2.jar.zip | awk '$1!="386cb397cadfaa1f6e43bba6bd663933e55d15029681ecad9bd853385a0a3817"{exit 1}'
           unzip -j tagsoup-1.2.jar.zip
           mv tagsoup-1.2.jar tagsoup.jar
           curl -o rhino.zip "https://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip"
-          shasum -a 256 rhino.zip | awk '$1!="C94C6DE3A29B3ACBC4EEE732E688F75A5D94BD02C9878BE4CEB4D3CD220F3866"{exit 1}'
+          sha256sum rhino.zip | awk '$1!="C94C6DE3A29B3ACBC4EEE732E688F75A5D94BD02C9878BE4CEB4D3CD220F3866"{exit 1}'
           unzip -j rhino.zip "*/js.jar"
 
       - name: Compile rust
         run: |
           curl -o rust.tar.gz "https://static.rust-lang.org/dist/rust-1.34.1-x86_64-unknown-linux-gnu.tar.gz"
-          shasum -a 256 rust.tar.gz | awk '$1!="8e2eead11bd5bf61409e29018d007c6fc874bcda2ff54db3d04d1691e779c14e"{exit 1}'
+          sha256sum rust.tar.gz | awk '$1!="8e2eead11bd5bf61409e29018d007c6fc874bcda2ff54db3d04d1691e779c14e"{exit 1}'
           tar -zxf rust.tar.gz
           cd rust-1.34.1-x86_64-unknown-linux-gnu
           ./install.sh
@@ -66,7 +66,7 @@ jobs:
       - name: Compile pkg-config
         run: |
           curl -o pkg-config.tar.gz "https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
-          shasum -a 256 pkg-config.tar.gz | awk '$1!="6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591"{exit 1}'
+          sha256sum pkg-config.tar.gz | awk '$1!="6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591"{exit 1}'
           tar -zxf pkg-config.tar.gz
           cd pkg-config-0.29.2
           ./configure --with-internal-glib
@@ -75,7 +75,7 @@ jobs:
       - name: Compile automake
         run: |
           curl -o automake-1.13.1.tar.gz "https://ftp.gnu.org/gnu/automake/automake-1.13.1.tar.gz"
-          shasum -a 256 automake-1.13.1.tar.gz | awk '$1!="51bc10031847e9965c4f2c16a0a66552309ce28ea82b1afa8cef736643ebaa27"{exit 1}'
+          sha256sum automake-1.13.1.tar.gz | awk '$1!="51bc10031847e9965c4f2c16a0a66552309ce28ea82b1afa8cef736643ebaa27"{exit 1}'
           tar -zxf automake-1.13.1.tar.gz 
           cd automake-1.13.1
           bash configure
