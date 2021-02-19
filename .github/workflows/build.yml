@@ -154,10 +154,8 @@ jobs:
         run: |
           yum -y install autoconf bind-utils bzip2 cpio elfutils-libelf-devel gcc gcc-c++ glibc glibc-common glibc-devel \
           gmp-devel java-1.8.0-openjdk-devel libcurl-devel make mpfr-devel perl unzip which zip
-          curl -o tagsoup-1.2.jar.zip "http://www.java2s.com/Code/JarDownload/tagsoup/tagsoup-1.2.jar.zip"
-          sha256sum tagsoup-1.2.jar.zip | awk '$1!="386cb397cadfaa1f6e43bba6bd663933e55d15029681ecad9bd853385a0a3817"{exit 1}'
-          unzip -j tagsoup-1.2.jar.zip
-          mv tagsoup-1.2.jar tagsoup.jar
+          curl -o tagsoup.jar "https://repo1.maven.org/maven2/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar"
+          sha256sum tagsoup.jar | awk '$1!="ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04"{exit 1}'
           curl -o mslinks.jar "https://repo1.maven.org/maven2/com/github/vatbub/mslinks/1.0.5/mslinks-1.0.5.jar"
           sha256sum mslinks.jar | awk '$1!="e14d756f81b310b75baeb5baf219d25592b6a8635eb215c4059f17493b0cea5c"{exit 1}'
           curl -o rhino.zip "https://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip"
