@@ -52,7 +52,7 @@ jobs:
           unzip -j tagsoup-1.2.jar.zip
           mv tagsoup-1.2.jar tagsoup.jar
           curl -o rhino.zip "https://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip"
-          sha256sum rhino.zip | awk '$1!="C94C6DE3A29B3ACBC4EEE732E688F75A5D94BD02C9878BE4CEB4D3CD220F3866"{exit 1}'
+          sha256sum rhino.zip | awk '$1!="c94c6de3a29b3acbc4eee732e688f75a5d94bd02c9878be4ceb4d3cd220f3866"{exit 1}'
           unzip -j rhino.zip "*/js.jar"
 
       - name: Compile rust
