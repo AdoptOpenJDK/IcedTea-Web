@@ -139,6 +139,110 @@ jobs:
           asset_name: ${{ github.event.inputs.version }}.linux.bin.zip.sha256.txt
           asset_content_type: application/zip
 
+  portable:
+    if: always()
+    needs: release
+    name: Portable
+    runs-on: ubuntu-latest
+    container: centos:7
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: icedtea-web
+
+      - name: Install Dependencies
+        run: |
+          yum -y install autoconf bind-utils bzip2 cpio elfutils-libelf-devel gcc gcc-c++ glibc glibc-common glibc-devel \
+          gmp-devel java-1.8.0-openjdk-devel libcurl-devel make mpfr-devel perl unzip which zip
+          curl -o tagsoup-1.2.jar.zip "http://www.java2s.com/Code/JarDownload/tagsoup/tagsoup-1.2.jar.zip"
+          sha256sum tagsoup-1.2.jar.zip | awk '$1!="386cb397cadfaa1f6e43bba6bd663933e55d15029681ecad9bd853385a0a3817"{exit 1}'
+          unzip -j tagsoup-1.2.jar.zip
+          mv tagsoup-1.2.jar tagsoup.jar
+          curl -o mslinks.jar "https://repo1.maven.org/maven2/com/github/vatbub/mslinks/1.0.5/mslinks-1.0.5.jar"
+          sha256sum mslinks.jar | awk '$1!="e14d756f81b310b75baeb5baf219d25592b6a8635eb215c4059f17493b0cea5c"{exit 1}'
+          curl -o rhino.zip "https://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip"
+          sha256sum rhino.zip | awk '$1!="c94c6de3a29b3acbc4eee732e688f75a5d94bd02c9878be4ceb4d3cd220f3866"{exit 1}'
+          unzip -j rhino.zip "*/js.jar"
+
+      - name: Compile pkg-config
+        run: |
+          curl -o pkg-config.tar.gz "https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz"
+          sha256sum pkg-config.tar.gz | awk '$1!="6fc69c01688c9458a57eb9a1664c9aba372ccda420a02bf4429fe610e7e7d591"{exit 1}'
+          tar -zxf pkg-config.tar.gz
+          cd pkg-config-0.29.2
+          ./configure --with-internal-glib
+          make install
+
+      - name: Compile automake
+        run: |
+          curl -o automake-1.13.1.tar.gz "https://ftp.gnu.org/gnu/automake/automake-1.13.1.tar.gz"
+          sha256sum automake-1.13.1.tar.gz | awk '$1!="51bc10031847e9965c4f2c16a0a66552309ce28ea82b1afa8cef736643ebaa27"{exit 1}'
+          tar -zxf automake-1.13.1.tar.gz 
+          cd automake-1.13.1
+          bash configure
+          make && make install
+          rm -rf /usr/local/bin/automake
+          ln -s /usr/local/bin/automake-1.13 /usr/local/bin/automake
+
+      - name: Build
+        run: |
+          export ICEDTEAWEB_INSTALL="/icedtea-web-image"
+          export JAVA_EXE="$(which java)"
+          export JAVA_PATH="$(readlink -e "${JAVA_EXE}")"
+          export BIN_PATH="$(dirname "${JAVA_PATH}")"
+          export JRE_PATH="$(dirname "${BIN_PATH}")"
+          export JAVA_HOME="$(dirname "${JRE_PATH}")"
+          export WORKSPACE="${PWD}"
+          pkg-config --version
+          cd icedtea-web
+          echo "Invoking autogen.sh"
+          ./autogen.sh
+          echo "Incoking IcedTea-Web configure"
+          ./configure --disable-native-plugin --enable-bats-on-linux --enable-shell-launchers --prefix="${ICEDTEAWEB_INSTALL}" --with-itw-libs=BUNDLED --with-rhino="${WORKSPACE}/js.jar" --with-mslinks="${WORKSPACE}/mslinks.jar" --with-tagsoup="${WORKSPACE}/tagsoup.jar" --with-jdk-home="${JAVA_HOME}"
+          echo "Build IcedTea-Web"
+          make DESTDIR="${WORKSPACE}/dest"
+          
+      - name: Build Distribution
+        run: |
+          export WORKSPACE="${PWD}"
+          echo "Create IcedTea-Web Distribution"
+          cd icedtea-web
+          make linux-bin-dist DESTDIR="${WORKSPACE}/dest"
+          find . -name "icedtea-web-*.linux.bin.zip"
+          for zip in icedtea-web-*.linux.bin.zip; do
+            zip_rename="${zip/linux/portable}"
+              mv "$zip" "$zip_rename"
+            sha256sum "$zip_rename" > "$zip_rename.sha256.txt"
+          done
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: icedtea-web_build_x86-64_portable
+          path: |
+            icedtea-web/icedtea-web-*.portable.bin.*
+
+      - name: Upload binary
+        uses: actions/upload-release-asset@v1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.portable.bin.zip
+          asset_name: ${{ github.event.inputs.version }}.portable.bin.zip
+          asset_content_type: application/zip
+
+      - name: Upload shasum
+        uses: actions/upload-release-asset@v1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.portable.bin.zip.sha256.txt
+          asset_name: ${{ github.event.inputs.version }}.portable.bin.zip.sha256.txt
+          asset_content_type: application/zip
+
   windows:
     if: always()
     needs: release
