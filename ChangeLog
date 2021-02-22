@@ -1,3 +1,14 @@
+
+2021-02-22  Hendrik Ebbers <hendrik.ebbers@web.de>
+
+        Release changes
+	* Change so that it can also be built under freebsd
+	* fix for cargo test sometimes fails when make runs with several simultaneous jobs
+	* JARs downloaded with URI-escaped characters don't get loaded
+	* Reduced number of threads spawned for downloading of resources
+	* handle broken XML in jnlp
+	* Migrated to GitHub Action release support
+
 2020-06-03  Hendrik Ebbers <hendrik.ebbers@web.de>
 
         Release changes
