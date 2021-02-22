@@ -8,6 +8,14 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.8.5 (2021-02-22):
+* Change so that it can also be built under freebsd
+* fix for cargo test sometimes fails when make runs with several simultaneous jobs
+* JARs downloaded with URI-escaped characters don't get loaded
+* Reduced number of threads spawned for downloading of resources
+* handle broken XML in jnlp
+* Migrated to GitHub Action release support
+
 New in release 1.8.4 (2020-06-03):
 * Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/389
 * Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/384
