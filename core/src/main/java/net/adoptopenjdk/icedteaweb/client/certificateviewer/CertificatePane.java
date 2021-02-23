@@ -473,7 +473,7 @@ public class CertificatePane extends JPanel {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
                     JFileChooser chooser = new JFileChooser();
-                    int returnVal = chooser.showOpenDialog(parent);
+                    int returnVal = chooser.showSaveDialog(parent);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         String alias = keyStore.getKs().getCertificateAlias(certs
                                                         .get(selectedRow));
