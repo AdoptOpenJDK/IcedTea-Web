@@ -287,8 +287,8 @@ jobs:
             exit 1
           }
           # Retrieve mslinks jar
-          Invoke-WebRequest -UseBasicParsing 'https://repo1.maven.org/maven2/com/github/vatbub/mslinks/1.0.5/mslinks-1.0.5.jar' -OutFile 'C:\cygwin64\usr\share\java\mslinks-1.0.5.jar'
-          $checksum = (Get-FileHash -Algorithm SHA256 'C:\cygwin64\usr\share\java\mslinks-1.0.5.jar' | Select-Object -ExpandProperty Hash)
+          Invoke-WebRequest -UseBasicParsing 'https://repo1.maven.org/maven2/com/github/vatbub/mslinks/1.0.5/mslinks-1.0.5.jar' -OutFile 'C:\cygwin64\usr\share\java\mslinks.jar'
+          $checksum = (Get-FileHash -Algorithm SHA256 'C:\cygwin64\usr\share\java\mslinks.jar' | Select-Object -ExpandProperty Hash)
           If ($checksum -ne "E14D756F81B310B75BAEB5BAF219D25592B6A8635EB215C4059F17493B0CEA5C") {
             Write-Host "Checksums did not match!"
             exit 1
