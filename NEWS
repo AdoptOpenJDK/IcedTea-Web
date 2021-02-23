@@ -8,6 +8,9 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.8.6 (2021-02-23):
+* Fix missing mslinks in Windows build
+
 New in release 1.8.5 (2021-02-22):
 * Change so that it can also be built under freebsd
 * fix for cargo test sometimes fails when make runs with several simultaneous jobs
