@@ -1,3 +1,7 @@
+2021-02-23  George Adams <gadams@microsoft.com>
+
+    Release changes
+	* Fix missing mslinks in Windows build
 
 2021-02-22  Hendrik Ebbers <hendrik.ebbers@web.de>
 
