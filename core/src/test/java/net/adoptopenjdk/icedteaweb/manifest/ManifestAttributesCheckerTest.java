@@ -33,22 +33,26 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.manifest;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
 import net.sourceforge.jnlp.LaunchException;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.DummySecurityDelegate;
-import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class ManifestAttributesCheckerTest {
 
@@ -74,6 +78,40 @@ public class ManifestAttributesCheckerTest {
         SecurityDesc security = new SecurityDesc(file, AppletPermissionLevel.ALL,SecurityDesc.ALL_PERMISSIONS, codebase);
         SecurityDelegate securityDelegate = new DummySecurityDelegate();
         ManifestAttributesChecker checker = new ManifestAttributesChecker(security, file, JNLPClassLoader.SigningState.FULL, securityDelegate);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.name());
+        checker.checkAll();
+    }
+    
+    @Test
+    public void checkAllCheckAlacLocalJNLPFileTest() throws LaunchException, IOException, ParseException {
+        // there shouldn't be a warning about multiple remote locations when the JNLP file is loaded from disk
+        ClassLoader cl = ManifestAttributesCheckerTest.class.getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+        URL jnlpURL = cl.getResource("net/sourceforge/jnlp/minimal.jnlp");
+        JNLPFile jnlpFile = new JNLPFileFactory().create(jnlpURL);
+        URL codebase = new URL("http://foo/");
+        SecurityDesc security = new SecurityDesc(jnlpFile, AppletPermissionLevel.ALL,SecurityDesc.ALL_PERMISSIONS, codebase);
+        SecurityDelegate securityDelegate = new DummySecurityDelegate();
+        ManifestAttributesChecker checker = new ManifestAttributesChecker(security, jnlpFile, JNLPClassLoader.SigningState.FULL, securityDelegate);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.name());
+        checker.checkAll();
+    }
+    
+    @Test(expected = NullPointerException.class)
+    public void checkAllCheckAlacLocalJarFileTest() throws LaunchException, IOException, ParseException {
+        // there must be a warning about multiple remote locations when the JNLP file is loaded from a remote location and there's at least one local jar 
+        ClassLoader cl = ManifestAttributesCheckerTest.class.getClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+        URL codebase = new URL("http://aaa/bb/");
+        URL jar1 = new URL("file://aaa/bb/a.jar");
+        JNLPFile jnlpFile = new DummyJNLPFileWithJar(codebase, jar1);
+        SecurityDesc security = new SecurityDesc(jnlpFile, AppletPermissionLevel.ALL,SecurityDesc.ALL_PERMISSIONS, codebase);
+        SecurityDelegate securityDelegate = new DummySecurityDelegate();
+        ManifestAttributesChecker checker = new ManifestAttributesChecker(security, jnlpFile, JNLPClassLoader.SigningState.FULL, securityDelegate);
         JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.ALAC.name());
         checker.checkAll();
     }
