@@ -33,6 +33,7 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.manifest;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextendedsecurity.AppletSecurityLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.AppletPermissionLevel;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.testing.mock.DummyJNLPFileWithJar;
@@ -77,6 +78,33 @@ public class ManifestAttributesCheckerTest {
         checker.checkAll();
     }
 
+    @Test
+    public void checkAllPermissionsNoJarsTest() throws LaunchException, MalformedURLException {
+        // checking permissions on a JNLP that contains no jars should not fail 
+        URL codebase = new URL("http://aaa/bb/");
+        JNLPFile file = new DummyJNLPFileWithJar(codebase);
+        SecurityDesc security = new SecurityDesc(file, AppletPermissionLevel.ALL,SecurityDesc.ALL_PERMISSIONS, codebase);
+        SecurityDelegate securityDelegate = new DummySecurityDelegate();
+        ManifestAttributesChecker checker = new ManifestAttributesChecker(security, file, JNLPClassLoader.SigningState.FULL, securityDelegate);
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.name());
+        JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.DENY_UNSIGNED.name());
+        checker.checkAll();
+    }
+    
+    @Test(expected = LaunchException.class)
+    public void checkAllPermissionsFailTest() throws LaunchException, MalformedURLException {
+    	// checking permissions on a JNLP that contains a jar without the permissions attribute when ALL_PERMISSIONS is requested should fail
+    	URL codebase = new URL("http://aaa/bb/");
+    	URL jar1 = new URL("http://aaa/bb/a.jar");
+    	JNLPFile file = new DummyJNLPFileWithJar(codebase, jar1);
+    	SecurityDesc security = new SecurityDesc(file, AppletPermissionLevel.ALL,SecurityDesc.ALL_PERMISSIONS, codebase);
+    	SecurityDelegate securityDelegate = new DummySecurityDelegate();
+    	ManifestAttributesChecker checker = new ManifestAttributesChecker(security, file, JNLPClassLoader.SigningState.FULL, securityDelegate);
+    	JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, ManifestAttributesChecker.MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS.name());
+    	JNLPRuntime.getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.DENY_UNSIGNED.name());
+    	checker.checkAll();
+    }
+        
     private static void tryTest(String src, String expected) throws MalformedURLException {
         URL s = new URL(src);
         URL q = ManifestAttributesChecker.stripDocbase(s);

@@ -116,7 +116,7 @@ public class ManifestAttributesChecker {
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.PERMISSIONS) ||
                     attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
-                checkPermissionsAttribute();
+            	checkPermissionsAttribute();
             } else {
                 LOG.warn("check on {} skipped because property of deployment.manifest.attributes.check was not set to ALL or includes {} in the combination of options", "Permissions", "PERMISSIONS");
             }
@@ -264,43 +264,47 @@ public class ManifestAttributesChecker {
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
      */
     private void checkPermissionsAttribute() throws LaunchException {
-        if (securityDelegate.getRunInSandbox()) {
-            LOG.warn("The 'Permissions' attribute of this application is '{}'. You have chosen the Sandbox run option, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.", permissionsToString());
-            return;
-        }
-
-        final ManifestBoolean sandboxForced = isSandboxForced();
-        // If the attribute is not specified in the manifest, prompt the user. Oracle's spec says that the
-        // attribute is required, but this breaks a lot of existing applets. Therefore, when on the highest
-        // security level, we refuse to run these applets. On the standard security level, we ask. And on the
-        // lowest security level, we simply proceed without asking.
-        if (sandboxForced == ManifestBoolean.UNDEFINED) {
-            final AppletSecurityLevel itwSecurityLevel = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
-            if (itwSecurityLevel == AppletSecurityLevel.DENY_UNSIGNED) {
-                throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
-            }
-            if (itwSecurityLevel == AppletSecurityLevel.ASK_UNSIGNED) {
-                final boolean userApproved = SecurityDialogs.showMissingPermissionsAttributeDialogue(file);
-                if (!userApproved) {
-                    throw new LaunchException("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have refused to run it.");
-                } else {
-                    LOG.debug("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have allowed to run it.");
-                }
-            }
-            return;
-        }
-
-        final AppletPermissionLevel requestedPermissionLevel = file.getAppletPermissionLevel();
-        validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissionLevel, sandboxForced);
-        if (isNoneOrDefault(requestedPermissionLevel)) {
-            if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
-                LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
-                securityDelegate.setRunInSandbox();
-            }
-            if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
-                LOG.warn("The 'permissions' attribute is '{}' and the applet is unsigned. Forcing sandbox.", permissionsToString());
-                securityDelegate.setRunInSandbox();
-            }
+        if (file.getResources().getJARs().length > 0) {
+	        if (securityDelegate.getRunInSandbox()) {
+	            LOG.warn("The 'Permissions' attribute of this application is '{}'. You have chosen the Sandbox run option, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.", permissionsToString());
+	            return;
+	        }
+	
+	        final ManifestBoolean sandboxForced = isSandboxForced();
+	        // If the attribute is not specified in the manifest, prompt the user. Oracle's spec says that the
+	        // attribute is required, but this breaks a lot of existing applets. Therefore, when on the highest
+	        // security level, we refuse to run these applets. On the standard security level, we ask. And on the
+	        // lowest security level, we simply proceed without asking.
+	        if (sandboxForced == ManifestBoolean.UNDEFINED) {
+	            final AppletSecurityLevel itwSecurityLevel = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
+	            if (itwSecurityLevel == AppletSecurityLevel.DENY_UNSIGNED) {
+	                throw new LaunchException("Your Extended applets security is at 'Very high', and this application is missing the 'permissions' attribute in manifest. This is fatal");
+	            }
+	            if (itwSecurityLevel == AppletSecurityLevel.ASK_UNSIGNED) {
+	                final boolean userApproved = SecurityDialogs.showMissingPermissionsAttributeDialogue(file);
+	                if (!userApproved) {
+	                    throw new LaunchException("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have refused to run it.");
+	                } else {
+	                    LOG.debug("Your Extended applets security is at 'high' and this application is missing the 'permissions' attribute in manifest. And you have allowed to run it.");
+	                }
+	            }
+	            return;
+	        }
+	
+	        final AppletPermissionLevel requestedPermissionLevel = file.getAppletPermissionLevel();
+	        validateRequestedPermissionLevelMatchesManifestPermissions(requestedPermissionLevel, sandboxForced);
+	        if (isNoneOrDefault(requestedPermissionLevel)) {
+	            if (sandboxForced == ManifestBoolean.TRUE && signing != SigningState.NONE) {
+	                LOG.warn("The 'permissions' attribute is '{}' and the applet is signed. Forcing sandbox.", permissionsToString());
+	                securityDelegate.setRunInSandbox();
+	            }
+	            if (sandboxForced == ManifestBoolean.FALSE && signing == SigningState.NONE) {
+	                LOG.warn("The 'permissions' attribute is '{}' and the applet is unsigned. Forcing sandbox.", permissionsToString());
+	                securityDelegate.setRunInSandbox();
+	            }
+	        }
+        } else {
+        	LOG.debug("check permissions on {} skipped because it contains no jars.", file.getFileLocation());
         }
     }
 
