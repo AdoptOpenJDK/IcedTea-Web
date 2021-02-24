@@ -70,6 +70,7 @@ AM_CONDITIONAL([ENABLE_NATIVE_LAUNCHERS], [test ! x"$RUSTC" = x -a ! x"$CARGO" =
 
 build_linux=no
 build_windows=no
+build_macos=no
 case "${host_os}" in
     linux*|freebsd*)
         build_linux=yes
@@ -77,12 +78,16 @@ case "${host_os}" in
     cygwin*)
         build_windows=yes
         ;;
+    darwin*)
+        build_macos=yes
+        ;;
     *)
         AC_MSG_ERROR(["OS $host_os is not supported"])
         ;;
 esac
 AM_CONDITIONAL([LINUX], [test "$build_linux" = "yes"])
 AM_CONDITIONAL([WINDOWS], [test "$build_windows" = "yes"])
+AM_CONDITIONAL([MACOS], [test "$build_macos" = "yes"])
 
 # the images built with this switch on linux, are not exactly windows friendly (see removed jars in make log, which are made in favor of clean linux build)
 AC_MSG_CHECKING([whether to include also bat lunchers during linux build])
@@ -172,6 +177,9 @@ IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILE, [sun.net.www.protocol.ja
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILECALLBACK, [sun.net.www.protocol.jar.URLJarFileCallBack], [some.pkg], [$JAVA_BASE])
 if test "x$build_linux" = xyes ; then
   IT_CHECK_FOR_CLASS(SUN_AWT_X11_XEMBEDDEDFRAME, [sun.awt.X11.XEmbeddedFrame], [some.pkg], [$JAVA_DESKTOP])
+fi
+if test "x$build_macos" = xyes ; then
+  IT_CHECK_FOR_CLASS(SUN_LWAWT_CEMBEDDEDFRAME, [sun.lwawt.macosx.CEmbeddedFrame], [some.pkg], [$JAVA_DESKTOP])
 fi
 if test "x$build_windows" = xyes ; then
   IT_CHECK_FOR_CLASS(SUN_AWT_WEMBEDDEDFRAME, [sun.awt.windows.WEmbeddedFrame], [some.pkg], [$JAVA_DESKTOP])
