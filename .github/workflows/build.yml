@@ -337,9 +337,10 @@ jobs:
         run: |
           Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe' -OutFile 'C:\temp\cygwin.exe'
           Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe.sig' -OutFile 'C:\temp\cygwin.exe.sig'
-          gpg --keyserver keys.gnupg.net --recv-key 1A698DE9E2E56300
-          gpg --keyserver keys.gnupg.net --recv-key 676041BA
-          gpg --keyid-format=long --with-fingerprint --verify 'C:\temp\cygwin.exe.sig' 'C:\temp\cygwin.exe'
+          # These steps are too flaky. keys.gnupg.net seems to be constantly down.
+          # gpg --keyserver keys.gnupg.net --recv-key 1A698DE9E2E56300
+          # gpg --keyserver keys.gnupg.net --recv-key 676041BA
+          # gpg --keyid-format=long --with-fingerprint --verify 'C:\temp\cygwin.exe.sig' 'C:\temp\cygwin.exe'
           Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,cpio,curl,gcc,git,gnupg,grep,libtool,make,mingw64-x86_64-gcc-core,perl,pkg-config,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
 
       - name: Set PATH
