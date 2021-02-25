@@ -264,6 +264,10 @@ public class ManifestAttributesChecker {
      * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#permissions
      */
     private void checkPermissionsAttribute() throws LaunchException {
+        if (file.getResources().getJARs().length <= 0) {
+            LOG.debug("check permissions on {} skipped because it contains no jars.", file.getFileLocation());
+            return;
+        }
         if (securityDelegate.getRunInSandbox()) {
             LOG.warn("The 'Permissions' attribute of this application is '{}'. You have chosen the Sandbox run option, which overrides the Permissions manifest attribute, or the applet has already been automatically sandboxed.", permissionsToString());
             return;
