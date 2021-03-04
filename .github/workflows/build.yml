@@ -257,12 +257,24 @@ jobs:
           path: C:\cygwin_packages
           key: cygwin-packages-${{ runner.os }}-v1
 
-      - name: Install Cygwin
+      - name: Download Cygwin
         run: |
           Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe' -OutFile 'C:\temp\cygwin.exe'
           Invoke-WebRequest -UseBasicParsing 'https://cygwin.com/setup-x86_64.exe.sig' -OutFile 'C:\temp\cygwin.exe.sig'
-          gpg --keyserver keys.gnupg.net --recv-key 1A698DE9E2E56300
-          gpg --keyserver keys.gnupg.net --recv-key 676041BA
+
+      - name: Download Cygwin keys
+        shell: bash {0}
+        run: |
+          gpg -v --keyserver keys.gnupg.net --recv-key 1A698DE9E2E56300
+          gpg -v --keyserver keys.gnupg.net --recv-key 676041BA
+          gpg -v --keyserver ipv4.pool.sks-keyservers.net --recv-key 1A698DE9E2E56300
+          gpg -v --keyserver ipv4.pool.sks-keyservers.net --recv-key 676041BA
+          gpg -v --keyserver keyserver.ubuntu.com --recv-key 1A698DE9E2E56300
+          gpg -v --keyserver keyserver.ubuntu.com --recv-key 676041BA
+          exit 0
+
+      - name: Check Cygwin sig
+        run: |
           gpg --keyid-format=long --with-fingerprint --verify 'C:\temp\cygwin.exe.sig' 'C:\temp\cygwin.exe'
           Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,cpio,curl,gcc,git,gnupg,grep,libtool,make,mingw64-x86_64-gcc-core,perl,pkg-config,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
 
