@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -346,23 +347,22 @@ public final class DeploymentConfiguration {
 
         final Map<String, Setting> defaults = Defaults.getDefaults();
 
-        for (final String key : initial.keySet()) {
-            final Setting s = initial.get(key);
-            if (!(s.getName().equals(key))) {
-                LOG.info("key '{}' does not match setting name '{}'", key, s.getName());
+        for (final Map.Entry<String, Setting> entry : initial.entrySet()) {
+            final String key = entry.getKey();
+            final Setting setting = entry.getValue();
+            if (!(Objects.equals(setting.getName(), key))) {
+                LOG.warn("key '{}' does not match setting name '{}'", key, setting.getName());
             } else if (!defaults.containsKey(key)) {
-                LOG.info("Property '{}' is unknown.", key);
+                LOG.warn("Property '{}' is unknown.", key);
             } else {
                 final ValueValidator checker = defaults.get(key).getValidator();
-                if (checker == null) {
-                    continue;
-                }
-
-                try {
-                    checker.validate(s.getValue());
-                } catch (final IllegalArgumentException e) {
-                    LOG.error("Property '{}' has incorrect value \"{}\". Possible values {}.", key, s.getValue(), checker.getPossibleValues(), e);
-                    s.setValue(s.getDefaultValue());
+                if (checker != null) {
+                    try {
+                        checker.validate(setting.getValue());
+                    } catch (final IllegalArgumentException e) {
+                        LOG.error("Property '{}' has incorrect value \"{}\". Possible values {}.", key, setting.getValue(), checker.getPossibleValues(), e);
+                        setting.setValue(setting.getDefaultValue());
+                    }
                 }
             }
         }
