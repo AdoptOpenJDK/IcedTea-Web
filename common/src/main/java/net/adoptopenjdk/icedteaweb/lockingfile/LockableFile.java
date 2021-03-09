@@ -107,16 +107,10 @@ public class LockableFile {
     }
 
     private boolean isReadOnly(final File file) {
-        boolean result;
-        if (!file.isFile() && file.getParentFile() != null && !file.getParentFile().canWrite()) {
-            result = true;
-        } else {
-            result = !file.canWrite();
-            if (!result && file.getParentFile() != null && !file.getParentFile().canWrite()) {
-                result = true;
-            }
-        }
-        return result;
+        final File parent = file.getParentFile();
+        final boolean canWriteParent = parent != null && parent.isDirectory() && parent.canWrite();
+        final boolean canWriteFile = file.isFile() && file.canWrite() && canWriteParent;
+        return !canWriteFile;
     }
 
     /**
@@ -289,7 +283,7 @@ public class LockableFile {
             }
 
             createParentDirIfMissing();
-            while (!lockFile.createNewFile()) {
+            while (!readOnly && !lockFile.createNewFile()) {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
@@ -306,7 +300,7 @@ public class LockableFile {
             }
 
             createParentDirIfMissing();
-            if (!lockFile.createNewFile()) {
+            if (!readOnly && !lockFile.createNewFile()) {
                 return false;
             }
             lockFile.deleteOnExit();
@@ -315,10 +309,10 @@ public class LockableFile {
 
         private void createParentDirIfMissing() {
             final File dir = lockFile.getParentFile();
-            if (!dir.isDirectory()) {
-                if (!dir.mkdirs()) {
-                    logger.warn("failed to create parent directory of {}", lockFile);
-                }
+            if (dir == null) {
+                logger.warn("parent of lockfile {} is null", lockFile);
+            } else if (!dir.isDirectory() && !dir.mkdirs()) {
+                logger.warn("failed to create parent directory of {}", lockFile);
             }
         }
 
