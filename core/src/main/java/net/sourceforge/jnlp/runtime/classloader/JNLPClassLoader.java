@@ -1432,12 +1432,13 @@ public class JNLPClassLoader extends URLClassLoader {
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
         final List<ExceptionalSupplier<Class<?>, ClassNotFoundException>> list = new ArrayList<>();
-        list.add(() -> findLoadedClassAll(name));
-        list.add(() -> loadClassFromParentClassloader(name));
-        list.add(() -> loadClassExt(name));
-        list.add(() -> loadClassFromInternalManifestClasspath(name));
-        list.add(() -> loadFromJarIndexes(name));
-
+        synchronized (getClassLoadingLock(name)) {
+            list.add(() -> findLoadedClassAll(name));
+            list.add(() -> loadClassFromParentClassloader(name));
+            list.add(() -> loadClassExt(name));
+            list.add(() -> loadClassFromInternalManifestClasspath(name));
+            list.add(() -> loadFromJarIndexes(name));
+        }
         return list.stream()
                 .map(ExceptionalSupplier::getResultOfCallOrNull)
                 .filter(Objects::nonNull)
