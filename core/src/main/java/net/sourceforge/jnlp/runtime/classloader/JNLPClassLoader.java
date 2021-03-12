@@ -1438,12 +1438,12 @@ public class JNLPClassLoader extends URLClassLoader {
             list.add(() -> loadClassExt(name));
             list.add(() -> loadClassFromInternalManifestClasspath(name));
             list.add(() -> loadFromJarIndexes(name));
+            return list.stream()
+                    .map(ExceptionalSupplier::getResultOfCallOrNull)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElseThrow(() -> new ClassNotFoundException(name));
         }
-        return list.stream()
-                .map(ExceptionalSupplier::getResultOfCallOrNull)
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(() -> new ClassNotFoundException(name));
     }
 
     private Class<?> loadClassFromParentClassloader(final String name) throws ClassNotFoundException {
