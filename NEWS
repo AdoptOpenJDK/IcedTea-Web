@@ -8,6 +8,10 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+
+New in release 1.8.7 (2021-03-04):
+* Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/467 fix https://github.com/AdoptOpenJDK/IcedTea-Web/issues/89
+
 New in release 1.8.6 (2021-02-23):
 * Fix missing mslinks in Windows build
 

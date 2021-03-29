@@ -14,7 +14,39 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 package net.sourceforge.jnlp.runtime;
 
-import static net.sourceforge.jnlp.runtime.Translator.R;
+import net.sourceforge.jnlp.AppletDesc;
+import net.sourceforge.jnlp.ApplicationDesc;
+import net.sourceforge.jnlp.ExtensionDesc;
+import net.sourceforge.jnlp.JARDesc;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPMatcher;
+import net.sourceforge.jnlp.JNLPMatcherException;
+import net.sourceforge.jnlp.LaunchDesc;
+import net.sourceforge.jnlp.LaunchException;
+import net.sourceforge.jnlp.NullJnlpFileException;
+import net.sourceforge.jnlp.OptionsDefinitions;
+import net.sourceforge.jnlp.ParseException;
+import net.sourceforge.jnlp.ParserSettings;
+import net.sourceforge.jnlp.PluginBridge;
+import net.sourceforge.jnlp.ResourcesDesc;
+import net.sourceforge.jnlp.SecurityDesc;
+import net.sourceforge.jnlp.Version;
+import net.sourceforge.jnlp.cache.CacheUtil;
+import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
+import net.sourceforge.jnlp.cache.NativeLibraryStorage;
+import net.sourceforge.jnlp.cache.ResourceTracker;
+import net.sourceforge.jnlp.cache.UpdatePolicy;
+import net.sourceforge.jnlp.config.DeploymentConfiguration;
+import net.sourceforge.jnlp.jdk89acesses.JarIndexAccess;
+import net.sourceforge.jnlp.security.AppVerifier;
+import net.sourceforge.jnlp.security.JNLPAppVerifier;
+import net.sourceforge.jnlp.security.PluginAppVerifier;
+import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
+import net.sourceforge.jnlp.tools.JarCertVerifier;
+import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.StreamUtils;
+import net.sourceforge.jnlp.util.UrlUtils;
+import net.sourceforge.jnlp.util.logging.OutputController;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,39 +89,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
 
-import net.sourceforge.jnlp.AppletDesc;
-import net.sourceforge.jnlp.ApplicationDesc;
-import net.sourceforge.jnlp.ExtensionDesc;
-import net.sourceforge.jnlp.JARDesc;
-import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.JNLPMatcher;
-import net.sourceforge.jnlp.JNLPMatcherException;
-import net.sourceforge.jnlp.jdk89acesses.JarIndexAccess;
-import net.sourceforge.jnlp.LaunchDesc;
-import net.sourceforge.jnlp.LaunchException;
-import net.sourceforge.jnlp.NullJnlpFileException;
-import net.sourceforge.jnlp.OptionsDefinitions;
-import net.sourceforge.jnlp.ParseException;
-import net.sourceforge.jnlp.ParserSettings;
-import net.sourceforge.jnlp.PluginBridge;
-import net.sourceforge.jnlp.ResourcesDesc;
-import net.sourceforge.jnlp.SecurityDesc;
-import net.sourceforge.jnlp.Version;
-import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.cache.IllegalResourceDescriptorException;
-import net.sourceforge.jnlp.cache.NativeLibraryStorage;
-import net.sourceforge.jnlp.cache.ResourceTracker;
-import net.sourceforge.jnlp.cache.UpdatePolicy;
-import net.sourceforge.jnlp.config.DeploymentConfiguration;
-import net.sourceforge.jnlp.security.AppVerifier;
-import net.sourceforge.jnlp.security.JNLPAppVerifier;
-import net.sourceforge.jnlp.security.PluginAppVerifier;
-import net.sourceforge.jnlp.security.appletextendedsecurity.UnsignedAppletTrustConfirmation;
-import net.sourceforge.jnlp.tools.JarCertVerifier;
-import net.sourceforge.jnlp.util.JarFile;
-import net.sourceforge.jnlp.util.StreamUtils;
-import net.sourceforge.jnlp.util.UrlUtils;
-import net.sourceforge.jnlp.util.logging.OutputController;
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
 /**
@@ -2084,7 +2083,9 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         // Codebase
-        addToCodeBaseLoader(extLoader.file.getCodeBase());
+        if (this.enableCodeBase) {
+            addToCodeBaseLoader(extLoader.file.getCodeBase());
+        }
 
         // native search paths
         for (File nativeDirectory : extLoader.nativeLibraryStorage.getSearchDirectories()) {

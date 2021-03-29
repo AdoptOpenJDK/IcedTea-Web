@@ -43,7 +43,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.AccessController;
@@ -104,11 +103,9 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
 
         if (UrlUtils.isLocalFile(localUrl)) {
             // if it is known to us, just return the cached file
-            JarFile returnFile=null;
+            JarFile returnFile = new JarFile(UrlUtils.decodeUrlQuietly(localUrl).getPath());
             
             try {
-            	localUrl.toURI().getPath();
-            	returnFile = new JarFile(localUrl.toURI().getPath());
                 
                 // Blank out the class-path because:
                 // 1) Web Start does not support it
@@ -120,8 +117,6 @@ final class CachedJarFileCallback implements URLJarFileCallBack {
 
             } catch (NullPointerException npe) {
                 // Discard NPE here. Maybe there was no manifest, maybe there were no attributes, etc.
-			} catch (URISyntaxException e) {
-				// should not happen as localUrl was built using localFile.toURI().toURL(), see JNLPClassLoader.activateJars(List<JARDesc>)
             }
 
             return returnFile;
