@@ -244,6 +244,82 @@ jobs:
           asset_name: ${{ github.event.inputs.version }}.portable.bin.zip.sha256.txt
           asset_content_type: application/zip
 
+  macos:
+    if: always()
+    needs: release
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: icedtea-web
+
+      - name: Install Dependencies
+        run: |
+          brew install autoconf automake coreutils freetype gnu-sed rust
+          curl -o tagsoup.jar "https://repo1.maven.org/maven2/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar"
+          sha256sum tagsoup.jar | awk '$1!="ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04"{exit 1}'
+          curl -o rhino.zip "https://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip"
+          sha256sum rhino.zip | awk '$1!="c94c6de3a29b3acbc4eee732e688f75a5d94bd02c9878be4ceb4d3cd220f3866"{exit 1}'
+          unzip -j rhino.zip "*/js.jar"
+
+      - name: Build
+        run: |
+          export ICEDTEAWEB_INSTALL="/icedtea-web-image"
+          export PATH="/usr/local/opt/gnu-sed/libexec/gnubin/:/usr/local/opt/coreutils/bin/:$PATH"
+          export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+          export TAGSOUP="${PWD}/tagsoup.jar"
+          export RHINO="${PWD}/js.jar"
+          export ACLOCAL_PATH="/usr/local/share/aclocal"
+          export WORKSPACE="${PWD}"
+          pkg-config --version
+          cd icedtea-web
+          echo "Invoking autogen.sh"
+          ./autogen.sh
+          echo "Incoking IcedTea-Web configure"
+          ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-itw-libs=BUNDLED --with-rhino="${RHINO}" --with-tagsoup="${TAGSOUP}" --with-jdk-home="${JAVA_HOME}" --with-jre-home="${JAVA_HOME}/jre"
+          echo "Build IcedTea-Web"
+          make DESTDIR="${WORKSPACE}"
+          
+      - name: Build Distribution
+        run: |
+          export WORKSPACE="${PWD}"
+          echo "Create IcedTea-Web Distribution"
+          cd icedtea-web
+          make macos-bin-dist DESTDIR="${WORKSPACE}"
+          find . -name "icedtea-web-*.linux.bin.zip"
+          for zip in icedtea-web-*.macos.bin.zip; do
+            sha256sum "$zip" > "$zip.sha256.txt"
+          done
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: icedtea-web_build_x86-64_macos
+          path: |
+            icedtea-web/icedtea-web-*.macos.bin.*
+
+      - name: Upload binary
+        uses: actions/upload-release-asset@v1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.macos.bin.zip
+          asset_name: ${{ github.event.inputs.version }}.macos.bin.zip
+          asset_content_type: application/zip
+
+      - name: Upload shasum
+        uses: actions/upload-release-asset@v1
+        if: github.event.inputs.release == 'True'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: icedtea-web/${{ github.event.inputs.version }}.macos.bin.zip.sha256.txt
+          asset_name: ${{ github.event.inputs.version }}.macos.bin.zip.sha256.txt
+          asset_content_type: application/zip
+
   windows:
     if: always()
     needs: release

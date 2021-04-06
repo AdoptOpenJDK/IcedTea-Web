@@ -77,6 +77,7 @@ export BASH_CMPL_DEST_DIR=$(DESTDIR)@bashcompdir@
 export WIN_ALL_DEPS=$(DESTDIR)$(prefix)/win-deps-all
 export WIN_RUN_DEPS=$(DESTDIR)$(prefix)/win-deps-runtime
 export LINUX_BIN_DIST_DEPS=$(DESTDIR)$(prefix)/linux-deps-runtime
+export MACOS_BIN_DIST_DEPS=$(DESTDIR)$(prefix)/macos-deps-runtime
 
 export REPORT_STYLES_DIRNAME=report-styles
 
@@ -196,6 +197,10 @@ endif
 endif
 
 # Flags
+# macOS requires this flag, see https://youtrack.jetbrains.com/issue/IDEA-72010
+if MACOS
+	export JAVACFLAGS="-XDignore.symbol.file"
+endif
 export IT_CFLAGS=$(CFLAGS) $(ARCHFLAG)
 export IT_JAVAC_SETTINGS=-g -encoding utf-8 $(JAVACFLAGS) $(MEMORY_LIMIT) $(PREFER_SOURCE)
 export IT_LANGUAGE_SOURCE_VERSION=8
@@ -486,6 +491,28 @@ endif
 	if [ ! -e $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ] ; then cp $(MODULARJDK_ARGS_LOCATION) $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ; fi
 	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).linux.bin.zip `basename $(DESTDIR)$(prefix)` );
 
+macos-bin-dist: install
+	rm -f $(DESTDIR)$(libdir)/$(BUILT_PLUGIN_LIBRARY)
+	mkdir -p $(MACOS_BIN_DIST_DEPS)
+if WITH_RHINO
+	filteredName=`basename $(RHINO_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(RHINO_JAR) $(MACOS_BIN_DIST_DEPS)/$$filteredName
+endif
+if HAVE_TAGSOUP
+	filteredName=`basename $(TAGSOUP_JAR) | sed "s/[^a-zA-Z]//g" | sed "s/jar$$/.jar/"` ; \
+	cp -v $(TAGSOUP_JAR) $(MACOS_BIN_DIST_DEPS)/$$filteredName
+endif
+	cp $(NETX_DIR)/lib/src.zip $(DESTDIR)$(prefix)/netx.src.zip
+if ENABLE_PLUGINJAR
+	cp $(TOP_BUILD_DIR)/liveconnect/lib/src.zip $(DESTDIR)$(prefix)/plugin.src.zip
+endif
+if ENABLE_DOCS
+	cp -r $(DOCS_DIR)/html $(DESTDIR)$(prefix)/icedtea-web-docs
+endif
+	if [ ! -e $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ] ; then cp $(MODULARJDK_ARGS_LOCATION) $(DESTDIR)$(bindir)/$(MODULARJDK_ARGS_FILE) ; fi
+	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).macos.bin.zip `basename $(DESTDIR)$(prefix)` );
+
+
 win-bin-dist: win-only-image
 	(cd $(DESTDIR)$(prefix)/.. && $(ZIP) -qr $(TOP_BUILD_DIR)/$(distdir).win.bin.zip `basename $(DESTDIR)$(prefix)` );
 
@@ -729,12 +756,18 @@ clean-plugin: $(ICEDTEAPLUGIN_CLEAN)
 
 liveconnect-source-files.txt:
 if WINDOWS
-	  echo "Using WEmbeddedFrame" ; \
-	  sed "s;sun.awt.X11.XEmbeddedFrame;sun.awt.windows.WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
-	  sed "s;XEmbeddedFrame;WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
-	  sed "s;super(handle, true);super(handle);" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; 
+	echo "Using WEmbeddedFrame" ; \
+	sed "s;sun.awt.X11.XEmbeddedFrame;sun.awt.windows.WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
+	sed "s;XEmbeddedFrame;WEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
+	sed "s;super(handle, true);super(handle);" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ;
+endif
+if MACOS
+	echo "Using CEmbeddedFrame" ; \
+	sed "s;sun.awt.X11.XEmbeddedFrame;sun.lwawt.macosx.CEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ; \
+	sed "s;XEmbeddedFrame;CEmbeddedFrame;" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ;
+	sed "s;super(handle, true);super();" -i $(LIVECONNECT_SRCS)/$(SUN_APPLET_DIRS)/PluginAppletViewer.java ;
 else
-	echo "Using XEmbeddedFrame" ; 
+	echo "Using XEmbeddedFrame" ;
 endif
 	if test "x${LIVECONNECT_DIR}" != x; then \
 	  find $(LIVECONNECT_SRCS) -name '*.java' | sort > $@ ; \

@@ -130,6 +130,10 @@ AC_DEFUN_ONCE([FIND_JAVAC],
 [
   AC_REQUIRE([IT_CHECK_FOR_JDK])
   JAVAC=${SYSTEM_JDK_DIR}/bin/javac
+  # macOS requires this flag, see https://youtrack.jetbrains.com/issue/IDEA-72010
+  AM_COND_IF([MACOS], [
+    JAVACFLAGS="-XDignore.symbol.file"
+  ])
   IT_FIND_JAVAC
   IT_FIND_ECJ
   IT_USING_ECJ
