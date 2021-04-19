@@ -85,7 +85,7 @@ public class JvmUtils {
         return false;
     }
 
-    private static boolean isValidStartingJavaModulesArgument(final String argument) {
+    public static boolean isValidStartingJavaModulesArgument(final String argument) {
         for (String validStartingArgument : VALID_STARTING_JAVA_MODULES_ARGUMENTS) {
             if (argument.startsWith(validStartingArgument)) {
                 return true;
