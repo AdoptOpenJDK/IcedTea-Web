@@ -435,23 +435,25 @@ public class JvmUtils {
 
         final List<String> result = new ArrayList<>();
         boolean inQuotes = false;
-        boolean requireWhitespace = false;
+        boolean wasInQuotes = false;
         StringBuilder next = new StringBuilder();
         for (char c : args.toCharArray()) {
             if (c == QUOTES) {
+                wasInQuotes = inQuotes;
                 inQuotes = !inQuotes;
-                requireWhitespace = !inQuotes;
-            } else if (inQuotes || !isWhitespace(c)) {
-                if (requireWhitespace) {
-                    throw new ParseException("failed to parse vmArgs " + args);
-                }
+            } else if (inQuotes) {
                 next.append(c);
-            } else {
-                requireWhitespace = false;
+            } else if (isWhitespace(c)) {
+                wasInQuotes = false;
                 if (next.length() > 0) {
                     result.add(next.toString());
                     next = new StringBuilder();
                 }
+            } else if (wasInQuotes) {
+                // after a quote must follow a whitespace
+                throw new ParseException("failed to parse vmArgs " + args);
+            } else {
+                next.append(c);
             }
         }
 

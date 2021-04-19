@@ -1,6 +1,8 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_JVM_ARGS_WHITELIST;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -249,5 +252,28 @@ public class JvmUtilsTest {
     public void testInvalidConfigArgs() {
         final String java_vm_args = "-Darg3=bb -Darg4=gg";
         JvmUtils.checkVMArgs(java_vm_args);
+    }
+
+    @Test
+    public void parsingNoArguments() throws ParseException {
+        final List<String> result = JvmUtils.parseArguments(null);
+        Assert.assertEquals(emptyList(), result);
+    }
+
+    @Test
+    public void parsingUnquotedArguments() throws ParseException {
+        final List<String> result = JvmUtils.parseArguments("  some arguments \t\n without   quotes  ");
+        Assert.assertEquals(Arrays.asList("some", "arguments", "without", "quotes"), result);
+    }
+
+    @Test
+    public void parsingQuotedArguments() throws ParseException {
+        final List<String> result = JvmUtils.parseArguments("  some arguments \t\n \"with   Quotes\"  ");
+        Assert.assertEquals(Arrays.asList("some", "arguments", "with   Quotes"), result);
+    }
+
+    @Test(expected = ParseException.class)
+    public void parsingWrongQuotedArguments() throws ParseException {
+        JvmUtils.parseArguments("  some arguments \"with   Quotes\"AndMissingSpace after quote  ");
     }
 }
