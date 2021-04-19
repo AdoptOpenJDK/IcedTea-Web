@@ -334,7 +334,7 @@ public class ManifestAttributesChecker {
         final Map<URL, Set<URL>> usedUrls = new HashMap<>();
         final URL sourceLocation = file.getSourceLocation();
         final ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
-        if (sourceLocation != null) {
+        if ((sourceLocation != null) && !FILE_PROTOCOL.equals(sourceLocation.getProtocol())) {
             final URL urlWithoutFileName = UrlUtils.removeFileName(sourceLocation);
             usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(sourceLocation);
         }
@@ -356,11 +356,6 @@ public class ManifestAttributesChecker {
                         usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(jarDesc.getLocation());
                     }
                 }
-            }
-            JNLPFile jnlp = resourcesDesc.getJNLPFile();
-            if (jnlp != null) {
-                final URL urlWithoutFileName = UrlUtils.removeFileName(jnlp.getSourceLocation());
-                usedUrls.computeIfAbsent(urlWithoutFileName, url -> new HashSet<>()).add(jnlp.getSourceLocation());
             }
         }
 
