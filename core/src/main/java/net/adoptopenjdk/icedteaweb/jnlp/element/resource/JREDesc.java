@@ -16,7 +16,6 @@
 
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
-import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 
@@ -26,9 +25,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.Character.isWhitespace;
-import static java.util.Collections.emptyList;
-
+import static net.adoptopenjdk.icedteaweb.jvm.JvmUtils.parseArguments;
 
 /**
  * The java element (or the j2se element) (sub-element of resources) specifies what Java Runtime Environment (JRE)
@@ -43,7 +40,6 @@ import static java.util.Collections.emptyList;
  * @version $Revision: 1.5 $
  */
 public class JREDesc {
-    private static final char QUOTES = '"';
 
     public static final String VERSION_ATTRIBUTE = "version";
     public static final String VENDOR_ATTRIBUTE = "vendor";
@@ -62,7 +58,7 @@ public class JREDesc {
 
     private final String vendor;
 
-    private boolean require32Bit;
+    private final boolean require32Bit;
 
     /** the location of a JRE product or null */
     private final URL location;
@@ -173,44 +169,6 @@ public class JREDesc {
             result.add("-Xmx" + maximumHeapSize);
         }
         result.addAll(parsedArguments);
-        return result;
-    }
-
-    private List<String> parseArguments(final String args) throws ParseException {
-        if (StringUtils.isBlank(args)) {
-            return emptyList();
-        }
-
-        final List<String> result = new ArrayList<>();
-        boolean inQuotes = false;
-        boolean requireWhitespace = false;
-        StringBuilder next = new StringBuilder();
-        for (char c : args.toCharArray()) {
-            if (c == QUOTES) {
-                inQuotes = !inQuotes;
-                requireWhitespace = !inQuotes;
-            } else if (inQuotes || !isWhitespace(c)) {
-                if (requireWhitespace) {
-                    throw new ParseException("failed to parse vmArgs " + args);
-                }
-                next.append(c);
-            } else {
-                requireWhitespace = false;
-                if (next.length() > 0) {
-                    result.add(next.toString());
-                    next = new StringBuilder();
-                }
-            }
-        }
-
-        if (inQuotes) {
-            throw new ParseException("failed to parse vmArgs " + args);
-        }
-
-        if (next.length() > 0) {
-            result.add(next.toString());
-        }
-
         return result;
     }
 

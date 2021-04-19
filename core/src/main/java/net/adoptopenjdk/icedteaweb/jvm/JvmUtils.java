@@ -1,20 +1,20 @@
 package net.adoptopenjdk.icedteaweb.jvm;
 
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
+import static java.lang.Character.isWhitespace;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.JAVAWS;
@@ -30,7 +30,9 @@ public class JvmUtils {
     private static final Set<String> VALID_SECURE_PROPERTIES = unmodifiableSet(new HashSet<>(asList(getValidSecureProperties())));
     private static final String WHITESPACE_REGEX = "\\s+";
     private static final String KEY_VALUE_SEPARATOR = "=";
-    private static List<String> configJvmArgs = null;
+    private static final char QUOTES = '"';
+
+    private static Set<String> configJvmArgsWhitelist = null;
 
     /**
      * Check that the VM args are valid and safe.
@@ -106,17 +108,18 @@ public class JvmUtils {
         return VALID_SECURE_PROPERTIES.contains(argument);
     }
 
-    private static  List<String> getConfigJvmArgs() {
-        if (configJvmArgs == null) {
-            configJvmArgs = unmodifiableList(JNLPRuntime.getConfiguration().getPropertyAsList(KEY_JVM_ARGS_WHITELIST));
+    private static Set<String> getConfigJvmArgsWhitelist() {
+        if (configJvmArgsWhitelist == null) {
+            final List<String> whitelist = JNLPRuntime.getConfiguration().getPropertyAsList(KEY_JVM_ARGS_WHITELIST);
+            configJvmArgsWhitelist = unmodifiableSet(new HashSet<>(whitelist));
         }
-        return configJvmArgs;
+        return configJvmArgsWhitelist;
     }
 
     // Arguments that are specified in deployment.jvm.arguments.whitelist in deployment.config
     private static boolean isValidConfigArgument(final String argument) {
         final String[] argParts = argument.split(KEY_VALUE_SEPARATOR);
-        return getConfigJvmArgs().stream().anyMatch(configArgument ->Objects.equals(argParts[0], configArgument));
+        return getConfigJvmArgsWhitelist().contains(argParts[0]);
     }
 
     /**
@@ -423,5 +426,43 @@ public class JvmUtils {
         // Now add merged predefined args
         moduleArgMap.forEach((key, value) -> mergedVMArgs.add(key + "=" + String.join(",", value)));
         return mergedVMArgs;
+    }
+
+    public static List<String> parseArguments(final String args) throws ParseException {
+        if (isBlank(args)) {
+            return emptyList();
+        }
+
+        final List<String> result = new ArrayList<>();
+        boolean inQuotes = false;
+        boolean requireWhitespace = false;
+        StringBuilder next = new StringBuilder();
+        for (char c : args.toCharArray()) {
+            if (c == QUOTES) {
+                inQuotes = !inQuotes;
+                requireWhitespace = !inQuotes;
+            } else if (inQuotes || !isWhitespace(c)) {
+                if (requireWhitespace) {
+                    throw new ParseException("failed to parse vmArgs " + args);
+                }
+                next.append(c);
+            } else {
+                requireWhitespace = false;
+                if (next.length() > 0) {
+                    result.add(next.toString());
+                    next = new StringBuilder();
+                }
+            }
+        }
+
+        if (inQuotes) {
+            throw new ParseException("failed to parse vmArgs " + args);
+        }
+
+        if (next.length() > 0) {
+            result.add(next.toString());
+        }
+
+        return result;
     }
 }
