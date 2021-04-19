@@ -372,27 +372,31 @@ public class JvmUtils {
      */
     static Map<String, Set<String>> getPredefinedJavaModulesVMArgumentsMap() {
         return new HashMap<String, Set<String>>() {{
-            put("--add-reads=java.base", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED", "java.desktop")));
-            put("--add-reads=java.desktop", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED", "java.naming")));
-            put("--add-reads=java.naming", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-reads=java.base", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-reads=java.desktop", moduleArgs("ALL-UNNAMED", "java.naming"));
+            put("--add-reads=java.naming", moduleArgs("ALL-UNNAMED", "java.desktop"));
 
-            put("--add-exports=java.desktop/sun.awt", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.desktop/javax.jnlp", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/sun.awt", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.desktop/javax.jnlp", moduleArgs("ALL-UNNAMED", "java.desktop"));
 
-            put("--add-exports=java.base/com.sun.net.ssl.internal.ssl", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.net.www.protocol.jar", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.action", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.provider", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.util", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.validator", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.security.x509", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/jdk.internal.util.jar", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.base/sun.net.www.protocol.http", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.base/com.sun.net.ssl.internal.ssl", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/sun.net.www.protocol.jar", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/sun.security.action", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/sun.security.provider", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/sun.security.util", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/sun.security.validator", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/sun.security.x509", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/jdk.internal.util.jar", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.base/sun.net.www.protocol.http", moduleArgs("ALL-UNNAMED", "java.desktop"));
 
-            put("--add-exports=java.desktop/sun.awt.X11", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
-            put("--add-exports=java.desktop/sun.applet", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop,jdk.jsobject")));
-            put("--add-exports=java.naming/com.sun.jndi.toolkit.url", new LinkedHashSet<>(Arrays.asList("ALL-UNNAMED,java.desktop")));
+            put("--add-exports=java.desktop/sun.awt.X11", moduleArgs("ALL-UNNAMED", "java.desktop"));
+            put("--add-exports=java.desktop/sun.applet", moduleArgs("ALL-UNNAMED", "java.desktop", "jdk.jsobject"));
+            put("--add-exports=java.naming/com.sun.jndi.toolkit.url", moduleArgs("ALL-UNNAMED", "java.desktop"));
         }};
+    }
+
+    private static Set<String> moduleArgs(final String... args) {
+        return new LinkedHashSet<>(asList(args));
     }
 
     /**
@@ -402,27 +406,22 @@ public class JvmUtils {
     public static List<String> mergeJavaModulesVMArgs(final List<String> vmArgs) {
 
         final List<String> mergedVMArgs = new ArrayList<>();
-        final Map<String, Set<String>> moduleArgMap = new LinkedHashMap<>(getPredefinedJavaModulesVMArgumentsMap());
+        final Map<String, Set<String>> moduleArgMap = getPredefinedJavaModulesVMArgumentsMap();
 
         vmArgs.forEach(arg -> {
             if (isValidStartingJavaModulesArgument(arg)) { // it is a Java Module VM arg
-                final int vmArgEndIndex = arg.lastIndexOf("=");
-                String predefArgKey = arg.substring(0, vmArgEndIndex);
-                Set<String> predefArgSet = moduleArgMap.get(predefArgKey);
-                if (predefArgSet != null) { // this vm arg is a predef arg so need to merge its values
-                    String vmArgValues = arg.substring(vmArgEndIndex + 1);
-                    String[] vmArgValueStrs = vmArgValues.split(",");
-                    predefArgSet.addAll(Arrays.asList(vmArgValueStrs));
-                    moduleArgMap.put(predefArgKey, predefArgSet);
-                } else { // module arg but not predef
-                    mergedVMArgs.add(arg);
-                }
+                final int vmArgEndIndex = arg.indexOf("=");
+                final String argKey = arg.substring(0, vmArgEndIndex);
+                final String argValue = arg.substring(vmArgEndIndex + 1);
+
+                moduleArgMap.computeIfAbsent(argKey, k -> new LinkedHashSet<>())
+                        .addAll(asList(argValue.split(",")));
             } else { // non module arg
                 mergedVMArgs.add(arg);
             }
         });
         // Now add merged predefined args
-        moduleArgMap.keySet().forEach(key -> mergedVMArgs.add(key + "=" + String.join(",", moduleArgMap.get(key))));
+        moduleArgMap.forEach((key, value) -> mergedVMArgs.add(key + "=" + String.join(",", value)));
         return mergedVMArgs;
     }
 }
