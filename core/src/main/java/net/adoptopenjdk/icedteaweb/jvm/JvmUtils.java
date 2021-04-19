@@ -410,7 +410,7 @@ public class JvmUtils {
 
         vmArgs.forEach(arg -> {
             if (isValidStartingJavaModulesArgument(arg)) { // it is a Java Module VM arg
-                final int vmArgEndIndex = arg.indexOf("=");
+                final int vmArgEndIndex = arg.lastIndexOf("=");
                 final String argKey = arg.substring(0, vmArgEndIndex);
                 final String argValue = arg.substring(vmArgEndIndex + 1);
 

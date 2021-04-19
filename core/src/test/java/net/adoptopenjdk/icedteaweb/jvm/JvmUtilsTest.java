@@ -147,31 +147,31 @@ public class JvmUtilsTest {
     @Test
     public void testMergeJavaModuleVMArgs() {
         final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx"};
-        final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
+        final List<String> usrDefArgs = new ArrayList<>(Arrays.asList(usrStrArr));
 
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(usrDefArgs);
         assertEquals(JvmUtils.getPredefinedJavaModulesVMArgumentsMap().size() + 1, result.size());
         assertTrue(result.contains("-DnoModuleArg=bbb"));
         assertTrue(result.contains("--add-reads=java.base=ALL-UNNAMED,java.desktop,java.xxx"));
-        assertTrue(!result.contains("--add-reads=java.base=ALL-UNNAMED,java.xxx"));
+        assertFalse(result.contains("--add-reads=java.base=ALL-UNNAMED,java.xxx"));
     }
 
     @Test
     public void testMergeDuplicateJavaModuleVMArgs() {
         final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--add-reads=java.base=ALL-UNNAMED,java.xxx", "--add-reads=java.base=ALL-UNNAMED,java.yyy"};
-        final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
+        final List<String> usrDefArgs = new ArrayList<>(Arrays.asList(usrStrArr));
 
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(usrDefArgs);
         assertTrue(result.contains("-DnoModuleArg=bbb"));
         assertTrue(result.contains("--add-reads=java.base=ALL-UNNAMED,java.desktop,java.xxx,java.yyy"));
-        assertTrue(!result.contains("--add-reads=java.base=ALL-UNNAMED,java.xxx"));
-        assertTrue(!result.contains("--add-reads=java.base=ALL-UNNAMED,java.yyy"));
+        assertFalse(result.contains("--add-reads=java.base=ALL-UNNAMED,java.xxx"));
+        assertFalse(result.contains("--add-reads=java.base=ALL-UNNAMED,java.yyy"));
     }
 
     @Test
     public void testNonPredefJavaModuleVMArgs() {
         final String[] usrStrArr = new String[]{"-DnoModuleArg=bbb", "--module-path=java.base=java.xxx", "--add-opens=java.base=java.aaa", "--add-modules=java.base=java.bbb", "--patch-module=java.base=java.ccc", "--add-reads=java.base=ALL-UNNAMED,java.yyy"};
-        final List<String> usrDefArgs = new ArrayList(Arrays.asList(usrStrArr));
+        final List<String> usrDefArgs = new ArrayList<>(Arrays.asList(usrStrArr));
 
         final List<String> result = JvmUtils.mergeJavaModulesVMArgs(usrDefArgs);
         assertTrue(result.contains("-DnoModuleArg=bbb"));
