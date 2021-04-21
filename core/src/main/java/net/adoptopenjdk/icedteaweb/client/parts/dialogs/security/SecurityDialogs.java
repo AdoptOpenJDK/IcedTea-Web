@@ -52,7 +52,6 @@ import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.JDialog;
 
-import java.awt.Dialog;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -62,6 +61,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.cert.X509Certificate;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
@@ -80,12 +80,12 @@ import java.util.concurrent.Semaphore;
  */
 public class SecurityDialogs {
 
-    private final static Logger LOG = LoggerFactory.getLogger(SecurityDialogs.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityDialogs.class);
 
     /**
      * Types of dialogs we can create
      */
-    public static enum DialogType {
+    public enum DialogType {
 
         CERT_WARNING,
         MORE_INFO,
@@ -112,9 +112,10 @@ public class SecurityDialogs {
      * @param extras array of objects used as extra.toString or similarly later
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static AccessWarningPaneComplexReturn showAccessWarningDialog(final AccessType accessType,
-            final JNLPFile file, final Object[] extras) {
-
+    public static AccessWarningPaneComplexReturn showAccessWarningDialog(
+            final AccessType accessType,
+            final JNLPFile file, final Object[] extras
+    ) {
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
 
         message.dialogType = DialogType.ACCESS_WARNING;
@@ -138,7 +139,7 @@ public class SecurityDialogs {
         message.dialogType = DialogType.UNSIGNED_WARNING;
         message.accessType = AccessType.UNSIGNED;
 
-        DialogResult r = getUserResponse(message);
+        final DialogResult r = getUserResponse(message);
 
         return (YesNoSandboxLimited) r;
     }
@@ -158,16 +159,18 @@ public class SecurityDialogs {
      * wants the applet to run with only sandbox permissions, or CANCEL if the
      * user did not accept running the applet
      */
-    public static YesNoSandbox showCertWarningDialog(AccessType accessType,
-                                                     JNLPFile file, CertVerifier certVerifier, SecurityDelegate securityDelegate) {
-
+    public static YesNoSandbox showCertWarningDialog(
+            AccessType accessType,
+            JNLPFile file,
+            CertVerifier certVerifier, SecurityDelegate securityDelegate
+    ) {
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.CERT_WARNING;
         message.accessType = accessType;
         message.certVerifier = certVerifier;
         message.extras = new Object[]{securityDelegate};
 
-        DialogResult selectedValue = getUserResponse(message);
+        final DialogResult selectedValue = getUserResponse(message);
 
         return (YesNoSandbox) selectedValue;
     }
@@ -181,16 +184,18 @@ public class SecurityDialogs {
      * @param securityDelegate the delegate for security atts.
      * @return true if permission was granted by the user, false otherwise.
      */
-    public static YesNoSandbox showPartiallySignedWarningDialog(JNLPFile file, CertVerifier certVerifier,
-            SecurityDelegate securityDelegate) {
-
+    public static YesNoSandbox showPartiallySignedWarningDialog(
+            JNLPFile file,
+            CertVerifier certVerifier,
+            SecurityDelegate securityDelegate
+    ) {
         final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.PARTIALLY_SIGNED_WARNING;
         message.accessType = AccessType.PARTIALLY_SIGNED;
         message.certVerifier = certVerifier;
         message.extras = new Object[]{securityDelegate};
 
-        DialogResult r = getUserResponse(message);
+        final DialogResult r = getUserResponse(message);
         return (YesNoSandbox) r;
     }
 
@@ -209,10 +214,9 @@ public class SecurityDialogs {
      */
     public static NamePassword showAuthenticationPrompt(String host, int port, String prompt, String type) {
 
-        SecurityManager sm = System.getSecurityManager();
+        final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            NetPermission requestPermission
-                    = new NetPermission("requestPasswordAuthentication");
+            final NetPermission requestPermission = new NetPermission("requestPasswordAuthentication");
             sm.checkPermission(requestPermission);
         }
 
@@ -221,11 +225,11 @@ public class SecurityDialogs {
         message.dialogType = DialogType.AUTHENTICATION;
         message.extras = new Object[]{host, port, prompt, type};
 
-        DialogResult response = getUserResponse(message);
-        LOG.debug("Decided action for matching alaca at  was {}", response);
+        final DialogResult response = getUserResponse(message);
+        LOG.debug("Decided action for matching alaca at was {}", response);
         return (NamePassword) response;
     }
-    
+
     public static DialogResult showClientCertSelectionPrompt(LinkedHashMap<String, X509Certificate> aliases) {
 
        final SecurityDialogMessage message = new SecurityDialogMessage(null);
@@ -233,23 +237,24 @@ public class SecurityDialogs {
        message.extras = new Object[] {aliases};
        message.showInTaskBar = true;
 
-       DialogResult response = getUserResponse(message);
+       final DialogResult response = getUserResponse(message);
        LOG.debug("Decided action for selecting client certificate was {}", response);
        return response;
     }
 
     public static boolean showMissingALACAttributePanel(JNLPFile file, URL codeBase, Set<URL> remoteUrls) {
 
-        SecurityDialogMessage message = new SecurityDialogMessage(file);
+        final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MISSING_ALACA;
-        String urlToShow = file.getNotNullProbableCodeBase().toExternalForm();
+        final String urlToShow;
         if (codeBase != null) {
             urlToShow = codeBase.toString();
         } else {
+            urlToShow = file.getNotNullProbableCodeBase().toExternalForm();
             LOG.warn("Warning, null codebase wants to show in ALACA!");
         }
         message.extras = new Object[]{urlToShow, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
-        DialogResult selectedValue = getUserResponse(message);
+        final DialogResult selectedValue = getUserResponse(message);
 
         LOG.debug("Decided action for matching alaca at {} was {}", file.getCodeBase(), selectedValue);
 
@@ -261,14 +266,16 @@ public class SecurityDialogs {
 
     public static boolean showMatchingALACAttributePanel(JNLPFile file, URL documentBase, Set<URL> remoteUrls) {
 
-        SecurityDialogMessage message = new SecurityDialogMessage(file);
+        final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.MATCHING_ALACA;
-        String docBaseString = "null-documentbase";
+        final String docBaseString;
         if (documentBase != null) {
             docBaseString = documentBase.toString();
+        } else {
+            docBaseString = "null-documentbase";
         }
         message.extras = new Object[]{docBaseString, UrlUtils.setOfUrlsToHtmlList(remoteUrls)};
-        DialogResult selectedValue = getUserResponse(message);
+        final DialogResult selectedValue = getUserResponse(message);
 
         LOG.debug("Decided action for matching alaca at {} was {}", file.getCodeBase(), selectedValue);
 
@@ -277,14 +284,13 @@ public class SecurityDialogs {
         }
 
         return false;
-
     }
 
     public static boolean showMissingPermissionsAttributeDialogue(JNLPFile file) {
 
-        SecurityDialogMessage message = new SecurityDialogMessage(file);
+        final SecurityDialogMessage message = new SecurityDialogMessage(file);
         message.dialogType = DialogType.UNSIGNED_EAS_NO_PERMISSIONS_WARNING;
-        DialogResult selectedValue = getUserResponse(message);
+        final DialogResult selectedValue = getUserResponse(message);
         LOG.debug("Decided action for missing permissions at {} was {}", file.getCodeBase(), selectedValue);
 
         if (selectedValue != null) {
@@ -339,12 +345,9 @@ public class SecurityDialogs {
                 public void windowOpened(WindowEvent e) {
                     message.toDispose = fakeDialog;
                     message.lock = null;
-                    AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                        @Override
-                        public Void run() {
-                            JNLPRuntime.getSecurityDialogHandler().postMessage(message);
-                            return null;
-                        }
+                    AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                        JNLPRuntime.getSecurityDialogHandler().postMessage(message);
+                        return null;
                     });
                 }
             });
@@ -378,14 +381,11 @@ public class SecurityDialogs {
     // false = terminate ITW
     // true = continue
     public static boolean show511Dialogue(Resource r) {
-        SecurityDialogMessage message = new SecurityDialogMessage(null);
+        final SecurityDialogMessage message = new SecurityDialogMessage(null);
         message.dialogType = DialogType.SECURITY_511;
         message.extras = new Object[]{r.getLocation()};
-        DialogResult selectedValue = getUserResponse(message);
-        if (selectedValue != null && selectedValue.equals(YesCancel.cancel())) {
-            return false; //kill command
-        }
-        return true;
+        final DialogResult selectedValue = getUserResponse(message);
+        return !Objects.equals(selectedValue, YesCancel.cancel());
     }
 
 }
