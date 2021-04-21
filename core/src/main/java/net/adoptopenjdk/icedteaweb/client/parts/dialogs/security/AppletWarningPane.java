@@ -35,9 +35,9 @@ statement from your version.
 package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.sourceforge.jnlp.security.CertVerifier;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoCancel;
+import net.sourceforge.jnlp.security.CertVerifier;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -46,7 +46,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -72,9 +71,7 @@ public class AppletWarningPane extends SecurityDialogPanel {
         JLabel topLabel = new JLabel(htmlWrap(topLabelText));
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));
-        topLabel.setForeground(Color.BLACK);
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
         topPanel.setPreferredSize(new Dimension(400, 80));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

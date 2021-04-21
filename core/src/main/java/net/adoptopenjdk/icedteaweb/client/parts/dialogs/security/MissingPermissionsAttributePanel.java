@@ -57,7 +57,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -67,12 +66,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements  RememberableDialog{
+public class MissingPermissionsAttributePanel extends SecurityDialogPanel implements RememberableDialog {
 
     private final static Logger LOG = LoggerFactory.getLogger(MissingPermissionsAttributePanel.class);
 
     private RememberPanel rememberPanel;
-    
+
     public MissingPermissionsAttributePanel(SecurityDialog x, String title, String codebase) {
         super(x);
         try {
@@ -97,9 +96,7 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
         JLabel topLabel = new JLabel(htmlWrap(topLabelText), icon, SwingConstants.CENTER);
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                 Font.BOLD, 12));
-        topLabel.setForeground(Color.BLACK);
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
         topPanel.setPreferredSize(new Dimension(400, 80));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -156,7 +153,7 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.setVisible(true);
     }
-    
+
     @Override
     public RememberPanelResult getRememberAction() {
         return rememberPanel.getRememberAction();
@@ -171,7 +168,7 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
     public JNLPFile getFile() {
         return parent.getFile();
     }
-    
+
     @Override
     public DialogResult readValue(String s) {
         return YesNo.readValue(s);
@@ -191,7 +188,7 @@ public class MissingPermissionsAttributePanel extends SecurityDialogPanel implem
     public DialogResult readFromStdIn(String what) {
         return YesNo.readValue(what);
     }
-    
+
     @Override
     public String helpToStdIn() {
         return YesNo.no().getAllowedValues().toString();
