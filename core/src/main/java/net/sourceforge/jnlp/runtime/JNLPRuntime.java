@@ -35,8 +35,6 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.JNLPAuthenticator;
-import net.sourceforge.jnlp.security.KeyStores;
-import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.RestrictedFileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
@@ -46,7 +44,7 @@ import sun.net.www.protocol.jar.URLJarFile;
 import javax.jnlp.ServiceManager;
 import javax.naming.ConfigurationException;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -70,7 +68,6 @@ import java.net.UnknownHostException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.security.AllPermission;
-import java.security.KeyStore;
 import java.security.Policy;
 import java.security.Security;
 import java.text.DateFormat;
@@ -272,13 +269,9 @@ public class JNLPRuntime {
         try {
             SSLSocketFactory sslSocketFactory;
             SSLContext context = SSLContext.getInstance("SSL");
-            KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS).getKs();
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-            SecurityUtil.initKeyManagerFactory(kmf, ks);
             TrustManager[] trust = new TrustManager[] { getSSLSocketTrustManager() };
-            context.init(kmf.getKeyManagers(), trust, null);
+            context.init(new KeyManager[] { new MergedKeyManager() }, trust, null);
             sslSocketFactory = context.getSocketFactory();
-
             HttpsURLConnection.setDefaultSSLSocketFactory(sslSocketFactory);
         } catch (Exception e) {
             LOG.error("Unable to set SSLSocketfactory (may _prevent_ access to sites that should be trusted)! Continuing anyway...", e);

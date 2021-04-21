@@ -57,13 +57,15 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ViwableDialog {
 
     private JDialog jd = null;
+    private boolean showInTaskBar;
     List<Runnable> operations = new ArrayList<Runnable>();
 
-    public ViwableDialog() {
+    public ViwableDialog(boolean showInTaskBar) {
+        this.showInTaskBar = showInTaskBar;
     }
 
     private JDialog createJDialog() {
-        jd = new JDialog();
+        jd = showInTaskBar?new JDialog((Dialog)null):new JDialog();
         jd.setName("ViwableDialog");
         SwingUtils.info(jd);
         jd.setIconImages(ImageResources.INSTANCE.getApplicationImages());

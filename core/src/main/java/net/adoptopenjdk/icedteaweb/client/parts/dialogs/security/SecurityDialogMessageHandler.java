@@ -110,7 +110,7 @@ public class SecurityDialogMessageHandler implements Runnable {
     protected void handleMessage(final SecurityDialogMessage message) {
 
         final SecurityDialog dialog = new SecurityDialog(message.dialogType,
-                message.accessType, message.file, message.certVerifier, message.certificate, message.extras);
+                message.accessType, message.file, message.certVerifier, message.certificate, message.extras, message.showInTaskBar);
 
         if (processAutomatedAnswers(message, dialog)){
             return;

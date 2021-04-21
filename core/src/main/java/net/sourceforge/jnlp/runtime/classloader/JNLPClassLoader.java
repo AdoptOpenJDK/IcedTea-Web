@@ -316,7 +316,8 @@ public class JNLPClassLoader extends URLClassLoader {
         strict = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_STRICT_JNLP_CLASSLOADER));
 
         this.file = file;
-        this.tracker = new ResourceTracker(true, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
+        // no prefetch otherwise deployment.cache.parallelDownloadCount is not enforced
+        this.tracker = new ResourceTracker(false, file.getDownloadOptions(), JNLPRuntime.getDefaultUpdatePolicy());
         this.updatePolicy = policy;
         this.resources = file.getResources();
 
@@ -684,7 +685,6 @@ public class JNLPClassLoader extends URLClassLoader {
             if (jar.isEager() || jar.isMain()) {
                 initialJars.add(jar); // regardless of part
             }
-            // FIXME: this will trigger an eager download as the tracker is created with prefetch == true
             tracker.addResource(jar.getLocation(), jar.getVersion(),
                     jar.isCacheable() ? JNLPRuntime.getDefaultUpdatePolicy() : UpdatePolicy.FORCE);
         }

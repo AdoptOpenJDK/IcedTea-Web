@@ -21,6 +21,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider.DaemonThreadFactory;
+import net.adoptopenjdk.icedteaweb.resources.Resource.Status;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -396,6 +397,9 @@ public class ResourceTracker {
             LOG.debug("Download done. Shutting down executor");
             downloadExecutor.shutdownNow();
         }
+        
+        if (resources.length == 1 && resources[0].isSet(Status.ERROR))
+            throw new RuntimeException("Error while downloading initial resource " + resources[0]);
     }
 
     private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {
