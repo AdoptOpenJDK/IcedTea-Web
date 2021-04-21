@@ -1,6 +1,5 @@
-package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
-
-/* ClientCertSelectionPane.java -- requests client cert selection from users
+/* ClientCertSelectionPane.java
+   Copyright (C) 2021 Karakun AG.
 
 This file is part of IcedTea.
 
@@ -30,7 +29,10 @@ conditions of the license of that module. An independent module is a module
 which is not derived from or based on this library. If you modify this library,
 you may extend this exception to your version of the library, but you are not
 obligated to do so. If you do not wish to do so, delete this exception
-statement from your version. */
+statement from your version.
+*/
+
+package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.SecurityUtil;
@@ -43,7 +45,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -63,8 +64,11 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
 /**
@@ -72,169 +76,189 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  */
 public class ClientCertSelectionPane extends SecurityDialogPanel {
 
- public ClientCertSelectionPane(SecurityDialog parent, Object[] extras) {
-     super(parent);
-     setLayout(new GridBagLayout());
-     JLabel jlInfo = new JLabel("<html>" + R("CVCertificateViewer")  + "</html>");
+    public ClientCertSelectionPane(SecurityDialog parent, Object[] extras) {
+        super(requireNonNull(parent, "parent"));
+        setLayout(new GridBagLayout());
+        final JLabel jlInfo = new JLabel("<html>" + R("CVCertificateViewer") + "</html>");
 
-     @SuppressWarnings("unchecked") LinkedHashMap<String, X509Certificate> aliasesMap = (LinkedHashMap<String, X509Certificate>)extras[0];
-     ArrayList<String> displayedNames = new ArrayList<String>();
-     for (Entry<String, X509Certificate> entry : aliasesMap.entrySet()) {
-        String subject = SecurityUtil.getCN(entry.getValue().getSubjectX500Principal().getName());
-        String issuer = SecurityUtil.getCN(entry.getValue().getIssuerX500Principal().getName());
-        int pos = entry.getKey().lastIndexOf(" (from ");
-        String source = (pos!=-1)?entry.getKey().substring(pos):"";
-        displayedNames.add(subject + ":" + issuer + source);
-     }
-     
-     JList<String> jlist = new JList<String>(displayedNames.toArray(new String[0]));
-     jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-     jlist.setSelectedIndex(0);
-     JScrollPane scrollPane = new JScrollPane(jlist);
+        final Map<String, X509Certificate> aliasesMap = getAliases(extras);
+        final List<String> displayedNames = new ArrayList<>();
+        for (final Entry<String, X509Certificate> entry : aliasesMap.entrySet()) {
+            final String subject = SecurityUtil.getCN(entry.getValue().getSubjectX500Principal().getName());
+            final String issuer = SecurityUtil.getCN(entry.getValue().getIssuerX500Principal().getName());
+            final int pos = entry.getKey().lastIndexOf(" (from ");
+            final String source = (pos != -1) ? entry.getKey().substring(pos) : "";
+            displayedNames.add(subject + ":" + issuer + source);
+        }
 
-     JButton jbOK = new JButton(R("ButOk"));
-     JButton jbCancel = new JButton(R("ButCancel"));
-     jbOK.setPreferredSize(jbCancel.getPreferredSize());
-     JButton jbDetails = new JButton(R("ButShowDetails"));
-     jbDetails.setBorderPainted(false);
-     jbDetails.setContentAreaFilled(false);
-     jbDetails.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-     jbDetails.setMargin(new Insets(0, 0, 0, 0));
+        final JList<String> jList = new JList<>(displayedNames.toArray(new String[0]));
+        jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jList.setSelectedIndex(0);
+        final JScrollPane scrollPane = new JScrollPane(jList);
 
-     GridBagConstraints c = new GridBagConstraints();
-     c.anchor = GridBagConstraints.NORTHWEST;
-     c.gridx = 0;
-     c.gridy = 0;
-     c.weightx = 1.0;
-     c.insets = new Insets(10, 5, 3, 3);
-     add(jlInfo, c);
+        final JButton jbOK = new JButton(R("ButOk"));
+        final JButton jbCancel = new JButton(R("ButCancel"));
+        jbOK.setPreferredSize(jbCancel.getPreferredSize());
+        final JButton jbDetails = new JButton(R("ButShowDetails"));
+        jbDetails.setBorderPainted(false);
+        jbDetails.setContentAreaFilled(false);
+        jbDetails.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        jbDetails.setMargin(new Insets(0, 0, 0, 0));
 
-     c = new GridBagConstraints();
-     c.fill = GridBagConstraints.BOTH;
-     c.gridx = 0;
-     c.gridy = 1;
-     c.weightx = 1.0;
-     c.weighty = 1.0;
-     c.insets = new Insets(10, 5, 3, 3);
-     add(scrollPane, c);
+        final GridBagConstraints jlInfoConstraints = new GridBagConstraints();
+        jlInfoConstraints.anchor = GridBagConstraints.NORTHWEST;
+        jlInfoConstraints.gridx = 0;
+        jlInfoConstraints.gridy = 0;
+        jlInfoConstraints.weightx = 1.0;
+        jlInfoConstraints.insets = new Insets(10, 5, 3, 3);
+        add(jlInfo, jlInfoConstraints);
 
-     c = new GridBagConstraints();
-     c.anchor = GridBagConstraints.SOUTHEAST;
-     c.gridx = 0;
-     c.gridy = 2;
-     c.weightx = 1.0;
-     c.insets = new Insets(5, 5, 3, 3);
-     add(jbDetails, c);
-     
-     c = new GridBagConstraints();
-     c.anchor = GridBagConstraints.SOUTHEAST;
-     c.gridx = 0;
-     c.gridy = 3;
-     c.weightx = 1.0;
-     c.insets = new Insets(3, 3, 10, 10);
-     
-     JPanel okCancelPane = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
-     okCancelPane.add(jbOK);
-     okCancelPane.add(Box.createHorizontalStrut(10));
-     okCancelPane.add(jbCancel);
-     add(okCancelPane, c);
-     
-     if (parent!=null) {
-         parent.getViwableDialog().setMinimumSize(new Dimension(500, 300));
-         parent.getViwableDialog().setLocationRelativeTo(null);
-         parent.getViwableDialog().pack();
-     }
+        final GridBagConstraints scrollPaneConstraints = new GridBagConstraints();
+        scrollPaneConstraints.fill = GridBagConstraints.BOTH;
+        scrollPaneConstraints.gridx = 0;
+        scrollPaneConstraints.gridy = 1;
+        scrollPaneConstraints.weightx = 1.0;
+        scrollPaneConstraints.weighty = 1.0;
+        scrollPaneConstraints.insets = new Insets(10, 5, 3, 3);
+        add(scrollPane, scrollPaneConstraints);
 
-     initialFocusComponent = scrollPane;
+        final GridBagConstraints jbDetailsConstraints = new GridBagConstraints();
+        jbDetailsConstraints.anchor = GridBagConstraints.SOUTHEAST;
+        jbDetailsConstraints.gridx = 0;
+        jbDetailsConstraints.gridy = 2;
+        jbDetailsConstraints.weightx = 1.0;
+        jbDetailsConstraints.insets = new Insets(5, 5, 3, 3);
+        add(jbDetails, jbDetailsConstraints);
 
-     // click on OK
-     jbOK.addActionListener(new ActionListener() {
-         @Override public void actionPerformed(ActionEvent e) {
-             certSelected(parent, jlist);
-         }
-     });
-     // double-click on selection
-     jlist.addMouseListener(new MouseAdapter() {
-         @Override public void mouseClicked(MouseEvent me) {
-             if (me.getClickCount() == 2)
-                 certSelected(parent, jlist);
-         }
-     });
-     // enter on selection
-     jlist.addKeyListener(new KeyAdapter() {
-         @Override public void keyReleased(KeyEvent ke) {
-             if(ke.getKeyCode() == KeyEvent.VK_ENTER)
-                 certSelected(parent, jlist);
-         }
-     });
-     // open certificate details
-     jbDetails.addActionListener(new ActionListener() {
-         @Override public void actionPerformed(ActionEvent e) {
-             SecurityDialog.showSingleCertInfoDialog(aliasesMap.values().toArray(new X509Certificate[0])[jlist.getSelectedIndex()],
-                 ClientCertSelectionPane.this);
-         }
-     });
-     // click on Cancel
-     jbCancel.addActionListener(new ActionListener() {
-         @Override public void actionPerformed(ActionEvent e) {
-             parent.setValue(null);
-             parent.getViwableDialog().dispose();
-         }
-     });
- }
+        final GridBagConstraints okCancelPaneConstraints = new GridBagConstraints();
+        okCancelPaneConstraints.anchor = GridBagConstraints.SOUTHEAST;
+        okCancelPaneConstraints.gridx = 0;
+        okCancelPaneConstraints.gridy = 3;
+        okCancelPaneConstraints.weightx = 1.0;
+        okCancelPaneConstraints.insets = new Insets(3, 3, 10, 10);
 
- @Override
- public DialogResult getDefaultNegativeAnswer() {
-     return null;
- }
+        final JPanel okCancelPane = new JPanel(new FlowLayout(FlowLayout.TRAILING, 0, 0));
+        okCancelPane.add(jbOK);
+        okCancelPane.add(Box.createHorizontalStrut(10));
+        okCancelPane.add(jbCancel);
+        add(okCancelPane, okCancelPaneConstraints);
 
- @Override
- public DialogResult getDefaultPositiveAnswer() {
-     return null;
- }
+        parent.getViwableDialog().setMinimumSize(new Dimension(500, 300));
+        parent.getViwableDialog().setLocationRelativeTo(null);
+        parent.getViwableDialog().pack();
 
- @Override
- public DialogResult readFromStdIn(String what) {
-     return null;
- }
+        initialFocusComponent = scrollPane;
 
- @Override
- public String helpToStdIn() {
-     return "";
- }
- 
- private void certSelected(SecurityDialog parent, JList<String> jlist) {
-     parent.setValue(new DialogResult() {
-         @Override public int getButtonIndex() {
-            return jlist.getSelectedIndex();
-         }
-         @Override public boolean toBoolean() {
-            throw new UnsupportedOperationException("Not supported yet.");
-         }
-         @Override public String writeValue() {
-            throw new UnsupportedOperationException("Not supported yet.");
-         }                
-       });
-     parent.getViwableDialog().dispose();
- }
+        // click on OK
+        jbOK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                ClientCertSelectionPane.this.certSelected(parent, jList);
+            }
+        });
+        // double-click on selection
+        jList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                if (me.getClickCount() == 2) {
+                    certSelected(parent, jList);
+                }
+            }
+        });
+        // enter on selection
+        jList.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent ke) {
+                if (ke.getKeyCode() == KeyEvent.VK_ENTER) {
+                    certSelected(parent, jList);
+                }
+            }
+        });
+        // open certificate details
+        jbDetails.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SecurityDialog.showSingleCertInfoDialog(aliasesMap.values().toArray(new X509Certificate[0])[jList.getSelectedIndex()],
+                        ClientCertSelectionPane.this);
+            }
+        });
+        // click on Cancel
+        jbCancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.setValue(null);
+                parent.getViwableDialog().dispose();
+            }
+        });
+    }
 
- public static void main(String[] args) throws Exception {
-     KeyStore ks = KeyStore.getInstance("Windows-MY");
-     ks.load(null, null);
-     Enumeration<String >aliases = ks.aliases();
-     LinkedHashMap<String, X509Certificate> aliasesMap = new LinkedHashMap<String, X509Certificate>();
-     while (aliases.hasMoreElements()) {
-         String alias = aliases.nextElement();
-         Certificate c = ks.getCertificate(alias);
-         if (c instanceof X509Certificate)
-            aliasesMap.put(alias + " (from browser keystore)", (X509Certificate)c);
-     }
-     JFrame f = new JFrame();
-     f.setMinimumSize(new Dimension(500, 300));
-     f.setSize(700, 300);
-     f.add(new ClientCertSelectionPane(null, new Object[] { aliasesMap }), BorderLayout.CENTER);
-     f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-     f.pack();
-     f.setVisible(true);
- }
+    @SuppressWarnings("unchecked")
+    private Map<String, X509Certificate> getAliases(final Object[] extras) {
+        final Object firstExtra = extras[0];
+        if (firstExtra instanceof Map) {
+            return (Map<String, X509Certificate>) firstExtra;
+        }
+        return new LinkedHashMap<>();
+    }
+
+    @Override
+    public DialogResult getDefaultNegativeAnswer() {
+        return null;
+    }
+
+    @Override
+    public DialogResult getDefaultPositiveAnswer() {
+        return null;
+    }
+
+    @Override
+    public DialogResult readFromStdIn(String what) {
+        return null;
+    }
+
+    @Override
+    public String helpToStdIn() {
+        return "";
+    }
+
+    private void certSelected(SecurityDialog parent, JList<String> jlist) {
+        parent.setValue(new DialogResult() {
+            @Override
+            public int getButtonIndex() {
+                return jlist.getSelectedIndex();
+            }
+
+            @Override
+            public boolean toBoolean() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public String writeValue() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
+        parent.getViwableDialog().dispose();
+    }
+
+    public static void main(String[] args) throws Exception {
+        final KeyStore ks = KeyStore.getInstance("Windows-MY");
+        ks.load(null, null);
+        final Enumeration<String> aliases = ks.aliases();
+        final Map<String, X509Certificate> aliasesMap = new LinkedHashMap<>();
+        while (aliases.hasMoreElements()) {
+            final String alias = aliases.nextElement();
+            final Certificate c = ks.getCertificate(alias);
+            if (c instanceof X509Certificate) {
+                aliasesMap.put(alias + " (from browser keystore)", (X509Certificate) c);
+            }
+        }
+        final JFrame f = new JFrame();
+        f.setMinimumSize(new Dimension(500, 300));
+        f.setSize(700, 300);
+        f.add(new ClientCertSelectionPane(null, new Object[]{aliasesMap}), BorderLayout.CENTER);
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        f.pack();
+        f.setVisible(true);
+    }
 }
