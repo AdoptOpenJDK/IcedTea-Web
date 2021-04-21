@@ -3,6 +3,7 @@ package net.sourceforge.jnlp.runtime;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.sourceforge.jnlp.security.SecurityUtil;
 
@@ -26,7 +27,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static net.sourceforge.jnlp.security.KeyStores.Level.SYSTEM;
 import static net.sourceforge.jnlp.security.KeyStores.Level.USER;
 import static net.sourceforge.jnlp.security.KeyStores.Type.CLIENT_CERTS;
@@ -50,7 +55,7 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
     }
 
     private X509KeyManager getX509KeyManager() {
-        if (System.getProperty("os.name").startsWith("Windows")) {
+        if (OsUtil.isWindows()) {
             try {
                 final KeyStore ks = KeyStore.getInstance("Windows-MY");
                 ks.load(null, null);
@@ -249,13 +254,13 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
     public String[] getClientAliases(String keyType, Principal[] issuers) {
         final List<String> aliases = new ArrayList<>();
         if (userKeyManager != null) {
-            addNonNullStrings(aliases, userKeyManager.getClientAliases(keyType, issuers), USER_SUFFIX);
+            aliases.addAll(appendSuffixToAll(userKeyManager.getClientAliases(keyType, issuers), USER_SUFFIX));
         }
         if (systemKeyManager != null) {
-            addNonNullStrings(aliases, systemKeyManager.getClientAliases(keyType, issuers), SYSTEM_SUFFIX);
+            aliases.addAll(appendSuffixToAll(systemKeyManager.getClientAliases(keyType, issuers), SYSTEM_SUFFIX));
         }
         if (browserKeyManager != null) {
-            addNonNullStrings(aliases, browserKeyManager.getClientAliases(keyType, issuers), BROWSER_SUFFIX);
+            aliases.addAll(appendSuffixToAll(browserKeyManager.getClientAliases(keyType, issuers), BROWSER_SUFFIX));
         }
         return aliases.toArray(new String[0]);
     }
@@ -279,13 +284,13 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
     public String[] getServerAliases(String keyType, Principal[] issuers) {
         final List<String> aliases = new ArrayList<>();
         if (userKeyManager != null) {
-            addNonNullStrings(aliases, userKeyManager.getServerAliases(keyType, issuers), null);
+            aliases.addAll(appendSuffixToAll(userKeyManager.getServerAliases(keyType, issuers), null));
         }
         if (systemKeyManager != null) {
-            addNonNullStrings(aliases, systemKeyManager.getServerAliases(keyType, issuers), null);
+            aliases.addAll(appendSuffixToAll(systemKeyManager.getServerAliases(keyType, issuers), null));
         }
         if (browserKeyManager != null) {
-            addNonNullStrings(aliases, browserKeyManager.getServerAliases(keyType, issuers), null);
+            aliases.addAll(appendSuffixToAll(browserKeyManager.getServerAliases(keyType, issuers), null));
         }
         return aliases.toArray(new String[0]);
     }
@@ -300,17 +305,15 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
         return chooseServerAlias(keyType, issuers, null);
     }
 
-    private void addNonNullStrings(List<String> list, String[] array, String suffix) {
-        if (array != null) {
-            for (String s : array) {
-                if (s != null) {
-                    if (suffix != null) {
-                        list.add(s + suffix);
-                    } else {
-                        list.add(s);
-                    }
-                }
-            }
+    private List<String> appendSuffixToAll(String[] array, String suffix) {
+        if (array == null) {
+            return emptyList();
         }
+        if (suffix == null) {
+            return asList(array);
+        }
+        return Stream.of(array)
+                .map(s -> s + suffix)
+                .collect(toList());
     }
 }
