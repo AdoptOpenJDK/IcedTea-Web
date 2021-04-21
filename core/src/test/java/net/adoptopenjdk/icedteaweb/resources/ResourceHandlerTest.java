@@ -215,7 +215,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final JarFile jarFile = new JarFile(jar.getAbsolutePath());
         final FileOutputStream fos = new FileOutputStream(pack);
         final Pack200.Packer p = Pack200.newPacker();
-        p.pack(jarFile, fos);
+        p.pack(jarFile.getNative(), fos);
         fos.close();
 
         final File packgz = new File(downloadDir, fileName + ".jar.pack.gz");

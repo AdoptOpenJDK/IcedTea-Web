@@ -1269,7 +1269,7 @@ public class JNLPClassLoader extends URLClassLoader {
                     CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURI().toURL());
 
                     try (JarFile jarFile = new JarFile(localFile.getAbsolutePath())) {
-                        JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile);
+                        JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile.getNative());
                         if (index != null) {
                             jarIndexes.add(index);
                         }
