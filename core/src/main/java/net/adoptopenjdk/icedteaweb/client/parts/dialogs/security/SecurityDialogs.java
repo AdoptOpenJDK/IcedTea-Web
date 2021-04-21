@@ -44,14 +44,13 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesCancel;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandbox;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.YesNoSandboxLimited;
 import net.sourceforge.jnlp.JNLPFile;
-import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.swing.JDialog;
-
 import java.awt.Dialog.ModalityType;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -59,8 +58,7 @@ import java.net.NetPermission;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.cert.X509Certificate;
-import java.util.Map;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -230,11 +228,11 @@ public class SecurityDialogs {
         return (NamePassword) response;
     }
 
-    public static DialogResult showClientCertSelectionPrompt(Map<String, X509Certificate> aliases) {
+    public static DialogResult showClientCertSelectionPrompt(List<ClientCertSelectionPane.CertificateOption> certificateOptions) {
 
        final SecurityDialogMessage message = new SecurityDialogMessage(null);
        message.dialogType = DialogType.CLIENT_CERT_SELECTION;
-       message.extras = new Object[] {aliases};
+       message.extras = new Object[] {certificateOptions};
        message.showInTaskBar = true;
 
        final DialogResult response = getUserResponse(message);

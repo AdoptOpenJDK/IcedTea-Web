@@ -1,5 +1,6 @@
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.ClientCertSelectionPane.CertificateOption;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -23,7 +24,6 @@ import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -102,9 +102,9 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
             }
         }
 
-        final Map<String, X509Certificate> validClientAliases = new LinkedHashMap<>();
-        final Map<String, X509Certificate> expiredClientAliases = new LinkedHashMap<>();
-        final Map<String, X509Certificate> otherAliases = new LinkedHashMap<>();
+        final List<CertificateOption> validClientAliases = new ArrayList<>();
+        final List<CertificateOption> expiredClientAliases = new ArrayList<>();
+        final List<CertificateOption> otherAliases = new ArrayList<>();
         for (final String keyType : keyTypes) {
             final String[] aliasesWithSuffix = getClientAliases(keyType, issuers);
             //if (aliasesWithSuffix != null)
@@ -121,18 +121,18 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
                         try {
                             cert.checkValidity();
                             LOG.info("Found valid client alias with clientCert or ANY extension: " + aliasWithSuffix);
-                            validClientAliases.put(aliasWithSuffix, cert);
+                            validClientAliases.add(new CertificateOption(aliasWithSuffix, cert));
                         } catch (CertificateException e) {
                             LOG.warn("Found expired client alias with clientCert or ANY extension: " + aliasWithSuffix);
-                            expiredClientAliases.put(aliasWithSuffix, cert);
+                            expiredClientAliases.add(new CertificateOption(aliasWithSuffix, cert));
                         }
                     } else {
                         LOG.warn("Found non-client alias: " + aliasWithSuffix);
-                        otherAliases.put(aliasWithSuffix, cert);
+                        otherAliases.add(new CertificateOption(aliasWithSuffix, cert));
                     }
                 } catch (CertificateParsingException e) {
                     LOG.warn("Exception while getting ExtendedKeyUsage for alias " + aliasWithSuffix);
-                    otherAliases.put(aliasWithSuffix, cert);
+                    otherAliases.add(new CertificateOption(aliasWithSuffix, cert));
                 }
             }
         }
@@ -141,7 +141,7 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
         if (!validClientAliases.isEmpty()) {
             alias = getPreferredAlias(validClientAliases, "valid client");
         } else {
-            expiredClientAliases.putAll(otherAliases);
+            expiredClientAliases.addAll(otherAliases);
             if (!expiredClientAliases.isEmpty()) {
                 alias = getPreferredAlias(expiredClientAliases, "remaining");
             } else {
@@ -178,25 +178,25 @@ public class MergedKeyManager extends X509ExtendedKeyManager {
         return null;
     }
 
-    private String getPreferredAlias(Map<String, X509Certificate> aliasesMap, String aliasType) {
+    private String getPreferredAlias(List<CertificateOption> certificateOptions, String aliasType) {
         final String alias;
-        if (aliasesMap.size() > 1) {
+        if (certificateOptions.size() > 1) {
             if (JNLPRuntime.isHeadless()) {
-                alias = aliasesMap.keySet().iterator().next();
+                alias = certificateOptions.get(0).alias;
                 LOG.info("Returning the first " + aliasType + " alias in headless mode : " + alias);
             } else {
-                final DialogResult res = SecurityDialogs.showClientCertSelectionPrompt(aliasesMap);
+                final DialogResult res = SecurityDialogs.showClientCertSelectionPrompt(certificateOptions);
                 if (res == null) {
                     alias = null;
                     userCancelled = true;
                     LOG.warn("Client certificate selection cancelled by user");
                 } else {
-                    alias = aliasesMap.keySet().toArray(new String[0])[res.getButtonIndex()];
+                    alias = certificateOptions.get(res.getButtonIndex()).alias;
                     LOG.info("Returning the selected " + aliasType + " alias : " + alias);
                 }
             }
-        } else if (aliasesMap.size() == 1) {
-            alias = aliasesMap.keySet().iterator().next();
+        } else if (certificateOptions.size() == 1) {
+            alias = certificateOptions.get(0).alias;
             LOG.info("Returning the only " + aliasType + " alias : " + alias);
         } else {
             alias = null;

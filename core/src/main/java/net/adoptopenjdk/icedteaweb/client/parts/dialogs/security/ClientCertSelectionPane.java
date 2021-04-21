@@ -81,13 +81,13 @@ public class ClientCertSelectionPane extends SecurityDialogPanel {
         setLayout(new GridBagLayout());
         final JLabel jlInfo = new JLabel("<html>" + R("CVCertificateViewer") + "</html>");
 
-        final Map<String, X509Certificate> aliasesMap = getAliases(extras);
+        final List<CertificateOption> certificateOptions = getAliases(extras);
         final List<String> displayedNames = new ArrayList<>();
-        for (final Entry<String, X509Certificate> entry : aliasesMap.entrySet()) {
-            final String subject = SecurityUtil.getCN(entry.getValue().getSubjectX500Principal().getName());
-            final String issuer = SecurityUtil.getCN(entry.getValue().getIssuerX500Principal().getName());
-            final int pos = entry.getKey().lastIndexOf(" (from ");
-            final String source = (pos != -1) ? entry.getKey().substring(pos) : "";
+        for (final CertificateOption entry : certificateOptions) {
+            final String subject = SecurityUtil.getCN(entry.certificate.getSubjectX500Principal().getName());
+            final String issuer = SecurityUtil.getCN(entry.certificate.getIssuerX500Principal().getName());
+            final int pos = entry.alias.lastIndexOf(" (from ");
+            final String source = (pos != -1) ? entry.alias.substring(pos) : "";
             displayedNames.add(subject + ":" + issuer + source);
         }
 
@@ -178,7 +178,7 @@ public class ClientCertSelectionPane extends SecurityDialogPanel {
         jbDetails.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SecurityDialog.showSingleCertInfoDialog(aliasesMap.values().toArray(new X509Certificate[0])[jList.getSelectedIndex()],
+                SecurityDialog.showSingleCertInfoDialog(certificateOptions.get(jList.getSelectedIndex()).certificate,
                         ClientCertSelectionPane.this);
             }
         });
@@ -193,12 +193,12 @@ public class ClientCertSelectionPane extends SecurityDialogPanel {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, X509Certificate> getAliases(final Object[] extras) {
+    private List<CertificateOption> getAliases(final Object[] extras) {
         final Object firstExtra = extras[0];
-        if (firstExtra instanceof Map) {
-            return (Map<String, X509Certificate>) firstExtra;
+        if (firstExtra instanceof List) {
+            return (List<CertificateOption>) firstExtra;
         }
-        return new LinkedHashMap<>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -245,20 +245,30 @@ public class ClientCertSelectionPane extends SecurityDialogPanel {
         final KeyStore ks = KeyStore.getInstance("Windows-MY");
         ks.load(null, null);
         final Enumeration<String> aliases = ks.aliases();
-        final Map<String, X509Certificate> aliasesMap = new LinkedHashMap<>();
+        final List<CertificateOption> certificateOptions = new ArrayList<>();
         while (aliases.hasMoreElements()) {
             final String alias = aliases.nextElement();
             final Certificate c = ks.getCertificate(alias);
             if (c instanceof X509Certificate) {
-                aliasesMap.put(alias + " (from browser keystore)", (X509Certificate) c);
+                certificateOptions.add(new CertificateOption(alias + " (from browser keystore)", (X509Certificate) c));
             }
         }
         final JFrame f = new JFrame();
         f.setMinimumSize(new Dimension(500, 300));
         f.setSize(700, 300);
-        f.add(new ClientCertSelectionPane(null, new Object[]{aliasesMap}), BorderLayout.CENTER);
+        f.add(new ClientCertSelectionPane(null, new Object[]{certificateOptions}), BorderLayout.CENTER);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         f.pack();
         f.setVisible(true);
+    }
+
+    public static class CertificateOption {
+        public final String alias;
+        public final X509Certificate certificate;
+
+        public CertificateOption(final String alias, final X509Certificate certificate) {
+            this.alias = alias;
+            this.certificate = certificate;
+        }
     }
 }
