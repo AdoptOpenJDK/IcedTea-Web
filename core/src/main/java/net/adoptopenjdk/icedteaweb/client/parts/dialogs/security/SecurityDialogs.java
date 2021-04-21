@@ -60,7 +60,7 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.cert.X509Certificate;
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -230,7 +230,7 @@ public class SecurityDialogs {
         return (NamePassword) response;
     }
 
-    public static DialogResult showClientCertSelectionPrompt(LinkedHashMap<String, X509Certificate> aliases) {
+    public static DialogResult showClientCertSelectionPrompt(Map<String, X509Certificate> aliases) {
 
        final SecurityDialogMessage message = new SecurityDialogMessage(null);
        message.dialogType = DialogType.CLIENT_CERT_SELECTION;

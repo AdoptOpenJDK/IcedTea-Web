@@ -165,8 +165,8 @@ public class MergedKeyManager extends X509ExtendedKeyManager
     }
     return null;
   }
-    
-  private String getPreferredAlias(LinkedHashMap<String, X509Certificate> aliasesMap, String aliasType) {
+
+  private String getPreferredAlias(Map<String, X509Certificate> aliasesMap, String aliasType) {
     String alias = null;
     if (aliasesMap.size() > 1) {
       if (JNLPRuntime.isHeadless()) {
