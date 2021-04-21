@@ -48,72 +48,54 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * This class encapsulate viwable part of SecurityDialog, so it do not need to
+ * This class encapsulate viewable part of SecurityDialog, so it do not need to
  * extend it.
- * 
+ * <p>
  * It is accepting commons setters for jdialog, but actually applying them right before it is created.
  * Obviously it do not have getters, but jdialog itself  should not be keeper of any information. SecurityPanel is.
  */
-public class ViwableDialog {
+public class ViewableDialog {
+
+    private final List<Runnable> operations = new ArrayList<>();
+    private final boolean showInTaskBar;
 
     private JDialog jd = null;
-    private boolean showInTaskBar;
-    List<Runnable> operations = new ArrayList<Runnable>();
 
-    public ViwableDialog(boolean showInTaskBar) {
+    public ViewableDialog(boolean showInTaskBar) {
         this.showInTaskBar = showInTaskBar;
     }
 
     private JDialog createJDialog() {
-        jd = showInTaskBar?new JDialog((Dialog)null):new JDialog();
+        jd = showInTaskBar ? new JDialog((Dialog) null) : new JDialog();
         jd.setName("ViwableDialog");
         SwingUtils.info(jd);
         jd.setIconImages(ImageResources.INSTANCE.getApplicationImages());
-        
-        for (Runnable operation : operations) {
+
+        for (final Runnable operation : operations) {
             operation.run();
         }
-        // prune operations. May throw NPE if operations used after createJDialog()
-        operations = null;
+        operations.clear();
         return jd;
     }
 
     public void setMinimumSize(final Dimension minimumSize) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.setMinimumSize(minimumSize);
-            }
-        });
+        operations.add(() -> jd.setMinimumSize(minimumSize));
     }
 
     public void pack() {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.pack();
-            }
-        });
+        operations.add(() -> jd.pack());
     }
 
     public void setLocationRelativeTo(final Component c) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.setLocationRelativeTo(c);
-            }
-        });
+        operations.add(() -> jd.setLocationRelativeTo(c));
     }
 
     public void show() {
-        SwingUtils.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                if (jd == null) {
-                    jd = createJDialog();
-                }
-                jd.setVisible(true);
+        SwingUtils.invokeAndWait(() -> {
+            if (jd == null) {
+                jd = createJDialog();
             }
+            jd.setVisible(true);
         });
     }
 
@@ -122,7 +104,7 @@ public class ViwableDialog {
      * choice (Ok, Cancel, etc) or closed the window
      */
     public void dispose() {
-        // avoid reentrance:
+        // avoid re-entrance:
         if (jd != null) {
             notifySelectionMade();
 
@@ -156,39 +138,19 @@ public class ViwableDialog {
     }
 
     public void add(final SecurityDialogPanel panel, final String constraints) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.add(panel, constraints);
-            }
-        });
+        operations.add(() -> jd.add(panel, constraints));
     }
 
     public void setModalityType(final Dialog.ModalityType modalityType) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.setModalityType(modalityType);
-            }
-        });
+        operations.add(() -> jd.setModalityType(modalityType));
     }
 
     public void setTitle(final String title) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.setTitle(title);
-            }
-        });
+        operations.add(() -> jd.setTitle(title));
     }
 
     public void setDefaultCloseOperation(final int op) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.setDefaultCloseOperation(op);
-            }
-        });
+        operations.add(() -> jd.setDefaultCloseOperation(op));
     }
 
     private static void centerDialog(JDialog dialog) {
@@ -196,12 +158,7 @@ public class ViwableDialog {
     }
 
     public void centerDialog() {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                centerDialog(jd);
-            }
-        });
+        operations.add(() -> centerDialog(jd));
     }
 
     public void setResizable(final boolean b) {
@@ -212,21 +169,10 @@ public class ViwableDialog {
     }
 
     public void addWindowListener(final WindowAdapter adapter) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.addWindowListener(adapter);
-            }
-        });
+        operations.add(() -> jd.addWindowListener(adapter));
     }
 
     public void addWindowFocusListener(final WindowAdapter adapter) {
-        operations.add(new Runnable() {
-            @Override
-            public void run() {
-                jd.addWindowFocusListener(adapter);
-            }
-        });
+        operations.add(() -> jd.addWindowFocusListener(adapter));
     }
-
 }
