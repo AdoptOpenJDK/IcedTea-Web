@@ -176,6 +176,7 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
         JLabel topLabel = new JLabel(topLabelText, getInfoImage(),
                 SwingConstants.LEFT);
         topLabel.setFont(new Font(topLabel.getFont().toString(), Font.BOLD, 12));
+        topLabel.setForeground(Color.BLACK);
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);

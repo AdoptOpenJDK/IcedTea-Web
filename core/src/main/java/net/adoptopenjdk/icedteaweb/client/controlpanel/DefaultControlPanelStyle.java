@@ -27,9 +27,11 @@ public class DefaultControlPanelStyle implements ControlPanelStyle {
 
         final JLabel about = new JLabel(R("CPMainDescriptionShort"));
         about.setFont(about.getFont().deriveFont(about.getFont().getSize2D() + 2).deriveFont(Font.BOLD));
+        about.setForeground(UIManager.getColor("TextPane.caretForeground"));
 
         final JLabel description = new JLabel(R("CPMainDescriptionLong"));
         description.setBorder(new EmptyBorder(2, 0, 2, 0));
+        description.setForeground(UIManager.getColor("TextPane.caretForeground"));
 
         final JPanel descriptionPanel = new JPanel(new GridLayout(0, 1));
         descriptionPanel.setBackground(UIManager.getColor("TextPane.background"));

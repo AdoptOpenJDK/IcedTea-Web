@@ -72,6 +72,7 @@ public class AppletWarningPane extends SecurityDialogPanel {
         JLabel topLabel = new JLabel(htmlWrap(topLabelText));
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));
+        topLabel.setForeground(Color.BLACK);
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
