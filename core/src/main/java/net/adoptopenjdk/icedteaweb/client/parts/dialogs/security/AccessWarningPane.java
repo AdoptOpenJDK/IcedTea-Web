@@ -37,6 +37,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberPanelResult;
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.remember.RememberableDialog;
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.jdk89access.SunMiscLauncher;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.ShortcutDesc;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
@@ -48,7 +49,6 @@ import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.AccessType;
 import net.sourceforge.jnlp.security.CertVerifier;
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.XDesktopEntry;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 
@@ -66,7 +66,6 @@ import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -184,7 +183,6 @@ public class AccessWarningPane extends SecurityDialogPanel implements Rememberab
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                         Font.BOLD, 12));
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
         topPanel.setPreferredSize(new Dimension(450, 100));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

@@ -61,7 +61,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -176,9 +175,7 @@ public abstract class AppTrustWarningPanel extends SecurityDialogPanel implement
         JLabel topLabel = new JLabel(topLabelText, getInfoImage(),
                 SwingConstants.LEFT);
         topLabel.setFont(new Font(topLabel.getFont().toString(), Font.BOLD, 12));
-
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
         topPanel.setPreferredSize(new Dimension(PANE_WIDTH, TOP_PANEL_HEIGHT));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

@@ -58,7 +58,6 @@ import javax.swing.SwingConstants;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -105,9 +104,8 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                 Font.BOLD, 12));
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
-        topPanel.setPreferredSize(new Dimension(400, 80));
+        topPanel.setPreferredSize(new Dimension(400, 100));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JEditorPane bottomLabel = new JEditorPane("text/html", htmlWrap(bottomLabelText));

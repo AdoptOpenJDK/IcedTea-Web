@@ -61,7 +61,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -185,7 +184,6 @@ public class CertWarningPane extends SecurityDialogPanel {
         topLabel.setFont(new Font(topLabel.getFont().toString(),
                                 Font.BOLD, 12));
         topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE);
         topPanel.add(topLabel, BorderLayout.CENTER);
         topPanel.setPreferredSize(new Dimension(400, 75));
         topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
