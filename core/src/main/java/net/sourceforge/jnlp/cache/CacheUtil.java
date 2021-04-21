@@ -234,18 +234,19 @@ public class CacheUtil {
      * @param title           name of the download
      */
     public static void waitForResources(final JNLPClassLoader jnlpClassLoader, final ResourceTracker tracker, final URL[] resources, final String title) {
-       // download first initial jar : so in case of client certificate, only 1 https client handshake is done 
+       // download first initial jar : so in case of client certificate, only 1 https client handshake is done
         boolean downloadInitialJarFirst = resources.length > 1 && resources[0].getProtocol().equals("https");
         try {
             final DownloadIndicator indicator = Optional.ofNullable(JNLPRuntime.getDefaultDownloadIndicator())
-                    .orElseGet(() -> new DummyDownloadIndicator());
+                    .orElseGet(DummyDownloadIndicator::new);
             final DownloadServiceListener listener = getDownloadServiceListener(jnlpClassLoader, title, resources, indicator);
             try {
                 for (URL url : resources) {
                     tracker.addDownloadListener(url, resources, listener);
                 }
-                if (downloadInitialJarFirst)
+                if (downloadInitialJarFirst) {
                     tracker.waitForResources(resources[0]);
+                }
                 // download all remaining ones
                 tracker.waitForResources(resources);
             } finally {
@@ -253,8 +254,9 @@ public class CacheUtil {
             }
         } catch (Exception ex) {
             LOG.error("Downloading of resources ended with error", ex);
-            if (downloadInitialJarFirst)
-               throw new RuntimeException(ex);
+            if (downloadInitialJarFirst) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 
