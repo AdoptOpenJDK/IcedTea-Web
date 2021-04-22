@@ -306,10 +306,10 @@ public class LockableFile {
             final BasicFileAttributes attr = Files.readAttributes(lockFile.toPath(), BasicFileAttributes.class);
             final long currentTime = System.currentTimeMillis();
             final long createTime = attr.creationTime().toMillis();
-            final double ageInSec = (currentTime - createTime) / 1000;
+            final double ageInSec = (currentTime - createTime) / 1000.0;
             if (ageInSec > STALENESS_INTERVAL_IN_SEC) {
                 logger.debug("Deleting stale lock file {}", lockFile.getPath());
-                lockFile.delete();
+                unlock();
             }
         }
 
