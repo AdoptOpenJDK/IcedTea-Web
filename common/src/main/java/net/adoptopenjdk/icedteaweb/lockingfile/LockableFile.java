@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -203,13 +205,15 @@ public class LockableFile {
      */
     private interface InterProcessLock {
         void lock() throws IOException;
+
         boolean tryLock() throws IOException;
+
         void unlock() throws IOException;
     }
 
     /**
      * This is the recommended way to lock a file system wide (across multiple processes).
-     *
+     * <p>
      * Unfortunately this causes problems during unlocking in Windows.
      * https://bugs.java.com/bugdatabase/view_bug.do?bug_id=4715154
      */
@@ -268,12 +272,13 @@ public class LockableFile {
 
     /**
      * This is an alternative approach to locking a file system wide.
-     *
+     * <p>
      * This is not recommended as there are claims that this is not reliable.
      * Most likely there are issues with remote file systems but the claims do not go into detail.
      */
     private class LockFile implements InterProcessLock {
 
+        public static final double STALENESS_INTERVAL_IN_SEC = 2.0;
         private final File lockFile = new File(file.getAbsoluteFile().getParent(), file.getName() + ".lock");
 
         @Override
@@ -283,14 +288,29 @@ public class LockableFile {
             }
 
             createParentDirIfMissing();
+            if (lockFile.exists()) {
+                deleteStaleLockFile();
+            }
             while (!readOnly && !lockFile.createNewFile()) {
                 try {
+                    logger.debug("Trying to create lock file {}", lockFile.getPath());
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
             lockFile.deleteOnExit();
+        }
+
+        private void deleteStaleLockFile() throws IOException {
+            final BasicFileAttributes attr = Files.readAttributes(lockFile.toPath(), BasicFileAttributes.class);
+            final long currentTime = System.currentTimeMillis();
+            final long createTime = attr.creationTime().toMillis();
+            final double ageInSec = (currentTime - createTime) / 1000;
+            if (ageInSec > STALENESS_INTERVAL_IN_SEC) {
+                logger.debug("Deleting stale lock file {}", lockFile.getPath());
+                lockFile.delete();
+            }
         }
 
         @Override
@@ -300,7 +320,11 @@ public class LockableFile {
             }
 
             createParentDirIfMissing();
+            if (lockFile.exists()) {
+                deleteStaleLockFile();
+            }
             if (!readOnly && !lockFile.createNewFile()) {
+                logger.debug("Could not create lock file {}", lockFile.getPath());
                 return false;
             }
             lockFile.deleteOnExit();
