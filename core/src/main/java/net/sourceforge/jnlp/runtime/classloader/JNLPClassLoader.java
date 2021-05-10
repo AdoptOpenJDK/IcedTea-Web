@@ -652,7 +652,8 @@ public class JNLPClassLoader extends URLClassLoader {
 
             if (loaders.length > 1) {
                 LOG.debug("Checking extensions of jnlp file '{}'", file.getSourceLocation());
-                final boolean containsUnsigned = Stream.of(loaders).anyMatch(l -> !l.getSigning());
+                // skip the first loader as it is the jnlp that points to extensions and that it has no jars and hence signing should not be checked
+                final boolean containsUnsigned = Stream.of(loaders).skip(1).anyMatch(l -> !l.getSigning());
                 if (containsUnsigned) {
                     LOG.debug("At least one extension for jnlp file '{}' contains unsigned content", file.getSourceLocation());
                     //TODO: is NONE really right? We do not kn ow if it is NONE or PARTIAL....
