@@ -72,25 +72,25 @@ done
 
 if test ${HAVE_AUTOCONF} = false; then
     echo "No proper autoconf was found."
-    echo "You must have autoconf 2.59 or later installed."
+    echo "You must have autoconf 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
 if test ${HAVE_AUTOHEADER} = false; then
     echo "No proper autoheader was found."
-    echo "You must have autoconf 2.59 or later installed."
+    echo "You must have autoheader 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
 if test ${HAVE_AUTOM4TE} = false; then
     echo "No proper autom4te was found."
-    echo "You must have autom4te 2.59 or later installed."
+    echo "You must have autom4te 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
 if test ${HAVE_AUTORECONF} = false; then
     echo "No proper autoreconf was found."
-    echo "You must have autoconf 2.59 or later installed."
+    echo "You must have autoreconf 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
