@@ -11,7 +11,7 @@ for AUTOCONF in autoconf autoconf259 autoconf2.59; do
         AUTOCONF_VERSION=`${AUTOCONF} --version | head -1 | sed 's/^[^0-9]*\([0-9.][0-9.]*\).*/\1/'`
 #        echo ${AUTOCONF_VERSION}
         case ${AUTOCONF_VERSION} in
-            2.59* | 2.6[0-9]* )
+            2.59* | 2.6[0-9]* | 2.7[0-9]* )
                 HAVE_AUTOCONF=true
                 break;
                 ;;
@@ -28,7 +28,7 @@ for AUTOHEADER in autoheader autoheader259 autoheader2.59; do
         AUTOHEADER_VERSION=`${AUTOHEADER} --version | head -1 | sed 's/^[^0-9]*\([0-9.][0-9.]*\).*/\1/'`
 #        echo ${AUTOHEADER_VERSION}
         case ${AUTOHEADER_VERSION} in
-            2.59* | 2.6[0-9]* )
+            2.59* | 2.6[0-9]* | 2.7[0-9]* )
                 HAVE_AUTOHEADER=true
                 break;
                 ;;
@@ -45,7 +45,7 @@ for AUTOM4TE in autom4te autom4te259 autom4te2.59; do
         AUTOM4TE_VERSION=`${AUTOM4TE} --version | head -1 | sed 's/^[^ ]* [^0-9]*\([0-9.][0-9.]*\).*/\1/'`
 #        echo ${AUTOM4TE_VERSION}
         case ${AUTOM4TE_VERSION} in
-            2.59* | 2.6[0-9]* )
+            2.59* | 2.6[0-9]* | 2.7[0-9]* )
                 HAVE_AUTOM4TE=true
                 break;
                 ;;
@@ -62,7 +62,7 @@ for AUTORECONF in autoreconf autoreconf2.59; do
         AUTORECONF_VERSION=`${AUTORECONF} --version | head -1 | sed 's/^[^0-9]*\([0-9.][0-9.]*\).*/\1/'`
 #        echo ${AUTORECONF_VERSION}
         case ${AUTORECONF_VERSION} in
-            2.59* | 2.6[0-9]* )
+            2.59* | 2.6[0-9]* | 2.7[0-9]* )
                 HAVE_AUTORECONF=true
                 break;
                 ;;
@@ -72,25 +72,25 @@ done
 
 if test ${HAVE_AUTOCONF} = false; then
     echo "No proper autoconf was found."
-    echo "You must have autoconf 2.59 or later installed."
+    echo "You must have autoconf 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
 if test ${HAVE_AUTOHEADER} = false; then
     echo "No proper autoheader was found."
-    echo "You must have autoconf 2.59 or later installed."
+    echo "You must have autoheader 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
 if test ${HAVE_AUTOM4TE} = false; then
     echo "No proper autom4te was found."
-    echo "You must have autom4te 2.59 or later installed."
+    echo "You must have autom4te 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
 if test ${HAVE_AUTORECONF} = false; then
     echo "No proper autoreconf was found."
-    echo "You must have autoconf 2.59 or later installed."
+    echo "You must have autoreconf 2.59, 2.6x or 2.7x installed."
     exit 1
 fi
 
