@@ -54,7 +54,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         resource.setLocalFile(cachedFile);
         resource.setTransferred(cachedFile.length());
 
-        LOG.debug("Use cached version of resource {}", resource);
+        LOG.debug("Use cached version of resource {} at {}", resource, cachedFile);
 
         return new InitializationResult();
     }
