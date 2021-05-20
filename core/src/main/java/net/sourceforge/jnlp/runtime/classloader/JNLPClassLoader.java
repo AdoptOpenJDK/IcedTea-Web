@@ -709,7 +709,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 //Note: one of these exceptions could be from not being able
                 //to read the cacerts or trusted.certs files.
                 LOG.error("Exception while verifying jars", e);
-                LaunchException ex = new LaunchException(null, null, FATAL,
+                LaunchException ex = new LaunchException(file, e, FATAL,
                         "Initialization Error", "A fatal error occurred while trying to verify jars.", "An exception has been thrown in class JarCertVerifier. Being unable to read the cacerts or trusted.certs files could be a possible cause for this exception.: " + e.getMessage());
                 consultCertificateSecurityException(ex);
             }
