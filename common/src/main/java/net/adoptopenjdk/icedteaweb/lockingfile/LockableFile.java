@@ -97,7 +97,7 @@ public class LockableFile {
                 logger.error("lockable file {} is not a file but something else (maybe a directory)", file);
             }
         } catch (final Exception ex) {
-            logger.error("Exception while creating lockable file", ex);
+            logger.error("Exception while creating lockable file - " + file, ex);
         }
         readOnly = isReadOnly(file);
 
