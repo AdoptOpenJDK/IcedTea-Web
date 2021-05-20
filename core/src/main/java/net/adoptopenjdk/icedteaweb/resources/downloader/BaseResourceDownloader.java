@@ -72,11 +72,32 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .map(Optional::get)
                 .findFirst()
                 .orElseGet(() -> {
-                    LOG.error("could not download resource {} from any of theses urls {}", resource, downloadUrls);
+                    LOG.error("could not download resource {} from any of theses urls {} {}", resource, downloadUrls, exceptionMessage());
                     resource.setStatus(ERROR);
                     checkForProxyError();
                     return resource;
                 });
+    }
+
+    private String exceptionMessage() {
+        return downLoadExceptions.stream()
+                .findFirst()
+                .map(this::exceptionMessage)
+                .map(s -> "caused by" + s)
+                .orElse("");
+    }
+
+    private String exceptionMessage(final Exception e) {
+        Throwable throwable = e;
+        final List<Throwable> list = new ArrayList<>();
+        while (throwable != null && !list.contains(throwable)) {
+            list.add(throwable);
+            throwable = throwable.getCause();
+        }
+
+        return list.stream()
+                .map(t -> t.getClass().getSimpleName() + ": " + t.getMessage())
+                .collect(Collectors.joining(" caused by "));
     }
 
     private void checkForProxyError() {
