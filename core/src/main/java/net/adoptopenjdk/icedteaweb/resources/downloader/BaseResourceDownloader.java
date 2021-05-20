@@ -154,6 +154,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final long actualBytes = countingInputStream.numBytesRead();
 
             if (expectedBytes > 0 && expectedBytes > actualBytes) {
+                cacheFile.delete();
                 throw new IOException(String.format("Did read %d bytes from server but expected %d", actualBytes, expectedBytes));
             }
 
