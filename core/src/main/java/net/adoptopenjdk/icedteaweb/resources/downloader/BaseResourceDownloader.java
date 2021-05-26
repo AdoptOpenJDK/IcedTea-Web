@@ -139,7 +139,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             resource.setTransferred(bytesTransferred);
             return resource;
         } catch (Exception ex) {
-            LOG.debug("Exception while downloading resource {} from {} - {}", resource, downloadFrom, ex.getMessage());
+            LOG.debug("Exception while downloading resource {} from {} - message: {} cause: {} ", resource, downloadFrom, ex.getMessage(), ex.getCause());
             throw ex;
         }
     }
@@ -176,6 +176,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
             if (expectedBytes > 0 && expectedBytes > actualBytes) {
                 cacheFile.delete();
+                LOG.debug("Deleted Corrupt File {}", cacheFile.getName());
                 throw new IOException(String.format("Did read %d bytes from server but expected %d", actualBytes, expectedBytes));
             }
 
