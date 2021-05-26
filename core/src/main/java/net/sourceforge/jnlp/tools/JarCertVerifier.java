@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
+import java.util.zip.ZipException;
 
 import static java.time.temporal.ChronoUnit.MONTHS;
 
@@ -287,9 +288,25 @@ public class JarCertVerifier implements CertVerifier {
                 }
             }
             return verifyJarEntryCerts(jarPath, jarFile.getManifest() != null, entries);
+        } catch (ZipException e) {
+            final File corruptedFile = new File(jarPath);
+            if (corruptedFile.exists()) {
+                if (corruptedFile.delete()) {
+                    final String msg = "Found and deleted corrupted file " + jarPath + ". Please retry starting the application";
+                    LOG.info(msg, e);
+                    throw new RuntimeException(msg, e);
+                }
+                final String msg = "Found corrupted file " + jarPath + ". Failed to clean cache. Please clean cache manually and restart application";
+                LOG.info(msg, e);
+                throw new RuntimeException(msg, e);
+            }
+            final String msg = "Found missing file " + jarPath + ". Please restart application";
+            LOG.info(msg, e);
+            throw new RuntimeException(msg, e);
         } catch (Exception e) {
-            LOG.error("Error in verify jar " + jarPath, e);
-            throw new RuntimeException("Error in verify jar " + jarPath, e);
+            final String msg = "Error in verify jar " + jarPath;
+            LOG.error(msg, e);
+            throw new RuntimeException(msg, e);
         }
     }
 
