@@ -81,23 +81,6 @@ public class FileTestUtils {
     }
 
     /**
-     * Check the amount of file descriptors before and after a Runnable.
-     * Is not thread-safe.
-     */
-    public static void assertNoFileLeak(final Runnable runnable) throws InterruptedException {
-        Thread.sleep(200);
-        final long filesOpenBefore = getOpenFileDescriptorCount();
-        runnable.run();
-        Thread.sleep(200);
-        final long filesLeaked = getOpenFileDescriptorCount() - filesOpenBefore;
-        //how come? Apparently can...
-        if (filesLeaked < 0) {
-            return;
-        }
-        assertEquals(0, filesLeaked);
-    }
-
-    /**
      * Creates a file with the given contents
      */
     public static void createFileWithContents(final File file, final String contents) throws IOException {

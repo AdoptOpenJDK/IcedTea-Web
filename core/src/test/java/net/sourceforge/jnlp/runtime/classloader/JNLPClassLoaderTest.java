@@ -80,7 +80,6 @@ import static java.util.jar.Attributes.Name.IMPLEMENTATION_VENDOR;
 import static java.util.jar.Attributes.Name.MAIN_CLASS;
 import static net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader.getAttributeFromJar;
 import static net.adoptopenjdk.icedteaweb.manifest.ManifestAttributesReader.getAttributeFromJars;
-import static net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils.assertNoFileLeak;
 import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -130,13 +129,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final File jarLocation = createJarWithoutContent();
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
 
-        assertNoFileLeak(() -> {
-            try {
-                new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
-            } catch (LaunchException e) {
-                fail(e.toString());
-            }
-        });
+        new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
     }
 
     /* Note: We should create a JNLPClassLoader with an invalid jar to test isInvalidJar with.
@@ -147,7 +140,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-        assertNoFileLeak(() -> assertFalse(classLoader.isInvalidJar(jnlpFile.getJarDesc())));
+        assertFalse(classLoader.isInvalidJar(jnlpFile.getJarDesc()));
     }
 
     @Test
@@ -163,7 +156,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-        assertNoFileLeak(() -> assertEquals("DummyClass", jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker())));
+        assertEquals("DummyClass", jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker()));
     }
 
     @Test
@@ -175,7 +168,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-        assertNoFileLeak(() -> assertNull(jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker())));
+        assertNull(jnlpFile.getManifestAttributesReader().getMainClass(jnlpFile.getJarLocation(), classLoader.getTracker()));
     }
 
     /* Note: Although it does a basic check, this mainly checks for file-descriptor leak */
@@ -185,13 +178,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
 
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
-        assertNoFileLeak(() -> {
-            try {
-                classLoader.checkForMain(asList(jnlpFile.getJarDesc()));
-            } catch (LaunchException e) {
-                fail(e.toString());
-            }
-        });
+        classLoader.checkForMain(asList(jnlpFile.getJarDesc()));
         assertFalse(classLoader.hasMainJar());
     }
 
@@ -210,11 +197,9 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-        assertNoFileLeak(() -> {
-            assertEquals("rh", getAttributeFromJar(IMPLEMENTATION_VENDOR, jnlpFile.getJarLocation(), classLoader.getTracker()));
-            assertEquals("DummyClass", getAttributeFromJar(MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
-            assertEquals("it", getAttributeFromJar(IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
-        });
+        assertEquals("rh", getAttributeFromJar(IMPLEMENTATION_VENDOR, jnlpFile.getJarLocation(), classLoader.getTracker()));
+        assertEquals("DummyClass", getAttributeFromJar(MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
+        assertEquals("it", getAttributeFromJar(IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
     }
 
     @Test
@@ -224,11 +209,9 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-        assertNoFileLeak(() -> {
-            assertNull(getAttributeFromJar(IMPLEMENTATION_VENDOR, jnlpFile.getJarLocation(), classLoader.getTracker()));
-            assertNull(getAttributeFromJar(MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
-            assertNull(getAttributeFromJar(IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
-        });
+        assertNull(getAttributeFromJar(IMPLEMENTATION_VENDOR, jnlpFile.getJarLocation(), classLoader.getTracker()));
+        assertNull(getAttributeFromJar(MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
+        assertNull(getAttributeFromJar(IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
     }
 
     @Test
@@ -268,18 +251,16 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(3, jarLocation5, jarLocation3, jarLocation4, jarLocation1, jarLocation2); //jar 1 should be main
         final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
 
-        assertNoFileLeak(() -> {
-            //defined twice
-            assertNull(getAttributeFromJars(IMPLEMENTATION_VENDOR, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
-            //defined twice, but one in main jar
-            assertEquals("DummyClass1", getAttributeFromJars(MAIN_CLASS, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
-            //defined not in main jar
-            assertEquals("it", getAttributeFromJars(IMPLEMENTATION_TITLE, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
-            //not defined
-            assertNull(getAttributeFromJars(Attributes.Name.IMPLEMENTATION_VENDOR_ID, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
-            //defined in first jar
-            assertEquals("some url1", getAttributeFromJars(Attributes.Name.IMPLEMENTATION_URL, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
-        });
+        //defined twice
+        assertNull(getAttributeFromJars(IMPLEMENTATION_VENDOR, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
+        //defined twice, but one in main jar
+        assertEquals("DummyClass1", getAttributeFromJars(MAIN_CLASS, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
+        //defined not in main jar
+        assertEquals("it", getAttributeFromJars(IMPLEMENTATION_TITLE, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
+        //not defined
+        assertNull(getAttributeFromJars(Attributes.Name.IMPLEMENTATION_VENDOR_ID, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
+        //defined in first jar
+        assertEquals("some url1", getAttributeFromJars(Attributes.Name.IMPLEMENTATION_URL, asList(jnlpFile.getJarDescs()), classLoader.getTracker()));
     }
 
     @Test
@@ -291,24 +272,10 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         /* Test with-out any attribute specified specified */
         FileTestUtils.createJarWithoutManifestContents(jarLocation, dummyContent);
 
-        final Exception[] exs = new Exception[2];
         final DummyJNLPFileWithJar jnlpFile = new DummyJNLPFileWithJar(jarLocation);
-        try {
-            final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
-            assertNoFileLeak(() -> {
-                try {
-                    assertNull(getAttributeFromJar(MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
-                    assertNull(getAttributeFromJar(IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
-                } catch (Exception e) {
-                    exs[0] = e;
-                }
-            });
-        } catch (Exception e) {
-            exs[1] = e;
-        }
-        Assert.assertNotNull(exs);
-        Assert.assertNull(exs[0]);
-        Assert.assertNull(exs[1]);
+        final JNLPClassLoader classLoader = new JNLPClassLoader(jnlpFile, UpdatePolicy.ALWAYS);
+        assertNull(getAttributeFromJar(MAIN_CLASS, jnlpFile.getJarLocation(), classLoader.getTracker()));
+        assertNull(getAttributeFromJar(IMPLEMENTATION_TITLE, jnlpFile.getJarLocation(), classLoader.getTracker()));
     }
 
     @Test
