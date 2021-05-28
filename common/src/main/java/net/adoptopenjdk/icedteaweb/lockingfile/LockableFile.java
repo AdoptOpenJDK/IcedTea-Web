@@ -88,18 +88,15 @@ public class LockableFile {
 
     private LockableFile(final File file) {
         this.file = file;
-        try {
-            if (!file.exists()) {
-                createParentDirIfMissing(file);
-                if (canWriteParent(file) && !file.createNewFile()) {
-                    throw new IOException("could not create file " + file);
-                }
-            } else if (!file.isFile()) {
-                logger.error("lockable file {} is not a file but something else (maybe a directory)", file);
-            }
-        } catch (final Exception ex) {
-            logger.error("Exception while creating lockable file - " + file, ex);
+
+        if (!file.exists()) {
+            logger.debug("lockable file {} does not yet exist", file);
+            createParentDirIfMissing(file);
+            createLockableFile();
+        } else if (!file.isFile()) {
+            logger.error("lockable file {} is not a file but something else (maybe a directory)", file);
         }
+
         readOnly = isReadOnly(file);
 
         if (OsUtil.isWindows()) {
@@ -129,6 +126,21 @@ public class LockableFile {
             logger.warn("parent of file {} is null", f);
         } else if (!dir.isDirectory() && !dir.mkdirs()) {
             logger.warn("failed to create parent directory of {}", f);
+        }
+    }
+
+    private void createLockableFile() {
+        if (!canWriteParent(file)) {
+            logger.debug("could not create lockable file as the parent is not writable");
+            return;
+        }
+
+        try {
+            if (!file.createNewFile()) {
+                logger.warn("could not create file " + file);
+            }
+        } catch (IOException e) {
+            logger.error("Exception while creating lockable file - " + file, e);
         }
     }
 
