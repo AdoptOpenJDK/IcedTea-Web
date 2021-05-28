@@ -312,30 +312,24 @@ public class LockableFile {
 
         @Override
         public void lock() throws IOException {
-            if (!file.exists()) {
+            if (readOnly) {
                 return;
             }
 
-            if (lockFile.exists()) {
-                deleteStaleLockFile();
-            } else {
-                createParentDirIfMissing(lockFile);
-            }
-
-            while (!readOnly && !lockFile.createNewFile()) {
+            logger.debug("Trying to create lock file {}", lockFile.getPath());
+            while (file.exists() && !tryLock()) {
                 try {
-                    logger.debug("Trying to create lock file {}", lockFile.getPath());
                     Thread.sleep(500);
+                    logger.debug("Trying to create lock file {}", lockFile.getPath());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            lockFile.deleteOnExit();
         }
 
         @Override
         public boolean tryLock() throws IOException {
-            if (!file.exists()) {
+            if (!file.exists() || readOnly) {
                 return false;
             }
 
@@ -345,7 +339,7 @@ public class LockableFile {
                 createParentDirIfMissing(lockFile);
             }
 
-            if (!readOnly && !lockFile.createNewFile()) {
+            if (!lockFile.createNewFile()) {
                 logger.debug("Could not create lock file {}", lockFile.getPath());
                 return false;
             }
