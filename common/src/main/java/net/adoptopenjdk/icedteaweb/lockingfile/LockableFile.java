@@ -88,17 +88,15 @@ public class LockableFile {
 
     private LockableFile(final File file) {
         this.file = file;
-        try {
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    throw new IOException("could not create file " + file);
-                }
-            } else if (!file.isFile()) {
-                logger.error("lockable file {} is not a file but something else (maybe a directory)", file);
-            }
-        } catch (final Exception ex) {
-            logger.error("Exception while creating lockable file - " + file, ex);
+
+        if (!file.exists()) {
+            logger.debug("lockable file {} does not yet exist", file);
+            createParentDirIfMissing(file);
+            createLockableFile();
+        } else if (!file.isFile()) {
+            logger.error("lockable file {} is not a file but something else (maybe a directory)", file);
         }
+
         readOnly = isReadOnly(file);
 
         if (OsUtil.isWindows()) {
@@ -109,10 +107,41 @@ public class LockableFile {
     }
 
     private boolean isReadOnly(final File file) {
+        final boolean isWritable = canWriteFile(file) && canWriteParent(file);
+        return !isWritable;
+    }
+
+    private boolean canWriteFile(File file) {
+        return file != null && file.isFile() && file.canWrite();
+    }
+
+    private boolean canWriteParent(File file) {
         final File parent = file.getParentFile();
-        final boolean canWriteParent = parent != null && parent.isDirectory() && parent.canWrite();
-        final boolean canWriteFile = file.isFile() && file.canWrite() && canWriteParent;
-        return !canWriteFile;
+        return parent != null && parent.isDirectory() && parent.canWrite();
+    }
+
+    private void createParentDirIfMissing(File f) {
+        final File dir = f.getParentFile();
+        if (dir == null) {
+            logger.warn("parent of file {} is null", f);
+        } else if (!dir.isDirectory() && !dir.mkdirs()) {
+            logger.warn("failed to create parent directory of {}", f);
+        }
+    }
+
+    private void createLockableFile() {
+        if (!canWriteParent(file)) {
+            logger.debug("could not create lockable file as the parent is not writable");
+            return;
+        }
+
+        try {
+            if (!file.createNewFile()) {
+                logger.warn("could not create file " + file);
+            }
+        } catch (IOException e) {
+            logger.error("Exception while creating lockable file - " + file, e);
+        }
     }
 
     /**
@@ -278,66 +307,44 @@ public class LockableFile {
      */
     private class LockFile implements InterProcessLock {
 
-        public static final double STALENESS_INTERVAL_IN_SEC = 2.0;
+        public static final long STALENESS_INTERVAL_IN_MILLIS = 2_000;
         private final File lockFile = new File(file.getAbsoluteFile().getParent(), file.getName() + ".lock");
 
         @Override
         public void lock() throws IOException {
-            if (!file.exists()) {
+            if (readOnly) {
                 return;
             }
 
-            createParentDirIfMissing();
-            if (lockFile.exists()) {
-                deleteStaleLockFile();
-            }
-            while (!readOnly && !lockFile.createNewFile()) {
+            logger.debug("Trying to create lock file {}", lockFile.getPath());
+            while (file.exists() && !tryLock()) {
                 try {
-                    logger.debug("Trying to create lock file {}", lockFile.getPath());
                     Thread.sleep(500);
+                    logger.debug("Trying to create lock file {}", lockFile.getPath());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }
-            lockFile.deleteOnExit();
-        }
-
-        private void deleteStaleLockFile() throws IOException {
-            final BasicFileAttributes attr = Files.readAttributes(lockFile.toPath(), BasicFileAttributes.class);
-            final long currentTime = System.currentTimeMillis();
-            final long createTime = attr.creationTime().toMillis();
-            final double ageInSec = (currentTime - createTime) / 1000.0;
-            if (ageInSec > STALENESS_INTERVAL_IN_SEC) {
-                logger.debug("Deleting stale lock file {}", lockFile.getPath());
-                unlock();
             }
         }
 
         @Override
         public boolean tryLock() throws IOException {
-            if (!file.exists()) {
+            if (!file.exists() || readOnly) {
                 return false;
             }
 
-            createParentDirIfMissing();
             if (lockFile.exists()) {
                 deleteStaleLockFile();
+            } else {
+                createParentDirIfMissing(lockFile);
             }
-            if (!readOnly && !lockFile.createNewFile()) {
+
+            if (!lockFile.createNewFile()) {
                 logger.debug("Could not create lock file {}", lockFile.getPath());
                 return false;
             }
             lockFile.deleteOnExit();
             return true;
-        }
-
-        private void createParentDirIfMissing() {
-            final File dir = lockFile.getParentFile();
-            if (dir == null) {
-                logger.warn("parent of lockfile {} is null", lockFile);
-            } else if (!dir.isDirectory() && !dir.mkdirs()) {
-                logger.warn("failed to create parent directory of {}", lockFile);
-            }
         }
 
         @Override
@@ -346,6 +353,17 @@ public class LockableFile {
                 if (lockFile.exists()) {
                     logger.error("Failed to delete lock file {}", lockFile);
                 }
+            }
+        }
+
+        private void deleteStaleLockFile() throws IOException {
+            final BasicFileAttributes attr = Files.readAttributes(lockFile.toPath(), BasicFileAttributes.class);
+            final long currentTime = System.currentTimeMillis();
+            final long createTime = attr.creationTime().toMillis();
+            final long ageInMillis = (currentTime - createTime);
+            if (ageInMillis > STALENESS_INTERVAL_IN_MILLIS) {
+                logger.debug("Deleting stale lock file {}", lockFile.getPath());
+                unlock();
             }
         }
     }
