@@ -1,4 +1,4 @@
-2021-03-04 Philippe Doussot <douphi@free.fr>
+2021-05-27 Philippe Doussot <douphi@free.fr>
 
         Release changes
 	* Webstarted application tries to load resources from server incorrectly : Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/467 fix https://github.com/AdoptOpenJDK/IcedTea-Web/issues/89
