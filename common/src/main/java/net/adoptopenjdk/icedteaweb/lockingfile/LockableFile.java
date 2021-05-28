@@ -307,7 +307,7 @@ public class LockableFile {
      */
     private class LockFile implements InterProcessLock {
 
-        public static final double STALENESS_INTERVAL_IN_SEC = 2.0;
+        public static final long STALENESS_INTERVAL_IN_MILLIS = 2_000;
         private final File lockFile = new File(file.getAbsoluteFile().getParent(), file.getName() + ".lock");
 
         @Override
@@ -360,8 +360,8 @@ public class LockableFile {
             final BasicFileAttributes attr = Files.readAttributes(lockFile.toPath(), BasicFileAttributes.class);
             final long currentTime = System.currentTimeMillis();
             final long createTime = attr.creationTime().toMillis();
-            final double ageInSec = (currentTime - createTime) / 1000.0;
-            if (ageInSec > STALENESS_INTERVAL_IN_SEC) {
+            final long ageInMillis = (currentTime - createTime);
+            if (ageInMillis > STALENESS_INTERVAL_IN_MILLIS) {
                 logger.debug("Deleting stale lock file {}", lockFile.getPath());
                 unlock();
             }
