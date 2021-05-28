@@ -46,7 +46,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.adoptopenjdk.icedteaweb.testing.util.FileTestUtils.assertNoFileLeak;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -114,7 +113,7 @@ public class NativeLibraryStorageTest {
             final URL tempJarUrl = jarLocation.toURI().toURL();
             final NativeLibraryStorage storage = nativeLibraryStorageWithCache(tempJarUrl);
 
-            assertNoFileLeak(() -> storage.addSearchJar(tempJarUrl));
+            storage.addSearchJar(tempJarUrl);
 
             /* If the file we added is native, it should be found
              * Due to an implementation detail, non-native files will not be found */
