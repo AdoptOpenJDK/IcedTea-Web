@@ -562,6 +562,7 @@ public class JarCertVerifier implements CertVerifier {
                 name.endsWith(".SF") ||
                 name.endsWith(".DSA") ||
                 name.endsWith(".RSA") ||
+                name.endsWith(".EC") ||
                 SIG.matcher(name).matches()
         );
     }
