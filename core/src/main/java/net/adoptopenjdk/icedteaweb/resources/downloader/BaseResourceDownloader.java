@@ -140,11 +140,9 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             resource.setTransferred(bytesTransferred);
             return resource;
         } catch (Exception ex) {
-            final URL resourceHref = resource.getLocation();
-            final VersionId version = getVersion(downloadDetails.downloadFrom, downloadDetails.version);
-            final File cacheFile = Cache.getCacheFile(resourceHref, version);
-            if (cacheFile != null && cacheFile.exists()) {
-                cacheFile.delete();
+            if (downloadDetails != null) {
+                LOG.debug("Marking as corrupted {}", resource);
+                Cache.markAsCorrupted(resource.getLocation(), getVersion(downloadDetails.downloadFrom, downloadDetails.version));
             }
             LOG.debug("Exception while downloading resource {} from {} - message: {} cause: {} ", resource, downloadFrom, ex.getMessage(), ex.getCause());
             throw ex;
