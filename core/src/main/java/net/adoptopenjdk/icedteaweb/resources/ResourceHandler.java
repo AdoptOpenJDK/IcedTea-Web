@@ -6,7 +6,6 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
-import net.sourceforge.jnlp.cache.CacheUtil;
 
 import java.io.File;
 import java.util.concurrent.CompletableFuture;
@@ -15,6 +14,7 @@ import java.util.concurrent.Future;
 
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
+import static net.sourceforge.jnlp.cache.CacheUtil.isNonCacheable;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 
@@ -23,16 +23,14 @@ class ResourceHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
 
     static Future<Resource> putIntoCache(final Resource resource, final Executor downloadExecutor) {
-        LOG.debug("Checking download state of {}", resource.getSimpleName());
         final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {
-            LOG.debug("Resource is already downloaded: {} ", resource.getSimpleName());
+            LOG.debug("Resource is already completed: {} ", resource.getSimpleName());
             result.complete(resource);
-        } else if (isNotCacheable(resource)) {
+        } else if (isNonCacheable(resource.getLocation())) {
             LOG.debug("Resource is not cacheable: {}", resource.getSimpleName());
             result.complete(initNoneCacheableResources(resource));
         } else {
-            LOG.debug("Download has not been started yet: {}", resource.getSimpleName());
             downloadExecutor.execute(() -> {
                 try {
                     result.complete(download(resource));
@@ -42,10 +40,6 @@ class ResourceHandler {
             });
         }
         return result;
-    }
-
-    private static boolean isNotCacheable(final Resource resource) {
-        return !CacheUtil.isCacheable(resource.getLocation());
     }
 
     private static Resource initNoneCacheableResources(final Resource resource) {
@@ -60,12 +54,14 @@ class ResourceHandler {
     }
 
     private static Resource download(final Resource resource) {
-        int triesLeft = 2;
+        LOG.debug("Starting download of: {}", resource.getSimpleName());
+        int numErrors = 0;
         while (true) {
             try {
                 return downloadResource(resource);
             } catch (Exception e) {
-                if (--triesLeft < 0) {
+                numErrors += 1;
+                if (numErrors >= 3) {
                     LOG.debug("Exception while downloading '{}'", resource.getSimpleName(), e);
                     resource.setStatus(ERROR);
                     throw e;
@@ -75,7 +71,6 @@ class ResourceHandler {
     }
 
     private static Resource downloadResource(final Resource resource) {
-        LOG.debug("Download of resource {} will start now!", resource.getSimpleName());
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
         final InitializationResult initResult = initializer.init();
         if (initResult.needsDownload()) {

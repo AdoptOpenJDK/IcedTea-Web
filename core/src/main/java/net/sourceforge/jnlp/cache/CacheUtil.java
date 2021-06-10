@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DummyDownloadIndicator;
@@ -122,9 +123,21 @@ public class CacheUtil {
      * @param source the url of resource
      * @return whether this resource can be cached
      */
+    public static boolean isNonCacheable(URL source) {
+        Assert.requireNonNull(source, "source");
+        return NON_CACHEABLE_PROTOCOLS.contains(source.getProtocol());
+    }
+
+    /**
+     * Returns whether the resource can be cached as a local file;
+     * if not, then URLConnection.openStream can be used to obtain
+     * the contents.
+     *
+     * @param source the url of resource
+     * @return whether this resource can be cached
+     */
     public static boolean isCacheable(URL source) {
-        final String protocol = source != null ? source.getProtocol() : null;
-        return !NON_CACHEABLE_PROTOCOLS.contains(protocol);
+        return !isNonCacheable(source);
     }
 
 

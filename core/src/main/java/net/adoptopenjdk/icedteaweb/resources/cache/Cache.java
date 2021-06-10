@@ -2,7 +2,6 @@ package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.cache.CacheUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +9,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static net.sourceforge.jnlp.cache.CacheUtil.isNonCacheable;
 
 /**
  * The Cache
@@ -47,14 +48,14 @@ public class Cache {
      * @throws IllegalArgumentException if the resource is not cacheable
      */
     public static File getCacheFile(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
         return LeastRecentlyUsedCache.getInstance().getOrCreateCacheFile(resource, version);
     }
 
     public static File addToCache(DownloadInfo infoFromRemote, InputStream unpackedStream) throws IOException {
-        if (!CacheUtil.isCacheable(infoFromRemote.getResourceHref())) {
+        if (isNonCacheable(infoFromRemote.getResourceHref())) {
             throw new IllegalArgumentException(infoFromRemote.getResourceHref() + " is not a cacheable resource");
         }
         return LeastRecentlyUsedCache.getInstance().addToCache(infoFromRemote, unpackedStream);
@@ -69,7 +70,7 @@ public class Cache {
      * @throws IllegalArgumentException if the resource is not cacheable
      */
     public static File replaceExistingCacheFile(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
         return LeastRecentlyUsedCache.getInstance().replaceExistingCacheFile(resource, version);
@@ -84,7 +85,7 @@ public class Cache {
     }
 
     public static void deleteFromCache(URL resource, VersionString version) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
         LeastRecentlyUsedCache.getInstance().deleteFromCache(resource, version);
@@ -100,7 +101,7 @@ public class Cache {
      * @throws IllegalArgumentException if the resource is not cacheable
      */
     public static boolean isCached(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
 
@@ -108,7 +109,7 @@ public class Cache {
     }
 
     public static ResourceInfo getInfo(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
 
@@ -125,14 +126,14 @@ public class Cache {
      * @throws IllegalArgumentException if the source is not cacheable
      */
     public static boolean isAnyCached(final URL resource, final VersionString version) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
         return LeastRecentlyUsedCache.getInstance().getBestMatchingEntryInCache(resource, version).isPresent();
     }
 
     public static VersionId getBestMatchingVersionInCache(final URL resource, final VersionString version) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
         return LeastRecentlyUsedCache.getInstance().getBestMatchingEntryInCache(resource, version)
@@ -141,7 +142,7 @@ public class Cache {
     }
 
     public static List<VersionId> getAllVersionsInCache(final URL resourceHref) {
-        if (!CacheUtil.isCacheable(resourceHref)) {
+        if (isNonCacheable(resourceHref)) {
             throw new IllegalArgumentException(resourceHref + " is not a cacheable resource");
         }
         return LeastRecentlyUsedCache.getInstance().getAllEntriesInCache(resourceHref).stream()
@@ -161,7 +162,7 @@ public class Cache {
      * @throws IllegalArgumentException if the resource is not cacheable
      */
     public static boolean isUpToDate(final URL resource, final VersionId version, long lastModified) {
-        if (!CacheUtil.isCacheable(resource)) {
+        if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }
 
