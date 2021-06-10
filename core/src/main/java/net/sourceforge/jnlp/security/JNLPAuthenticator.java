@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.createSingletonDaemonThreadPool;
 import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.globalFixedThreadPool;
 
 public class JNLPAuthenticator extends Authenticator {
@@ -87,7 +88,7 @@ public class JNLPAuthenticator extends Authenticator {
         static void putIntoCacheForFiveSeconds(final CacheKey key, final PasswordAuthentication value) {
             store.put(key, value);
 
-            globalFixedThreadPool().submit(() -> {
+            createSingletonDaemonThreadPool().submit(() -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException ignored) {
