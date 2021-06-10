@@ -52,7 +52,7 @@ public class ResourceTest {
         final URL url = new URL("http://example.com/applet.jar");
         final VersionString requestVersion = VersionString.fromString("1.0");
 
-        final Resource res = Resource.createResource(url, requestVersion, null, UpdatePolicy.ALWAYS);
+        final Resource res = Resource.createOrGetResource(url, requestVersion, null, UpdatePolicy.ALWAYS);
 
         assertEquals("Locations should match each other", url, res.getLocation());
         assertEquals("Versions should match each other.", res.getRequestVersion(), requestVersion);
@@ -88,6 +88,6 @@ public class ResourceTest {
 
     private static Resource createResource() throws MalformedURLException {
         final URL dummyUrl = new URL("http://example.com/applet.jar");
-        return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), DownloadOptions.NONE, UpdatePolicy.ALWAYS);
+        return Resource.createOrGetResource(dummyUrl, VersionString.fromString("1.0"), DownloadOptions.NONE, UpdatePolicy.ALWAYS);
     }
 }

@@ -110,7 +110,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
     public void testDownloadPackGzResource() throws Exception {
         setupPackGzFile("download-packgz");
 
-        final Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), null, new DownloadOptions(true, false), UpdatePolicy.NEVER);
+        final Resource resource = Resource.createOrGetResource(downloadServer.getUrl("download-packgz.jar"), null, new DownloadOptions(true, false), UpdatePolicy.NEVER);
 
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
@@ -131,7 +131,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         setupFile("download-version__V1.0.jar", expected);
 
         final URL url = downloadServer.getUrl("download-version.jar");
-        final Resource resource = Resource.createResource(url, VersionString.fromString("1.0"), new DownloadOptions(false, true), UpdatePolicy.NEVER);
+        final Resource resource = Resource.createOrGetResource(url, VersionString.fromString("1.0"), new DownloadOptions(false, true), UpdatePolicy.NEVER);
 
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
@@ -146,7 +146,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
     @Test
     public void testDownloadVersionedPackGzResource() throws Exception {
         setupPackGzFile("download-packgz__V1.0");
-        final Resource resource = Resource.createResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), new DownloadOptions(true, true), UpdatePolicy.NEVER);
+        final Resource resource = Resource.createOrGetResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), new DownloadOptions(true, true), UpdatePolicy.NEVER);
 
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
@@ -170,7 +170,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final String stringURL = "file://" + localFile.getAbsolutePath();
         final URL url = new URL(stringURL);
 
-        final Resource resource = Resource.createResource(url, null, null, UpdatePolicy.NEVER);
+        final Resource resource = Resource.createOrGetResource(url, null, null, UpdatePolicy.NEVER);
 
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
@@ -180,7 +180,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
 
     @Test
     public void testDownloadNotExistingResourceFails() throws Exception {
-        final Resource resource = Resource.createResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, null, UpdatePolicy.NEVER);
+        final Resource resource = Resource.createOrGetResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, null, UpdatePolicy.NEVER);
 
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
@@ -196,7 +196,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
     private Resource setupResource(String fileName, String text) throws Exception {
         setupFile(fileName, text);
         final URL url = downloadServer.getUrl(fileName);
-        return Resource.createResource(url, null, DownloadOptions.NONE, UpdatePolicy.NEVER);
+        return Resource.createOrGetResource(url, null, DownloadOptions.NONE, UpdatePolicy.NEVER);
     }
 
     private String readFile(File downloadedFile) throws Exception {

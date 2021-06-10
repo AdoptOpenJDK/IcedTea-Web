@@ -43,7 +43,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.createOrGetResource;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
 
@@ -148,11 +148,11 @@ public class ResourceTracker {
      */
     public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
         Assert.requireNonNull(location, "location");
-        LOG.debug("Will add resource at location '{}'", location);
+        LOG.debug("Create resource for '{}'", location);
 
 
         final URL normalizedLocation = normalizeUrlQuietly(location);
-        final Resource resource = createResource(normalizedLocation, version, downloadOptions, updatePolicy);
+        final Resource resource = createOrGetResource(normalizedLocation, version, downloadOptions, updatePolicy);
         LOG.debug("Will add resource '{}'", resource.getSimpleName());
         if (addToResources(resource)) {
             startDownloadingIfPrefetch(resource);

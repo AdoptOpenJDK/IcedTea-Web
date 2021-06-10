@@ -118,7 +118,7 @@ public class Resource {
      * @param updatePolicy    final policy for updating
      * @return new resource, which is already added in resources list
      */
-    static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
+    static Resource createOrGetResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, downloadOptions, updatePolicy);
 
