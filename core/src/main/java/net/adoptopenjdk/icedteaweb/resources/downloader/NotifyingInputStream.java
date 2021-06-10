@@ -28,7 +28,7 @@ class NotifyingInputStream extends CountingInputStream {
         if (totalSize <= 0) {
             return UNKNOWN_CHUNK_SIZE;
         }
-        return Long.max(totalSize / MAX_NOTIFICATIONS, MIN_CHUNK_SIZE);
+        return Long.max(totalSize / (MAX_NOTIFICATIONS-1), MIN_CHUNK_SIZE);
     }
 
     @Override

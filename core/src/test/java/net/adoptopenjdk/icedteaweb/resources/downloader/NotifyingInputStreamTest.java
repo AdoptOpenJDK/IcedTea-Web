@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static net.adoptopenjdk.icedteaweb.resources.downloader.NotifyingInputStream.MAX_NOTIFICATIONS;
 import static net.adoptopenjdk.icedteaweb.resources.downloader.NotifyingInputStream.MIN_CHUNK_SIZE;
 import static net.adoptopenjdk.icedteaweb.resources.downloader.NotifyingInputStream.UNKNOWN_CHUNK_SIZE;
 import static org.junit.Assert.assertEquals;
@@ -91,7 +92,7 @@ public class NotifyingInputStreamTest {
         readByteByByte(sut);
 
         // assert
-        assertEquals(listOf(MIN_CHUNK_SIZE, MIN_CHUNK_SIZE*2, MIN_CHUNK_SIZE*3, size), listener.notifications);
+        assertEquals(listOf(MIN_CHUNK_SIZE, MIN_CHUNK_SIZE * 2, MIN_CHUNK_SIZE * 3, size), listener.notifications);
     }
 
     @Test
@@ -105,7 +106,7 @@ public class NotifyingInputStreamTest {
         readBlock(sut, MIN_CHUNK_SIZE);
 
         // assert
-        assertEquals(listOf(MIN_CHUNK_SIZE, MIN_CHUNK_SIZE*2, MIN_CHUNK_SIZE*3, size), listener.notifications);
+        assertEquals(listOf(MIN_CHUNK_SIZE, MIN_CHUNK_SIZE * 2, MIN_CHUNK_SIZE * 3, size), listener.notifications);
     }
 
     @Test
@@ -119,7 +120,7 @@ public class NotifyingInputStreamTest {
         readByteByByte(sut);
 
         // assert
-        assertEquals(listOf(UNKNOWN_CHUNK_SIZE, UNKNOWN_CHUNK_SIZE*2, UNKNOWN_CHUNK_SIZE*3, size), listener.notifications);
+        assertEquals(listOf(UNKNOWN_CHUNK_SIZE, UNKNOWN_CHUNK_SIZE * 2, UNKNOWN_CHUNK_SIZE * 3, size), listener.notifications);
     }
 
     @Test
@@ -133,7 +134,37 @@ public class NotifyingInputStreamTest {
         readBlock(sut, MIN_CHUNK_SIZE);
 
         // assert
-        assertEquals(listOf(UNKNOWN_CHUNK_SIZE, UNKNOWN_CHUNK_SIZE*2, UNKNOWN_CHUNK_SIZE*3, size), listener.notifications);
+        assertEquals(listOf(UNKNOWN_CHUNK_SIZE, UNKNOWN_CHUNK_SIZE * 2, UNKNOWN_CHUNK_SIZE * 3, size), listener.notifications);
+    }
+
+
+    @Test
+    public void shouldNotifyMaxTimesForVeryLargeStreamWhenReadByteByByte() throws IOException {
+        // arrange
+        final int size = MIN_CHUNK_SIZE * (MAX_NOTIFICATIONS + 10);
+        final InputStream in = inputStream(size);
+        final NotifyingInputStream sut = new NotifyingInputStream(in, size, listener);
+
+        // act
+        readByteByByte(sut);
+
+        // assert
+        assertEquals(MAX_NOTIFICATIONS, listener.notifications.size());
+    }
+
+    @Test
+    public void shouldNotifyMaxTimesForVeryLargeStreamWhenReadBlockwise() throws IOException {
+        // arrange
+        final int size = (MIN_CHUNK_SIZE+1) * (MAX_NOTIFICATIONS + 10);
+
+        final InputStream in = inputStream(size);
+        final NotifyingInputStream sut = new NotifyingInputStream(in, size, listener);
+
+        // act
+        readBlock(sut, MIN_CHUNK_SIZE);
+
+        // assert
+        assertEquals(MAX_NOTIFICATIONS, listener.notifications.size());
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
