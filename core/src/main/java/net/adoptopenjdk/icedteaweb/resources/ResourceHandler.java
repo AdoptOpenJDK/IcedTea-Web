@@ -54,7 +54,7 @@ class ResourceHandler {
     }
 
     private static Resource download(final Resource resource) {
-        LOG.debug("Starting download of: {}", resource.getSimpleName());
+        LOG.debug("Start processing resource: {}", resource.getSimpleName());
         int numErrors = 0;
         while (true) {
             try {
@@ -62,7 +62,7 @@ class ResourceHandler {
             } catch (Exception e) {
                 numErrors += 1;
                 if (numErrors >= 3) {
-                    LOG.debug("Exception while downloading '{}'", resource.getSimpleName(), e);
+                    LOG.debug("Exception while processing resource '{}'", resource.getSimpleName(), e);
                     resource.setStatus(ERROR);
                     throw e;
                 }
