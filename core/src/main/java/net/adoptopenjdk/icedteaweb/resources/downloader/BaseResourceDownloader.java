@@ -164,7 +164,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             resource.setLocalFile(cacheFile);
             return cacheFile.length();
         } else {
-            final CountingInputStream countingInputStream = new CountingInputStream(downloadDetails.inputStream);
+            final CountingInputStream countingInputStream = downloadDetails.inputStream;
 
             final StreamUnpacker compressionUpacker = StreamUnpacker.getCompressionUnpacker(downloadDetails);
             final InputStream unpackedStream = compressionUpacker.unpack(countingInputStream);
@@ -201,7 +201,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
             final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
             final long totalSize = connection.getContentLength();
-            final InputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize, resource::setTransferred);
+            final NotifyingInputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize, resource::setTransferred);
 
             if (!String.valueOf(connection.getResponseCode()).startsWith("2")) {
                 throw new IllegalStateException("Request returned " + connection.getResponseCode() + " for URL " + connection.getURL());
@@ -235,7 +235,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final String version = headerMap.get(VERSION_ID_HEADER);
         final String contentType = headerMap.get(CONTENT_TYPE_HEADER);
         final String contentEncoding = headerMap.get(CONTENT_ENCODING_HEADER);
-        final InputStream inputStream = new ByteArrayInputStream(body);
+        final CountingInputStream inputStream = new CountingInputStream(new ByteArrayInputStream(body));
 
         return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified, body.length);
     }

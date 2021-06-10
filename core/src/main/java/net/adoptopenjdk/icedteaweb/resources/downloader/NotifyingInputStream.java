@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -8,11 +7,10 @@ import java.util.function.Consumer;
 /**
  * Input stream which notifies a listener about its progress.
  */
-class NotifyingInputStream extends FilterInputStream {
+class NotifyingInputStream extends CountingInputStream {
     private final Consumer<Long> downloadListener;
     private final long updateChunkSize;
 
-    private long downloaded = 0;
     private long nextUpdateSize;
 
     public NotifyingInputStream(final InputStream inputStream, final long totalSize, final Consumer<Long> downloadListener) {
@@ -22,29 +20,38 @@ class NotifyingInputStream extends FilterInputStream {
         this.nextUpdateSize = updateChunkSize;
     }
 
-    private long calculateChunkSize(long totalSize) {
-        if (totalSize <= 0) {
-            return 1000;
-        }
-
-        return Long.max(totalSize / 1000, 100);
+    private long calculateChunkSize(final long totalSize) {
+        return Long.max(totalSize / 1000, 1024);
     }
 
     @Override
     public int read() throws IOException {
         final int value = super.read();
-        if (value >= 0) {
-            if (nextUpdateSize <= ++downloaded) {
-                nextUpdateSize = downloaded + updateChunkSize;
-                notifyListener(downloaded);
-            }
-        }
+        handleRead(value);
         return value;
     }
 
-    private void notifyListener(final long value) {
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        int result = super.read(b, off, len);
+        handleRead(result);
+        return result;
+    }
+
+    private void handleRead(long result) {
+        if (result != -1) {
+            if (numBytesRead() >= nextUpdateSize) {
+                nextUpdateSize += updateChunkSize;
+                notifyListener();
+            }
+        } else {
+            notifyListener();
+        }
+    }
+
+    private void notifyListener() {
         try {
-            downloadListener.accept(value);
+            downloadListener.accept(numBytesRead());
         } catch (Exception ignored) {
         }
     }
