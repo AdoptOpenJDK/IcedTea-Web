@@ -8,7 +8,9 @@ import java.util.function.Consumer;
  * Input stream which notifies a listener about its progress.
  */
 class NotifyingInputStream extends CountingInputStream {
-    static final int MIN_CHUNK_SIZE = 1024;
+    static final int UNKNOWN_CHUNK_SIZE = 1024;
+    static final int MIN_CHUNK_SIZE = 256;
+    static final int MAX_NOTIFICATIONS = 100;
 
     private final Consumer<Long> downloadListener;
     private final long updateChunkSize;
@@ -23,7 +25,10 @@ class NotifyingInputStream extends CountingInputStream {
     }
 
     private long calculateChunkSize(final long totalSize) {
-        return Long.max(totalSize / 1000, MIN_CHUNK_SIZE);
+        if (totalSize <= 0) {
+            return UNKNOWN_CHUNK_SIZE;
+        }
+        return Long.max(totalSize / MAX_NOTIFICATIONS, MIN_CHUNK_SIZE);
     }
 
     @Override

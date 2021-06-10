@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.resources.downloader.NotifyingInputStream.MIN_CHUNK_SIZE;
+import static net.adoptopenjdk.icedteaweb.resources.downloader.NotifyingInputStream.UNKNOWN_CHUNK_SIZE;
 import static org.junit.Assert.assertEquals;
 
 public class NotifyingInputStreamTest {
@@ -105,6 +106,34 @@ public class NotifyingInputStreamTest {
 
         // assert
         assertEquals(listOf(MIN_CHUNK_SIZE, MIN_CHUNK_SIZE*2, MIN_CHUNK_SIZE*3, size), listener.notifications);
+    }
+
+    @Test
+    public void shouldNotifyMultipleTimesForLargeStreamOfUnknownSizeWhenReadByteByByte() throws IOException {
+        // arrange
+        final int size = (UNKNOWN_CHUNK_SIZE * 3) + 1;
+        final InputStream in = inputStream(size);
+        final NotifyingInputStream sut = new NotifyingInputStream(in, 0, listener);
+
+        // act
+        readByteByByte(sut);
+
+        // assert
+        assertEquals(listOf(UNKNOWN_CHUNK_SIZE, UNKNOWN_CHUNK_SIZE*2, UNKNOWN_CHUNK_SIZE*3, size), listener.notifications);
+    }
+
+    @Test
+    public void shouldNotifyMultipleTimesForLargeStreamOfUnknownSizeWhenReadBlockwise() throws IOException {
+        // arrange
+        final int size = (UNKNOWN_CHUNK_SIZE * 3) + 1;
+        final InputStream in = inputStream(size);
+        final NotifyingInputStream sut = new NotifyingInputStream(in, 0, listener);
+
+        // act
+        readBlock(sut, MIN_CHUNK_SIZE);
+
+        // assert
+        assertEquals(listOf(UNKNOWN_CHUNK_SIZE, UNKNOWN_CHUNK_SIZE*2, UNKNOWN_CHUNK_SIZE*3, size), listener.notifications);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
