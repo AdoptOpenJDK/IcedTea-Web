@@ -124,8 +124,9 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     }
 
     private Resource tryDownloading(final URL downloadFrom) throws IOException {
+        DownloadDetails downloadDetails = null;
         try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
-            final DownloadDetails downloadDetails = getDownloadDetails(connection);
+            downloadDetails = getDownloadDetails(connection);
 
             if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(ERROR_MIME_TYPE)) {
                 final String serverResponse = StreamUtils.readStreamAsString(downloadDetails.inputStream);
@@ -139,6 +140,10 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             resource.setTransferred(bytesTransferred);
             return resource;
         } catch (Exception ex) {
+            if (downloadDetails != null) {
+                LOG.debug("Marking as corrupted {}", resource);
+                Cache.markAsCorrupted(resource.getLocation(), getVersion(downloadDetails.downloadFrom, downloadDetails.version));
+            }
             LOG.debug("Exception while downloading resource {} from {} - message: {} cause: {} ", resource, downloadFrom, ex.getMessage(), ex.getCause());
             throw ex;
         }

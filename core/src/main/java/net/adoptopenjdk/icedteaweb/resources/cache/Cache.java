@@ -75,6 +75,10 @@ public class Cache {
         return LeastRecentlyUsedCache.getInstance().replaceExistingCacheFile(resource, version);
     }
 
+    public static void markAsCorrupted(URL resource, VersionId version) {
+        LeastRecentlyUsedCache.getInstance().markAsCorrupted(resource, version);
+    }
+
     public static void deleteFromCache(ResourceInfo info) {
         LeastRecentlyUsedCache.getInstance().deleteFromCache(info.getResourceHref(), info.getVersion());
     }

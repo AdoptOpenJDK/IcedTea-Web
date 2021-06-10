@@ -121,6 +121,10 @@ class LeastRecentlyUsedCache {
         return getCacheFile(entry);
     }
 
+    void markAsCorrupted(URL resourceHref, VersionId version) {
+        cacheIndex.runSynchronized(idx -> idx.markEntryForDeletion(resourceHref, version));
+    }
+
     private LeastRecentlyUsedCacheEntry createNewInfoFileAndIndexEntry(LeastRecentlyUsedCacheIndex idx, URL resourceHref, VersionId version) {
         final File dir = makeNewCacheDir();
         final String entryId = entryIdFromCacheDir(dir);
