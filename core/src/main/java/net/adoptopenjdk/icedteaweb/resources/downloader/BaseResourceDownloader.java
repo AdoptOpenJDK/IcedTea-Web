@@ -9,7 +9,6 @@ import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.DownloadInfo;
@@ -33,6 +32,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.globalFixedThreadPool;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.ACCEPT_ENCODING_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CONTENT_ENCODING_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CONTENT_TYPE_HEADER;
@@ -113,7 +113,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private CompletableFuture<Resource> downloadFrom(final URL url) {
         LOG.debug("Will download in background: {}", url);
         final CompletableFuture<Resource> result = new CompletableFuture<>();
-        CachedDaemonThreadPoolProvider.getThreadPool().execute(() -> {
+        globalFixedThreadPool().execute(() -> {
             try {
                 result.complete(tryDownloading(url));
             } catch (Exception e) {

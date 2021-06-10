@@ -28,11 +28,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.INCOMPLETE;
+import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.validateWithApplicationWhiteList;
 
 /**
  * <p>
@@ -213,14 +215,6 @@ public class Resource {
         return futureForDownloaded != null;
     }
 
-    void startProcessing(Future<Resource> futureThis) {
-        this.futureForDownloaded = futureThis;
-    }
-
-    Future<Resource> getFutureForDownloaded() {
-        return futureForDownloaded;
-    }
-
     /**
      * Check if the specified flag is set.
      *
@@ -290,5 +284,16 @@ public class Resource {
                 .map(p -> p.split("/"))
                 .map(a -> a[a.length - 1])
                 .orElse("UNKNOWN");
+    }
+
+    Future<Resource> putIntoCache(final Executor downloadExecutor) {
+        validateWithApplicationWhiteList(location);
+
+        synchronized (this) {
+            if (futureForDownloaded == null) {
+                this.futureForDownloaded = ResourceHandler.putIntoCache(this, downloadExecutor);
+            }
+            return futureForDownloaded;
+        }
     }
 }

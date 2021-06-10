@@ -34,7 +34,6 @@ statement from your version. */
 package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogs;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.NamePassword;
 
 import java.net.Authenticator;
@@ -43,6 +42,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.globalFixedThreadPool;
 
 public class JNLPAuthenticator extends Authenticator {
 
@@ -86,7 +87,7 @@ public class JNLPAuthenticator extends Authenticator {
         static void putIntoCacheForFiveSeconds(final CacheKey key, final PasswordAuthentication value) {
             store.put(key, value);
 
-            CachedDaemonThreadPoolProvider.getThreadPool().submit(() -> {
+            globalFixedThreadPool().submit(() -> {
                 try {
                     TimeUnit.SECONDS.sleep(5);
                 } catch (InterruptedException ignored) {

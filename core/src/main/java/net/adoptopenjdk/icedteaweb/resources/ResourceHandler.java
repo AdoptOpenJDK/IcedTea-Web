@@ -1,20 +1,14 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
 
-import net.adoptopenjdk.icedteaweb.Assert;
-import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
-import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
 
 import java.io.File;
-import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -28,46 +22,20 @@ class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
 
-    private final Resource resource;
-
-    ResourceHandler(Resource resource) {
-        this.resource = Assert.requireNonNull(resource, "resource");
-    }
-
-    Future<Resource> putIntoCache(final Executor downloadExecutor) {
-        LOG.debug("Will check and maybe put into cache: {}", resource.getSimpleName());
-        validateWithWhitelist();
-
-        // the thread which is processing this resource will set its future onto the resource all other
-        // threads will return this future and ensure a resource is only processed by a single thread
-        synchronized (resource) {
-            final Future<Resource> future = resource.getFutureForDownloaded();
-            if (future == null) {
-                LOG.debug("Download for {} has not been started until now", resource.getSimpleName());
-                final Future<Resource> futureResource = getDownloadStateAndStartUnstartedDownload(downloadExecutor);
-                resource.startProcessing(futureResource);
-                return futureResource;
-            } else {
-                LOG.debug("Download for {} has already been started.", resource.getSimpleName());
-                return future;
-            }
-        }
-    }
-
-    private Future<Resource> getDownloadStateAndStartUnstartedDownload(final Executor downloadExecutor) {
+    static Future<Resource> putIntoCache(final Resource resource, final Executor downloadExecutor) {
         LOG.debug("Checking download state of {}", resource.getSimpleName());
         final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {
             LOG.debug("Resource is already downloaded: {} ", resource.getSimpleName());
             result.complete(resource);
-        } else if (isNotCacheable()) {
+        } else if (isNotCacheable(resource)) {
             LOG.debug("Resource is not cacheable: {}", resource.getSimpleName());
-            result.complete(initNoneCacheableResources());
+            result.complete(initNoneCacheableResources(resource));
         } else {
             LOG.debug("Download has not been started yet: {}", resource.getSimpleName());
             downloadExecutor.execute(() -> {
                 try {
-                    result.complete(download());
+                    result.complete(download(resource));
                 } catch (Exception e) {
                     result.completeExceptionally(e);
                 }
@@ -76,11 +44,11 @@ class ResourceHandler {
         return result;
     }
 
-    private boolean isNotCacheable() {
+    private static boolean isNotCacheable(final Resource resource) {
         return !CacheUtil.isCacheable(resource.getLocation());
     }
 
-    private Resource initNoneCacheableResources() {
+    private static Resource initNoneCacheableResources(final Resource resource) {
         resource.setStatus(DOWNLOADED);
         if (resource.getLocation().getProtocol().equals(FILE_PROTOCOL)) {
             final File file = new File(decodeUrlQuietly(resource.getLocation()).getPath());
@@ -91,11 +59,11 @@ class ResourceHandler {
         return resource;
     }
 
-    private Resource download() {
+    private static Resource download(final Resource resource) {
         int triesLeft = 2;
         while (true) {
             try {
-                return downloadResource();
+                return downloadResource(resource);
             } catch (Exception e) {
                 if (--triesLeft < 0) {
                     LOG.debug("Exception while downloading '{}'", resource.getSimpleName(), e);
@@ -106,7 +74,7 @@ class ResourceHandler {
         }
     }
 
-    private Resource downloadResource() {
+    private static Resource downloadResource(final Resource resource) {
         LOG.debug("Download of resource {} will start now!", resource.getSimpleName());
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
         final InitializationResult initResult = initializer.init();
@@ -117,16 +85,4 @@ class ResourceHandler {
         return resource;
     }
 
-    private void validateWithWhitelist() {
-        final URL url = resource.getLocation();
-        Assert.requireNonNull(url, "url");
-
-        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
-        final boolean found = UrlWhiteListUtils.isUrlInApplicationUrlWhitelist(url);
-        if (!found) {
-            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
-            LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
-            JNLPRuntime.exit(-1);
-        }
-    }
 }

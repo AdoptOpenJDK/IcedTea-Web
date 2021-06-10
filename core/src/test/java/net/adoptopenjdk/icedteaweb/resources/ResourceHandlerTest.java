@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider.DaemonThreadFactory;
 import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.adoptopenjdk.icedteaweb.testing.ServerLauncher;
 import net.jcip.annotations.NotThreadSafe;
@@ -25,7 +24,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -35,6 +35,7 @@ import java.util.zip.GZIPOutputStream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
+import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.validateWithApplicationWhiteList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -96,8 +97,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final String expected = "testDownloadResource";
         final Resource resource = setupResource("download-resource", expected);
 
-        final ResourceHandler resourceHandler = new ResourceHandler(resource);
-        resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
+        ResourceHandler.putIntoCache(resource, executor()).get();
 
         final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
@@ -112,8 +112,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
 
         final Resource resource = Resource.createOrGetResource(downloadServer.getUrl("download-packgz.jar"), null, new DownloadOptions(true, false), UpdatePolicy.NEVER);
 
-        final ResourceHandler resourceHandler = new ResourceHandler(resource);
-        resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
+        ResourceHandler.putIntoCache(resource, executor()).get();
 
         final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
@@ -133,8 +132,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final URL url = downloadServer.getUrl("download-version.jar");
         final Resource resource = Resource.createOrGetResource(url, VersionString.fromString("1.0"), new DownloadOptions(false, true), UpdatePolicy.NEVER);
 
-        final ResourceHandler resourceHandler = new ResourceHandler(resource);
-        resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
+        ResourceHandler.putIntoCache(resource, executor()).get();
 
         final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
@@ -148,8 +146,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         setupPackGzFile("download-packgz__V1.0");
         final Resource resource = Resource.createOrGetResource(downloadServer.getUrl("download-packgz.jar"), VersionString.fromString("1.0"), new DownloadOptions(true, true), UpdatePolicy.NEVER);
 
-        final ResourceHandler resourceHandler = new ResourceHandler(resource);
-        resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
+        ResourceHandler.putIntoCache(resource, executor()).get();
 
         final File downloadedFile = resource.getLocalFile();
         assertTrue(downloadedFile.exists() && downloadedFile.isFile());
@@ -172,8 +169,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
 
         final Resource resource = Resource.createOrGetResource(url, null, null, UpdatePolicy.NEVER);
 
-        final ResourceHandler resourceHandler = new ResourceHandler(resource);
-        resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
+        ResourceHandler.putIntoCache(resource, executor()).get();
 
         assertTrue(resource.hasStatus(DOWNLOADED));
     }
@@ -182,8 +178,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
     public void testDownloadNotExistingResourceFails() throws Exception {
         final Resource resource = Resource.createOrGetResource(new URL(downloadServer.getUrl() + "/notexistingfile"), null, null, UpdatePolicy.NEVER);
 
-        final ResourceHandler resourceHandler = new ResourceHandler(resource);
-        resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
+        ResourceHandler.putIntoCache(resource, executor()).get();
 
         assertTrue(resource.hasStatus(ERROR));
     }
@@ -224,5 +219,9 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final GZIPOutputStream gos = new GZIPOutputStream(new FileOutputStream(packgz));
         gos.write(Files.readAllBytes(pack.toPath()));
         gos.close();
+    }
+
+    private ExecutorService executor() {
+        return DaemonThreadPoolProvider.createSingletonDaemonThreadPool();
     }
 }

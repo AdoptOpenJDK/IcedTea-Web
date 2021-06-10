@@ -20,7 +20,6 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider.DaemonThreadFactory;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -38,12 +37,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.createFixedDaemonThreadPool;
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.createSingletonDaemonThreadPool;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.createOrGetResource;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
 
@@ -187,7 +187,7 @@ public class ResourceTracker {
     private void startDownloadingIfPrefetch(Resource resource) {
         if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
             LOG.debug("Prefetching resource {}", resource.getSimpleName());
-            triggerDownloadFor(resource, Executors.newSingleThreadExecutor(new DaemonThreadFactory()));
+            triggerDownloadFor(resource, createSingletonDaemonThreadPool());
         }
     }
 
@@ -385,7 +385,7 @@ public class ResourceTracker {
 
         final int configuredThreadCount = Integer.parseInt(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT));
         final int threadCount = Math.min(configuredThreadCount, resources.length);
-        final ExecutorService downloadExecutor = Executors.newFixedThreadPool(threadCount, new DaemonThreadFactory());
+        final ExecutorService downloadExecutor = createFixedDaemonThreadPool(threadCount);
         try {
             final List<Future<Resource>> futures = Arrays.asList(resources).stream()
                     .map(r -> triggerDownloadFor(r, downloadExecutor))
@@ -403,7 +403,7 @@ public class ResourceTracker {
     }
 
     private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {
-        return new ResourceHandler(resource).putIntoCache(downloadExecutor);
+        return resource.putIntoCache(downloadExecutor);
     }
 
     public void addDownloadListener(final URL resourceUrl, URL[] allResources, final DownloadServiceListener listener) {
