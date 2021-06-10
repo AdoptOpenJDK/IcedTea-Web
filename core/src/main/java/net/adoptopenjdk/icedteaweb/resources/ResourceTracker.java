@@ -150,10 +150,12 @@ public class ResourceTracker {
         Assert.requireNonNull(location, "location");
         LOG.debug("Create resource for '{}'", location);
 
-
         final URL normalizedLocation = normalizeUrlQuietly(location);
+        if (!location.toString().equals(normalizedLocation.toString())) {
+            LOG.debug("Normalized location {} -> {}", location, normalizedLocation);
+        }
+
         final Resource resource = createOrGetResource(normalizedLocation, version, downloadOptions, updatePolicy);
-        LOG.debug("Will add resource '{}'", resource.getSimpleName());
         if (addToResources(resource)) {
             startDownloadingIfPrefetch(resource);
         }
@@ -168,21 +170,23 @@ public class ResourceTracker {
 
             if (existingResource == null) {
                 resources.put(resource.getLocation(), resource);
-            } else {
-                final VersionString newVersion = resource.getRequestVersion();
-                final VersionString existingVersion = existingResource.getRequestVersion();
-                if (!Objects.equals(existingVersion, newVersion)) {
-                    throw new IllegalStateException("Found two resources with location '" + resource.getLocation() +
-                            "' but different versions '" + newVersion + "' - '" + existingVersion + "'");
-                }
+                return true;
             }
 
-            return existingResource == null;
+            final VersionString newVersion = resource.getRequestVersion();
+            final VersionString existingVersion = existingResource.getRequestVersion();
+            if (!Objects.equals(existingVersion, newVersion)) {
+                throw new IllegalStateException("Found two resources with location '" + resource.getLocation() +
+                        "' but different versions '" + newVersion + "' - '" + existingVersion + "'");
+            }
+
+            return false;
         }
     }
 
     private void startDownloadingIfPrefetch(Resource resource) {
         if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
+            LOG.debug("Prefetching resource {}", resource.getSimpleName());
             triggerDownloadFor(resource, Executors.newSingleThreadExecutor(new DaemonThreadFactory()));
         }
     }
