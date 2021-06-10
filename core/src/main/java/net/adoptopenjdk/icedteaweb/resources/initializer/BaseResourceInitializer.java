@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.ACCEPT_ENCODING_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.PACK_200_OR_GZIP;
 

@@ -41,8 +41,8 @@ import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstant
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.LAST_MODIFIED_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.PACK_200_OR_GZIP;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_ID_HEADER;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 
 /**
  * Base class for resource downloader.

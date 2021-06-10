@@ -42,7 +42,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
@@ -259,7 +259,7 @@ public class ResourceTracker {
 
     private static File getCacheFile(final Resource resource) {
         final URL location = resource.getLocation();
-        if (resource.isSet(ERROR)) {
+        if (resource.hasStatus(ERROR)) {
             LOG.debug("Error flag set for resource '{}'. Can not return a local file for the resource", resource.getLocation());
             return null;
         }

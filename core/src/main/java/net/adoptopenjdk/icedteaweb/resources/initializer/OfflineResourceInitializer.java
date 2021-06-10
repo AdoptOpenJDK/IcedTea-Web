@@ -6,7 +6,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 
 /**
  * Class to initialize resources in case the application runs in offline mode.

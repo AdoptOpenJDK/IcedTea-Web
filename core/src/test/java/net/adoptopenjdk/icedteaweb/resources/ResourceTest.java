@@ -41,6 +41,7 @@ import org.junit.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.INCOMPLETE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -82,7 +83,7 @@ public class ResourceTest {
     @Test
     public void testNewResourceIsUninitialized() throws Exception {
         Resource res = createResource();
-        assertTrue("Resource should not have had any status flags set", res.isSet(Resource.Status.INCOMPLETE));
+        assertTrue("Resource should not have had any status flags set", res.hasStatus(INCOMPLETE));
     }
 
     private static Resource createResource() throws MalformedURLException {

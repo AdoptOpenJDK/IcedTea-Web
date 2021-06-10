@@ -33,6 +33,8 @@ import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -173,7 +175,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
 
-        assertTrue(resource.isSet(Resource.Status.DOWNLOADED));
+        assertTrue(resource.hasStatus(DOWNLOADED));
     }
 
     @Test
@@ -183,7 +185,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
         final ResourceHandler resourceHandler = new ResourceHandler(resource);
         resourceHandler.putIntoCache(Executors.newSingleThreadExecutor(new DaemonThreadFactory())).get();
 
-        assertTrue(resource.isSet(Resource.Status.ERROR));
+        assertTrue(resource.hasStatus(ERROR));
     }
 
     private void setupFile(String fileName, String text) throws Exception {

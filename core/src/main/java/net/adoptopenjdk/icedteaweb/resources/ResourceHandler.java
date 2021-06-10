@@ -19,8 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 
