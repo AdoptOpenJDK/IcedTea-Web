@@ -42,7 +42,7 @@ class ResourceHandler {
         // threads will return this future and ensure a resource is only processed by a single thread
         synchronized (resource) {
             final Future<Resource> future = resource.getFutureForDownloaded();
-            if(future == null) {
+            if (future == null) {
                 LOG.debug("Download for {} has not been started until now", resource.getSimpleName());
                 final Future<Resource> futureResource = getDownloadStateAndStartUnstartedDownload(downloadExecutor);
                 resource.startProcessing(futureResource);
