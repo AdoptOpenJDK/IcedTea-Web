@@ -28,7 +28,7 @@ public class UrlWhiteListUtils {
         return applicationUrlWhiteList;
     }
 
-    private static List<WhitelistEntry> loadWhitelistFromConfiguration(final String whitelistPropertyName) {
+    public static List<WhitelistEntry> loadWhitelistFromConfiguration(final String whitelistPropertyName) {
         return JNLPRuntime.getConfiguration().getPropertyAsList(whitelistPropertyName)
                 .stream()
                 .filter(s -> !StringUtils.isBlank(s))
@@ -36,7 +36,7 @@ public class UrlWhiteListUtils {
                 .collect(Collectors.toList());
     }
 
-    static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
+    public static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
         Assert.requireNonNull(url, "url");
         Assert.requireNonNull(whiteList, "whiteList");
 
