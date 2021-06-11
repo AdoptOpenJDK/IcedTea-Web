@@ -565,6 +565,18 @@ public class Defaults {
                     ConfigurationConstants.KEY_JVM_ARGS_WHITELIST,
                     null,
                     null
+            ),
+
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_HTTPCONNECTION_CONNECT_TIMEOUT,
+                    String.valueOf(10000),
+                    null
+            ),
+
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_HTTPCONNECTION_READ_TIMEOUT,
+                    String.valueOf(10000),
+                    null
             )
     );
 

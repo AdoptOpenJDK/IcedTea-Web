@@ -48,6 +48,31 @@ public class ConnectionFactory {
             final HttpMethod requestMethod,
             final Map<String, String> requestProperties
     ) throws IOException {
+       return openConnection(url, requestMethod, requestProperties, 0, 0);
+    }
+
+    /**
+     * Opens a connection to a URL.
+     * <p>
+     * If the URL has HTTP or HTTPS as its protocol than {@link HttpURLConnection} is opened
+     * and the {@code requestMethod} and {@code requestProperties} are set onto the connection.
+     * Otherwise the {@code requestMethod} and {@code requestProperties} are ignored.
+     *
+     * @param url               the url to which to open a connection. Must have protocol HTTP or HTTPS
+     * @param requestMethod     the HTTP method to use for the connection.
+     * @param requestProperties properties to set on the connection.
+     * @param httpConnectTimeout
+     * @param httpReadTimeout
+     * @return the established connection.
+     * @throws IOException if an I/O exception occurs.
+     */
+    public static CloseableConnection openConnection(
+            final URL url,
+            final HttpMethod requestMethod,
+            final Map<String, String> requestProperties,
+            final int httpConnectTimeout,
+            final int httpReadTimeout
+    ) throws IOException {
         requireNonNull(url, "url");
         requireNonNull(requestMethod, "requestMethod");
         requireNonNull(requestProperties, "requestProperties");
@@ -55,7 +80,7 @@ public class ConnectionFactory {
         final URLConnection connection = url.openConnection();
 
         if (connection instanceof HttpURLConnection) {
-            return createHttpConnection((HttpURLConnection) connection, requestMethod, requestProperties);
+            return createHttpConnection((HttpURLConnection) connection, requestMethod, requestProperties, httpConnectTimeout, httpReadTimeout);
         }
 
         return new CloseableConnection(connection);
@@ -78,6 +103,30 @@ public class ConnectionFactory {
             final HttpMethod requestMethod,
             final Map<String, String> requestProperties
     ) throws IOException {
+        return openHttpConnection(url, requestMethod, requestProperties, 0, 0);
+    }
+
+    /**
+     * Opens a connection to a URL.
+     * <p>
+     * If the URL has not HTTP or HTTPS as its protocol a {@link IllegalArgumentException} is thrown.
+     * Otherwise the {@code requestMethod} and {@code requestProperties} are set onto the connection.
+     *
+     * @param url               the url to which to open a connection. Must have protocol HTTP or HTTPS
+     * @param requestMethod     the HTTP method to use for the connection.
+     * @param requestProperties properties to set on the connection.
+     * @param httpConnectTimeout
+     * @param httpReadTimeout
+     * @return the established connection.
+     * @throws IOException if an I/O exception occurs.
+     */
+    public static CloseableHttpConnection openHttpConnection(
+            final URL url,
+            final HttpMethod requestMethod,
+            final Map<String, String> requestProperties,
+            final int httpConnectTimeout,
+            final int httpReadTimeout
+    ) throws IOException {
         requireNonNull(url, "url");
         requireNonNull(requestMethod, "requestMethod");
         requireNonNull(requestProperties, "requestProperties");
@@ -87,7 +136,7 @@ public class ConnectionFactory {
         if (!(connection instanceof HttpURLConnection)) {
             throw new IllegalArgumentException("only HTTP and HTTPS urls are supported: " + url.toExternalForm());
         }
-        return createHttpConnection((HttpURLConnection) connection, requestMethod, requestProperties);
+        return createHttpConnection((HttpURLConnection) connection, requestMethod, requestProperties, httpConnectTimeout, httpReadTimeout);
     }
 
     /**
@@ -105,6 +154,30 @@ public class ConnectionFactory {
             final HttpMethod requestMethod,
             final Map<String, String> requestProperties
     ) throws IOException {
+        return createHttpConnection(httpConnection, requestMethod, requestProperties, 0, 0);
+    }
+
+    /**
+     * Create a HTTP or HTTPS connection
+     * The {@code requestMethod} and {@code requestProperties} are set onto the connection.
+     *
+     * @param httpConnection    the connection to wrap.
+     * @param requestMethod     the HTTP method to use for the connection.
+     * @param requestProperties properties to set on the connection.
+     * @param httpConnectTimeout
+     * @param httpReadTimeout
+     * @return the established connection.
+     * @throws IOException if an I/O exception occurs.
+     */
+    private static CloseableHttpConnection createHttpConnection(
+            final HttpURLConnection httpConnection,
+            final HttpMethod requestMethod,
+            final Map<String, String> requestProperties,
+            final int httpConnectTimeout,
+            final int httpReadTimeout
+    ) throws IOException {
+        httpConnection.setConnectTimeout(httpConnectTimeout);
+        httpConnection.setReadTimeout(httpReadTimeout);
         httpConnection.setRequestMethod(requestMethod.name());
 
         for (final Map.Entry<String, String> property : requestProperties.entrySet()) {

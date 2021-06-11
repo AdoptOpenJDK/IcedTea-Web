@@ -293,4 +293,10 @@ public interface ConfigurationConstants {
      */
     String KEY_SECURITY_SERVER_WHITELIST = "deployment.security.whitelist";
     String KEY_JVM_ARGS_WHITELIST = "deployment.jvm.arguments.whitelist";
+
+    /*
+     * HTTP Connection properties
+     */
+    String KEY_HTTPCONNECTION_CONNECT_TIMEOUT = "deployment.connection.connectTimeout";
+    String KEY_HTTPCONNECTION_READ_TIMEOUT = "deployment.connection.readTimeout";
 }
