@@ -33,7 +33,7 @@ class ResourceHandler {
         } else {
             downloadExecutor.execute(() -> {
                 try {
-                    result.complete(download(resource));
+                    result.complete(process(resource));
                 } catch (Exception e) {
                     result.completeExceptionally(e);
                 }
@@ -53,12 +53,12 @@ class ResourceHandler {
         return resource;
     }
 
-    private static Resource download(final Resource resource) {
+    private static Resource process(final Resource resource) {
         LOG.debug("Start processing resource: {}", resource.getSimpleName());
         int numErrors = 0;
         while (true) {
             try {
-                return downloadResource(resource);
+                return processResource(resource);
             } catch (Exception e) {
                 numErrors += 1;
                 if (numErrors >= 3) {
@@ -70,7 +70,7 @@ class ResourceHandler {
         }
     }
 
-    private static Resource downloadResource(final Resource resource) {
+    private static Resource processResource(final Resource resource) {
         final ResourceInitializer initializer = ResourceInitializer.of(resource);
         final InitializationResult initResult = initializer.init();
         if (initResult.needsDownload()) {
