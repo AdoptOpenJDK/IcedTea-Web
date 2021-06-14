@@ -18,6 +18,7 @@ package net.adoptopenjdk.icedteaweb.jnlp.element.application;
 
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -100,7 +101,7 @@ public class ApplicationDesc implements EntryPoint {
         this.type = type;
         this.mainClass = mainClass;
         this.progressClass = progressClass;
-        this.arguments = Arrays.asList(arguments);
+        this.arguments = new ArrayList<>(Arrays.asList(arguments));
     }
 
     /**
