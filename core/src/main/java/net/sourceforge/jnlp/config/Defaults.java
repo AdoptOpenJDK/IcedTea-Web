@@ -570,13 +570,13 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_HTTPCONNECTION_CONNECT_TIMEOUT,
                     String.valueOf(10000),
-                    null
+                    ValidatorFactory.createRangedIntegerValidator(0, Integer.MAX_VALUE)
             ),
 
             Setting.createDefault(
                     ConfigurationConstants.KEY_HTTPCONNECTION_READ_TIMEOUT,
                     String.valueOf(10000),
-                    null
+                    ValidatorFactory.createRangedIntegerValidator(0, Integer.MAX_VALUE)
             )
     );
 

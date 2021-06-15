@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StreamUtils;
 import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
@@ -164,7 +163,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             try {
                 timeout = Integer.valueOf(value);
             } catch (NumberFormatException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+                LOG.error("Could not parse {} with value '{}' - reason {}", key, value, e.getMessage());
             }
         }
         return timeout;
