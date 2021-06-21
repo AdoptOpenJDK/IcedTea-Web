@@ -48,7 +48,7 @@ public class Cache {
      * @return the file location in the cache, or {@code null} if no versions cached
      * @throws IllegalArgumentException if the resource is not cacheable
      */
-    public static File getCacheFile(final URL resource, final VersionId version) {
+    public static File getOrCreateCacheFile(final URL resource, final VersionId version) {
         if (isNonCacheable(resource)) {
             throw new IllegalArgumentException(resource + " is not a cacheable resource");
         }

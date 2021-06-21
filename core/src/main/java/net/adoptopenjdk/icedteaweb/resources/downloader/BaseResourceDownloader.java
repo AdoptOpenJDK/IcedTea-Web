@@ -160,7 +160,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final VersionId version = getVersion(downloadDetails.downloadFrom, downloadDetails.version);
 
         if (isUpToDate(resourceHref, version, downloadDetails.lastModified)) {
-            final File cacheFile = Cache.getCacheFile(resourceHref, version);
+            final File cacheFile = Cache.getOrCreateCacheFile(resourceHref, version);
             resource.setLocalFile(cacheFile);
             return cacheFile.length();
         } else {

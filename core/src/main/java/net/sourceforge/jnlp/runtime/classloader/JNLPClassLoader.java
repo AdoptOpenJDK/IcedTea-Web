@@ -949,7 +949,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         if (jnlp.getFileLocation().getProtocol().toLowerCase().equals(FILE_PROTOCOL)) {
                             jn = new File(jnlp.getFileLocation().getPath());
                         } else {
-                            jn = Cache.getCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());
+                            jn = Cache.getOrCreateCacheFile(jnlp.getFileLocation(), jnlp.getFileVersion());
                         }
 
                         InputStream jnlpStream = new FileInputStream(jn);

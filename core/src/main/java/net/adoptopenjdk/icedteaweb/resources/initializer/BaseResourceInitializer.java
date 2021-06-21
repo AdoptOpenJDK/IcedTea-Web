@@ -47,7 +47,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     }
 
     InitializationResult initFromCache(VersionId version) {
-        final File cachedFile = Cache.getCacheFile(this.resource.getLocation(), version);
+        final File cachedFile = Cache.getOrCreateCacheFile(this.resource.getLocation(), version);
 
         resource.setStatus(DOWNLOADED);
         resource.setSize(cachedFile.length());
