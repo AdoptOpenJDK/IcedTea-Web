@@ -1,5 +1,6 @@
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
+import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheIdInfo;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 
@@ -171,14 +172,14 @@ public class Cache {
     /**
      * This method load all known IDs of applications
      */
-    public static List<CacheId> getJnlpCacheIds() {
+    public static List<CacheIdInfo> getJnlpCacheIds() {
         return LeastRecentlyUsedCache.getInstance().getCacheIds(".*", true, false);
     }
 
     /**
      * This method load all known IDs of applications
      */
-    public static List<CacheId> getDomainCacheIds() {
+    public static List<CacheIdInfo> getDomainCacheIds() {
         return LeastRecentlyUsedCache.getInstance().getCacheIds(".*", false, true);
     }
 
@@ -187,7 +188,7 @@ public class Cache {
      *
      * @param filter - regex to filter keys
      */
-    public static List<CacheId> getCacheIds(final String filter) {
+    public static List<CacheIdInfo> getCacheIds(final String filter) {
         return LeastRecentlyUsedCache.getInstance().getCacheIds(filter, true, true);
     }
 

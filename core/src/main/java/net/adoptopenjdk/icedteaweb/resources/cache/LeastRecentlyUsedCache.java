@@ -33,6 +33,7 @@ statement from your version.
 */
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
+import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheIdInfo;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
@@ -252,29 +253,29 @@ class LeastRecentlyUsedCache {
         });
     }
 
-    List<CacheId> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
+    List<CacheIdInfo> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
         if (!includeJnlpPath && !includeDomain) {
             return Collections.emptyList();
         }
 
         final List<LeastRecentlyUsedCacheEntry> entries = cacheIndex.getSynchronized(LeastRecentlyUsedCacheIndex::getAllUnDeletedEntries);
 
-        final Map<String, CacheId> result = new LinkedHashMap<>();
+        final Map<String, CacheIdInfoImpl> result = new LinkedHashMap<>();
         entries.forEach(entry -> {
-            final CacheFile fileEntry = createPaneObjectArray(entry);
+            final CacheFileInfoImpl fileEntry = createPaneObjectArray(entry);
             if (includeJnlpPath) {
                 final CacheEntry infoFile = getInfoFile(entry);
                 final String jnlpPath = infoFile.getJnlpPath();
                 if (jnlpPath != null && jnlpPath.matches(filter)) {
-                    final CacheId cacheId = result.computeIfAbsent(jnlpPath, CacheId::jnlpPathId);
-                    cacheId.getFiles().add(fileEntry);
+                    final CacheIdInfoImpl cacheId = result.computeIfAbsent(jnlpPath, CacheIdInfoImpl::jnlpPathId);
+                    cacheId.addFileInfo(fileEntry);
                 }
             }
             if (includeDomain) {
                 final String domain = entry.getDomain();
                 if (domain != null && domain.matches(filter)) {
-                    final CacheId cacheId = result.computeIfAbsent(domain, CacheId::domainId);
-                    cacheId.getFiles().add(fileEntry);
+                    final CacheIdInfoImpl cacheId = result.computeIfAbsent(domain, CacheIdInfoImpl::domainId);
+                    cacheId.addFileInfo(fileEntry);
                 }
             }
         });
@@ -282,9 +283,9 @@ class LeastRecentlyUsedCache {
         return new ArrayList<>(result.values());
     }
 
-    private CacheFile createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
+    private CacheFileInfoImpl createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
         final CacheEntry infoFile = getInfoFile(entry);
-        return new CacheFile(infoFile, entry);
+        return new CacheFileInfoImpl(infoFile, entry);
     }
 
     void deleteFromCache(URL resourceHref, VersionId version) {

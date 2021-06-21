@@ -19,8 +19,6 @@ package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
-import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
 import net.adoptopenjdk.icedteaweb.ui.swing.ScreenFinder;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -48,8 +46,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * This class will provide a visual way of viewing cache ids.
@@ -96,8 +92,8 @@ public class CacheAppViewer extends JDialog {
         final JButton delete = new JButton(Translator.R("TIFPDeleteFiles"));
         DummyCacheIdListModel jnlpPathsIds = new DummyCacheIdListModel(Cache.getJnlpCacheIds());
         DummyCacheIdListModel domainIds = new DummyCacheIdListModel(Cache.getDomainCacheIds());
-        final JList<CacheId> appsByJnlpPath = new JList<>();
-        final JList<CacheId> appsByDomain = new JList<>();
+        final JList<CacheIdInfo> appsByJnlpPath = new JList<>();
+        final JList<CacheIdInfo> appsByDomain = new JList<>();
         appsByJnlpPath.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         appsByDomain.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         delete.setEnabled(false);
@@ -149,10 +145,10 @@ public class CacheAppViewer extends JDialog {
     private static class DummyListSelectionListenerWithModel implements ListSelectionListener {
 
         private final JTextArea info;
-        private final JList<CacheId> apps;
+        private final JList<CacheIdInfo> apps;
         private final JButton delete;
 
-        public DummyListSelectionListenerWithModel(JTextArea info, JList<CacheId> apps, JButton delete) {
+        public DummyListSelectionListenerWithModel(JTextArea info, JList<CacheIdInfo> apps, JButton delete) {
             this.info = info;
             this.apps = apps;
             this.delete = delete;
@@ -162,20 +158,11 @@ public class CacheAppViewer extends JDialog {
         public void valueChanged(ListSelectionEvent e) {
             info.setText("");
             if (apps.getSelectedValue() != null) {
-                for (CacheFile cacheFile : apps.getSelectedValue().getFiles()) {
-                    final StringBuilder sb = new StringBuilder();
-                    final Consumer<Object> appender = v -> sb.append(Optional.ofNullable(v).orElse("??")).append(" ;  ");
-                    appender.accept(cacheFile.getInfoFile());
-                    appender.accept(cacheFile.getParentFile());
-                    appender.accept(cacheFile.getProtocol());
-                    appender.accept(cacheFile.getDomain());
-                    appender.accept(cacheFile.getSize());
-                    appender.accept(cacheFile.getLastModified());
-                    appender.accept(cacheFile.getJnlpPath());
-                    info.setText(info.getText() + sb.toString() + "\n");
+                for (CacheFileInfo cacheFileInfo : apps.getSelectedValue().getFileInfos()) {
+                    info.setText(info.getText() + cacheFileInfo + "\n");
                 }
                 delete.setEnabled(true);
-                delete.setText(Translator.R("TIFPDeleteFiles") + " - " + apps.getSelectedValue().getFiles().size());
+                delete.setText(Translator.R("TIFPDeleteFiles") + " - " + apps.getSelectedValue().getFileInfos().size());
             } else {
                 delete.setEnabled(false);
                 delete.setText(Translator.R("TIFPDeleteFiles"));
@@ -183,11 +170,11 @@ public class CacheAppViewer extends JDialog {
         }
     }
 
-    private static class DummyCacheIdListModel implements ListModel<CacheId> {
+    private static class DummyCacheIdListModel implements ListModel<CacheIdInfo> {
 
-        private final List<CacheId> content;
+        private final List<CacheIdInfo> content;
 
-        public DummyCacheIdListModel(List<CacheId> content) {
+        public DummyCacheIdListModel(List<CacheIdInfo> content) {
             this.content = content;
         }
 
@@ -197,7 +184,7 @@ public class CacheAppViewer extends JDialog {
         }
 
         @Override
-        public CacheId getElementAt(int index) {
+        public CacheIdInfo getElementAt(int index) {
             return content.get(index);
         }
 

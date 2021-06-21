@@ -23,7 +23,6 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
 import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -403,9 +402,9 @@ public class CachePane extends JPanel {
 
             CacheTableModel tableModel;
             (tableModel = (CacheTableModel)cacheTable.getModel()).clear(); //Clears the table
-            final List<CacheId> cacheIds = Cache.getDomainCacheIds();
-            for (CacheId cacheId : cacheIds) {
-                tableModel.addAll(cacheId.getFiles());
+            final List<CacheIdInfo> cacheIdInfos = Cache.getDomainCacheIds();
+            for (CacheIdInfo cacheIdInfo : cacheIdInfos) {
+                tableModel.addAll(cacheIdInfo.getFileInfos());
             }
 
         } catch (Exception exception) {
