@@ -153,32 +153,29 @@ class CacheEntry implements ResourceInfo {
     }
 
     /**
-     * Returns true if the cache has a local copy of the contents
-     * of the URL matching the specified version string.
+     * Returns true if the cache has a local copy of the resource.
      *
      * @return true if the resource is in the cache
      */
     boolean isCached() {
-        if (!cacheFile.exists()) {
-            return false;
-        }
-
-        if (! properties.containsPropertyKey(KEY_SIZE)) {
-            return false;
-        }
-
         try {
-            long cachedLength = cacheFile.length();
-            long remoteLength = getSize();
-            final boolean isCached = cachedLength == remoteLength;
+            if (!cacheFile.exists() || !properties.containsPropertyKey(KEY_SIZE)) {
+                return false;
+            }
 
-            LOG.debug("isCached: remote size:{} cached size:{} -> {}", remoteLength, cachedLength, isCached);
-            return isCached;
+            long actualFileSize = cacheFile.length();
+            long storedFileSize = getSize();
+            final boolean hasExpectedSize = actualFileSize == storedFileSize;
+
+            if (hasExpectedSize) {
+                return true;
+            }
+
+            LOG.warn("expected {} to have size {} but found file size to be {}", cacheFile, storedFileSize, actualFileSize);
         } catch (Exception ex) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-
-            return false; // should throw?
+            LOG.error("Unexpected exception", ex);
         }
+        return false; // should throw?
     }
 
     void storeInfo(long downloadedAt, long lastModified, long size) {
