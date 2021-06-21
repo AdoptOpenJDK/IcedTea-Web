@@ -112,16 +112,7 @@ class LeastRecentlyUsedCache {
                 .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, resourceHref, version));
     }
 
-    File replaceExistingCacheFile(URL resourceHref, VersionId version) {
-        final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx -> {
-            // Old entry will still exist. (but removed at cleanup)
-            idx.markEntryForDeletion(resourceHref, version);
-            return createNewInfoFileAndIndexEntry(idx, resourceHref, version);
-        });
-        return getCacheFile(entry);
-    }
-
-    void markAsCorrupted(URL resourceHref, VersionId version) {
+    void invalidateExistingCacheFile(final URL resourceHref, final VersionId version) {
         cacheIndex.runSynchronized(idx -> idx.markEntryForDeletion(resourceHref, version));
     }
 

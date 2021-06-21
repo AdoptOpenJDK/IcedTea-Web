@@ -67,7 +67,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     void invalidateExistingEntryInCache(VersionId version) {
         final URL location = resource.getLocation();
         LOG.debug("Invalidating resource in cache: {} / {}", location, version);
-        Cache.replaceExistingCacheFile(location, version);
+        Cache.invalidateExistingCacheFile(location, version);
     }
 
     DownloadOptions getDownloadOptions() {
@@ -89,7 +89,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         try {
             return Optional.ofNullable(future.get());
         } catch (InterruptedException | ExecutionException e) {
-            LOG.debug("failed to determine best URL: {}",  e.getMessage());
+            LOG.debug("failed to determine best URL: {}", e.getMessage());
             return Optional.empty();
         }
     }

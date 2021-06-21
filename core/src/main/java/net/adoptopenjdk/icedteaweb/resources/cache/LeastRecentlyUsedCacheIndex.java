@@ -134,7 +134,6 @@ class LeastRecentlyUsedCacheIndex {
     void markEntryForDeletion(URL resourceHref, VersionId version) {
         find(resourceHref, version).ifPresent(entry -> {
             entries.remove(entry);
-            entries.add(new LeastRecentlyUsedCacheEntry(entry.getId(), entry.getResourceHref(), entry.getVersion()));
             propertiesFile.setProperty(entry.getId() + '.' + KEY_DELETE, TRUE.toString());
             dirty = true;
         });
@@ -225,9 +224,7 @@ class LeastRecentlyUsedCacheIndex {
             try {
                 final VersionId version = versionValue != null ? VersionId.fromString(versionValue) : null;
                 final URL resourceHref = new URL(resourceHrefValue);
-                if (Boolean.parseBoolean(markedForDeletionValue)) {
-                    entries.add(new LeastRecentlyUsedCacheEntry(id, resourceHref, version));
-                } else {
+                if (!Boolean.parseBoolean(markedForDeletionValue)) {
                     final long lastAccessed = Long.parseLong(lastAccessedValue);
                     entries.add(new LeastRecentlyUsedCacheEntry(id, lastAccessed, resourceHref, version));
                 }

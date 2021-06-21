@@ -142,7 +142,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         } catch (Exception ex) {
             if (downloadDetails != null) {
                 LOG.debug("Marking as corrupted {}", resource);
-                Cache.markAsCorrupted(resource.getLocation(), getVersion(downloadDetails.downloadFrom, downloadDetails.version));
+                Cache.invalidateExistingCacheFile(resource.getLocation(), getVersion(downloadDetails.downloadFrom, downloadDetails.version));
             }
             LOG.debug("Exception while downloading resource {} from {} - message: {} cause: {} ", resource, downloadFrom, ex.getMessage(), ex.getCause());
             throw ex;
@@ -289,6 +289,6 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     void invalidateExistingEntryInCache(VersionId version) {
         final URL location = resource.getLocation();
         LOG.debug("Invalidating resource in cache: {} / {}", location, version);
-        Cache.replaceExistingCacheFile(location, version);
+        Cache.invalidateExistingCacheFile(location, version);
     }
 }
