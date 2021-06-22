@@ -14,43 +14,44 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
     private final long lastAccessed;
     private final boolean markedForDeletion;
 
-    private final URL resourceHref;
-    private final VersionId version;
+    private final CacheKey key;
 
-    LeastRecentlyUsedCacheEntry(String id, long lastAccessed, URL resourceHref, VersionId version) {
+    LeastRecentlyUsedCacheEntry(String id, long lastAccessed, CacheKey key) {
         this.id = id;
         this.lastAccessed = lastAccessed;
         this.markedForDeletion = false;
-        this.resourceHref = resourceHref;
-        this.version = version;
+        this.key = key;
     }
 
-    LeastRecentlyUsedCacheEntry(String id, URL resourceHref, VersionId version) {
+    LeastRecentlyUsedCacheEntry(String id, CacheKey key) {
         this.id = id;
         this.lastAccessed = 0;
         this.markedForDeletion = true;
-        this.resourceHref = resourceHref;
-        this.version = version;
+        this.key = key;
     }
 
     String getId() {
         return id;
     }
 
+    CacheKey getCacheKey() {
+        return key;
+    }
+
     URL getResourceHref() {
-        return resourceHref;
+        return key.getLocation();
     }
 
     VersionId getVersion() {
-        return version;
+        return key.getVersion();
     }
 
     String getProtocol() {
-        return resourceHref.getProtocol();
+        return key.getLocation().getProtocol();
     }
 
     String getDomain() {
-        return resourceHref.getHost();
+        return key.getLocation().getHost();
     }
 
     boolean isMarkedForDeletion() {
@@ -58,15 +59,16 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
     }
 
     boolean matches(URL resource) {
-        return this.resourceHref.equals(resource);
+        return key.getLocation().equals(resource);
     }
 
-    boolean matches(URL resource, VersionId versionId) {
-        return matches(resource) && Objects.equals(versionId, version);
+    boolean matches(CacheKey key) {
+        return this.key.equals(key);
     }
 
     boolean matches(URL resource, VersionString versionString) {
         if (matches(resource)) {
+            final VersionId version = key.getVersion();
             if (versionString == null && version == null) {
                 return true;
             }

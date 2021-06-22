@@ -9,14 +9,9 @@ import java.net.URL;
  */
 public interface ResourceInfo {
     /**
-     * @return URL as specified in the JNLP file
+     * @return the cache key of the resource
      */
-    URL getResourceHref();
-
-    /**
-     * @return version-id contained in the version-string of the JNLP file
-     */
-    VersionId getVersion();
+    CacheKey getCacheKey();
 
     /**
      * @return the size of the resource in bytes
@@ -32,4 +27,5 @@ public interface ResourceInfo {
      * @return the last time the resource was downloaded (in Java millis)
      */
     long getDownloadedAt();
+
 }

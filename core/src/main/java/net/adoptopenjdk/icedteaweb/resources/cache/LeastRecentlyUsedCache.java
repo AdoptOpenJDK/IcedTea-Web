@@ -101,27 +101,27 @@ class LeastRecentlyUsedCache {
         this.rootCacheDir = cacheDir;
     }
 
-    File getOrCreateCacheFile(URL resourceHref, VersionId version) {
+    File getOrCreateCacheFile(CacheKey key) {
         final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx ->
-                getOrCreateCacheEntry(idx, resourceHref, version)
+                getOrCreateCacheEntry(idx, key)
         );
         return getCacheFile(entry);
     }
 
-    private LeastRecentlyUsedCacheEntry getOrCreateCacheEntry(LeastRecentlyUsedCacheIndex idx, URL resourceHref, VersionId version) {
-        return idx.findAndMarkAsAccessed(resourceHref, version)
-                .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, resourceHref, version));
+    private LeastRecentlyUsedCacheEntry getOrCreateCacheEntry(LeastRecentlyUsedCacheIndex idx, CacheKey key) {
+        return idx.findAndMarkAsAccessed(key)
+                .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, key));
     }
 
-    void invalidateExistingCacheFile(final URL resourceHref, final VersionId version) {
-        cacheIndex.runSynchronized(idx -> idx.markEntryForDeletion(resourceHref, version));
+    void invalidateExistingCacheFile(final CacheKey key) {
+        cacheIndex.runSynchronized(idx -> idx.markEntryForDeletion(key));
     }
 
-    private LeastRecentlyUsedCacheEntry createNewInfoFileAndIndexEntry(LeastRecentlyUsedCacheIndex idx, URL resourceHref, VersionId version) {
+    private LeastRecentlyUsedCacheEntry createNewInfoFileAndIndexEntry(LeastRecentlyUsedCacheIndex idx, CacheKey key) {
         final File dir = makeNewCacheDir();
         final String entryId = entryIdFromCacheDir(dir);
         createInfoFile(dir);
-        return idx.createEntry(resourceHref, version, entryId);
+        return idx.createEntry(key, entryId);
     }
 
     private File makeNewCacheDir() {
@@ -163,13 +163,13 @@ class LeastRecentlyUsedCache {
         final List<IOException> ex = new ArrayList<>();
 
         final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx ->
-                getOrCreateCacheEntry(idx, info.getResourceHref(), info.getVersion())
+                getOrCreateCacheEntry(idx, info.getCacheKey())
         );
 
         final CacheEntry infoFile = getInfoFile(entry);
         final File cacheFile = infoFile.getCacheFile();
         try {
-            LOG.debug("Downloading file: {} into: {}", info.getResourceHref(), cacheFile.getCanonicalPath());
+            LOG.debug("Downloading file: {} into: {}", info.getCacheKey().getLocation(), cacheFile.getCanonicalPath());
             try (final OutputStream out = new FileOutputStream(cacheFile)) {
                 IOUtils.copy(inputStream, out);
             }
@@ -185,41 +185,39 @@ class LeastRecentlyUsedCache {
         return cacheFile;
     }
 
-    Optional<CacheEntry> getResourceInfo(URL resourceHref, VersionId version) {
-        return cacheIndex.getSynchronized(idx -> idx.find(resourceHref, version))
+    Optional<CacheEntry> getResourceInfo(CacheKey key) {
+        return cacheIndex.getSynchronized(idx -> idx.find(key))
                 .map(this::getInfoFile);
     }
 
     /**
      * Returns whether there is a version of the URL contents in the cache.
      *
-     * @param resourceHref the resourceHref {@link URL}
-     * @param version      the versions to check for
+     * @param key the key of the cache entry
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
-    boolean isCached(URL resourceHref, VersionId version) {
-        final boolean isCached = getResourceInfo(resourceHref, version)
+    boolean isCached(CacheKey key) {
+        final boolean isCached = getResourceInfo(key)
                 .map(CacheEntry::isCached)
                 .orElse(false);
-        LOG.info("isCached: {} - (v: {}) = {}", resourceHref, version, isCached);
+        LOG.info("isCached: {} = {}", key, isCached);
         return isCached;
     }
 
     /**
      * Returns whether there is a version of the URL contents in the cache and it is up to date.
      *
-     * @param resourceHref the resourceHref {@link URL}
-     * @param version      the versions to check for
+     * @param key the key of the cache entry
      * @param lastModified time in millis since epoch of last modification
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
-    boolean isUpToDate(URL resourceHref, VersionId version, long lastModified) {
-        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(resourceHref, version))
+    boolean isUpToDate(CacheKey key, long lastModified) {
+        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(key))
                 .map(e -> getInfoFile(e).isCurrent(lastModified))
                 .orElse(false);
-        LOG.info("isUpToDate: {} - (v: {}) = {}", resourceHref, version, isUpToDate);
+        LOG.info("isUpToDate: {} = {}", key, isUpToDate);
         return isUpToDate;
     }
 
@@ -288,9 +286,9 @@ class LeastRecentlyUsedCache {
         return new CacheFileInfoImpl(infoFile, entry);
     }
 
-    void deleteFromCache(URL resourceHref, VersionId version) {
+    void deleteFromCache(CacheKey key) {
         cacheIndex.runSynchronized(idx -> idx
-                .find(resourceHref, version)
+                .find(key)
                 .ifPresent(entry -> deleteFromCache(idx, entry)));
     }
 
@@ -326,7 +324,7 @@ class LeastRecentlyUsedCache {
             LOG.error("Failed to delete '{}'. continue..." + directory.getAbsolutePath());
         }
 
-        idx.removeEntry(entry.getResourceHref(), entry.getVersion());
+        idx.removeEntry(entry.getCacheKey());
     }
 
     /**

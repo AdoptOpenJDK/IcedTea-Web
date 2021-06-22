@@ -46,11 +46,7 @@ class CacheEntry implements ResourceInfo {
     private static final String KEY_DOWNLOADED_AT = "last-updated";
     static final String KEY_JNLP_PATH = "jnlp-path";
 
-    /** the remote resource location */
-    private final URL location;
-
-    /** the requested version */
-    private final VersionId version;
+    private final CacheKey key;
 
     /** the cache file */
     private final File cacheFile;
@@ -59,28 +55,18 @@ class CacheEntry implements ResourceInfo {
     private final PropertiesFile properties;
 
     CacheEntry(LeastRecentlyUsedCacheEntry lruEntry, File cacheFile, File infoFile) {
-        this(lruEntry.getResourceHref(), lruEntry.getVersion(), cacheFile, infoFile);
+        this(lruEntry.getCacheKey(), cacheFile, infoFile);
     }
 
-    CacheEntry(URL location, VersionId version, File cacheFile, File infoFile) {
-        this.location = location;
-        this.version = version;
+    CacheEntry(CacheKey key, File cacheFile, File infoFile) {
+        this.key = key;
         this.cacheFile = cacheFile;
         this.properties = new PropertiesFile(infoFile, R("CAutoGen"));
     }
 
-    /**
-     * Returns the remote location this entry caches.
-     * @return URL same as the one on which this entry was created
-     */
     @Override
-    public URL getResourceHref() {
-        return location;
-    }
-
-    @Override
-    public VersionId getVersion() {
-        return version;
+    public CacheKey getCacheKey() {
+        return key;
     }
 
     /**
@@ -136,7 +122,7 @@ class CacheEntry implements ResourceInfo {
      */
     boolean isCurrent(long lastModified) {
         boolean cached = isCached();
-        LOG.debug("{} - version {}: isCached {}", location, version, cached);
+        LOG.debug("{}: isCached {}", key, cached);
 
         if (!cached) {
             return false;
@@ -144,7 +130,7 @@ class CacheEntry implements ResourceInfo {
         try {
             long cachedModified = getLastModified();
             final boolean isCurrent = lastModified > 0 && lastModified <= cachedModified;
-            LOG.debug("{} - version {}: lastModified cache:{} actual:{} -> {}", location, version, cachedModified, lastModified, isCurrent);
+            LOG.debug("{}: lastModified cache:{} actual:{} -> {}", key, cachedModified, lastModified, isCurrent);
             return isCurrent;
         } catch (Exception ex){
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);

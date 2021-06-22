@@ -49,10 +49,10 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> find(URL resourceHref, VersionId version) {
+    Optional<LeastRecentlyUsedCacheEntry> find(CacheKey key) {
         return entries.stream()
                 .filter(e -> !e.isMarkedForDeletion())
-                .filter(e -> e.matches(resourceHref, version))
+                .filter(e -> e.matches(key))
                 .findFirst();
     }
 
@@ -61,8 +61,8 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> findAndMarkAsAccessed(URL resourceHref, VersionId version) {
-        final Optional<LeastRecentlyUsedCacheEntry> result = find(resourceHref, version);
+    Optional<LeastRecentlyUsedCacheEntry> findAndMarkAsAccessed(CacheKey key) {
+        final Optional<LeastRecentlyUsedCacheEntry> result = find(key);
 
         result.ifPresent(this::markAccessed);
 
@@ -114,11 +114,12 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the newly created entry
      */
-    LeastRecentlyUsedCacheEntry createEntry(URL resourceHref, VersionId version, String entryId) {
+    LeastRecentlyUsedCacheEntry createEntry(CacheKey key, String entryId) {
         final long now = System.currentTimeMillis();
-        final LeastRecentlyUsedCacheEntry newEntry = new LeastRecentlyUsedCacheEntry(entryId, now, resourceHref, version);
+        final LeastRecentlyUsedCacheEntry newEntry = new LeastRecentlyUsedCacheEntry(entryId, now, key);
         entries.add(0, newEntry);
-        propertiesFile.setProperty(entryId + '.' + KEY_HREF, resourceHref.toString());
+        propertiesFile.setProperty(entryId + '.' + KEY_HREF, key.getLocation().toString());
+        final VersionId version = key.getVersion();
         if (version != null) {
             propertiesFile.setProperty(entryId + '.' + KEY_VERSION, version.toString());
         }
@@ -131,8 +132,8 @@ class LeastRecentlyUsedCacheIndex {
     /**
      * Marks the entry for deletion
      */
-    void markEntryForDeletion(URL resourceHref, VersionId version) {
-        find(resourceHref, version).ifPresent(entry -> {
+    void markEntryForDeletion(CacheKey key) {
+        find(key).ifPresent(entry -> {
             entries.remove(entry);
             propertiesFile.setProperty(entry.getId() + '.' + KEY_DELETE, TRUE.toString());
             dirty = true;
@@ -142,8 +143,8 @@ class LeastRecentlyUsedCacheIndex {
     /**
      * Removes an entry from the index. If not entry matches nothing is changed.
      */
-    void removeEntry(URL resourceHref, VersionId version) {
-        find(resourceHref, version).ifPresent(this::removeEntry);
+    void removeEntry(CacheKey key) {
+        find(key).ifPresent(this::removeEntry);
     }
 
     /**
@@ -174,7 +175,7 @@ class LeastRecentlyUsedCacheIndex {
     private void markAccessed(LeastRecentlyUsedCacheEntry entry) {
         final long now = System.currentTimeMillis();
         entries.remove(entry);
-        entries.add(0, new LeastRecentlyUsedCacheEntry(entry.getId(), now, entry.getResourceHref(), entry.getVersion()));
+        entries.add(0, new LeastRecentlyUsedCacheEntry(entry.getId(), now, entry.getCacheKey()));
         propertiesFile.setProperty(entry.getId() + '.' + KEY_LAST_ACCESSED, Long.toString(now));
         dirty = true;
     }
@@ -226,7 +227,7 @@ class LeastRecentlyUsedCacheIndex {
                 final URL resourceHref = new URL(resourceHrefValue);
                 if (!Boolean.parseBoolean(markedForDeletionValue)) {
                     final long lastAccessed = Long.parseLong(lastAccessedValue);
-                    entries.add(new LeastRecentlyUsedCacheEntry(id, lastAccessed, resourceHref, version));
+                    entries.add(new LeastRecentlyUsedCacheEntry(id, lastAccessed, new CacheKey(resourceHref, version)));
                 }
             } catch (Exception e) {
                 LOG.debug("found broken ID: {}", id);
