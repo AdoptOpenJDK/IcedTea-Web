@@ -14,7 +14,17 @@ import java.util.stream.Collectors;
 import static net.sourceforge.jnlp.cache.CacheUtil.isNonCacheable;
 
 /**
- * The Cache
+ * The Cache.
+ *
+ * Key is a {@link URL} and a {@link VersionId}. The VersionId may be {@code null}.
+ *
+ * - clear() -> void
+ * - cleanup() -> void
+ * - contains(key) -> boolean
+ * - isNewerThan(key, date) -> boolean
+ * - get(key) -> file
+ * - add(inputStream, downloadInfo) -> void
+ * - bestMatchingVersion(url, versionRange) -> versionId
  */
 public class Cache {
     /**
