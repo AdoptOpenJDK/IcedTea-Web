@@ -12,6 +12,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.DownloadInfo;
+import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
@@ -152,7 +153,20 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private CloseableConnection getDownloadConnection(final URL location) throws IOException {
         final Map<String, String> requestProperties = new HashMap<>();
         requestProperties.put(ACCEPT_ENCODING_HEADER, PACK_200_OR_GZIP);
-        return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties);
+        return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties, getTimeoutValue(ConfigurationConstants.KEY_HTTPCONNECTION_CONNECT_TIMEOUT), getTimeoutValue(ConfigurationConstants.KEY_HTTPCONNECTION_READ_TIMEOUT));
+    }
+
+    private int getTimeoutValue(final String key) {
+        int timeout = 0;
+        final String value = JNLPRuntime.getConfiguration().getProperty(key);
+        if (value != null && value.trim().length() != 0) {
+            try {
+                timeout = Integer.valueOf(value);
+            } catch (NumberFormatException e) {
+                LOG.error("Could not parse {} with value '{}' - reason {}", key, value, e.getMessage());
+            }
+        }
+        return timeout;
     }
 
     private long tryDownloading(final DownloadDetails downloadDetails) throws IOException {
@@ -164,7 +178,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             resource.setLocalFile(cacheFile);
             return cacheFile.length();
         } else {
-            final CountingInputStream countingInputStream = new CountingInputStream(downloadDetails.inputStream);
+            final CountingInputStream countingInputStream = downloadDetails.inputStream;
 
             final StreamUnpacker compressionUpacker = StreamUnpacker.getCompressionUnpacker(downloadDetails);
             final InputStream unpackedStream = compressionUpacker.unpack(countingInputStream);
@@ -201,7 +215,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             final String contentType = connection.getHeaderField(CONTENT_TYPE_HEADER);
             final String contentEncoding = connection.getHeaderField(CONTENT_ENCODING_HEADER);
             final long totalSize = connection.getContentLength();
-            final InputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize, resource::setTransferred);
+            final NotifyingInputStream inputStream = new NotifyingInputStream(connection.getInputStream(), totalSize, resource::setTransferred);
 
             if (!String.valueOf(connection.getResponseCode()).startsWith("2")) {
                 throw new IllegalStateException("Request returned " + connection.getResponseCode() + " for URL " + connection.getURL());
@@ -235,7 +249,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final String version = headerMap.get(VERSION_ID_HEADER);
         final String contentType = headerMap.get(CONTENT_TYPE_HEADER);
         final String contentEncoding = headerMap.get(CONTENT_ENCODING_HEADER);
-        final InputStream inputStream = new ByteArrayInputStream(body);
+        final CountingInputStream inputStream = new CountingInputStream(new ByteArrayInputStream(body));
 
         return new DownloadDetails(url, inputStream, contentType, contentEncoding, version, lastModified, body.length);
     }

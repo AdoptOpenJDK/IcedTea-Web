@@ -44,9 +44,7 @@ class CountingInputStream extends FilterInputStream {
 
     @Override
     public long skip(long n) throws IOException {
-        long result = in.skip(n);
-        count += result;
-        return result;
+        throw new IOException("skip not supported");
     }
 
     @Override
