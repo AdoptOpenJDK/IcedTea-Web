@@ -1,9 +1,5 @@
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-
-import java.net.URL;
-
 /**
  * Information about a resource.
  */
