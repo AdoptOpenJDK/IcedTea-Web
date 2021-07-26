@@ -16,7 +16,6 @@
 
 package net.sourceforge.jnlp.runtime;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -26,15 +25,14 @@ import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AllPermission;
 import java.security.CodeSource;
-import java.security.NoSuchAlgorithmException;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
@@ -43,6 +41,7 @@ import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
@@ -235,13 +234,14 @@ public class JNLPPolicy extends Policy {
             try {
                 final URI policyUri;
                 if (policyLocation.startsWith("file://")) {
-                    policyUri = new URL(policyLocation).toURI();
+                    final String encoded = URLEncoder.encode(policyLocation, UTF_8.name());
+                    policyUri = new URL(encoded).toURI();
                 } else {
                     policyUri = new URI(policyLocation.replace("\\", "/"));
                 }
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
-            } catch (IllegalArgumentException | NoSuchAlgorithmException | URISyntaxException  | MalformedURLException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            } catch (Exception e) {
+                LOG.error("Error while loading the policy from URL " + policyLocation, e);
             }
         }
         return policy;
