@@ -28,7 +28,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AllPermission;
@@ -41,7 +40,6 @@ import java.security.ProtectionDomain;
 import java.security.URIParameter;
 import java.util.Enumeration;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 
 /**
@@ -234,7 +232,7 @@ public class JNLPPolicy extends Policy {
             try {
                 final URI policyUri;
                 if (policyLocation.startsWith("file://")) {
-                    final String encoded = URLEncoder.encode(policyLocation, UTF_8.name());
+                    final String encoded = policyLocation.replaceAll(" ", "%20");
                     policyUri = new URL(encoded).toURI();
                 } else {
                     policyUri = new URI(policyLocation.replace("\\", "/"));
