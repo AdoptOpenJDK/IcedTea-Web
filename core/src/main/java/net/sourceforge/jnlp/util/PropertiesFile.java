@@ -191,6 +191,10 @@ public class PropertiesFile {
         final long currentStore = file.lastModified();
         final long currentTime = System.currentTimeMillis();
 
+        if (dirty) {
+            throw new IllegalStateException("loading dirty properties file");
+        }
+
         /* (re)load file, if
          *  - it wasn't loaded/stored, yet (lastStore == 0)
          *  - current file modification timestamp has changed since last store (currentStore != lastStore) OR
@@ -207,6 +211,8 @@ public class PropertiesFile {
             } catch (final IOException ex) {
                 LOG.error("Failed to load", ex);
             }
+        } else {
+            LOG.debug("not re-loading the properties file {}", lockableFile.getFile());
         }
         return false;
     }
