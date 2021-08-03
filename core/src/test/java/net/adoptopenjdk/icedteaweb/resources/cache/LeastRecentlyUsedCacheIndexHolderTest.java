@@ -173,17 +173,6 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     }
 
     @Test
-    public void testRemoveEntry() {
-        holder.runSynchronized(idx -> idx.createEntry(key, entryId));
-        final Optional<LeastRecentlyUsedCacheEntry> entryOne = holder.getSynchronized(idx -> idx.find(key));
-        assertTrue(entryOne.isPresent());
-
-        holder.runSynchronized(idx -> idx.removeEntry(key));
-        final Optional<LeastRecentlyUsedCacheEntry> entryTwo = holder.getSynchronized(idx -> idx.find(key));
-        assertFalse(entryTwo.isPresent());
-    }
-
-    @Test
     public void testSortingOfIndex() throws IOException {
         // given
         final List<String> ids = Arrays.asList("1-9", "0-1", "0-0", "1-3", "0-5");

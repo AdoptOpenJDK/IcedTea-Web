@@ -199,6 +199,11 @@ public class Cache {
     }
 
     public static void deleteFromCache(final String cacheId) {
+        LeastRecentlyUsedCache.getInstance().deleteFromCache(CacheIdInfoImpl.domainId(cacheId));
+        LeastRecentlyUsedCache.getInstance().deleteFromCache(CacheIdInfoImpl.jnlpPathId(cacheId));
+    }
+
+    public static void deleteFromCache(final CacheIdInfo cacheId) {
         LeastRecentlyUsedCache.getInstance().deleteFromCache(cacheId);
     }
 }

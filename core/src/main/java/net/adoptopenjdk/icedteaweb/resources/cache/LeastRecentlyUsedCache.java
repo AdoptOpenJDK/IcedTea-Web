@@ -67,8 +67,10 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
@@ -298,15 +300,30 @@ class LeastRecentlyUsedCache {
                 .forEach(entry -> deleteFromCache(idx, entry)));
     }
 
-    void deleteFromCache(String cacheId) {
+    void deleteFromCache(CacheIdInfo cacheId) {
+        final String idToDelete = cacheId.getId();
+        final Function<LeastRecentlyUsedCacheEntry, String> idExtractor = createExtractor(cacheId.getType());
+
         cacheIndex.runSynchronized(idx -> {
             final List<LeastRecentlyUsedCacheEntry> allEntries = idx.getAllUnDeletedEntries();
             allEntries.stream()
-                    .filter(entry -> cacheId.equals(entry.getDomain()) || cacheId.equals(getInfoFile(entry).getJnlpPath()))
+                    .filter(entry -> Objects.equals(idToDelete, idExtractor.apply(entry)))
                     .forEach(entry -> deleteFromCache(idx, entry));
         });
+
         if (OsUtil.isWindows()) {
-            WindowsShortcutManager.removeWindowsShortcuts(cacheId.toLowerCase());
+            WindowsShortcutManager.removeWindowsShortcuts(idToDelete.toLowerCase());
+        }
+    }
+
+    private Function<LeastRecentlyUsedCacheEntry, String> createExtractor(CacheIdInfo.CacheIdType idType) {
+        switch (idType) {
+            case DOMAIN:
+                return LeastRecentlyUsedCacheEntry::getDomain;
+            case JNLP_PATH:
+                return e -> getInfoFile(e).getJnlpPath();
+            default:
+                throw new IllegalStateException("Unknown CacheIdType: " + idType);
         }
     }
 
@@ -324,7 +341,7 @@ class LeastRecentlyUsedCache {
             LOG.error("Failed to delete '{}'. continue..." + directory.getAbsolutePath());
         }
 
-        idx.removeEntry(entry.getCacheKey());
+        idx.removeEntry(entry);
     }
 
     /**

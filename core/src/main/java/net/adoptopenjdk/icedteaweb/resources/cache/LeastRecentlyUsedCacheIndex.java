@@ -141,13 +141,6 @@ class LeastRecentlyUsedCacheIndex {
     }
 
     /**
-     * Removes an entry from the index. If not entry matches nothing is changed.
-     */
-    void removeEntry(CacheKey key) {
-        find(key).ifPresent(this::removeEntry);
-    }
-
-    /**
      * Removes an entry from the index.
      */
     void removeEntry(LeastRecentlyUsedCacheEntry entry) {
