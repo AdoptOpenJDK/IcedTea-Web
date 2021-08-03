@@ -12,6 +12,7 @@ import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
+import net.sourceforge.jnlp.deploymentrules.UrlDeploymentRulesSetUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -23,7 +24,10 @@ import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
-
+/*
+ * Modified class to add DeploymentRuleSet 
+ * DJ -03-02-2021
+ */
 class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
@@ -117,6 +121,7 @@ class ResourceHandler {
         return resource;
     }
 
+    /**  Original method
     private void validateWithWhitelist() {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
@@ -129,4 +134,41 @@ class ResourceHandler {
             JNLPRuntime.exit(-1);
         }
     }
+    */
+    private void validateWithWhitelist() {
+        final URL url = resource.getLocation();
+        Assert.requireNonNull(url, "url");
+        
+        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
+        //commented out by DJ -final key word so that URL can be checked against whitelist as well as deploymentRuleset.
+        /*final*/ boolean found = UrlWhiteListUtils.isUrlInApplicationUrlWhitelist(url);
+        //If not found in  the serverWhitelisting , check in DeploymentRuleSet.jar file.
+        LOG.debug("Resource URL not In Whitelist: {} found before calling Deployment rule set", found);
+        if (!found) {
+        	LOG.debug("----------------------BEGIN DEPLOYMENT RULESET CALL------------------------------------------", found);
+        	LOG.debug("Resource URL call inside (!found) before calling found=validateWithDeploymentRuleSet()", found);
+        	found=validateWithDeploymentRuleSet() ;
+        	LOG.debug("Resource URL call inside (!found) after calling found=validateWithDeploymentRuleSet()", found);
+        }
+        LOG.debug("Resource URL not In Whitelist: {} found after calling Deployment rule set", found);
+        if (!found) {
+            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
+            LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
+            JNLPRuntime.exit(-1);
+        }
+    }
+    
+    /**
+     * @author DJ 03-02-2021
+     * Validates the resource URL with the deploymentRuleSet jar file
+     */
+    private boolean validateWithDeploymentRuleSet() {
+        final URL url = resource.getLocation();
+        Assert.requireNonNull(url, "url");
+
+        // Validate with whitelist specified in DeploymentRuleSet.jar localhost is considered valid.
+        final boolean found = UrlDeploymentRulesSetUtils.isUrlInDeploymentRuleSetlist(url);
+        return found;
+    }
+
 }

@@ -299,4 +299,8 @@ public interface ConfigurationConstants {
      */
     String KEY_HTTPCONNECTION_CONNECT_TIMEOUT = "deployment.connection.connectTimeout";
     String KEY_HTTPCONNECTION_READ_TIMEOUT = "deployment.connection.readTimeout";
+
+    /*DJ -adding deloymentruleset properties*/
+    String KEY_DEPLOYMENT_RULE_SET = "deployment.deploymentruleset.jar";
+
 }
