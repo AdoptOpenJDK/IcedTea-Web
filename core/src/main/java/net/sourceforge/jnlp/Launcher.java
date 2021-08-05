@@ -36,6 +36,7 @@ import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
 
+import javax.imageio.ImageIO;
 import javax.swing.text.html.parser.ParserDelegator;
 import java.applet.Applet;
 import java.applet.AppletStub;
@@ -396,6 +397,10 @@ public class Launcher {
             handler.launchStarting(app);
 
             main.setAccessible(true);
+
+            // Load ImageReader service impls in IIORegistry.
+            // The above must be done for problems related to sun.awt.AppContext
+            ImageIO.scanForPlugins();
 
             LOG.info("Invoking main() with args: {}", Arrays.toString(args));
             main.invoke(null, new Object[] { args });
