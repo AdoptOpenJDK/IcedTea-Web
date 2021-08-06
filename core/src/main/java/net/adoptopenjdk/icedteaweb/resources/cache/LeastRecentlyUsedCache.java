@@ -111,7 +111,7 @@ class LeastRecentlyUsedCache {
     }
 
     private LeastRecentlyUsedCacheEntry getOrCreateCacheEntry(LeastRecentlyUsedCacheIndex idx, CacheKey key) {
-        return idx.findAndMarkAsAccessed(key)
+        return idx.findUnDeletedAndMarkAsAccessed(key)
                 .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, key));
     }
 
@@ -188,7 +188,7 @@ class LeastRecentlyUsedCache {
     }
 
     Optional<CacheEntry> getResourceInfo(CacheKey key) {
-        return cacheIndex.getSynchronized(idx -> idx.find(key))
+        return cacheIndex.getSynchronized(idx -> idx.findUnDeletedEntry(key))
                 .map(this::getInfoFile);
     }
 
@@ -216,7 +216,7 @@ class LeastRecentlyUsedCache {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isUpToDate(CacheKey key, long lastModified) {
-        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(key))
+        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx.findUnDeletedAndMarkAsAccessed(key))
                 .map(e -> getInfoFile(e).isCurrent(lastModified))
                 .orElse(false);
         LOG.info("isUpToDate: {} = {}", key, isUpToDate);
@@ -227,7 +227,7 @@ class LeastRecentlyUsedCache {
         final Comparator<VersionId> versionIdComparator = version != null ? new VersionIdComparator(version) : VersionId::compareTo;
         final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion, versionIdComparator);
         return cacheIndex.getSynchronized(idx -> {
-            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAll(resourceHref, version);
+            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAllUnDeletedEntries(resourceHref, version);
             final List<LeastRecentlyUsedCacheEntry> all = new ArrayList<>(allSet);
             all.sort(versionComparator);
 
@@ -244,7 +244,7 @@ class LeastRecentlyUsedCache {
     List<LeastRecentlyUsedCacheEntry> getAllEntriesInCache(final URL resourceHref) {
         final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion);
         return cacheIndex.getSynchronized(idx -> {
-            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAll(resourceHref);
+            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAllUnDeletedEntries(resourceHref);
 
             return allSet.stream()
                     .filter(entry -> getInfoFile(entry).isCached())
@@ -290,13 +290,13 @@ class LeastRecentlyUsedCache {
 
     void deleteFromCache(CacheKey key) {
         cacheIndex.runSynchronized(idx -> idx
-                .find(key)
+                .findUnDeletedEntry(key)
                 .ifPresent(entry -> deleteFromCache(idx, entry)));
     }
 
     void deleteFromCache(URL resourceHref, VersionString version) {
         cacheIndex.runSynchronized(idx -> idx
-                .findAll(resourceHref, version)
+                .findAllUnDeletedEntries(resourceHref, version)
                 .forEach(entry -> deleteFromCache(idx, entry)));
     }
 

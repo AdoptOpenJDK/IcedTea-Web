@@ -49,7 +49,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> find(CacheKey key) {
+    Optional<LeastRecentlyUsedCacheEntry> findUnDeletedEntry(CacheKey key) {
         return entries.stream()
                 .filter(e -> !e.isMarkedForDeletion())
                 .filter(e -> e.matches(key))
@@ -61,8 +61,8 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> findAndMarkAsAccessed(CacheKey key) {
-        final Optional<LeastRecentlyUsedCacheEntry> result = find(key);
+    Optional<LeastRecentlyUsedCacheEntry> findUnDeletedAndMarkAsAccessed(CacheKey key) {
+        final Optional<LeastRecentlyUsedCacheEntry> result = findUnDeletedEntry(key);
 
         result.ifPresent(this::markAccessed);
 
@@ -74,7 +74,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return a set of all matching entries, never {@code null}.
      */
-    Set<LeastRecentlyUsedCacheEntry> findAll(URL resourceHref) {
+    Set<LeastRecentlyUsedCacheEntry> findAllUnDeletedEntries(URL resourceHref) {
         return entries.stream()
                 .filter(e -> !e.isMarkedForDeletion())
                 .filter(e -> e.matches(resourceHref))
@@ -86,7 +86,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return a set of all matching entries, never {@code null}.
      */
-    Set<LeastRecentlyUsedCacheEntry> findAll(URL resourceHref, VersionString versionString) {
+    Set<LeastRecentlyUsedCacheEntry> findAllUnDeletedEntries(URL resourceHref, VersionString versionString) {
         return entries.stream()
                 .filter(e -> !e.isMarkedForDeletion())
                 .filter(e -> e.matches(resourceHref, versionString))
@@ -133,7 +133,7 @@ class LeastRecentlyUsedCacheIndex {
      * Marks the entry for deletion
      */
     void markEntryForDeletion(CacheKey key) {
-        find(key).ifPresent(entry -> {
+        findUnDeletedEntry(key).ifPresent(entry -> {
             entries.remove(entry);
             propertiesFile.setProperty(entry.getId() + '.' + KEY_DELETE, TRUE.toString());
             dirty = true;
