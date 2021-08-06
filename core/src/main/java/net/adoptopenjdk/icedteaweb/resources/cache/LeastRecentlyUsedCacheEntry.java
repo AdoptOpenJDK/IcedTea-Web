@@ -54,6 +54,10 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
         return key.getLocation().getHost();
     }
 
+    long getLastAccessed() {
+        return lastAccessed;
+    }
+
     boolean isMarkedForDeletion() {
         return markedForDeletion;
     }
