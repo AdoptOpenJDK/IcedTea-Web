@@ -258,8 +258,7 @@ public class LeastRecentlyUsedCacheFileTest {
         try {
             cacheFile.lock();
             cacheFile.persistChanges();
-        }
-        finally {
+        } finally {
             cacheFile.unlock();
         }
 
@@ -278,8 +277,7 @@ public class LeastRecentlyUsedCacheFileTest {
         try {
             cacheFile.lock();
             cacheFile.persistChanges();
-        }
-        finally {
+        } finally {
             cacheFile.unlock();
         }
 
@@ -305,8 +303,7 @@ public class LeastRecentlyUsedCacheFileTest {
         try {
             cacheFile.lock();
             cacheFile.saveCompactedFile();
-        }
-        finally {
+        } finally {
             cacheFile.unlock();
         }
 
@@ -325,12 +322,63 @@ public class LeastRecentlyUsedCacheFileTest {
         try {
             cacheFile.lock();
             cacheFile.saveCompactedFile();
-        }
-        finally {
+        } finally {
             cacheFile.unlock();
         }
 
         assertFileContent(physicalFile, "::i=1/11::l=https://test.com::v=1.1::a=5678::");
+    }
+
+    @Test
+    public void clearEmptyFileDoesNothingDirty() throws Exception {
+        loadFile();
+
+        cacheFile.clear();
+
+        assertFalse(cacheFile.isDirty());
+    }
+
+    @Test
+    public void clearMakesFileDirty() throws Exception {
+        loadFile("::i=1/11::l=https://test.com::v=1.1::a=1234::");
+
+        cacheFile.clear();
+
+        assertTrue(cacheFile.isDirty());
+    }
+
+    @Test
+    public void persistingClearedFileEmptiesFileOnFS() throws Exception {
+        loadFile("::i=1/11::l=https://test.com::v=1.1::a=1234::");
+
+        cacheFile.clear();
+
+        try {
+            cacheFile.lock();
+            cacheFile.persistChanges();
+        } finally {
+            cacheFile.unlock();
+        }
+
+        assertFileContent(physicalFile);
+        assertFalse(cacheFile.isDirty());
+    }
+
+    @Test
+    public void savingClearedFileEmptiesFileOnFS() throws Exception {
+        loadFile("::i=1/11::l=https://test.com::v=1.1::a=1234::");
+
+        cacheFile.clear();
+
+        try {
+            cacheFile.lock();
+            cacheFile.saveCompactedFile();
+        } finally {
+            cacheFile.unlock();
+        }
+
+        assertFileContent(physicalFile);
+        assertFalse(cacheFile.isDirty());
     }
 
     private void loadFile(String... lines) throws IOException {

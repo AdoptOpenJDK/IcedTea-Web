@@ -37,6 +37,7 @@ class LeastRecentlyUsedCacheFile {
      * time of last modification, lazy loaded on getProperty
      */
     private long lastLoadOrStore = -1;
+    private boolean hasBeenCleared = false;
 
     private final List<LeastRecentlyUsedCacheEntry> entries = new ArrayList<>();
     private final List<LeastRecentlyUsedCacheEntry> unmodifiableEntries = Collections.unmodifiableList(entries);
@@ -110,13 +111,26 @@ class LeastRecentlyUsedCacheFile {
         }
     }
 
+    void clear() {
+        if (entries.isEmpty()) {
+            return;
+        }
+
+        entries.clear();
+        hasBeenCleared = true;
+    }
+
     boolean isDirty() {
-        return !unsavedActions.isEmpty();
+        return !unsavedActions.isEmpty() || hasBeenCleared;
     }
 
     public void persistChanges() throws IOException {
         if (!lockableFile.isHeldByCurrentThread()) {
             throw new IllegalStateException("Cannot persist changes to cache file when not locked");
+        }
+        if (hasBeenCleared) {
+            saveCompactedFile();
+            return;
         }
         if (!isDirty()) {
             return;
@@ -154,6 +168,7 @@ class LeastRecentlyUsedCacheFile {
         FileUtils.saveFileUtf8(content, lockableFile.getFile());
 
         lastLoadOrStore = System.currentTimeMillis();
+        hasBeenCleared = false;
         unsavedActions.clear();
     }
 
