@@ -1,6 +1,5 @@
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
-import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.lockingfile.LockableFile;
 
 import java.io.File;
@@ -37,7 +36,7 @@ class LeastRecentlyUsedCacheFile {
      * time of last modification, lazy loaded on getProperty
      */
     private long lastLoadOrStore = -1;
-    private boolean hasBeenCleared = false;
+    private boolean requestCompression = false;
 
     private final List<LeastRecentlyUsedCacheEntry> entries = new ArrayList<>();
     private final List<LeastRecentlyUsedCacheEntry> unmodifiableEntries = Collections.unmodifiableList(entries);
@@ -48,6 +47,10 @@ class LeastRecentlyUsedCacheFile {
 
     LeastRecentlyUsedCacheFile(LockableFile lockableFile) {
         this.lockableFile = requireNonNull(lockableFile, "lockableFile");
+    }
+
+    File getUnderlyingFile() {
+        return lockableFile.getFile();
     }
 
     List<LeastRecentlyUsedCacheEntry> getAllEntries() {
@@ -117,25 +120,29 @@ class LeastRecentlyUsedCacheFile {
         }
 
         entries.clear();
-        hasBeenCleared = true;
+        requestCompression();
+    }
+
+    void requestCompression() {
+        requestCompression = true;
     }
 
     boolean isDirty() {
-        return !unsavedActions.isEmpty() || hasBeenCleared;
+        return !unsavedActions.isEmpty() || requestCompression;
     }
 
-    public void persistChanges() throws IOException {
+    void persistChanges() throws IOException {
         if (!lockableFile.isHeldByCurrentThread()) {
             throw new IllegalStateException("Cannot persist changes to cache file when not locked");
         }
-        if (hasBeenCleared) {
+        if (requestCompression) {
             saveCompactedFile();
-            return;
+        } else if (!unsavedActions.isEmpty()) {
+            appendUnsavedActionsToFile();
         }
-        if (!isDirty()) {
-            return;
-        }
+    }
 
+    private void appendUnsavedActionsToFile() throws IOException {
         final byte[] changes = unsavedActions.stream()
                 .map(LeastRecentlyUsedCacheAction::serialize)
                 .collect(Collectors.joining("\n"))
@@ -148,27 +155,29 @@ class LeastRecentlyUsedCacheFile {
         }
 
         lastLoadOrStore = System.currentTimeMillis();
+        requestCompression = false;
         unsavedActions.clear();
     }
 
-    public void saveCompactedFile() throws IOException {
+    private void saveCompactedFile() throws IOException {
         if (!lockableFile.isHeldByCurrentThread()) {
             throw new IllegalStateException("Cannot save compacted cache file when not locked");
         }
-        if (!isDirty()) {
-            return;
-        }
 
-        final String content = entries.stream()
+        final byte[] content = entries.stream()
                 .map(LeastRecentlyUsedCacheAction::createAddActionFor)
                 .map(LeastRecentlyUsedCacheAction::serialize)
                 .collect(Collectors.joining("\n"))
-                .concat("\n");
+                .concat("\n")
+                .getBytes(UTF_8);
 
-        FileUtils.saveFileUtf8(content, lockableFile.getFile());
+        try (FileOutputStream out = new FileOutputStream(lockableFile.getFile())) {
+            out.write(content);
+            out.flush();
+        }
 
         lastLoadOrStore = System.currentTimeMillis();
-        hasBeenCleared = false;
+        requestCompression = false;
         unsavedActions.clear();
     }
 

@@ -288,13 +288,6 @@ public class LeastRecentlyUsedCacheFileTest {
                 "!2/22");
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void cannotSaveCompactedIfNotLocked() throws Exception {
-        loadFile();
-        cacheFile.addEntry(ENTRY_1);
-        cacheFile.saveCompactedFile();
-    }
-
     @Test
     public void saveCompactedClearsTheDirtyState() throws Exception {
         loadFile();
@@ -302,7 +295,8 @@ public class LeastRecentlyUsedCacheFileTest {
 
         try {
             cacheFile.lock();
-            cacheFile.saveCompactedFile();
+            cacheFile.requestCompression();
+            cacheFile.persistChanges();
         } finally {
             cacheFile.unlock();
         }
@@ -321,7 +315,8 @@ public class LeastRecentlyUsedCacheFileTest {
 
         try {
             cacheFile.lock();
-            cacheFile.saveCompactedFile();
+            cacheFile.requestCompression();
+            cacheFile.persistChanges();
         } finally {
             cacheFile.unlock();
         }
@@ -356,23 +351,6 @@ public class LeastRecentlyUsedCacheFileTest {
         try {
             cacheFile.lock();
             cacheFile.persistChanges();
-        } finally {
-            cacheFile.unlock();
-        }
-
-        assertFileContent(physicalFile);
-        assertFalse(cacheFile.isDirty());
-    }
-
-    @Test
-    public void savingClearedFileEmptiesFileOnFS() throws Exception {
-        loadFile("::i=1/11::l=https://test.com::v=1.1::a=1234::");
-
-        cacheFile.clear();
-
-        try {
-            cacheFile.lock();
-            cacheFile.saveCompactedFile();
         } finally {
             cacheFile.unlock();
         }
