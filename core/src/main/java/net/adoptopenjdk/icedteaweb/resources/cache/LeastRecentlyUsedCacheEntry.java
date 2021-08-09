@@ -12,21 +12,12 @@ import java.util.Objects;
 class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEntry> {
     private final String id;
     private final long lastAccessed;
-    private final boolean markedForDeletion;
 
     private final CacheKey key;
 
     LeastRecentlyUsedCacheEntry(String id, long lastAccessed, CacheKey key) {
         this.id = id;
         this.lastAccessed = lastAccessed;
-        this.markedForDeletion = false;
-        this.key = key;
-    }
-
-    LeastRecentlyUsedCacheEntry(String id, CacheKey key) {
-        this.id = id;
-        this.lastAccessed = 0;
-        this.markedForDeletion = true;
         this.key = key;
     }
 
@@ -56,10 +47,6 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
 
     long getLastAccessed() {
         return lastAccessed;
-    }
-
-    boolean isMarkedForDeletion() {
-        return markedForDeletion;
     }
 
     boolean matches(URL resource) {

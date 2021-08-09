@@ -4,15 +4,16 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.util.PropertiesFile;
 import net.sourceforge.jnlp.util.RestrictedFileUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static net.sourceforge.jnlp.config.ConfigurationConstants.OLD_CACHE_INDEX_FILE_NAME;
 
 /**
  * Holder of the cached LeastRecentlyUsedCacheIndex data.
@@ -23,12 +24,9 @@ class LeastRecentlyUsedCacheIndexHolder {
 
     private static final Logger LOG = LoggerFactory.getLogger(LeastRecentlyUsedCacheIndexHolder.class);
 
-    private static final ReentrantLock lock = new ReentrantLock();
-
     private final InfrastructureFileDescriptor recentlyUsed;
 
-    private PropertiesFile cachedIndexPropertiesFile;
-    private List<LeastRecentlyUsedCacheEntry> cachedEntries;
+    private LeastRecentlyUsedCacheFile cachedCacheFile;
 
     LeastRecentlyUsedCacheIndexHolder(InfrastructureFileDescriptor recentlyUsed) {
         this.recentlyUsed = recentlyUsed;
@@ -50,101 +48,128 @@ class LeastRecentlyUsedCacheIndexHolder {
      * @return the result of the passed function.
      */
     <T> T getSynchronized(Function<LeastRecentlyUsedCacheIndex, T> action) {
-        lock.lock();
+        LeastRecentlyUsedCacheFile cacheFile = null;
         try {
-            final PropertiesFile propertiesFile = lockPropertiesFile();
-            try {
-                final LeastRecentlyUsedCacheIndex index = load(propertiesFile);
-                final T result = action.apply(index);
-                if (index.isDirty()) {
-                    store(propertiesFile);
-                }
-                return result;
-            } finally {
-                unlockPropertiesFile(propertiesFile);
+            cacheFile = lockCacheFile();
+            final LeastRecentlyUsedCacheIndex index = load(cacheFile);
+            final T result = action.apply(index);
+            if (index.isDirty()) {
+                store(cacheFile);
             }
+            return result;
         } finally {
-            lock.unlock();
+            unlockCacheFile(cacheFile);
         }
     }
 
     /**
      * Lock the properties file to have exclusive access.
      */
-    private PropertiesFile lockPropertiesFile() {
-        final PropertiesFile cacheProperties = getCacheProperties();
-        cacheProperties.lock();
-        return cacheProperties;
+    private LeastRecentlyUsedCacheFile lockCacheFile() {
+        try {
+            final LeastRecentlyUsedCacheFile cacheFile = getCacheFile();
+            cacheFile.lock();
+            return cacheFile;
+        } catch (IOException e) {
+            LOG.error("Failed to lock cache file", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
      * Unlock the properties file.
      */
-    private void unlockPropertiesFile(PropertiesFile propertiesFile) {
-        propertiesFile.unlock();
+    private void unlockCacheFile(LeastRecentlyUsedCacheFile cacheFile) {
+        if (cacheFile != null) {
+            try {
+                cacheFile.unlock();
+            } catch (IOException e) {
+                LOG.error("Failed to unlock cache file", e);
+            }
+        }
     }
 
     /**
      * Loads the data from the properties file into an index.
      */
-    private LeastRecentlyUsedCacheIndex load(PropertiesFile propertiesFile) {
-        if (propertiesFile.load()) {
-            final LeastRecentlyUsedCacheIndex.ConversionResult result = LeastRecentlyUsedCacheIndex.convertPropertiesToEntries(propertiesFile);
-            if (result.propertiesNeedToBeStored) {
-                LOG.warn("Cache is corrupt. Fixing...");
-                store(propertiesFile);
-                LOG.warn("Cache was corrupt and has been fixed. It is strongly recommended that you run ''javaws -Xclearcache'' and rerun your application as soon as possible. You can also use via itw-settings Cache -> View files -> Purge");
-            }
-
-            cachedEntries = result.entries;
+    private LeastRecentlyUsedCacheIndex load(LeastRecentlyUsedCacheFile cacheFile) {
+        try {
+            cacheFile.load();
+            return new LeastRecentlyUsedCacheIndex(cacheFile);
+        } catch (IOException e) {
+            LOG.error("Failed to load cache file", e);
+            throw new RuntimeException(e);
         }
-        return new LeastRecentlyUsedCacheIndex(propertiesFile, cachedEntries);
     }
 
     /**
      * Write file to disk.
      */
-    private void store(PropertiesFile propertiesFile) {
-        if (propertiesFile.isHeldByCurrentThread()) {
-            propertiesFile.store();
+    private void store(LeastRecentlyUsedCacheFile cacheFile) {
+        try {
+            cacheFile.persistChanges();
+        } catch (IOException e) {
+            LOG.error("Failed to store cache file", e);
         }
     }
 
     /**
      * @return the recentlyUsedPropertiesFile
      */
-    private PropertiesFile getCacheProperties() {
-        final File recentlyUsedFile = recentlyUsed.getFile();
-        if (!recentlyUsedFile.exists()) {
+    private LeastRecentlyUsedCacheFile getCacheFile() {
+        final File underlyingFile = recentlyUsed.getFile();
+        if (!underlyingFile.exists()) {
             try {
-                FileUtils.createParentDir(recentlyUsedFile);
-                RestrictedFileUtils.createRestrictedFile(recentlyUsedFile);
+                FileUtils.createParentDir(underlyingFile);
+                RestrictedFileUtils.createRestrictedFile(underlyingFile);
+                cachedCacheFile = loadOldIndex();
             } catch (IOException e) {
                 LOG.error("Error in creating recently used cache items file.", e);
             }
         }
 
-        if (cachedIndexPropertiesFile == null) {
-            // no properties file yet, create it
-            cachedIndexPropertiesFile = new PropertiesFile(recentlyUsedFile);
-            return cachedIndexPropertiesFile;
+        if (cachedCacheFile == null || !Objects.equals(underlyingFile, cachedCacheFile.getUnderlyingFile())) {
+            cachedCacheFile = new LeastRecentlyUsedCacheFile(underlyingFile);
+        }
+        return cachedCacheFile;
+    }
+
+
+    private LeastRecentlyUsedCacheFile loadOldIndex() {
+        final File cacheDir = recentlyUsed.getFile().getParentFile();
+        final File oldIndex = new File(cacheDir, OLD_CACHE_INDEX_FILE_NAME);
+
+        if (!oldIndex.exists()) {
+            return null;
         }
 
-        if (recentlyUsedFile.equals(cachedIndexPropertiesFile.getStoreFile())) {
-            // The underlying InfrastructureFileDescriptor is still pointing to the same file, use current properties file
-            return cachedIndexPropertiesFile;
-        } else {
-            // the InfrastructureFileDescriptor was set to different location, move to it
-            if (cachedIndexPropertiesFile.tryLock()) {
-                try {
-                    cachedIndexPropertiesFile.store();
-                } finally {
-                    cachedIndexPropertiesFile.unlock();
-                }
+        try {
+            final List<LeastRecentlyUsedCacheEntry> oldEntries = OldCacheFileReader.loadEntriesFromOldIndex(oldIndex);
+
+            if (oldEntries == null || oldEntries.isEmpty()) {
+                return null;
             }
-            cachedIndexPropertiesFile = new PropertiesFile(recentlyUsedFile);
-            return cachedIndexPropertiesFile;
+
+            final LeastRecentlyUsedCacheFile result = new LeastRecentlyUsedCacheFile(recentlyUsed.getFile());
+            try {
+                result.lock();
+                result.load();
+                oldEntries.stream()
+                        .map(e -> new LeastRecentlyUsedCacheEntry(convertOldId(e.getId()), e.getLastAccessed(), e.getCacheKey()))
+                        .forEach(result::addEntry);
+                result.persistChanges();
+            } finally {
+                result.unlock();
+            }
+            return result;
+        } catch (Exception ignored) {
+            return null;
+        } finally {
+            oldIndex.delete();
         }
     }
 
+    private String convertOldId(String id) {
+        return id.replace('-', File.pathSeparatorChar);
+    }
 }

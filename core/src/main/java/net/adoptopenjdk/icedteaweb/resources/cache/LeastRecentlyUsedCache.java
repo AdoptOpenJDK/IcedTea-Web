@@ -258,7 +258,7 @@ class LeastRecentlyUsedCache {
             return Collections.emptyList();
         }
 
-        final List<LeastRecentlyUsedCacheEntry> entries = cacheIndex.getSynchronized(LeastRecentlyUsedCacheIndex::getAllUnDeletedEntries);
+        final List<LeastRecentlyUsedCacheEntry> entries = cacheIndex.getSynchronized(idx -> idx.getAllEntries());
 
         final Map<String, CacheIdInfoImpl> result = new LinkedHashMap<>();
         entries.forEach(entry -> {
@@ -305,7 +305,7 @@ class LeastRecentlyUsedCache {
         final Function<LeastRecentlyUsedCacheEntry, String> idExtractor = createExtractor(cacheId.getType());
 
         cacheIndex.runSynchronized(idx -> {
-            final List<LeastRecentlyUsedCacheEntry> allEntries = idx.getAllUnDeletedEntries();
+            final List<LeastRecentlyUsedCacheEntry> allEntries = idx.getAllEntries();
             allEntries.stream()
                     .filter(entry -> Objects.equals(idToDelete, idExtractor.apply(entry)))
                     .forEach(entry -> deleteFromCache(idx, entry));
@@ -418,6 +418,7 @@ class LeastRecentlyUsedCache {
             final Set<String> entryIdsFromFileSystem = collectAllEntryIdsFromFileSystem(levelOneDirs);
             final Set<String> entryIdsFromIndex = new HashSet<>();
             cacheIndex.runSynchronized(idx -> {
+                idx.requestCompression();
 
                 final long maxSize = getMaxSizeInBytes();
                 long curSize = 0;
@@ -437,12 +438,6 @@ class LeastRecentlyUsedCache {
                         continue;
                     }
 
-                    if (entry.isMarkedForDeletion()) {
-                        LOG.debug("marked for deletion {}", entry.getResourceHref());
-                        toRemoveFromIndex.add(entry);
-                        deleteDir(directory);
-                        continue;
-                    }
                     if (!cacheFile.isFile()) {
                         LOG.debug("missing cache file {}", entry.getResourceHref());
                         toRemoveFromIndex.add(entry);
@@ -518,7 +513,7 @@ class LeastRecentlyUsedCache {
             final String maxSizePropertyValue = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_CACHE_MAX_SIZE);
             final long maxSizeInMegaBytes = Long.parseLong(maxSizePropertyValue);
             return maxSizeInMegaBytes << 20; // Convert from megabyte to byte (Negative values will be considered unlimited.)
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException | NullPointerException ignored) {
             return -1;
         }
     }
@@ -526,9 +521,8 @@ class LeastRecentlyUsedCache {
     // Helpers
 
     private File getCacheFile(LeastRecentlyUsedCacheEntry entry) {
-        final String[] idParts = entry.getId().split("-");
         final String cacheFilName = getCacheFileName(entry.getResourceHref());
-        return new File(String.join("/", rootCacheDir.getFullPath(), idParts[0], idParts[1], cacheFilName));
+        return new File(cacheDirFromEntryId(entry.getId()), cacheFilName);
     }
 
     private CacheEntry getInfoFile(LeastRecentlyUsedCacheEntry entry) {
@@ -538,12 +532,11 @@ class LeastRecentlyUsedCache {
     }
 
     private String entryIdFromCacheDir(File dir) {
-        return dir.getParentFile().getName() + "-" + dir.getName();
+        return dir.getParentFile().getName() + File.separatorChar + dir.getName();
     }
 
     private File cacheDirFromEntryId(String entryId) {
-        final String[] idParts = entryId.split("-");
-        return new File(String.join("/", rootCacheDir.getFullPath(), idParts[0], idParts[1]));
+        return new File(rootCacheDir.getFullPath(), entryId);
     }
 
     private String getCacheFileName(URL resourceHref) {
