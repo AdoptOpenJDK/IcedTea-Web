@@ -9,7 +9,12 @@ import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 import net.sourceforge.jnlp.security.AppVerifier;
 import net.sourceforge.jnlp.tools.CertInformation;
 import net.sourceforge.jnlp.tools.JarCertVerifier;
-
+/**
+ * DeploymentRuleSetJarVerifier object for accessing jar file.
+ * 
+ * This is class is rarely used yet and can be extended when a 
+ * UI component to display the entire rulset.xml file and edit it will be enhanced
+ */
 public class DeploymentRuleSetJarVerifier implements AppVerifier {
 
 	@Override

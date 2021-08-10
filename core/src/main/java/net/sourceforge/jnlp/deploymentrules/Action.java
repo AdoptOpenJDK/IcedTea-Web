@@ -1,23 +1,27 @@
 package net.sourceforge.jnlp.deploymentrules;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name = "action")
-@XmlAccessorType(XmlAccessType.FIELD)
+/**
+ * Action object of Rule from the rulset file
+ * Stores the attributes value from id tag
+ * permission and version.
+ * If permission is run, then location which is the url whitelisted is permitted to be accessible.
+ */
 public class Action {
-	@XmlAttribute
+
 private	String permission;
+private String version;
+public String getVersion() {
+	return version;
+}
+public void setVersion(String version) {
+	this.version = version;
+}
 public String getPermission() {
 	return permission;
 }
 public void setPermission(String permission) {
 	this.permission = permission;
 }
-@XmlElement
+
 private 	String message;
 public String getMessage() {
 	return message;

@@ -1,21 +1,13 @@
 package net.sourceforge.jnlp.deploymentrules;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-
-//import org.eclipse.persistence.oxm.annotations.XmlPath;
-
-@XmlRootElement(name = "certificate")
-//If you want you can define the order in which the fields are written
-//Optional
-//@XmlType(propOrder = { "id", "action","message"})
-
-@XmlAccessorType(XmlAccessType.FIELD)
-
+/**
+ * Certificate object of Rule from the rulset file
+ * Stores the attributes value from action tag
+ * hash.
+ * This is class is rarely used yet and can be extended when a 
+ * UI component to display the entire rulset.xml file and edit it will be enhanced
+ */
 public class Certificate {
-@XmlAttribute(name="hash")
+
 private String hash;
 
 
