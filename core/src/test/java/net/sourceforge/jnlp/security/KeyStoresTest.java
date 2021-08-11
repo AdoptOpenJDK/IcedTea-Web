@@ -33,13 +33,15 @@ statement from your version.
 */
 package net.sourceforge.jnlp.security;
 
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.config.PathsAndFiles;
+import java.security.Permission;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.security.Permission;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.KeyStores.KeyStoreWrap;
 
 public class KeyStoresTest {
 
@@ -124,6 +126,20 @@ public class KeyStoresTest {
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.JSSE_CERTS);
         Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_JSSECERT.getFile());
         Assert.assertEquals(true, dm.called);
-    } 
+    }
+
+    @Test
+    public void getKeyStoreWindowsRootTestSM() {
+        DummySM dm = new DummySM();
+        System.setSecurityManager(dm);
+        
+        KeyStoreWrap keyStoreWrap;
+        
+        keyStoreWrap = KeyStores.getWrapContainer(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS).getWrap();        
+        Assert.assertEquals(keyStoreWrap.getFamily(), KeyStores.Family.WINDOWS);
+        
+        keyStoreWrap = KeyStores.getWrapContainer(KeyStores.Level.USER, KeyStores.Type.CA_CERTS).getWrap();        
+        Assert.assertEquals(keyStoreWrap.getFamily(), KeyStores.Family.WINDOWS);
+    }    
 
 }

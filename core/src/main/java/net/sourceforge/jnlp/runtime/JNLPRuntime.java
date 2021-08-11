@@ -272,7 +272,7 @@ public class JNLPRuntime {
         try {
             SSLSocketFactory sslSocketFactory;
             SSLContext context = SSLContext.getInstance("SSL");
-            KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS).getKs();
+            KeyStore ks = KeyStores.getWrapContainer(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS).getWrap().getKs();
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             SecurityUtil.initKeyManagerFactory(kmf, ks);
             TrustManager[] trust = new TrustManager[] { getSSLSocketTrustManager() };

@@ -332,7 +332,7 @@ public class CertWarningPane extends SecurityDialogPanel {
 
     public void saveCert() {
         try {
-            KeyStore ks = KeyStores.getKeyStore(Level.USER, Type.CERTS).getKs();
+            KeyStore ks = KeyStores.getWrapContainer(Level.USER, Type.CERTS).getWrap().getKs();
             X509Certificate c = (X509Certificate) parent.getCertVerifier().getPublisher(null);
             CertificateUtils.addToKeyStore(c, ks);
             File keyStoreFile = KeyStores.getKeyStoreLocation(Level.USER, Type.CERTS).getFile();
