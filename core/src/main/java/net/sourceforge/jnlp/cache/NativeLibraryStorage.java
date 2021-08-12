@@ -65,13 +65,13 @@ public class NativeLibraryStorage {
     }
 
     /**
-     * Adds the {@link File} to the search path of this {@link NativeLibraryStorage}
+     * Adds the {@link File}s to the search path of this {@link NativeLibraryStorage}
      * when trying to find a native library
      *
-     * @param directory directory to be added
+     * @param directories directories to be added
      */
-    public void addSearchDirectory(final File directory) {
-        nativeSearchDirectories.add(directory);
+    public void addSearchDirectories(final List<File> directories) {
+        nativeSearchDirectories.addAll(directories);
     }
 
     public List<File> getSearchDirectories() {
@@ -86,7 +86,7 @@ public class NativeLibraryStorage {
      * @return path to library if found, null otherwise.
      */
     public File findLibrary(final String fileName) {
-        for (final File dir : getSearchDirectories()) {
+        for (final File dir : nativeSearchDirectories) {
             final File target = new File(dir, fileName);
             if (target.exists()) {
                 return target;
@@ -147,11 +147,17 @@ public class NativeLibraryStorage {
     }
 
     File getNativeStoreDirectory() {
-        if (jarEntryDirectory == null) {
-            jarEntryDirectory = createNativeStoreDirectory();
-            addSearchDirectory(jarEntryDirectory);
+        if (jarEntryDirectory != null) {
+            return jarEntryDirectory;
         }
-        return jarEntryDirectory;
+
+        synchronized (this) {
+            if (jarEntryDirectory == null) {
+                jarEntryDirectory = createNativeStoreDirectory();
+                nativeSearchDirectories.add(jarEntryDirectory);
+            }
+            return jarEntryDirectory;
+        }
     }
 
     /**
