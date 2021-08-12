@@ -81,7 +81,7 @@ interface StreamUnpacker {
                     .map(VersionId::fromString)
                     .orElseThrow(() -> new IllegalArgumentException("Mime-Type " + JAR_DIFF_MIME_TYPE + " for non incremental request to " + downloadDetails.downloadFrom));
 
-            final File cacheFile = Cache.getCacheFile(resourceHref, currentVersionId);
+            final File cacheFile = Cache.getOrCreateCacheFile(resourceHref, currentVersionId);
             LOG.debug("Will use JarDiff for '{}'", resourceHref);
             return new JarDiffUnpacker(cacheFile);
         }

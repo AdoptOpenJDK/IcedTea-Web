@@ -16,6 +16,7 @@
 
 package net.adoptopenjdk.icedteaweb.resources;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.util.UrlUtils;
@@ -27,7 +28,13 @@ import java.io.File;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
+
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.INCOMPLETE;
+import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.validateWithApplicationWhiteList;
 
 /**
  * <p>
@@ -57,12 +64,6 @@ public class Resource {
 
     private final PropertyChangeSupport propertyChangeSupport;
 
-    public enum Status {
-        INCOMPLETE,
-        DOWNLOADED,
-        ERROR,
-    }
-
     /** the remote location of the resource */
     private final URL location;
 
@@ -85,10 +86,10 @@ public class Resource {
     private volatile long size = -1;
 
     /** A future to wait for completion of download of this resource */
-    private volatile Future<Resource> futureForDownlaoded;
+    private volatile Future<Resource> futureForDownloaded;
 
     /** the status of the resource */
-    private volatile Status status = Status.INCOMPLETE;
+    private volatile ResourceStatus status = INCOMPLETE;
 
     /**
      * Create a resource.
@@ -119,7 +120,7 @@ public class Resource {
      * @param updatePolicy    final policy for updating
      * @return new resource, which is already added in resources list
      */
-    static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
+    static Resource createOrGetResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
         synchronized (resources) {
             Resource resource = new Resource(location, requestVersion, downloadOptions, updatePolicy);
 
@@ -211,15 +212,7 @@ public class Resource {
     }
 
     boolean isBeingProcessed() {
-        return futureForDownlaoded != null;
-    }
-
-    void startProcessing(Future<Resource> futureThis) {
-        this.futureForDownlaoded = futureThis;
-    }
-
-    Future<Resource> getFutureForDownloaded() {
-        return futureForDownlaoded;
+        return futureForDownloaded != null;
     }
 
     /**
@@ -228,12 +221,12 @@ public class Resource {
      * @param flag a status flag
      * @return true iff the flag is set
      */
-    boolean isSet(Status flag) {
+    boolean hasStatus(ResourceStatus flag) {
         return status == flag;
     }
 
     boolean isComplete() {
-        return isSet(Status.ERROR) || isSet(Status.DOWNLOADED);
+        return hasStatus(ERROR) || hasStatus(DOWNLOADED);
     }
 
     /**
@@ -252,7 +245,8 @@ public class Resource {
      *
      * @param status a collection of status flags to set
      */
-    public void setStatus(Status status) {
+    public void setStatus(ResourceStatus status) {
+        Assert.requireNonNull(status, "status");
         this.status = status;
     }
 
@@ -281,14 +275,25 @@ public class Resource {
 
     @Override
     public String toString() {
-        return "location=" + location.toString() + " version=" + requestVersion + " state=" + status;
+        return "[l=" + location.toString() + " v=" + requestVersion + " s=" + status.getShortName() + "]";
     }
 
     public String getSimpleName() {
         return Optional.ofNullable(getLocation())
-                .map(l -> l.getPath())
+                .map(URL::getPath)
                 .map(p -> p.split("/"))
                 .map(a -> a[a.length - 1])
                 .orElse("UNKNOWN");
+    }
+
+    Future<Resource> putIntoCache(final Executor downloadExecutor) {
+        validateWithApplicationWhiteList(location);
+
+        synchronized (this) {
+            if (futureForDownloaded == null) {
+                this.futureForDownloaded = ResourceHandler.putIntoCache(this, downloadExecutor);
+            }
+            return futureForDownloaded;
+        }
     }
 }

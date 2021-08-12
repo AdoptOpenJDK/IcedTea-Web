@@ -1,8 +1,8 @@
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
+import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheIdInfo;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
-import net.sourceforge.jnlp.cache.CacheUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +11,18 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.sourceforge.jnlp.cache.CacheUtil.isNonCacheable;
+
 /**
- * The Cache
+ * The Cache.
+ *
+ * - clear() -> void
+ * - cleanup() -> void
+ * - contains(cacheKey) -> boolean
+ * - isNewerThan(cacheKey, date) -> boolean
+ * - get(cacheKey) -> file
+ * - add(inputStream, downloadInfo) -> void
+ * - bestMatchingVersion(url, versionRange) -> versionId
  */
 public class Cache {
     /**
@@ -46,17 +56,16 @@ public class Cache {
      * @return the file location in the cache, or {@code null} if no versions cached
      * @throws IllegalArgumentException if the resource is not cacheable
      */
-    public static File getCacheFile(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
-        return LeastRecentlyUsedCache.getInstance().getOrCreateCacheFile(resource, version);
+    public static File getOrCreateCacheFile(final URL resource, final VersionId version) {
+        return getOrCreateCacheFile(new CacheKey(resource, version));
+    }
+    private static File getOrCreateCacheFile(final CacheKey key) {
+        assertLocationIsCacheable(key.getLocation());
+        return LeastRecentlyUsedCache.getInstance().getOrCreateCacheFile(key);
     }
 
     public static File addToCache(DownloadInfo infoFromRemote, InputStream unpackedStream) throws IOException {
-        if (!CacheUtil.isCacheable(infoFromRemote.getResourceHref())) {
-            throw new IllegalArgumentException(infoFromRemote.getResourceHref() + " is not a cacheable resource");
-        }
+        assertLocationIsCacheable(infoFromRemote.getCacheKey().getLocation());
         return LeastRecentlyUsedCache.getInstance().addToCache(infoFromRemote, unpackedStream);
     }
 
@@ -65,28 +74,22 @@ public class Cache {
      *
      * @param resource the resource {@link URL}
      * @param version  the versions
-     * @return the newly created cache file (which of course will be empty)
      * @throws IllegalArgumentException if the resource is not cacheable
      */
-    public static File replaceExistingCacheFile(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
-        return LeastRecentlyUsedCache.getInstance().replaceExistingCacheFile(resource, version);
+    public static void invalidateExistingCacheFile(final URL resource, final VersionId version) {
+        invalidateExistingCacheFile(new CacheKey(resource, version));
     }
-
-    public static void markAsCorrupted(URL resource, VersionId version) {
-        LeastRecentlyUsedCache.getInstance().markAsCorrupted(resource, version);
+    private static void invalidateExistingCacheFile(final CacheKey key) {
+        assertLocationIsCacheable(key.getLocation());
+        LeastRecentlyUsedCache.getInstance().invalidateExistingCacheFile(key);
     }
 
     public static void deleteFromCache(ResourceInfo info) {
-        LeastRecentlyUsedCache.getInstance().deleteFromCache(info.getResourceHref(), info.getVersion());
+        LeastRecentlyUsedCache.getInstance().deleteFromCache(info.getCacheKey());
     }
 
     public static void deleteFromCache(URL resource, VersionString version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
+        assertLocationIsCacheable(resource);
         LeastRecentlyUsedCache.getInstance().deleteFromCache(resource, version);
     }
 
@@ -100,19 +103,19 @@ public class Cache {
      * @throws IllegalArgumentException if the resource is not cacheable
      */
     public static boolean isCached(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
-
-        return LeastRecentlyUsedCache.getInstance().isCached(resource, version);
+        return isCached(new CacheKey(resource, version));
+    }
+    private static boolean isCached(final CacheKey key) {
+        assertLocationIsCacheable(key.getLocation());
+        return LeastRecentlyUsedCache.getInstance().isCached(key);
     }
 
     public static ResourceInfo getInfo(final URL resource, final VersionId version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
-
-        return LeastRecentlyUsedCache.getInstance().getResourceInfo(resource, version).orElse(null);
+        return getInfo(new CacheKey(resource, version));
+    }
+    public static ResourceInfo getInfo(final CacheKey key) {
+        assertLocationIsCacheable(key.getLocation());
+        return LeastRecentlyUsedCache.getInstance().getResourceInfo(key).orElse(null);
     }
 
     /**
@@ -125,25 +128,19 @@ public class Cache {
      * @throws IllegalArgumentException if the source is not cacheable
      */
     public static boolean isAnyCached(final URL resource, final VersionString version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
+        assertLocationIsCacheable(resource);
         return LeastRecentlyUsedCache.getInstance().getBestMatchingEntryInCache(resource, version).isPresent();
     }
 
     public static VersionId getBestMatchingVersionInCache(final URL resource, final VersionString version) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
+        assertLocationIsCacheable(resource);
         return LeastRecentlyUsedCache.getInstance().getBestMatchingEntryInCache(resource, version)
                 .map(LeastRecentlyUsedCacheEntry::getVersion)
                 .orElse(null);
     }
 
     public static List<VersionId> getAllVersionsInCache(final URL resourceHref) {
-        if (!CacheUtil.isCacheable(resourceHref)) {
-            throw new IllegalArgumentException(resourceHref + " is not a cacheable resource");
-        }
+        assertLocationIsCacheable(resourceHref);
         return LeastRecentlyUsedCache.getInstance().getAllEntriesInCache(resourceHref).stream()
                 .map(LeastRecentlyUsedCacheEntry::getVersion)
                 .collect(Collectors.toList());
@@ -161,11 +158,17 @@ public class Cache {
      * @throws IllegalArgumentException if the resource is not cacheable
      */
     public static boolean isUpToDate(final URL resource, final VersionId version, long lastModified) {
-        if (!CacheUtil.isCacheable(resource)) {
-            throw new IllegalArgumentException(resource + " is not a cacheable resource");
-        }
+        return isUpToDate(new CacheKey(resource, version), lastModified);
+    }
+    private static boolean isUpToDate(final CacheKey key, long lastModified) {
+        assertLocationIsCacheable(key.getLocation());
+        return LeastRecentlyUsedCache.getInstance().isUpToDate(key, lastModified);
+    }
 
-        return LeastRecentlyUsedCache.getInstance().isUpToDate(resource, version, lastModified);
+    private static void assertLocationIsCacheable(URL location) {
+        if (isNonCacheable(location)) {
+            throw new IllegalArgumentException(location + " is not a cacheable resource");
+        }
     }
 
     /* ***************
@@ -175,14 +178,14 @@ public class Cache {
     /**
      * This method load all known IDs of applications
      */
-    public static List<CacheId> getJnlpCacheIds() {
+    public static List<CacheIdInfo> getJnlpCacheIds() {
         return LeastRecentlyUsedCache.getInstance().getCacheIds(".*", true, false);
     }
 
     /**
      * This method load all known IDs of applications
      */
-    public static List<CacheId> getDomainCacheIds() {
+    public static List<CacheIdInfo> getDomainCacheIds() {
         return LeastRecentlyUsedCache.getInstance().getCacheIds(".*", false, true);
     }
 
@@ -191,11 +194,16 @@ public class Cache {
      *
      * @param filter - regex to filter keys
      */
-    public static List<CacheId> getCacheIds(final String filter) {
+    public static List<CacheIdInfo> getCacheIds(final String filter) {
         return LeastRecentlyUsedCache.getInstance().getCacheIds(filter, true, true);
     }
 
     public static void deleteFromCache(final String cacheId) {
+        LeastRecentlyUsedCache.getInstance().deleteFromCache(CacheIdInfoImpl.domainId(cacheId));
+        LeastRecentlyUsedCache.getInstance().deleteFromCache(CacheIdInfoImpl.jnlpPathId(cacheId));
+    }
+
+    public static void deleteFromCache(final CacheIdInfo cacheId) {
         LeastRecentlyUsedCache.getInstance().deleteFromCache(cacheId);
     }
 }

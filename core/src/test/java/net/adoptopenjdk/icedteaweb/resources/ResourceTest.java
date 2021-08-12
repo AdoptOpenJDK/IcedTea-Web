@@ -41,6 +41,7 @@ import org.junit.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.INCOMPLETE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -51,7 +52,7 @@ public class ResourceTest {
         final URL url = new URL("http://example.com/applet.jar");
         final VersionString requestVersion = VersionString.fromString("1.0");
 
-        final Resource res = Resource.createResource(url, requestVersion, null, UpdatePolicy.ALWAYS);
+        final Resource res = Resource.createOrGetResource(url, requestVersion, null, UpdatePolicy.ALWAYS);
 
         assertEquals("Locations should match each other", url, res.getLocation());
         assertEquals("Versions should match each other.", res.getRequestVersion(), requestVersion);
@@ -82,11 +83,11 @@ public class ResourceTest {
     @Test
     public void testNewResourceIsUninitialized() throws Exception {
         Resource res = createResource();
-        assertTrue("Resource should not have had any status flags set", res.isSet(Resource.Status.INCOMPLETE));
+        assertTrue("Resource should not have had any status flags set", res.hasStatus(INCOMPLETE));
     }
 
     private static Resource createResource() throws MalformedURLException {
         final URL dummyUrl = new URL("http://example.com/applet.jar");
-        return Resource.createResource(dummyUrl, VersionString.fromString("1.0"), DownloadOptions.NONE, UpdatePolicy.ALWAYS);
+        return Resource.createOrGetResource(dummyUrl, VersionString.fromString("1.0"), DownloadOptions.NONE, UpdatePolicy.ALWAYS);
     }
 }

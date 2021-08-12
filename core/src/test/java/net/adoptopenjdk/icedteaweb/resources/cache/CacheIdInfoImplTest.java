@@ -37,19 +37,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class CacheIdTest {
+public class CacheIdInfoImplTest {
     @Test
-    public void CacheID(){
-        CacheId cj11 = CacheId.jnlpPathId("a");
-        CacheId cj12 = CacheId.jnlpPathId("a");
-        CacheId cj2 = CacheId.jnlpPathId("b");
-        CacheId cj31 = CacheId.jnlpPathId(null);
-        CacheId cj32 = CacheId.jnlpPathId(null);
-        CacheId cd11 = CacheId.domainId("a");
-        CacheId cd12 = CacheId.domainId("a");
-        CacheId cd2 = CacheId.domainId("b");
-        CacheId cd31 = CacheId.domainId(null);
-        CacheId cd32 = CacheId.domainId(null);
+    public void InfosForSettingsUi(){
+        CacheIdInfoImpl cj11 = CacheIdInfoImpl.jnlpPathId("a");
+        CacheIdInfoImpl cj12 = CacheIdInfoImpl.jnlpPathId("a");
+        CacheIdInfoImpl cj2 = CacheIdInfoImpl.jnlpPathId("b");
+        CacheIdInfoImpl cj31 = CacheIdInfoImpl.jnlpPathId(null);
+        CacheIdInfoImpl cj32 = CacheIdInfoImpl.jnlpPathId(null);
+        CacheIdInfoImpl cd11 = CacheIdInfoImpl.domainId("a");
+        CacheIdInfoImpl cd12 = CacheIdInfoImpl.domainId("a");
+        CacheIdInfoImpl cd2 = CacheIdInfoImpl.domainId("b");
+        CacheIdInfoImpl cd31 = CacheIdInfoImpl.domainId(null);
+        CacheIdInfoImpl cd32 = CacheIdInfoImpl.domainId(null);
 
         Assert.assertEquals(cj11, cj11);
         Assert.assertEquals(cj11, cj12);

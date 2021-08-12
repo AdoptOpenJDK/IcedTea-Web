@@ -10,6 +10,6 @@ import java.net.URL;
  */
 public class ResourceFactory {
     public static Resource createResource(final URL location, final VersionString requestVersion, final DownloadOptions downloadOptions, final UpdatePolicy updatePolicy) {
-        return Resource.createResource(location, requestVersion, downloadOptions, updatePolicy);
+        return Resource.createOrGetResource(location, requestVersion, downloadOptions, updatePolicy);
     }
 }

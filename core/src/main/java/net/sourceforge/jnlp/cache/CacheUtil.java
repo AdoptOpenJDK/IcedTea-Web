@@ -16,7 +16,10 @@
 
 package net.sourceforge.jnlp.cache;
 
+import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheFileInfo;
+import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheIdInfo;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DummyDownloadIndicator;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
@@ -29,8 +32,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
-import net.adoptopenjdk.icedteaweb.resources.cache.CacheId;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 
@@ -43,7 +44,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -90,25 +90,16 @@ public class CacheUtil {
     }
 
     public static void logCacheIds(String filter) {
-        List<CacheId> items = Cache.getCacheIds(filter);
+        List<CacheIdInfo> items = Cache.getCacheIds(filter);
         if (JNLPRuntime.isDebug()) {
-            for (CacheId id : items) {
-                LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.getFiles().size());
-                for (CacheFile cacheFile : id.getFiles()) {
-                    final StringBuilder sb = new StringBuilder();
-                    final Consumer<Object> appender = v -> sb.append(Optional.ofNullable(v).orElse("??")).append(" ;  ");
-                    appender.accept(cacheFile.getInfoFile());
-                    appender.accept(cacheFile.getParentFile());
-                    appender.accept(cacheFile.getProtocol());
-                    appender.accept(cacheFile.getDomain());
-                    appender.accept(cacheFile.getSize());
-                    appender.accept(cacheFile.getLastModified());
-                    appender.accept(cacheFile.getJnlpPath());
-                    LOG.info("  * {}", sb);
+            for (CacheIdInfo id : items) {
+                LOG.info("{} ({}) [{}]", id.getId(), id.getType(), id.getFileInfos().size());
+                for (CacheFileInfo cacheFileInfo : id.getFileInfos()) {
+                    LOG.info("  * {}", cacheFileInfo);
                 }
             }
         } else {
-            for (CacheId id : items) {
+            for (CacheIdInfo id : items) {
                 LOG.info(id.getId());
             }
         }
@@ -122,9 +113,21 @@ public class CacheUtil {
      * @param source the url of resource
      * @return whether this resource can be cached
      */
+    public static boolean isNonCacheable(URL source) {
+        Assert.requireNonNull(source, "source");
+        return NON_CACHEABLE_PROTOCOLS.contains(source.getProtocol());
+    }
+
+    /**
+     * Returns whether the resource can be cached as a local file;
+     * if not, then URLConnection.openStream can be used to obtain
+     * the contents.
+     *
+     * @param source the url of resource
+     * @return whether this resource can be cached
+     */
     public static boolean isCacheable(URL source) {
-        final String protocol = source != null ? source.getProtocol() : null;
-        return !NON_CACHEABLE_PROTOCOLS.contains(protocol);
+        return !isNonCacheable(source);
     }
 
 

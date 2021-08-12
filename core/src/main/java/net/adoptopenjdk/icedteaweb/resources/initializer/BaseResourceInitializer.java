@@ -6,7 +6,6 @@ import net.adoptopenjdk.icedteaweb.http.HttpMethod;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.adoptopenjdk.icedteaweb.resources.PrioritizedParallelExecutor;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
@@ -26,9 +25,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.globalFixedThreadPool;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.ACCEPT_ENCODING_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.PACK_200_OR_GZIP;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 
 /**
  * Base class with commonly used methods.
@@ -36,7 +36,7 @@ import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstant
 abstract class BaseResourceInitializer implements ResourceInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(BaseResourceInitializer.class);
 
-    private static final ExecutorService remoteExecutor = CachedDaemonThreadPoolProvider.getThreadPool();
+    private static final ExecutorService remoteExecutor = globalFixedThreadPool();
 
     private static final int NETWORK_AUTHENTICATION_REQUIRED = 511;
 
@@ -47,7 +47,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     }
 
     InitializationResult initFromCache(VersionId version) {
-        final File cachedFile = Cache.getCacheFile(this.resource.getLocation(), version);
+        final File cachedFile = Cache.getOrCreateCacheFile(this.resource.getLocation(), version);
 
         resource.setStatus(DOWNLOADED);
         resource.setSize(cachedFile.length());
@@ -67,7 +67,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
     void invalidateExistingEntryInCache(VersionId version) {
         final URL location = resource.getLocation();
         LOG.debug("Invalidating resource in cache: {} / {}", location, version);
-        Cache.replaceExistingCacheFile(location, version);
+        Cache.invalidateExistingCacheFile(location, version);
     }
 
     DownloadOptions getDownloadOptions() {
@@ -89,7 +89,7 @@ abstract class BaseResourceInitializer implements ResourceInitializer {
         try {
             return Optional.ofNullable(future.get());
         } catch (InterruptedException | ExecutionException e) {
-            LOG.debug("failed to determine best URL: {}",  e.getMessage());
+            LOG.debug("failed to determine best URL: {}", e.getMessage());
             return Optional.empty();
         }
     }
