@@ -133,19 +133,16 @@ class LeastRecentlyUsedCacheAction {
         this.entry = new LeastRecentlyUsedCacheEntry(id, lastAccessed, key);
     }
 
-    void applyTo(LeastRecentlyUsedCacheFile cacheFile) {
+    boolean applyTo(LeastRecentlyUsedCacheEntries entries) {
         switch (type) {
             case ADD:
-                cacheFile.addEntry(entry);
-                break;
+                return entries.addEntry(entry);
             case REMOVE:
-                cacheFile.removeEntry(entry);
-                break;
+                return entries.removeEntry(entry);
             case UPDATE_ACCESS_TIME:
-                cacheFile.markAccessed(entry, entry.getLastAccessed());
-                break;
+                return entries.markAccessed(entry, entry.getLastAccessed());
             default:
-                // do nothing
+                return false;
         }
     }
 

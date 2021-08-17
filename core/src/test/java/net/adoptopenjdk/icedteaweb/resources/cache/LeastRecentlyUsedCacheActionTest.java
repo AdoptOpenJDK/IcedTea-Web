@@ -2,11 +2,8 @@ package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -33,55 +30,49 @@ public class LeastRecentlyUsedCacheActionTest {
     public static final CacheKey CACHE_KEY_1 = new CacheKey(url(RESOURCE_1_URL), VersionId.fromString(RESOURCE_1_VERSION));
     public static final LeastRecentlyUsedCacheEntry ENTRY_1 = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, CACHE_KEY_1);
 
-    private LeastRecentlyUsedCacheFile cacheFile;
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private LeastRecentlyUsedCacheEntries entries;
 
     @Before
     public void setup() throws IOException {
-        final File tempFile = temporaryFolder.newFile("cache_file");
-        cacheFile = new LeastRecentlyUsedCacheFile(tempFile);
-        cacheFile.lock();
-        cacheFile.load();
+        entries = new LeastRecentlyUsedCacheEntries();
     }
 
     @Test
     public void addActionAppliedToListWillAddEntry() {
         final LeastRecentlyUsedCacheAction addAction = createAddActionFor(ENTRY_1);
-        addAction.applyTo(cacheFile);
+        addAction.applyTo(entries);
 
-        assertEqualEntries(asList(ENTRY_1), cacheFile.getAllEntries());
+        assertEqualEntries(asList(ENTRY_1), entries);
     }
 
     @Test
     public void removeActionAppliedToListWillRemoveEntry() {
-        cacheFile.addEntry(ENTRY_1);
+        entries.addEntry(ENTRY_1);
 
         final LeastRecentlyUsedCacheAction addAction = createRemoveActionFor(ENTRY_1.getId());
-        addAction.applyTo(cacheFile);
+        addAction.applyTo(entries);
 
-        assertTrue(cacheFile.getAllEntries().isEmpty());
+        assertTrue(entries.getAllEntries().isEmpty());
     }
 
     @Test
     public void updateAccessTimeActionAppliedToListWillChangeTheAccessTimeOfTheEntry() {
-        cacheFile.addEntry(ENTRY_1);
+        entries.addEntry(ENTRY_1);
 
         final LeastRecentlyUsedCacheAction addAction = createAccessActionFor(ENTRY_1.getId(), LAST_ACCESSED_2);
-        addAction.applyTo(cacheFile);
+        addAction.applyTo(entries);
 
         final LeastRecentlyUsedCacheEntry modifiedEntry1 = new LeastRecentlyUsedCacheEntry(ENTRY_1.getId(), LAST_ACCESSED_2, ENTRY_1.getCacheKey());
-        assertEqualEntries(asList(modifiedEntry1), cacheFile.getAllEntries());
+        assertEqualEntries(asList(modifiedEntry1), entries);
     }
 
     @Test
     public void doNothingShouldDoNothing() {
-        cacheFile.addEntry(ENTRY_1);
+        entries.addEntry(ENTRY_1);
 
-        DO_NOTHING.applyTo(cacheFile);
+        DO_NOTHING.applyTo(entries);
 
-        assertEqualEntries(asList(ENTRY_1), cacheFile.getAllEntries());
+        assertEqualEntries(asList(ENTRY_1), entries);
     }
 
     @Test
@@ -131,9 +122,9 @@ public class LeastRecentlyUsedCacheActionTest {
     @Test
     public void parseAddAction() {
         final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::l=https://test.com::v=1.1::a=1234::");
-        removeAction.applyTo(cacheFile);
+        removeAction.applyTo(entries);
 
-        assertEqualEntries(asList(ENTRY_1), cacheFile.getAllEntries());
+        assertEqualEntries(asList(ENTRY_1), entries);
     }
 
     @Test
@@ -141,10 +132,10 @@ public class LeastRecentlyUsedCacheActionTest {
         final CacheKey key = new CacheKey(url("https://test.com#::vv"), VersionId.fromString("2::3"));
 
         final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::l=https://test.com#::::vv::v=2::::3::a=1234::");
-        removeAction.applyTo(cacheFile);
+        removeAction.applyTo(entries);
 
         final LeastRecentlyUsedCacheEntry entryWithDelimiter = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
-        assertEqualEntries(asList(entryWithDelimiter), cacheFile.getAllEntries());
+        assertEqualEntries(asList(entryWithDelimiter), entries);
     }
 
     @Test
@@ -152,31 +143,31 @@ public class LeastRecentlyUsedCacheActionTest {
         final CacheKey key = new CacheKey(url("https://test.com#::vv::ww"), VersionId.fromString("2::3"));
 
         final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::l=https://test.com#::::vv::::ww::v=2::::3::a=1234::");
-        removeAction.applyTo(cacheFile);
+        removeAction.applyTo(entries);
 
         final LeastRecentlyUsedCacheEntry entryWithDelimiter = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
-        assertEqualEntries(asList(entryWithDelimiter), cacheFile.getAllEntries());
+        assertEqualEntries(asList(entryWithDelimiter), entries);
     }
 
     @Test
     public void parseRemovalAction() {
-        cacheFile.addEntry(ENTRY_1);
+        entries.addEntry(ENTRY_1);
 
         final LeastRecentlyUsedCacheAction removeAction = parse("!1/11!");
-        removeAction.applyTo(cacheFile);
+        removeAction.applyTo(entries);
 
-        assertTrue(cacheFile.getAllEntries().isEmpty());
+        assertTrue(entries.getAllEntries().isEmpty());
     }
 
     @Test
     public void parseAccessAction() {
-        cacheFile.addEntry(ENTRY_1);
+        entries.addEntry(ENTRY_1);
 
         final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::a=3456::");
-        removeAction.applyTo(cacheFile);
+        removeAction.applyTo(entries);
 
         final LeastRecentlyUsedCacheEntry updatedEntry = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_2, CACHE_KEY_1);
-        assertEqualEntries(asList(updatedEntry), cacheFile.getAllEntries());
+        assertEqualEntries(asList(updatedEntry), entries);
     }
 
     @Test
@@ -221,7 +212,8 @@ public class LeastRecentlyUsedCacheActionTest {
         }
     }
 
-    private void assertEqualEntries(List<LeastRecentlyUsedCacheEntry> expected, List<LeastRecentlyUsedCacheEntry> actual) {
+    private void assertEqualEntries(List<LeastRecentlyUsedCacheEntry> expected, LeastRecentlyUsedCacheEntries actualEntries) {
+        final List<LeastRecentlyUsedCacheEntry> actual = actualEntries.getAllEntries();
         assertEquals(expected.size(), actual.size());
         for (int i = 0; i < expected.size(); i++) {
             final LeastRecentlyUsedCacheEntry expectedEntry = expected.get(0);

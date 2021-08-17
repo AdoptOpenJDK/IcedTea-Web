@@ -6,14 +6,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Collections.sort;
 import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.io.FileUtils.loadFileAsUtf8String;
 import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.createAccessActionFor;
@@ -41,8 +39,7 @@ class LeastRecentlyUsedCacheFile {
     private long lastLoadOrStore = -1;
     private boolean requestCompression = false;
 
-    private final List<LeastRecentlyUsedCacheEntry> entries = new ArrayList<>();
-    private final List<LeastRecentlyUsedCacheEntry> unmodifiableEntries = Collections.unmodifiableList(entries);
+    private final LeastRecentlyUsedCacheEntries entries = new LeastRecentlyUsedCacheEntries();
 
     LeastRecentlyUsedCacheFile(File file) {
         this(LockableFile.getInstance(file));
@@ -60,40 +57,32 @@ class LeastRecentlyUsedCacheFile {
         if (hasNeverBeenLoaded()) {
             throw new IllegalStateException("Cannot access entries before loading the file");
         }
-        return unmodifiableEntries;
+        return entries.getAllEntries();
     }
 
     void addEntry(LeastRecentlyUsedCacheEntry entry) {
-        entries.add(entry);
-        unsavedActions.add(createAddActionFor(entry));
-        sort(entries);
+        applyAndSort(createAddActionFor(entry));
     }
 
     void markAccessed(LeastRecentlyUsedCacheEntry entry, long lastAccessed) {
-        final int idx = entries.indexOf(entry);
-        if (idx > -1) {
-            final LeastRecentlyUsedCacheEntry old = entries.remove(idx);
-            LeastRecentlyUsedCacheEntry accessedEntry = new LeastRecentlyUsedCacheEntry(old.getId(), lastAccessed, old.getCacheKey());
-            entries.add(0, accessedEntry);
-            unsavedActions.add(createAccessActionFor(old.getId(), lastAccessed));
-            sort(entries);
-        }
+        applyAndSort(createAccessActionFor(entry.getId(), lastAccessed));
     }
 
     void removeEntry(LeastRecentlyUsedCacheEntry entry) {
-        final boolean entryRemoved = entries.remove(entry);
-        if (entryRemoved) {
-            unsavedActions.add(createRemoveActionFor(entry.getId()));
+        applyAndSort(createRemoveActionFor(entry.getId()));
+    }
+
+    private void applyAndSort(LeastRecentlyUsedCacheAction action) {
+        if (entries.apply(action)) {
+            unsavedActions.add(action);
+            entries.sortByLastAccessed();
         }
     }
 
     void clear() {
-        if (entries.isEmpty()) {
-            return;
+        if (entries.clear()) {
+            requestCompression();
         }
-
-        entries.clear();
-        requestCompression();
     }
 
     void load() throws IOException {
@@ -119,10 +108,10 @@ class LeastRecentlyUsedCacheFile {
 
             Stream.of(lines)
                     .map(LeastRecentlyUsedCacheAction::parse)
-                    .forEach(action -> action.applyTo(this));
+                    .forEach(entries::apply);
 
             lastLoadOrStore = lastModified;
-            unsavedActions.clear();
+            entries.sortByLastAccessed();
         }
     }
 
