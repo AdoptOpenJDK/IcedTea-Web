@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class LeastRecentlyUsedCacheFileTest {
+public class CacheIndexFileTest {
 
     private static final URL RESOURCE_1_URL = url("https://test.com");
     private static final URL RESOURCE_2_URL = url("https://foo.com");
@@ -33,10 +33,10 @@ public class LeastRecentlyUsedCacheFileTest {
     public static final long LAST_ACCESSED_2 = 3456;
     public static final long LAST_ACCESSED_3 = 5678;
 
-    public static final LeastRecentlyUsedCacheEntry ENTRY_1 = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, new CacheKey(RESOURCE_1_URL, RESOURCE_1_VERSION));
-    public static final LeastRecentlyUsedCacheEntry ENTRY_2 = new LeastRecentlyUsedCacheEntry(CACHE_ID_2, LAST_ACCESSED_2, new CacheKey(RESOURCE_2_URL, RESOURCE_2_VERSION));
+    public static final CacheIndexEntry ENTRY_1 = new CacheIndexEntry(CACHE_ID_1, LAST_ACCESSED_1, new CacheKey(RESOURCE_1_URL, RESOURCE_1_VERSION));
+    public static final CacheIndexEntry ENTRY_2 = new CacheIndexEntry(CACHE_ID_2, LAST_ACCESSED_2, new CacheKey(RESOURCE_2_URL, RESOURCE_2_VERSION));
 
-    private LeastRecentlyUsedCacheFile cacheFile;
+    private CacheIndexFile cacheFile;
     private File physicalFile;
 
     @Rule
@@ -45,7 +45,7 @@ public class LeastRecentlyUsedCacheFileTest {
     @Before
     public void setup() throws IOException {
         physicalFile = temporaryFolder.newFile("cache_file");
-        cacheFile = new LeastRecentlyUsedCacheFile(physicalFile);
+        cacheFile = new CacheIndexFile(physicalFile);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -68,7 +68,7 @@ public class LeastRecentlyUsedCacheFileTest {
     @Test
     public void loadingAnEmptyFileCreatesNoEntries() throws Exception {
         loadFile("");
-        final List<LeastRecentlyUsedCacheEntry> result = cacheFile.getAllEntries();
+        final List<CacheIndexEntry> result = cacheFile.getAllEntries();
 
         assertTrue(result.isEmpty());
     }
@@ -76,7 +76,7 @@ public class LeastRecentlyUsedCacheFileTest {
     @Test
     public void loadingNonEmptyFileWillApplyAppropriateActions() throws Exception {
         loadFile("::i=1/11::l=https://test.com::v=1.1::a=1234::");
-        final List<LeastRecentlyUsedCacheEntry> result = cacheFile.getAllEntries();
+        final List<CacheIndexEntry> result = cacheFile.getAllEntries();
 
         assertEqualEntries(asList(ENTRY_1), result);
     }
@@ -87,9 +87,9 @@ public class LeastRecentlyUsedCacheFileTest {
                 "::i=1/11::l=https://test.com::v=1.1::a=1234::",
                 "::i=1/11::a=3456::"
         );
-        final List<LeastRecentlyUsedCacheEntry> result = cacheFile.getAllEntries();
+        final List<CacheIndexEntry> result = cacheFile.getAllEntries();
 
-        final LeastRecentlyUsedCacheEntry updatedEntry1 = new LeastRecentlyUsedCacheEntry(ENTRY_1.getId(), LAST_ACCESSED_2, ENTRY_1.getCacheKey());
+        final CacheIndexEntry updatedEntry1 = new CacheIndexEntry(ENTRY_1.getId(), LAST_ACCESSED_2, ENTRY_1.getCacheKey());
         assertEqualEntries(asList(updatedEntry1), result);
     }
 
@@ -100,7 +100,7 @@ public class LeastRecentlyUsedCacheFileTest {
                 "::i=2/22::l=https://test.com::v=1.1::a=1234::",
                 "!2/22!"
         );
-        final List<LeastRecentlyUsedCacheEntry> result = cacheFile.getAllEntries();
+        final List<CacheIndexEntry> result = cacheFile.getAllEntries();
 
         assertEqualEntries(asList(ENTRY_1), result);
     }
@@ -133,7 +133,7 @@ public class LeastRecentlyUsedCacheFileTest {
         cacheFile.addEntry(ENTRY_2);
         cacheFile.markAccessed(ENTRY_1, LAST_ACCESSED_3);
 
-        final LeastRecentlyUsedCacheEntry updatedEntry1 = new LeastRecentlyUsedCacheEntry(ENTRY_1.getId(), LAST_ACCESSED_3, ENTRY_1.getCacheKey());
+        final CacheIndexEntry updatedEntry1 = new CacheIndexEntry(ENTRY_1.getId(), LAST_ACCESSED_3, ENTRY_1.getCacheKey());
         assertEqualEntries(asList(updatedEntry1, ENTRY_2), cacheFile.getAllEntries());
     }
 
@@ -145,7 +145,7 @@ public class LeastRecentlyUsedCacheFileTest {
         cacheFile.addEntry(ENTRY_2);
         cacheFile.markAccessed(ENTRY_2, LAST_ACCESSED_3);
 
-        final LeastRecentlyUsedCacheEntry updatedEntry2 = new LeastRecentlyUsedCacheEntry(ENTRY_2.getId(), LAST_ACCESSED_3, ENTRY_2.getCacheKey());
+        final CacheIndexEntry updatedEntry2 = new CacheIndexEntry(ENTRY_2.getId(), LAST_ACCESSED_3, ENTRY_2.getCacheKey());
         assertEqualEntries(asList(updatedEntry2, ENTRY_1), cacheFile.getAllEntries());
     }
 
@@ -372,11 +372,11 @@ public class LeastRecentlyUsedCacheFileTest {
         }
     }
 
-    private void assertEqualEntries(List<LeastRecentlyUsedCacheEntry> expected, List<LeastRecentlyUsedCacheEntry> actual) {
+    private void assertEqualEntries(List<CacheIndexEntry> expected, List<CacheIndexEntry> actual) {
         assertEquals(expected.size(), actual.size());
         for (int i = 0; i < expected.size(); i++) {
-            final LeastRecentlyUsedCacheEntry expectedEntry = expected.get(0);
-            final LeastRecentlyUsedCacheEntry actualEntry = actual.get(0);
+            final CacheIndexEntry expectedEntry = expected.get(0);
+            final CacheIndexEntry actualEntry = actual.get(0);
 
             assertEquals(expectedEntry.getId(), actualEntry.getId());
             assertEquals(expectedEntry.getLastAccessed(), actualEntry.getLastAccessed());

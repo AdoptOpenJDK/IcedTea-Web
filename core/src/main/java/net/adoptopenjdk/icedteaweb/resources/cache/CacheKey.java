@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 
-public class CacheKey {
+class CacheKey {
 
     private final URL location;
     private final VersionId version;

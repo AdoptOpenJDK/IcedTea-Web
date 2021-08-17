@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
  * This implementation uses a least recently accessed approach
  * to evict resources when the total size of the cache exceeds the limit.
  */
-class LeastRecentlyUsedCacheIndex {
+class CacheIndex {
 
-    private final LeastRecentlyUsedCacheFile cacheFile;
+    private final CacheIndexFile cacheFile;
 
-    LeastRecentlyUsedCacheIndex(LeastRecentlyUsedCacheFile cacheFile) {
+    CacheIndex(CacheIndexFile cacheFile) {
         this.cacheFile = cacheFile;
     }
 
@@ -27,7 +27,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> findEntry(CacheKey key) {
+    Optional<CacheIndexEntry> findEntry(CacheKey key) {
         return cacheFile.getAllEntries().stream()
                 .filter(e -> e.matches(key))
                 .findFirst();
@@ -38,8 +38,8 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> findAndMarkAsAccessed(CacheKey key) {
-        final Optional<LeastRecentlyUsedCacheEntry> result = findEntry(key);
+    Optional<CacheIndexEntry> findAndMarkAsAccessed(CacheKey key) {
+        final Optional<CacheIndexEntry> result = findEntry(key);
 
         result.ifPresent(this::markAccessed);
 
@@ -51,7 +51,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return a set of all matching entries, never {@code null}.
      */
-    Set<LeastRecentlyUsedCacheEntry> findAllEntries(URL resourceHref) {
+    Set<CacheIndexEntry> findAllEntries(URL resourceHref) {
         return cacheFile.getAllEntries().stream()
                 .filter(e -> e.matches(resourceHref))
                 .collect(Collectors.toSet());
@@ -62,7 +62,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return a set of all matching entries, never {@code null}.
      */
-    Set<LeastRecentlyUsedCacheEntry> findAllEntries(URL resourceHref, VersionString versionString) {
+    Set<CacheIndexEntry> findAllEntries(URL resourceHref, VersionString versionString) {
         return cacheFile.getAllEntries().stream()
                 .filter(e -> e.matches(resourceHref, versionString))
                 .collect(Collectors.toSet());
@@ -71,7 +71,7 @@ class LeastRecentlyUsedCacheIndex {
     /**
      * @return all entries
      */
-    List<LeastRecentlyUsedCacheEntry> getAllEntries() {
+    List<CacheIndexEntry> getAllEntries() {
         return cacheFile.getAllEntries();
     }
 
@@ -80,9 +80,9 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the newly created entry
      */
-    LeastRecentlyUsedCacheEntry createEntry(CacheKey key, String entryId) {
+    CacheIndexEntry createEntry(CacheKey key, String entryId) {
         final long now = System.currentTimeMillis();
-        final LeastRecentlyUsedCacheEntry newEntry = new LeastRecentlyUsedCacheEntry(entryId, now, key);
+        final CacheIndexEntry newEntry = new CacheIndexEntry(entryId, now, key);
         cacheFile.addEntry(newEntry);
         return newEntry;
     }
@@ -97,7 +97,7 @@ class LeastRecentlyUsedCacheIndex {
     /**
      * Removes an entry from the index.
      */
-    void removeEntry(LeastRecentlyUsedCacheEntry entry) {
+    void removeEntry(CacheIndexEntry entry) {
         cacheFile.removeEntry(entry);
     }
 
@@ -112,7 +112,7 @@ class LeastRecentlyUsedCacheIndex {
         cacheFile.clear();
     }
 
-    private void markAccessed(LeastRecentlyUsedCacheEntry entry) {
+    private void markAccessed(CacheIndexEntry entry) {
         final long now = System.currentTimeMillis();
         cacheFile.markAccessed(entry, now);
     }

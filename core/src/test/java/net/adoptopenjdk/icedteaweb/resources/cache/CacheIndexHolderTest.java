@@ -52,7 +52,7 @@ import java.util.Optional;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class LeastRecentlyUsedCacheIndexHolderTest {
+public class CacheIndexHolderTest {
 
     private static CacheKey key;
     private static URL url;
@@ -61,7 +61,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     private static final int noEntriesCacheFile = 1000;
 
     private File recentlyUsedFile;
-    private LeastRecentlyUsedCacheIndexHolder holder;
+    private CacheIndexHolder holder;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -76,7 +76,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     public void setup() throws IOException {
         final File cacheDir = temporaryFolder.newFolder();
         recentlyUsedFile = new File(cacheDir, ConfigurationConstants.CACHE_INDEX_FILE_NAME);
-        holder = new LeastRecentlyUsedCacheIndexHolder(new DummyInfrastructureFileDescriptor(recentlyUsedFile));
+        holder = new CacheIndexHolder(new DummyInfrastructureFileDescriptor(recentlyUsedFile));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
         // required as file system only stores seconds in lastModified()
         Thread.sleep(1010);
 
-        holder.runSynchronized(LeastRecentlyUsedCacheIndex::clear);
+        holder.runSynchronized(CacheIndex::clear);
         final long lmAfter = recentlyUsedFile.lastModified();
 
         assertTrue("modification timestamp hasn't changed! Before = " + lmBefore + " After = " + lmAfter, lmBefore < lmAfter);
@@ -126,7 +126,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     @Test
     public void testAddEntry() {
         holder.runSynchronized(idx -> idx.createEntry(key, entryId));
-        final Optional<LeastRecentlyUsedCacheEntry> entry = holder.getSynchronized(idx -> idx.findEntry(key));
+        final Optional<CacheIndexEntry> entry = holder.getSynchronized(idx -> idx.findEntry(key));
         assertTrue(entry.isPresent());
         assertEquals(entry.get().getResourceHref(), url);
         assertEquals(entry.get().getVersion(), version);

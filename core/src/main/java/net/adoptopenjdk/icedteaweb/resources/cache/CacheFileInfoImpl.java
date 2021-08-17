@@ -10,11 +10,11 @@ import java.util.function.Consumer;
 
 class CacheFileInfoImpl implements CacheFileInfo {
 
-    private final CacheEntry infoFile;
+    private final CachedFile infoFile;
 
-    private final LeastRecentlyUsedCacheEntry entry;
+    private final CacheIndexEntry entry;
 
-    public CacheFileInfoImpl(final CacheEntry infoFile, final LeastRecentlyUsedCacheEntry entry) {
+    public CacheFileInfoImpl(final CachedFile infoFile, final CacheIndexEntry entry) {
         this.infoFile = Assert.requireNonNull(infoFile, "infoFile");
         this.entry = Assert.requireNonNull(entry, "entry");
     }

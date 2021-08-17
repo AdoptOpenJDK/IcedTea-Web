@@ -10,14 +10,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static net.adoptopenjdk.icedteaweb.StringUtils.isBlank;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.ActionType.ADD;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.ActionType.NOOP;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.ActionType.REMOVE;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.ActionType.UPDATE_ACCESS_TIME;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.ActionType.ADD;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.ActionType.NOOP;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.ActionType.REMOVE;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.ActionType.UPDATE_ACCESS_TIME;
 
-class LeastRecentlyUsedCacheAction {
+class CacheAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(LeastRecentlyUsedCacheAction.class);
+    private static final Logger logger = LoggerFactory.getLogger(CacheAction.class);
 
     private static final String DELIMITER = "::";
     private static final String ID_PREFIX = "i=";
@@ -25,21 +25,21 @@ class LeastRecentlyUsedCacheAction {
     private static final String VERSION_PREFIX = "v=";
     private static final String ACCESS_TIME_PREFIX = "a=";
 
-    static final LeastRecentlyUsedCacheAction DO_NOTHING = new LeastRecentlyUsedCacheAction(NOOP, null, null, -1);
+    static final CacheAction DO_NOTHING = new CacheAction(NOOP, null, null, -1);
 
-    static LeastRecentlyUsedCacheAction createAddActionFor(final LeastRecentlyUsedCacheEntry entry) {
-        return new LeastRecentlyUsedCacheAction(ADD, entry.getId(), entry.getCacheKey(), entry.getLastAccessed());
+    static CacheAction createAddActionFor(final CacheIndexEntry entry) {
+        return new CacheAction(ADD, entry.getId(), entry.getCacheKey(), entry.getLastAccessed());
     }
 
-    static LeastRecentlyUsedCacheAction createAccessActionFor(final String id, final long lastAccessed) {
-        return new LeastRecentlyUsedCacheAction(UPDATE_ACCESS_TIME, id, null, lastAccessed);
+    static CacheAction createAccessActionFor(final String id, final long lastAccessed) {
+        return new CacheAction(UPDATE_ACCESS_TIME, id, null, lastAccessed);
     }
 
-    static LeastRecentlyUsedCacheAction createRemoveActionFor(final String id) {
-        return new LeastRecentlyUsedCacheAction(REMOVE, id, null, -1);
+    static CacheAction createRemoveActionFor(final String id) {
+        return new CacheAction(REMOVE, id, null, -1);
     }
 
-    static LeastRecentlyUsedCacheAction parse(final String line) {
+    static CacheAction parse(final String line) {
         if (isBlank(line)) {
             return DO_NOTHING;
         }
@@ -107,7 +107,7 @@ class LeastRecentlyUsedCacheAction {
             if (access > -1 && !isBlank(id)) {
                 if (location != null) {
                     final CacheKey key = new CacheKey(location, version);
-                    return createAddActionFor(new LeastRecentlyUsedCacheEntry(id, access, key));
+                    return createAddActionFor(new CacheIndexEntry(id, access, key));
                 }
                 if (version == null) {
                     return createAccessActionFor(id, access);
@@ -126,14 +126,14 @@ class LeastRecentlyUsedCacheAction {
     }
 
     private final ActionType type;
-    private final LeastRecentlyUsedCacheEntry entry;
+    private final CacheIndexEntry entry;
 
-    private LeastRecentlyUsedCacheAction(final ActionType type, final String id, final CacheKey key, final long lastAccessed) {
+    private CacheAction(final ActionType type, final String id, final CacheKey key, final long lastAccessed) {
         this.type = type;
-        this.entry = new LeastRecentlyUsedCacheEntry(id, lastAccessed, key);
+        this.entry = new CacheIndexEntry(id, lastAccessed, key);
     }
 
-    boolean applyTo(LeastRecentlyUsedCacheEntries entries) {
+    boolean applyTo(CacheIndexEntries entries) {
         switch (type) {
             case ADD:
                 return entries.addEntry(entry);

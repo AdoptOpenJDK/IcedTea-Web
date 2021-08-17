@@ -10,16 +10,16 @@ import java.net.URL;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.DO_NOTHING;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.createAccessActionFor;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.createAddActionFor;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.createRemoveActionFor;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.parse;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.DO_NOTHING;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.createAccessActionFor;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.createAddActionFor;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.createRemoveActionFor;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.parse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-public class LeastRecentlyUsedCacheActionTest {
+public class CacheActionTest {
 
     private static final String RESOURCE_1_URL = "https://test.com";
     private static final String RESOURCE_1_VERSION = "1.1";
@@ -28,18 +28,18 @@ public class LeastRecentlyUsedCacheActionTest {
     public static final long LAST_ACCESSED_2 = 3456;
 
     public static final CacheKey CACHE_KEY_1 = new CacheKey(url(RESOURCE_1_URL), VersionId.fromString(RESOURCE_1_VERSION));
-    public static final LeastRecentlyUsedCacheEntry ENTRY_1 = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, CACHE_KEY_1);
+    public static final CacheIndexEntry ENTRY_1 = new CacheIndexEntry(CACHE_ID_1, LAST_ACCESSED_1, CACHE_KEY_1);
 
-    private LeastRecentlyUsedCacheEntries entries;
+    private CacheIndexEntries entries;
 
     @Before
     public void setup() throws IOException {
-        entries = new LeastRecentlyUsedCacheEntries();
+        entries = new CacheIndexEntries();
     }
 
     @Test
     public void addActionAppliedToListWillAddEntry() {
-        final LeastRecentlyUsedCacheAction addAction = createAddActionFor(ENTRY_1);
+        final CacheAction addAction = createAddActionFor(ENTRY_1);
         addAction.applyTo(entries);
 
         assertEqualEntries(asList(ENTRY_1), entries);
@@ -49,7 +49,7 @@ public class LeastRecentlyUsedCacheActionTest {
     public void removeActionAppliedToListWillRemoveEntry() {
         entries.addEntry(ENTRY_1);
 
-        final LeastRecentlyUsedCacheAction addAction = createRemoveActionFor(ENTRY_1.getId());
+        final CacheAction addAction = createRemoveActionFor(ENTRY_1.getId());
         addAction.applyTo(entries);
 
         assertTrue(entries.getAllEntries().isEmpty());
@@ -59,10 +59,10 @@ public class LeastRecentlyUsedCacheActionTest {
     public void updateAccessTimeActionAppliedToListWillChangeTheAccessTimeOfTheEntry() {
         entries.addEntry(ENTRY_1);
 
-        final LeastRecentlyUsedCacheAction addAction = createAccessActionFor(ENTRY_1.getId(), LAST_ACCESSED_2);
+        final CacheAction addAction = createAccessActionFor(ENTRY_1.getId(), LAST_ACCESSED_2);
         addAction.applyTo(entries);
 
-        final LeastRecentlyUsedCacheEntry modifiedEntry1 = new LeastRecentlyUsedCacheEntry(ENTRY_1.getId(), LAST_ACCESSED_2, ENTRY_1.getCacheKey());
+        final CacheIndexEntry modifiedEntry1 = new CacheIndexEntry(ENTRY_1.getId(), LAST_ACCESSED_2, ENTRY_1.getCacheKey());
         assertEqualEntries(asList(modifiedEntry1), entries);
     }
 
@@ -77,7 +77,7 @@ public class LeastRecentlyUsedCacheActionTest {
 
     @Test
     public void serializeAddAction() {
-        final LeastRecentlyUsedCacheAction addAction = createAddActionFor(ENTRY_1);
+        final CacheAction addAction = createAddActionFor(ENTRY_1);
         final String result = addAction.serialize();
 
         assertEquals("::i=1/11::l=https://test.com::v=1.1::a=1234::", result);
@@ -86,8 +86,8 @@ public class LeastRecentlyUsedCacheActionTest {
     @Test
     public void serializeAddActionWithoutVersion() {
         final CacheKey key = new CacheKey(url(RESOURCE_1_URL), null);
-        final LeastRecentlyUsedCacheEntry entryWithoutVersion = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
-        final LeastRecentlyUsedCacheAction addAction = createAddActionFor(entryWithoutVersion);
+        final CacheIndexEntry entryWithoutVersion = new CacheIndexEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
+        final CacheAction addAction = createAddActionFor(entryWithoutVersion);
         final String result = addAction.serialize();
 
         assertEquals("::i=1/11::l=https://test.com::a=1234::", result);
@@ -96,8 +96,8 @@ public class LeastRecentlyUsedCacheActionTest {
     @Test
     public void serializeAddActionWithDelimiter() {
         final CacheKey key = new CacheKey(url("https://test.com#::vv"), VersionId.fromString("2::3"));
-        final LeastRecentlyUsedCacheEntry entryWithDelimiter = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
-        final LeastRecentlyUsedCacheAction addAction = createAddActionFor(entryWithDelimiter);
+        final CacheIndexEntry entryWithDelimiter = new CacheIndexEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
+        final CacheAction addAction = createAddActionFor(entryWithDelimiter);
         final String result = addAction.serialize();
 
         assertEquals("::i=1/11::l=https://test.com#::::vv::v=2::::3::a=1234::", result);
@@ -105,7 +105,7 @@ public class LeastRecentlyUsedCacheActionTest {
 
     @Test
     public void serializeRemoveAction() {
-        final LeastRecentlyUsedCacheAction removeAction = createRemoveActionFor(CACHE_ID_1);
+        final CacheAction removeAction = createRemoveActionFor(CACHE_ID_1);
         final String result = removeAction.serialize();
 
         assertEquals("!1/11!", result);
@@ -113,7 +113,7 @@ public class LeastRecentlyUsedCacheActionTest {
 
     @Test
     public void serializeAccessAction() {
-        final LeastRecentlyUsedCacheAction accessAction = createAccessActionFor(CACHE_ID_1, LAST_ACCESSED_1);
+        final CacheAction accessAction = createAccessActionFor(CACHE_ID_1, LAST_ACCESSED_1);
         final String result = accessAction.serialize();
 
         assertEquals("::i=1/11::a=1234::", result);
@@ -121,7 +121,7 @@ public class LeastRecentlyUsedCacheActionTest {
 
     @Test
     public void parseAddAction() {
-        final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::l=https://test.com::v=1.1::a=1234::");
+        final CacheAction removeAction = parse("::i=1/11::l=https://test.com::v=1.1::a=1234::");
         removeAction.applyTo(entries);
 
         assertEqualEntries(asList(ENTRY_1), entries);
@@ -131,10 +131,10 @@ public class LeastRecentlyUsedCacheActionTest {
     public void parseAddActionWithDelimiter() {
         final CacheKey key = new CacheKey(url("https://test.com#::vv"), VersionId.fromString("2::3"));
 
-        final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::l=https://test.com#::::vv::v=2::::3::a=1234::");
+        final CacheAction removeAction = parse("::i=1/11::l=https://test.com#::::vv::v=2::::3::a=1234::");
         removeAction.applyTo(entries);
 
-        final LeastRecentlyUsedCacheEntry entryWithDelimiter = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
+        final CacheIndexEntry entryWithDelimiter = new CacheIndexEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
         assertEqualEntries(asList(entryWithDelimiter), entries);
     }
 
@@ -142,10 +142,10 @@ public class LeastRecentlyUsedCacheActionTest {
     public void parseAddActionWithMultipleDelimiter() {
         final CacheKey key = new CacheKey(url("https://test.com#::vv::ww"), VersionId.fromString("2::3"));
 
-        final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::l=https://test.com#::::vv::::ww::v=2::::3::a=1234::");
+        final CacheAction removeAction = parse("::i=1/11::l=https://test.com#::::vv::::ww::v=2::::3::a=1234::");
         removeAction.applyTo(entries);
 
-        final LeastRecentlyUsedCacheEntry entryWithDelimiter = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
+        final CacheIndexEntry entryWithDelimiter = new CacheIndexEntry(CACHE_ID_1, LAST_ACCESSED_1, key);
         assertEqualEntries(asList(entryWithDelimiter), entries);
     }
 
@@ -153,7 +153,7 @@ public class LeastRecentlyUsedCacheActionTest {
     public void parseRemovalAction() {
         entries.addEntry(ENTRY_1);
 
-        final LeastRecentlyUsedCacheAction removeAction = parse("!1/11!");
+        final CacheAction removeAction = parse("!1/11!");
         removeAction.applyTo(entries);
 
         assertTrue(entries.getAllEntries().isEmpty());
@@ -163,10 +163,10 @@ public class LeastRecentlyUsedCacheActionTest {
     public void parseAccessAction() {
         entries.addEntry(ENTRY_1);
 
-        final LeastRecentlyUsedCacheAction removeAction = parse("::i=1/11::a=3456::");
+        final CacheAction removeAction = parse("::i=1/11::a=3456::");
         removeAction.applyTo(entries);
 
-        final LeastRecentlyUsedCacheEntry updatedEntry = new LeastRecentlyUsedCacheEntry(CACHE_ID_1, LAST_ACCESSED_2, CACHE_KEY_1);
+        final CacheIndexEntry updatedEntry = new CacheIndexEntry(CACHE_ID_1, LAST_ACCESSED_2, CACHE_KEY_1);
         assertEqualEntries(asList(updatedEntry), entries);
     }
 
@@ -212,12 +212,12 @@ public class LeastRecentlyUsedCacheActionTest {
         }
     }
 
-    private void assertEqualEntries(List<LeastRecentlyUsedCacheEntry> expected, LeastRecentlyUsedCacheEntries actualEntries) {
-        final List<LeastRecentlyUsedCacheEntry> actual = actualEntries.getAllEntries();
+    private void assertEqualEntries(List<CacheIndexEntry> expected, CacheIndexEntries actualEntries) {
+        final List<CacheIndexEntry> actual = actualEntries.getAllEntries();
         assertEquals(expected.size(), actual.size());
         for (int i = 0; i < expected.size(); i++) {
-            final LeastRecentlyUsedCacheEntry expectedEntry = expected.get(0);
-            final LeastRecentlyUsedCacheEntry actualEntry = actual.get(0);
+            final CacheIndexEntry expectedEntry = expected.get(0);
+            final CacheIndexEntry actualEntry = actual.get(0);
 
             assertEquals(expectedEntry.getId(), actualEntry.getId());
             assertEquals(expectedEntry.getLastAccessed(), actualEntry.getLastAccessed());

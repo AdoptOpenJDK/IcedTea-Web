@@ -83,34 +83,34 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * multiple jvm instances. The LRU information is stored as a properties file in the
  * root of the file cache directory.
  */
-class LeastRecentlyUsedCache {
+class CacheImpl {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LeastRecentlyUsedCache.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CacheImpl.class);
 
-    static LeastRecentlyUsedCache getInstance() {
+    static CacheImpl getInstance() {
         return CacheHolder.INSTANCE;
     }
 
-    private final LeastRecentlyUsedCacheIndexHolder cacheIndex;
+    private final CacheIndexHolder cacheIndex;
     private final InfrastructureFileDescriptor rootCacheDir;
 
     /**
      * @param recentlyUsed file to be used as recently_used file
      * @param cacheDir     dir with cache
      */
-    private LeastRecentlyUsedCache(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
-        this.cacheIndex = new LeastRecentlyUsedCacheIndexHolder(recentlyUsed);
+    private CacheImpl(final InfrastructureFileDescriptor recentlyUsed, final InfrastructureFileDescriptor cacheDir) {
+        this.cacheIndex = new CacheIndexHolder(recentlyUsed);
         this.rootCacheDir = cacheDir;
     }
 
     File getOrCreateCacheFile(CacheKey key) {
-        final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx ->
+        final CacheIndexEntry entry = cacheIndex.getSynchronized(idx ->
                 getOrCreateCacheEntry(idx, key)
         );
         return getCacheFile(entry);
     }
 
-    private LeastRecentlyUsedCacheEntry getOrCreateCacheEntry(LeastRecentlyUsedCacheIndex idx, CacheKey key) {
+    private CacheIndexEntry getOrCreateCacheEntry(CacheIndex idx, CacheKey key) {
         return idx.findAndMarkAsAccessed(key)
                 .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, key));
     }
@@ -119,7 +119,7 @@ class LeastRecentlyUsedCache {
         cacheIndex.runSynchronized(idx -> idx.removeEntry(key));
     }
 
-    private LeastRecentlyUsedCacheEntry createNewInfoFileAndIndexEntry(LeastRecentlyUsedCacheIndex idx, CacheKey key) {
+    private CacheIndexEntry createNewInfoFileAndIndexEntry(CacheIndex idx, CacheKey key) {
         final File dir = makeNewCacheDir();
         final String entryId = entryIdFromCacheDir(dir);
         createInfoFile(dir);
@@ -145,7 +145,7 @@ class LeastRecentlyUsedCache {
 
     private void createInfoFile(File dir) {
         try {
-            final File infoFile = new File(dir, CacheEntry.INFO_SUFFIX);
+            final File infoFile = new File(dir, CachedFile.INFO_SUFFIX);
             RestrictedFileUtils.createRestrictedFile(infoFile); // Create the info file for marking later.
 
             final String jnlpPath = JNLPRuntime.getJnlpPath(); //get jnlp from args passed
@@ -153,7 +153,7 @@ class LeastRecentlyUsedCache {
                 LOG.info("Not-setting jnlp-path for missing main/jnlp argument");
             } else {
                 final PropertiesFile propertiesFile = new PropertiesFile(infoFile, R("CAutoGen"));
-                propertiesFile.setProperty(CacheEntry.KEY_JNLP_PATH, jnlpPath);
+                propertiesFile.setProperty(CachedFile.KEY_JNLP_PATH, jnlpPath);
                 propertiesFile.store();
             }
         } catch (IOException e) {
@@ -164,11 +164,11 @@ class LeastRecentlyUsedCache {
     File addToCache(DownloadInfo info, InputStream inputStream) throws IOException {
         final List<IOException> ex = new ArrayList<>();
 
-        final LeastRecentlyUsedCacheEntry entry = cacheIndex.getSynchronized(idx ->
+        final CacheIndexEntry entry = cacheIndex.getSynchronized(idx ->
                 getOrCreateCacheEntry(idx, info.getCacheKey())
         );
 
-        final CacheEntry infoFile = getInfoFile(entry);
+        final CachedFile infoFile = getInfoFile(entry);
         final File cacheFile = infoFile.getCacheFile();
         try {
             LOG.debug("Downloading file: {} into: {}", info.getCacheKey().getLocation(), cacheFile.getCanonicalPath());
@@ -187,7 +187,7 @@ class LeastRecentlyUsedCache {
         return cacheFile;
     }
 
-    Optional<CacheEntry> getResourceInfo(CacheKey key) {
+    Optional<CachedFile> getResourceInfo(CacheKey key) {
         return cacheIndex.getSynchronized(idx -> idx.findEntry(key))
                 .map(this::getInfoFile);
     }
@@ -201,7 +201,7 @@ class LeastRecentlyUsedCache {
      */
     boolean isCached(CacheKey key) {
         final boolean isCached = getResourceInfo(key)
-                .map(CacheEntry::isCached)
+                .map(CachedFile::isCached)
                 .orElse(false);
         LOG.info("isCached: {} = {}", key, isCached);
         return isCached;
@@ -223,15 +223,15 @@ class LeastRecentlyUsedCache {
         return isUpToDate;
     }
 
-    Optional<LeastRecentlyUsedCacheEntry> getBestMatchingEntryInCache(final URL resourceHref, final VersionString version) {
+    Optional<CacheIndexEntry> getBestMatchingEntryInCache(final URL resourceHref, final VersionString version) {
         final Comparator<VersionId> versionIdComparator = version != null ? new VersionIdComparator(version) : VersionId::compareTo;
-        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion, versionIdComparator);
+        final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion, versionIdComparator);
         return cacheIndex.getSynchronized(idx -> {
-            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAllEntries(resourceHref, version);
-            final List<LeastRecentlyUsedCacheEntry> all = new ArrayList<>(allSet);
+            final Set<CacheIndexEntry> allSet = idx.findAllEntries(resourceHref, version);
+            final List<CacheIndexEntry> all = new ArrayList<>(allSet);
             all.sort(versionComparator);
 
-            for (final LeastRecentlyUsedCacheEntry entry : all) {
+            for (final CacheIndexEntry entry : all) {
                 if (getInfoFile(entry).isCached()) {
                     return Optional.of(entry);
                 }
@@ -241,10 +241,10 @@ class LeastRecentlyUsedCache {
         });
     }
 
-    List<LeastRecentlyUsedCacheEntry> getAllEntriesInCache(final URL resourceHref) {
-        final Comparator<LeastRecentlyUsedCacheEntry> versionComparator = comparing(LeastRecentlyUsedCacheEntry::getVersion);
+    List<CacheIndexEntry> getAllEntriesInCache(final URL resourceHref) {
+        final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion);
         return cacheIndex.getSynchronized(idx -> {
-            final Set<LeastRecentlyUsedCacheEntry> allSet = idx.findAllEntries(resourceHref);
+            final Set<CacheIndexEntry> allSet = idx.findAllEntries(resourceHref);
 
             return allSet.stream()
                     .filter(entry -> getInfoFile(entry).isCached())
@@ -258,13 +258,13 @@ class LeastRecentlyUsedCache {
             return Collections.emptyList();
         }
 
-        final List<LeastRecentlyUsedCacheEntry> entries = cacheIndex.getSynchronized(idx -> idx.getAllEntries());
+        final List<CacheIndexEntry> entries = cacheIndex.getSynchronized(idx -> idx.getAllEntries());
 
         final Map<String, CacheIdInfoImpl> result = new LinkedHashMap<>();
         entries.forEach(entry -> {
             final CacheFileInfoImpl fileEntry = createPaneObjectArray(entry);
             if (includeJnlpPath) {
-                final CacheEntry infoFile = getInfoFile(entry);
+                final CachedFile infoFile = getInfoFile(entry);
                 final String jnlpPath = infoFile.getJnlpPath();
                 if (jnlpPath != null && jnlpPath.matches(filter)) {
                     final CacheIdInfoImpl cacheId = result.computeIfAbsent(jnlpPath, CacheIdInfoImpl::jnlpPathId);
@@ -283,8 +283,8 @@ class LeastRecentlyUsedCache {
         return new ArrayList<>(result.values());
     }
 
-    private CacheFileInfoImpl createPaneObjectArray(LeastRecentlyUsedCacheEntry entry) {
-        final CacheEntry infoFile = getInfoFile(entry);
+    private CacheFileInfoImpl createPaneObjectArray(CacheIndexEntry entry) {
+        final CachedFile infoFile = getInfoFile(entry);
         return new CacheFileInfoImpl(infoFile, entry);
     }
 
@@ -302,10 +302,10 @@ class LeastRecentlyUsedCache {
 
     void deleteFromCache(CacheIdInfo cacheId) {
         final String idToDelete = cacheId.getId();
-        final Function<LeastRecentlyUsedCacheEntry, String> idExtractor = createExtractor(cacheId.getType());
+        final Function<CacheIndexEntry, String> idExtractor = createExtractor(cacheId.getType());
 
         cacheIndex.runSynchronized(idx -> {
-            final List<LeastRecentlyUsedCacheEntry> allEntries = idx.getAllEntries();
+            final List<CacheIndexEntry> allEntries = idx.getAllEntries();
             allEntries.stream()
                     .filter(entry -> Objects.equals(idToDelete, idExtractor.apply(entry)))
                     .forEach(entry -> deleteFromCache(idx, entry));
@@ -316,10 +316,10 @@ class LeastRecentlyUsedCache {
         }
     }
 
-    private Function<LeastRecentlyUsedCacheEntry, String> createExtractor(CacheIdInfo.CacheIdType idType) {
+    private Function<CacheIndexEntry, String> createExtractor(CacheIdInfo.CacheIdType idType) {
         switch (idType) {
             case DOMAIN:
-                return LeastRecentlyUsedCacheEntry::getDomain;
+                return CacheIndexEntry::getDomain;
             case JNLP_PATH:
                 return e -> getInfoFile(e).getJnlpPath();
             default:
@@ -327,7 +327,7 @@ class LeastRecentlyUsedCache {
         }
     }
 
-    private void deleteFromCache(LeastRecentlyUsedCacheIndex idx, LeastRecentlyUsedCacheEntry entry) {
+    private void deleteFromCache(CacheIndex idx, CacheIndexEntry entry) {
         final File cacheFile = getCacheFile(entry);
         final File directory = cacheFile.getParentFile();
 
@@ -412,7 +412,7 @@ class LeastRecentlyUsedCache {
         final File[] levelOneDirs = rootCacheDir.getFile().listFiles(File::isDirectory);
         if (isNullOrEmpty(levelOneDirs)) {
             LOG.debug("found no folders in the cache dir - clear cache index");
-            cacheIndex.runSynchronized(LeastRecentlyUsedCacheIndex::clear);
+            cacheIndex.runSynchronized(CacheIndex::clear);
         } else {
             LOG.debug("start cleaning the cache");
             final Set<String> entryIdsFromFileSystem = collectAllEntryIdsFromFileSystem(levelOneDirs);
@@ -423,11 +423,11 @@ class LeastRecentlyUsedCache {
                 final long maxSize = getMaxSizeInBytes();
                 long curSize = 0;
 
-                final List<LeastRecentlyUsedCacheEntry> toRemoveFromIndex = new ArrayList<>();
-                for (LeastRecentlyUsedCacheEntry entry : idx.getAllEntries()) {
+                final List<CacheIndexEntry> toRemoveFromIndex = new ArrayList<>();
+                for (CacheIndexEntry entry : idx.getAllEntries()) {
                     entryIdsFromIndex.add(entry.getId());
 
-                    final CacheEntry infoFile = getInfoFile(entry);
+                    final CachedFile infoFile = getInfoFile(entry);
                     final File cacheFile = infoFile.getCacheFile();
                     final File directory = cacheFile.getParentFile();
 
@@ -456,7 +456,7 @@ class LeastRecentlyUsedCache {
                     final File[] cacheDirFiles = directory.listFiles();
                     if (!isNullOrEmpty(cacheDirFiles)) {
                         for (File file : cacheDirFiles) {
-                            if (!file.equals(cacheFile) && !file.getName().equals(CacheEntry.INFO_SUFFIX)) {
+                            if (!file.equals(cacheFile) && !file.getName().equals(CachedFile.INFO_SUFFIX)) {
                                 LOG.debug("found unknown file {}", file);
                                 deleteDir(file);
                             }
@@ -498,7 +498,7 @@ class LeastRecentlyUsedCache {
             if (levelTwoDirs != null) {
                 for (File levelTwoDir : levelTwoDirs) {
                     final String entryId = entryIdFromCacheDir(levelTwoDir);
-                    if (new File(levelTwoDir, CacheEntry.INFO_SUFFIX).isFile()) {
+                    if (new File(levelTwoDir, CachedFile.INFO_SUFFIX).isFile()) {
                         entryIds.add(entryId);
                     }
                 }
@@ -520,15 +520,15 @@ class LeastRecentlyUsedCache {
 
     // Helpers
 
-    private File getCacheFile(LeastRecentlyUsedCacheEntry entry) {
+    private File getCacheFile(CacheIndexEntry entry) {
         final String cacheFilName = getCacheFileName(entry.getResourceHref());
         return new File(cacheDirFromEntryId(entry.getId()), cacheFilName);
     }
 
-    private CacheEntry getInfoFile(LeastRecentlyUsedCacheEntry entry) {
+    private CachedFile getInfoFile(CacheIndexEntry entry) {
         final File cacheFile = getCacheFile(entry);
-        final File infoFile = new File(cacheFile.getParentFile(), CacheEntry.INFO_SUFFIX);
-        return new CacheEntry(entry, cacheFile, infoFile);
+        final File infoFile = new File(cacheFile.getParentFile(), CachedFile.INFO_SUFFIX);
+        return new CachedFile(entry, cacheFile, infoFile);
     }
 
     private String entryIdFromCacheDir(File dir) {
@@ -611,7 +611,7 @@ class LeastRecentlyUsedCache {
     }
 
     private static class CacheHolder {
-        private static final LeastRecentlyUsedCache INSTANCE = new LeastRecentlyUsedCache(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
+        private static final CacheImpl INSTANCE = new CacheImpl(PathsAndFiles.getRecentlyUsedFile(), PathsAndFiles.CACHE_DIR);
     }
 
 }

@@ -17,7 +17,7 @@ import java.util.Map;
 import static java.util.Collections.emptyList;
 
 /**
- * Algorithm to extract {@link LeastRecentlyUsedCacheEntry} from a properties file.
+ * Algorithm to extract {@link CacheIndexEntry} from a properties file.
  * The property file has been deprecated and is no longer used.
  * This algorithm is only used to migrate the existing data.
  */
@@ -32,7 +32,7 @@ class OldCacheFileReader {
 
     private static final char KEY_DELIMITER = '.';
 
-    static List<LeastRecentlyUsedCacheEntry> loadEntriesFromOldIndex(File file) {
+    static List<CacheIndexEntry> loadEntriesFromOldIndex(File file) {
         final PropertiesFile oldIndexProperties = new PropertiesFile(file);
         try {
             oldIndexProperties.lock();
@@ -46,7 +46,7 @@ class OldCacheFileReader {
 
     }
 
-    private static List<LeastRecentlyUsedCacheEntry> convertPropertiesToEntries(PropertiesFile props) {
+    private static List<CacheIndexEntry> convertPropertiesToEntries(PropertiesFile props) {
         // STEP 1
         // group all properties with the same ID together
         // throwing away entries which do not have a valid key
@@ -70,7 +70,7 @@ class OldCacheFileReader {
         // STEP 2
         // convert the properties to actual entries
         // collecting the IDs of the ones which have invalid data
-        final List<LeastRecentlyUsedCacheEntry> entries = new ArrayList<>(id2ValueMap.size());
+        final List<CacheIndexEntry> entries = new ArrayList<>(id2ValueMap.size());
         for (Map.Entry<String, Map<String, String>> valuesEntry : id2ValueMap.entrySet()) {
             final Map<String, String> values = valuesEntry.getValue();
 
@@ -85,7 +85,7 @@ class OldCacheFileReader {
                 final URL resourceHref = new URL(resourceHrefValue);
                 if (!Boolean.parseBoolean(markedForDeletionValue)) {
                     final long lastAccessed = Long.parseLong(lastAccessedValue);
-                    entries.add(new LeastRecentlyUsedCacheEntry(id, lastAccessed, new CacheKey(resourceHref, version)));
+                    entries.add(new CacheIndexEntry(id, lastAccessed, new CacheKey(resourceHref, version)));
                 }
             } catch (Exception e) {
                 LOG.debug("found broken ID: {}", id);

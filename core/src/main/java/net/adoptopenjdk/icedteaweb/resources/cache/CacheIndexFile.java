@@ -14,9 +14,9 @@ import java.util.stream.Stream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 import static net.adoptopenjdk.icedteaweb.io.FileUtils.loadFileAsUtf8String;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.createAccessActionFor;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.createAddActionFor;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.createRemoveActionFor;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.createAccessActionFor;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.createAddActionFor;
+import static net.adoptopenjdk.icedteaweb.resources.cache.CacheAction.createRemoveActionFor;
 
 /**
  * Class to interface with the LRU cache index file.
@@ -25,13 +25,13 @@ import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCache
  * - loading and saving can only be done when locked
  * - reading and changing the entities can only be done after loading
  */
-class LeastRecentlyUsedCacheFile {
+class CacheIndexFile {
 
     private static final String LINE_END = "\\R";
 
     private final LockableFile lockableFile;
 
-    private final List<LeastRecentlyUsedCacheAction> unsavedActions = new ArrayList<>();
+    private final List<CacheAction> unsavedActions = new ArrayList<>();
 
     /**
      * time of last modification, lazy loaded on getProperty
@@ -39,13 +39,13 @@ class LeastRecentlyUsedCacheFile {
     private long lastLoadOrStore = -1;
     private boolean requestCompression = false;
 
-    private final LeastRecentlyUsedCacheEntries entries = new LeastRecentlyUsedCacheEntries();
+    private final CacheIndexEntries entries = new CacheIndexEntries();
 
-    LeastRecentlyUsedCacheFile(File file) {
+    CacheIndexFile(File file) {
         this(LockableFile.getInstance(file));
     }
 
-    LeastRecentlyUsedCacheFile(LockableFile lockableFile) {
+    CacheIndexFile(LockableFile lockableFile) {
         this.lockableFile = requireNonNull(lockableFile, "lockableFile");
     }
 
@@ -53,26 +53,26 @@ class LeastRecentlyUsedCacheFile {
         return Objects.equals(file, lockableFile.getFile());
     }
 
-    List<LeastRecentlyUsedCacheEntry> getAllEntries() {
+    List<CacheIndexEntry> getAllEntries() {
         if (hasNeverBeenLoaded()) {
             throw new IllegalStateException("Cannot access entries before loading the file");
         }
         return entries.getAllEntries();
     }
 
-    void addEntry(LeastRecentlyUsedCacheEntry entry) {
+    void addEntry(CacheIndexEntry entry) {
         applyAndSort(createAddActionFor(entry));
     }
 
-    void markAccessed(LeastRecentlyUsedCacheEntry entry, long lastAccessed) {
+    void markAccessed(CacheIndexEntry entry, long lastAccessed) {
         applyAndSort(createAccessActionFor(entry.getId(), lastAccessed));
     }
 
-    void removeEntry(LeastRecentlyUsedCacheEntry entry) {
+    void removeEntry(CacheIndexEntry entry) {
         applyAndSort(createRemoveActionFor(entry.getId()));
     }
 
-    private void applyAndSort(LeastRecentlyUsedCacheAction action) {
+    private void applyAndSort(CacheAction action) {
         if (entries.apply(action)) {
             unsavedActions.add(action);
             entries.sortByLastAccessed();
@@ -107,7 +107,7 @@ class LeastRecentlyUsedCacheFile {
             final String[] lines = content.split(LINE_END);
 
             Stream.of(lines)
-                    .map(LeastRecentlyUsedCacheAction::parse)
+                    .map(CacheAction::parse)
                     .forEach(entries::apply);
 
             lastLoadOrStore = lastModified;
@@ -136,7 +136,7 @@ class LeastRecentlyUsedCacheFile {
 
     private void appendUnsavedActionsToFile() throws IOException {
         final byte[] changes = unsavedActions.stream()
-                .map(LeastRecentlyUsedCacheAction::serialize)
+                .map(CacheAction::serialize)
                 .collect(Collectors.joining("\n"))
                 .concat("\n")
                 .getBytes(UTF_8);
@@ -156,8 +156,8 @@ class LeastRecentlyUsedCacheFile {
         }
 
         final byte[] content = entries.stream()
-                .map(LeastRecentlyUsedCacheAction::createAddActionFor)
-                .map(LeastRecentlyUsedCacheAction::serialize)
+                .map(CacheAction::createAddActionFor)
+                .map(CacheAction::serialize)
                 .collect(Collectors.joining("\n"))
                 .concat("\n")
                 .getBytes(UTF_8);

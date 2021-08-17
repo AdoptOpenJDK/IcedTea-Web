@@ -7,39 +7,39 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.sort;
 
-class LeastRecentlyUsedCacheEntries {
+class CacheIndexEntries {
 
-    private final List<LeastRecentlyUsedCacheEntry> entries = new ArrayList<>();
-    private final List<LeastRecentlyUsedCacheEntry> unmodifiableEntries = Collections.unmodifiableList(entries);
+    private final List<CacheIndexEntry> entries = new ArrayList<>();
+    private final List<CacheIndexEntry> unmodifiableEntries = Collections.unmodifiableList(entries);
 
-    List<LeastRecentlyUsedCacheEntry> getAllEntries() {
+    List<CacheIndexEntry> getAllEntries() {
         return unmodifiableEntries;
     }
 
-    Stream<LeastRecentlyUsedCacheEntry> stream() {
+    Stream<CacheIndexEntry> stream() {
         return entries.stream();
     }
 
-    boolean apply(LeastRecentlyUsedCacheAction action) {
+    boolean apply(CacheAction action) {
         return action.applyTo(this);
     }
 
-    boolean addEntry(LeastRecentlyUsedCacheEntry entry) {
+    boolean addEntry(CacheIndexEntry entry) {
         entries.add(0, entry);
         return true;
     }
 
-    boolean markAccessed(LeastRecentlyUsedCacheEntry entry, long lastAccessed) {
+    boolean markAccessed(CacheIndexEntry entry, long lastAccessed) {
         final int idx = entries.indexOf(entry);
         if (idx > -1) {
-            final LeastRecentlyUsedCacheEntry old = entries.remove(idx);
-            LeastRecentlyUsedCacheEntry accessedEntry = new LeastRecentlyUsedCacheEntry(old.getId(), lastAccessed, old.getCacheKey());
+            final CacheIndexEntry old = entries.remove(idx);
+            CacheIndexEntry accessedEntry = new CacheIndexEntry(old.getId(), lastAccessed, old.getCacheKey());
             entries.add(0, accessedEntry);
         }
         return idx > -1;
     }
 
-    boolean removeEntry(LeastRecentlyUsedCacheEntry entry) {
+    boolean removeEntry(CacheIndexEntry entry) {
         return entries.remove(entry);
     }
 

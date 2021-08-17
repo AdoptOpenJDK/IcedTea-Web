@@ -9,13 +9,13 @@ import java.util.Objects;
 /**
  * ...
  */
-class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEntry> {
+class CacheIndexEntry implements Comparable<CacheIndexEntry> {
     private final String id;
     private final long lastAccessed;
 
     private final CacheKey key;
 
-    LeastRecentlyUsedCacheEntry(String id, long lastAccessed, CacheKey key) {
+    CacheIndexEntry(String id, long lastAccessed, CacheKey key) {
         this.id = id;
         this.lastAccessed = lastAccessed;
         this.key = key;
@@ -71,7 +71,7 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
     }
 
     @Override
-    public int compareTo(LeastRecentlyUsedCacheEntry o) {
+    public int compareTo(CacheIndexEntry o) {
         // this will sort in least recently used order
         return Long.compare(o.lastAccessed, this.lastAccessed);
     }
@@ -80,7 +80,7 @@ class LeastRecentlyUsedCacheEntry implements Comparable<LeastRecentlyUsedCacheEn
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LeastRecentlyUsedCacheEntry entry = (LeastRecentlyUsedCacheEntry) o;
+        CacheIndexEntry entry = (CacheIndexEntry) o;
         return id.equals(entry.id);
     }
 
