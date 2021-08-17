@@ -9,7 +9,6 @@ import net.sourceforge.jnlp.util.RestrictedFileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -53,9 +52,7 @@ class LeastRecentlyUsedCacheIndexHolder {
             cacheFile = lockCacheFile();
             final LeastRecentlyUsedCacheIndex index = load(cacheFile);
             final T result = action.apply(index);
-            if (index.isDirty()) {
-                store(cacheFile);
-            }
+            persistChanges(cacheFile);
             return result;
         } finally {
             unlockCacheFile(cacheFile);
@@ -105,7 +102,7 @@ class LeastRecentlyUsedCacheIndexHolder {
     /**
      * Write file to disk.
      */
-    private void store(LeastRecentlyUsedCacheFile cacheFile) {
+    private void persistChanges(LeastRecentlyUsedCacheFile cacheFile) {
         try {
             cacheFile.persistChanges();
         } catch (IOException e) {

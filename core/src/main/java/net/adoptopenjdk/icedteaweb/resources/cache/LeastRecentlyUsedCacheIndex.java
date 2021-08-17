@@ -112,10 +112,6 @@ class LeastRecentlyUsedCacheIndex {
         cacheFile.clear();
     }
 
-    boolean isDirty() {
-        return cacheFile.isDirty();
-    }
-
     private void markAccessed(LeastRecentlyUsedCacheEntry entry) {
         final long now = System.currentTimeMillis();
         cacheFile.markAccessed(entry, now);
