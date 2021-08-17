@@ -98,7 +98,7 @@ public class LeastRecentlyUsedCacheFileTest {
         loadFile(
                 "::i=1/11::l=https://test.com::v=1.1::a=1234::",
                 "::i=2/22::l=https://test.com::v=1.1::a=1234::",
-                "!2/22"
+                "!2/22!"
         );
         final List<LeastRecentlyUsedCacheEntry> result = cacheFile.getAllEntries();
 
@@ -285,7 +285,7 @@ public class LeastRecentlyUsedCacheFileTest {
                 "::i=1/11::l=https://test.com::v=1.1::a=1234::",
                 "::i=2/22::l=https://foo.com::v=2.2::a=3456::",
                 "::i=1/11::a=5678::",
-                "!2/22");
+                "!2/22!");
     }
 
     @Test

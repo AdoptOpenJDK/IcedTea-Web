@@ -117,7 +117,7 @@ public class LeastRecentlyUsedCacheActionTest {
         final LeastRecentlyUsedCacheAction removeAction = createRemoveActionFor(CACHE_ID_1);
         final String result = removeAction.serialize();
 
-        assertEquals("!1/11", result);
+        assertEquals("!1/11!", result);
     }
 
     @Test
@@ -162,7 +162,7 @@ public class LeastRecentlyUsedCacheActionTest {
     public void parseRemovalAction() {
         cacheFile.addEntry(ENTRY_1);
 
-        final LeastRecentlyUsedCacheAction removeAction = parse("!1/11");
+        final LeastRecentlyUsedCacheAction removeAction = parse("!1/11!");
         removeAction.applyTo(cacheFile);
 
         assertTrue(cacheFile.getAllEntries().isEmpty());
@@ -183,8 +183,11 @@ public class LeastRecentlyUsedCacheActionTest {
     public void parseInvalidLinesShouldReturnDoNothingAction() {
         final List<String> invalidLines = asList(
                 "",
-                "!",
+                "::",
                 "abcd",
+
+                "!", // missing ID
+                "!1/11", // missing postfix
 
                 "::l=https://test.com::v=1.1::a=1234::", // missing ID
                 "::i=::l=https://test.com::v=1.1::a=1234::", // empty ID

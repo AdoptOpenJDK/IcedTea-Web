@@ -1,6 +1,8 @@
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 
 import java.net.URL;
 import java.util.Objects;
@@ -14,6 +16,8 @@ import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCache
 import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheAction.ActionType.UPDATE_ACCESS_TIME;
 
 class LeastRecentlyUsedCacheAction {
+
+    private static final Logger logger = LoggerFactory.getLogger(LeastRecentlyUsedCacheAction.class);
 
     private static final String DELIMITER = "::";
     private static final String ID_PREFIX = "i=";
@@ -39,9 +43,10 @@ class LeastRecentlyUsedCacheAction {
         if (isBlank(line)) {
             return DO_NOTHING;
         }
-        if (line.startsWith("!")) {
-            final String id = line.substring(1).trim();
+        if (line.startsWith("!") && line.endsWith("!") && line.length() > 2) {
+            final String id = line.substring(1, line.length() - 1);
             if (isBlank(id)) {
+                logger.debug("encountered remove action line without ID");
                 return DO_NOTHING;
             }
             return createRemoveActionFor(id);
@@ -73,24 +78,28 @@ class LeastRecentlyUsedCacheAction {
                     try {
                         id = part.substring(2);
                     } catch (Exception e) {
+                        logger.debug("Exception while extracting ID {}", e.getMessage());
                         return DO_NOTHING;
                     }
                 } else if (part.startsWith(LOCATION_PREFIX)) {
                     try {
                         location = new URL(part.substring(2));
                     } catch (Exception e) {
+                        logger.debug("Exception while extracting location {}", e.getMessage());
                         return DO_NOTHING;
                     }
                 } else if (part.startsWith(VERSION_PREFIX)) {
                     try {
                         version = VersionId.fromString(part.substring(2));
                     } catch (Exception e) {
+                        logger.debug("Exception while extracting version {}", e.getMessage());
                         return DO_NOTHING;
                     }
                 } else if (part.startsWith(ACCESS_TIME_PREFIX)) {
                     try {
                         access = Long.parseLong(part.substring(2));
                     } catch (Exception e) {
+                        logger.debug("Exception while extracting access time {}", e.getMessage());
                         return DO_NOTHING;
                     }
                 }
@@ -154,7 +163,7 @@ class LeastRecentlyUsedCacheAction {
                         .filter(Objects::nonNull)
                         .collect(Collectors.joining(DELIMITER, DELIMITER, DELIMITER));
             case REMOVE:
-                return "!" + entry.getId();
+                return "!" + entry.getId() + "!";
             case UPDATE_ACCESS_TIME:
                 return Stream.of(
                         ID_PREFIX + entry.getId(),
