@@ -128,7 +128,7 @@ class LeastRecentlyUsedCacheIndexHolder {
             }
         }
 
-        if (cachedCacheFile == null || !Objects.equals(underlyingFile, cachedCacheFile.getUnderlyingFile())) {
+        if (cachedCacheFile == null || !cachedCacheFile.usesFile(underlyingFile)) {
             cachedCacheFile = new LeastRecentlyUsedCacheFile(underlyingFile);
         }
         return cachedCacheFile;

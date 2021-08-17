@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -49,12 +50,12 @@ class LeastRecentlyUsedCacheFile {
         this.lockableFile = requireNonNull(lockableFile, "lockableFile");
     }
 
-    File getUnderlyingFile() {
-        return lockableFile.getFile();
+    boolean usesFile(final File file) {
+        return Objects.equals(file, lockableFile.getFile());
     }
 
     List<LeastRecentlyUsedCacheEntry> getAllEntries() {
-        if (isHasNeverBeenLoaded()) {
+        if (hasNeverBeenLoaded()) {
             throw new IllegalStateException("Cannot access entries before loading the file");
         }
         return unmodifiableEntries;
@@ -100,7 +101,7 @@ class LeastRecentlyUsedCacheFile {
         final boolean almostNoTimeHasPassedSinceLastModification = lastModified / 1000 == now / 1000;
         // the last option is for file systems which do not store milliseconds in the lastModified field.
         // in such a case one can only see a difference in between lastModified and lastLoadOrStore if at least one second has passed.
-        if (isHasNeverBeenLoaded() || hasBeenModifiedSinceLastLoadOrStore || almostNoTimeHasPassedSinceLastModification) {
+        if (hasNeverBeenLoaded() || hasBeenModifiedSinceLastLoadOrStore || almostNoTimeHasPassedSinceLastModification) {
 
             final String content = loadFileAsUtf8String(file);
             final String[] lines = content.split("\\R");
@@ -181,15 +182,15 @@ class LeastRecentlyUsedCacheFile {
         unsavedActions.clear();
     }
 
-    public void lock() throws IOException {
+    void lock() throws IOException {
         lockableFile.lock();
     }
 
-    public void unlock() throws IOException {
+    void unlock() throws IOException {
         lockableFile.unlock();
     }
 
-    private boolean isHasNeverBeenLoaded() {
+    private boolean hasNeverBeenLoaded() {
         return lastLoadOrStore == -1;
     }
 }
