@@ -27,7 +27,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> findUnDeletedEntry(CacheKey key) {
+    Optional<LeastRecentlyUsedCacheEntry> findEntry(CacheKey key) {
         return cacheFile.getAllEntries().stream()
                 .filter(e -> e.matches(key))
                 .findFirst();
@@ -38,8 +38,8 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return the entry found or {@code empty}, never {@code null}.
      */
-    Optional<LeastRecentlyUsedCacheEntry> findUnDeletedAndMarkAsAccessed(CacheKey key) {
-        final Optional<LeastRecentlyUsedCacheEntry> result = findUnDeletedEntry(key);
+    Optional<LeastRecentlyUsedCacheEntry> findAndMarkAsAccessed(CacheKey key) {
+        final Optional<LeastRecentlyUsedCacheEntry> result = findEntry(key);
 
         result.ifPresent(this::markAccessed);
 
@@ -51,7 +51,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return a set of all matching entries, never {@code null}.
      */
-    Set<LeastRecentlyUsedCacheEntry> findAllUnDeletedEntries(URL resourceHref) {
+    Set<LeastRecentlyUsedCacheEntry> findAllEntries(URL resourceHref) {
         return cacheFile.getAllEntries().stream()
                 .filter(e -> e.matches(resourceHref))
                 .collect(Collectors.toSet());
@@ -62,7 +62,7 @@ class LeastRecentlyUsedCacheIndex {
      *
      * @return a set of all matching entries, never {@code null}.
      */
-    Set<LeastRecentlyUsedCacheEntry> findAllUnDeletedEntries(URL resourceHref, VersionString versionString) {
+    Set<LeastRecentlyUsedCacheEntry> findAllEntries(URL resourceHref, VersionString versionString) {
         return cacheFile.getAllEntries().stream()
                 .filter(e -> e.matches(resourceHref, versionString))
                 .collect(Collectors.toSet());
@@ -90,8 +90,8 @@ class LeastRecentlyUsedCacheIndex {
     /**
      * Marks the entry for deletion
      */
-    void markEntryForDeletion(CacheKey key) {
-        findUnDeletedEntry(key).ifPresent(cacheFile::removeEntry);
+    void removeEntry(CacheKey key) {
+        findEntry(key).ifPresent(cacheFile::removeEntry);
     }
 
     /**

@@ -126,7 +126,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     @Test
     public void testAddEntry() {
         holder.runSynchronized(idx -> idx.createEntry(key, entryId));
-        final Optional<LeastRecentlyUsedCacheEntry> entry = holder.getSynchronized(idx -> idx.findUnDeletedEntry(key));
+        final Optional<LeastRecentlyUsedCacheEntry> entry = holder.getSynchronized(idx -> idx.findEntry(key));
         assertTrue(entry.isPresent());
         assertEquals(entry.get().getResourceHref(), url);
         assertEquals(entry.get().getVersion(), version);
