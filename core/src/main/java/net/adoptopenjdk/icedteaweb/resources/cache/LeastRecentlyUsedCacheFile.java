@@ -29,6 +29,8 @@ import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCache
  */
 class LeastRecentlyUsedCacheFile {
 
+    private static final String LINE_END = "\\R";
+
     private final LockableFile lockableFile;
 
     private final List<LeastRecentlyUsedCacheAction> unsavedActions = new ArrayList<>();
@@ -72,7 +74,7 @@ class LeastRecentlyUsedCacheFile {
         if (idx > -1) {
             final LeastRecentlyUsedCacheEntry old = entries.remove(idx);
             LeastRecentlyUsedCacheEntry accessedEntry = new LeastRecentlyUsedCacheEntry(old.getId(), lastAccessed, old.getCacheKey());
-            entries.add(accessedEntry);
+            entries.add(0, accessedEntry);
             unsavedActions.add(createAccessActionFor(old.getId(), lastAccessed));
             sort(entries);
         }
@@ -83,6 +85,15 @@ class LeastRecentlyUsedCacheFile {
         if (entryRemoved) {
             unsavedActions.add(createRemoveActionFor(entry.getId()));
         }
+    }
+
+    void clear() {
+        if (entries.isEmpty()) {
+            return;
+        }
+
+        entries.clear();
+        requestCompression();
     }
 
     void load() throws IOException {
@@ -104,32 +115,23 @@ class LeastRecentlyUsedCacheFile {
         if (hasNeverBeenLoaded() || hasBeenModifiedSinceLastLoadOrStore || almostNoTimeHasPassedSinceLastModification) {
 
             final String content = loadFileAsUtf8String(file);
-            final String[] lines = content.split("\\R");
+            final String[] lines = content.split(LINE_END);
 
             Stream.of(lines)
                     .map(LeastRecentlyUsedCacheAction::parse)
                     .forEach(action -> action.applyTo(this));
 
-            lastLoadOrStore = now;
+            lastLoadOrStore = lastModified;
             unsavedActions.clear();
         }
     }
 
-    void clear() {
-        if (entries.isEmpty()) {
-            return;
-        }
-
-        entries.clear();
-        requestCompression();
+    boolean isDirty() {
+        return !unsavedActions.isEmpty() || requestCompression;
     }
 
     void requestCompression() {
         requestCompression = true;
-    }
-
-    boolean isDirty() {
-        return !unsavedActions.isEmpty() || requestCompression;
     }
 
     void persistChanges() throws IOException {
@@ -156,7 +158,6 @@ class LeastRecentlyUsedCacheFile {
         }
 
         lastLoadOrStore = System.currentTimeMillis();
-        requestCompression = false;
         unsavedActions.clear();
     }
 
