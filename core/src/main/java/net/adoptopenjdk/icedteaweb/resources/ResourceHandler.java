@@ -24,10 +24,7 @@ import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
-/*
- * Modified class to add DeploymentRuleSet 
- * DJ -03-02-2021
- */
+
 class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
@@ -46,7 +43,7 @@ class ResourceHandler {
         // threads will return this future and ensure a resource is only processed by a single thread
         synchronized (resource) {
             final Future<Resource> future = resource.getFutureForDownloaded();
-            if(future == null) {
+            if (future == null) {
                 LOG.debug("Download for {} has not been started until now", resource.getSimpleName());
                 final Future<Resource> futureResource = getDownloadStateAndStartUnstartedDownload(downloadExecutor);
                 resource.startProcessing(futureResource);
@@ -121,54 +118,23 @@ class ResourceHandler {
         return resource;
     }
 
-    /**  Original method
     private void validateWithWhitelist() {
         final URL url = resource.getLocation();
         Assert.requireNonNull(url, "url");
 
         // Validate with whitelist specified in deployment.properties. localhost is considered valid.
-        final boolean found = UrlWhiteListUtils.isUrlInApplicationUrlWhitelist(url);
-        if (!found) {
-            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
-            LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
-            JNLPRuntime.exit(-1);
+        if (UrlWhiteListUtils.isUrlInApplicationUrlWhitelist(url)) {
+            return;
         }
-    }
-    */
-    private void validateWithWhitelist() {
-        final URL url = resource.getLocation();
-        Assert.requireNonNull(url, "url");
-        
-        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
-        //commented out by DJ -final key word so that URL can be checked against whitelist as well as deploymentRuleset.
-        /*final*/ boolean found = UrlWhiteListUtils.isUrlInApplicationUrlWhitelist(url);
-        //If not found in  the serverWhitelisting , check in DeploymentRuleSet.jar file.
-        LOG.debug("Resource URL not In Whitelist: {} found before calling Deployment rule set", found);
-        if (!found) {
-        	LOG.debug("----------------------BEGIN DEPLOYMENT RULESET CALL------------------------------------------", found);
-        	LOG.debug("Resource URL call inside (!found) before calling found=validateWithDeploymentRuleSet()", found);
-        	found=validateWithDeploymentRuleSet() ;
-        	LOG.debug("Resource URL call inside (!found) after calling found=validateWithDeploymentRuleSet()", found);
-        }
-        LOG.debug("Resource URL not In Whitelist: {} found after calling Deployment rule set", found);
-        if (!found) {
-            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
-            LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
-            JNLPRuntime.exit(-1);
-        }
-    }
-    
-    /**
-     * @author DJ 03-02-2021
-     * Validates the resource URL with the deploymentRuleSet jar file
-     */
-    private boolean validateWithDeploymentRuleSet() {
-        final URL url = resource.getLocation();
-        Assert.requireNonNull(url, "url");
 
         // Validate with whitelist specified in DeploymentRuleSet.jar localhost is considered valid.
-        final boolean found = UrlDeploymentRulesSetUtils.isUrlInDeploymentRuleSetlist(url);
-        return found;
+        if (UrlDeploymentRulesSetUtils.isUrlInDeploymentRuleSet(url)) {
+            return;
+        }
+
+        BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
+        LOG.error("Resource URL not In Whitelist: {}", resource.getLocation());
+        JNLPRuntime.exit(-1);
     }
 
 }
