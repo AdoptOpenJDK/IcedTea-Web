@@ -92,13 +92,9 @@ class ResourceHandler {
     }
 
     private static void validateWithWhitelist(URL url) {
-        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
-        if (isUrlInWhitelist(url, getApplicationUrlWhiteList())) {
-            return;
-        }
-
-        // Validate with whitelist specified in DeploymentRuleSet.jar localhost is considered valid.
-        if (isUrlInDeploymentRuleSet(url)) {
+        // Validate with whitelist specified in deployment.properties or deployment ruleset.
+        // localhost is considered valid.
+        if (isUrlInWhitelist(url, getApplicationUrlWhiteList()) || isUrlInDeploymentRuleSet(url)) {
             return;
         }
 
