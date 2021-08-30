@@ -166,13 +166,12 @@ public class LockableFile {
      * @throws java.io.IOException if an I/O error occurs.
      */
     public void lock() throws IOException {
-        final boolean alreadyLocked = threadLock.isHeldByCurrentThread();
-        threadLock.lock();
-        if (alreadyLocked) {
+        if (threadLock.isHeldByCurrentThread()) {
             // early exit: process locking may not be reentrant causing an error when trying to lock the same file twice
             return;
         }
 
+        threadLock.lock();
         createFileIfMissing();
         processLock.lock();
     }

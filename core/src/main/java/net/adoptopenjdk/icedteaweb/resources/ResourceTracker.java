@@ -20,7 +20,6 @@ import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider.DaemonThreadFactory;
 import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
@@ -38,12 +37,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.createResource;
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.createFixedDaemonThreadPool;
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.createSingletonDaemonThreadPool;
+import static net.adoptopenjdk.icedteaweb.resources.Resource.createOrGetResource;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.normalizeUrlQuietly;
 
@@ -148,12 +148,14 @@ public class ResourceTracker {
      */
     public void addResource(URL location, final VersionString version, final UpdatePolicy updatePolicy) {
         Assert.requireNonNull(location, "location");
-        LOG.debug("Will add resource at location '{}'", location);
-
+        LOG.debug("Create resource for '{}'", location);
 
         final URL normalizedLocation = normalizeUrlQuietly(location);
-        final Resource resource = createResource(normalizedLocation, version, downloadOptions, updatePolicy);
-        LOG.debug("Will add resource '{}'", resource.getSimpleName());
+        if (!location.toString().equals(normalizedLocation.toString())) {
+            LOG.debug("Normalized location {} -> {}", location, normalizedLocation);
+        }
+
+        final Resource resource = createOrGetResource(normalizedLocation, version, downloadOptions, updatePolicy);
         if (addToResources(resource)) {
             startDownloadingIfPrefetch(resource);
         }
@@ -168,22 +170,24 @@ public class ResourceTracker {
 
             if (existingResource == null) {
                 resources.put(resource.getLocation(), resource);
-            } else {
-                final VersionString newVersion = resource.getRequestVersion();
-                final VersionString existingVersion = existingResource.getRequestVersion();
-                if (!Objects.equals(existingVersion, newVersion)) {
-                    throw new IllegalStateException("Found two resources with location '" + resource.getLocation() +
-                            "' but different versions '" + newVersion + "' - '" + existingVersion + "'");
-                }
+                return true;
             }
 
-            return existingResource == null;
+            final VersionString newVersion = resource.getRequestVersion();
+            final VersionString existingVersion = existingResource.getRequestVersion();
+            if (!Objects.equals(existingVersion, newVersion)) {
+                throw new IllegalStateException("Found two resources with location '" + resource.getLocation() +
+                        "' but different versions '" + newVersion + "' - '" + existingVersion + "'");
+            }
+
+            return false;
         }
     }
 
     private void startDownloadingIfPrefetch(Resource resource) {
         if (prefetch && !resource.isComplete() && !resource.isBeingProcessed()) {
-            triggerDownloadFor(resource, Executors.newSingleThreadExecutor(new DaemonThreadFactory()));
+            LOG.debug("Prefetching resource {}", resource.getSimpleName());
+            triggerDownloadFor(resource, createSingletonDaemonThreadPool());
         }
     }
 
@@ -259,7 +263,7 @@ public class ResourceTracker {
 
     private static File getCacheFile(final Resource resource) {
         final URL location = resource.getLocation();
-        if (resource.isSet(ERROR)) {
+        if (resource.hasStatus(ERROR)) {
             LOG.debug("Error flag set for resource '{}'. Can not return a local file for the resource", resource.getLocation());
             return null;
         }
@@ -381,7 +385,7 @@ public class ResourceTracker {
 
         final int configuredThreadCount = Integer.parseInt(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT));
         final int threadCount = Math.min(configuredThreadCount, resources.length);
-        final ExecutorService downloadExecutor = Executors.newFixedThreadPool(threadCount, new DaemonThreadFactory());
+        final ExecutorService downloadExecutor = createFixedDaemonThreadPool(threadCount);
         try {
             final List<Future<Resource>> futures = Arrays.asList(resources).stream()
                     .map(r -> triggerDownloadFor(r, downloadExecutor))
@@ -399,7 +403,7 @@ public class ResourceTracker {
     }
 
     private Future<Resource> triggerDownloadFor(Resource resource, final Executor downloadExecutor) {
-        return new ResourceHandler(resource).putIntoCache(downloadExecutor);
+        return resource.putIntoCache(downloadExecutor);
     }
 
     public void addDownloadListener(final URL resourceUrl, URL[] allResources, final DownloadServiceListener listener) {

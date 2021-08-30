@@ -83,7 +83,7 @@ public class CacheEntryTest {
 
     @Test
     public void verifyLocationIsSame() {
-        assertEquals(url, createEntry().getResourceHref());
+        assertEquals(url, createEntry().getCacheKey().getLocation());
     }
 
     @Test
@@ -153,6 +153,6 @@ public class CacheEntryTest {
     }
 
     private CacheEntry createEntry() {
-        return new CacheEntry(url, version, cacheFile, infoFile);
+        return new CacheEntry(new CacheKey(url, version), cacheFile, infoFile);
     }
 }

@@ -69,6 +69,7 @@ import static org.junit.Assert.assertTrue;
 
 public class LeastRecentlyUsedCacheIndexHolderTest {
 
+    private static CacheKey key;
     private static URL url;
     private static final VersionId version = VersionId.fromString("1.0");
     private static final String entryId = "1-1";
@@ -83,6 +84,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     @BeforeClass
     public static void setUpClass() throws MalformedURLException {
         url = new URL("http://example.com/example.jar");
+        key = new CacheKey(url, version);
     }
 
     @Before
@@ -118,7 +120,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
 
     @Test
     public void testModTimestampAfterClear() throws InterruptedException {
-        holder.runSynchronized(idx -> idx.createEntry(url, version, "1-1"));
+        holder.runSynchronized(idx -> idx.createEntry(key, "1-1"));
         final long lmBefore = recentlyUsedFile.lastModified();
 
         // required as file system only stores seconds in lastModified()
@@ -132,7 +134,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
 
     @Test
     public void testModTimestampAfterNoop() throws InterruptedException {
-        holder.runSynchronized(idx -> idx.createEntry(url, version, "1-1"));
+        holder.runSynchronized(idx -> idx.createEntry(key, "1-1"));
         final long lmBefore = recentlyUsedFile.lastModified();
 
         // required as file system only stores seconds in lastModified()
@@ -148,7 +150,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
 
     @Test
     public void testModTimestampAfterStore() throws InterruptedException {
-        holder.runSynchronized(idx -> idx.createEntry(url, version, "1-1"));
+        holder.runSynchronized(idx -> idx.createEntry(key, "1-1"));
         final long lmBefore = recentlyUsedFile.lastModified();
 
         // required as file system only stores seconds in lastModified()
@@ -162,23 +164,12 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
 
     @Test
     public void testAddEntry() {
-        holder.runSynchronized(idx -> idx.createEntry(url, version, entryId));
-        final Optional<LeastRecentlyUsedCacheEntry> entry = holder.getSynchronized(idx -> idx.find(url, version));
+        holder.runSynchronized(idx -> idx.createEntry(key, entryId));
+        final Optional<LeastRecentlyUsedCacheEntry> entry = holder.getSynchronized(idx -> idx.findUnDeletedEntry(key));
         assertTrue(entry.isPresent());
         assertEquals(entry.get().getResourceHref(), url);
         assertEquals(entry.get().getVersion(), version);
         assertEquals(entry.get().getId(), entryId);
-    }
-
-    @Test
-    public void testRemoveEntry() {
-        holder.runSynchronized(idx -> idx.createEntry(url, version, entryId));
-        final Optional<LeastRecentlyUsedCacheEntry> entryOne = holder.getSynchronized(idx -> idx.find(url, version));
-        assertTrue(entryOne.isPresent());
-
-        holder.runSynchronized(idx -> idx.removeEntry(url, version));
-        final Optional<LeastRecentlyUsedCacheEntry> entryTwo = holder.getSynchronized(idx -> idx.find(url, version));
-        assertFalse(entryTwo.isPresent());
     }
 
     @Test
@@ -203,7 +194,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
         holder.runSynchronized(idx -> {
             for (int i = 0; i < noEntriesCacheFile; i++) {
                 final VersionId v = VersionId.fromString(Integer.toString(i));
-                idx.createEntry(url, v, "2-" + i);
+                idx.createEntry(new CacheKey(url, v), "2-" + i);
             }
         });
     }

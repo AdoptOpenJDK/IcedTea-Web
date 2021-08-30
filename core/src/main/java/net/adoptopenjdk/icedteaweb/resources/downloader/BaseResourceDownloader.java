@@ -9,7 +9,6 @@ import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.DownloadInfo;
@@ -34,6 +33,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.globalFixedThreadPool;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.ACCEPT_ENCODING_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CONTENT_ENCODING_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.CONTENT_TYPE_HEADER;
@@ -42,8 +42,8 @@ import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstant
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.LAST_MODIFIED_HEADER;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.PACK_200_OR_GZIP;
 import static net.adoptopenjdk.icedteaweb.resources.JnlpDownloadProtocolConstants.VERSION_ID_HEADER;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.DOWNLOADED;
-import static net.adoptopenjdk.icedteaweb.resources.Resource.Status.ERROR;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
+import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 
 /**
  * Base class for resource downloader.
@@ -114,7 +114,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private CompletableFuture<Resource> downloadFrom(final URL url) {
         LOG.debug("Will download in background: {}", url);
         final CompletableFuture<Resource> result = new CompletableFuture<>();
-        CachedDaemonThreadPoolProvider.getThreadPool().execute(() -> {
+        globalFixedThreadPool().execute(() -> {
             try {
                 result.complete(tryDownloading(url));
             } catch (Exception e) {
@@ -143,7 +143,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         } catch (Exception ex) {
             if (downloadDetails != null) {
                 LOG.debug("Marking as corrupted {}", resource);
-                Cache.markAsCorrupted(resource.getLocation(), getVersion(downloadDetails.downloadFrom, downloadDetails.version));
+                Cache.invalidateExistingCacheFile(resource.getLocation(), getVersion(downloadDetails.downloadFrom, downloadDetails.version));
             }
             LOG.debug("Exception while downloading resource {} from {} - message: {} cause: {} ", resource, downloadFrom, ex.getMessage(), ex.getCause());
             throw ex;
@@ -174,7 +174,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         final VersionId version = getVersion(downloadDetails.downloadFrom, downloadDetails.version);
 
         if (isUpToDate(resourceHref, version, downloadDetails.lastModified)) {
-            final File cacheFile = Cache.getCacheFile(resourceHref, version);
+            final File cacheFile = Cache.getOrCreateCacheFile(resourceHref, version);
             resource.setLocalFile(cacheFile);
             return cacheFile.length();
         } else {
@@ -303,6 +303,6 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     void invalidateExistingEntryInCache(VersionId version) {
         final URL location = resource.getLocation();
         LOG.debug("Invalidating resource in cache: {} / {}", location, version);
-        Cache.replaceExistingCacheFile(location, version);
+        Cache.invalidateExistingCacheFile(location, version);
     }
 }

@@ -46,6 +46,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -69,7 +70,7 @@ public class NativeLibraryStorageTest {
     }
 
     private static List<FileExtension> makeExtensionsToTest() {
-        List<FileExtension> exts = new ArrayList<>();
+        final List<FileExtension> exts = new ArrayList<>();
         exts.add(new FileExtension(".foobar", false)); /* Dummy non-native test extension */
         for (String ext : NativeLibraryStorage.NATIVE_LIBRARY_EXTENSIONS) {
             exts.add(new FileExtension(ext, true));
@@ -82,7 +83,7 @@ public class NativeLibraryStorageTest {
 
     /* Creates a NativeLibraryStorage object, caching the given URLs */
     private static NativeLibraryStorage nativeLibraryStorageWithCache(URL... urlsToCache) {
-        ResourceTracker tracker = new ResourceTracker();
+        final ResourceTracker tracker = new ResourceTracker();
         for (URL urlToCache : urlsToCache) {
             tracker.addResource(urlToCache, VersionString.fromString("1.0"), UpdatePolicy.ALWAYS);
         }
@@ -98,16 +99,16 @@ public class NativeLibraryStorageTest {
     @Test
     public void testJarFileSearch() throws Exception {
         /* Create a temporary directory to create jars in */
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        final File tempDirectory = FileTestUtils.createTempDirectory();
 
         for (FileExtension ext : extensionsToTest) {
             /* Create empty file to search for */
-            String testFileName = "foobar" + ext.extension;
-            File testFile = new File(tempDirectory, testFileName);
+            final String testFileName = "foobar" + ext.extension;
+            final File testFile = new File(tempDirectory, testFileName);
             FileTestUtils.createFileWithContents(testFile, "");
 
             /* Create jar to search in */
-            File jarLocation = new File(tempDirectory, "test.jar");
+            final File jarLocation = new File(tempDirectory, "test.jar");
             FileTestUtils.createJarWithContents(jarLocation, testFile);
 
             final URL tempJarUrl = jarLocation.toURI().toURL();
@@ -117,7 +118,7 @@ public class NativeLibraryStorageTest {
 
             /* If the file we added is native, it should be found
              * Due to an implementation detail, non-native files will not be found */
-            boolean testFileWasFound = storage.findLibrary(testFileName) != null;
+            final boolean testFileWasFound = storage.findLibrary(testFileName) != null;
             assertEquals(ext.isNative, testFileWasFound);
         }
     }
@@ -126,35 +127,35 @@ public class NativeLibraryStorageTest {
     @Test
     public void testDirectorySearch() throws Exception {
         /* Create a temporary directory to search in */
-        File tempDirectory = FileTestUtils.createTempDirectory();
+        final File tempDirectory = FileTestUtils.createTempDirectory();
 
         for (FileExtension ext : extensionsToTest) {
             /* Create empty file in the directory */
-            String testFileName = "foobar" + ext.extension;
+            final String testFileName = "foobar" + ext.extension;
             FileTestUtils.createFileWithContents(new File(tempDirectory, testFileName), "");
 
             /* Add the directory to the search list */
-            NativeLibraryStorage storage = nativeLibraryStorageWithCache(/* None needed */);
-            storage.addSearchDirectory(tempDirectory);
+            final NativeLibraryStorage storage = nativeLibraryStorageWithCache(/* None needed */);
+            storage.addSearchDirectories(asList(tempDirectory));
 
             /* Ensure directory is in our search list */
             assertTrue(storage.getSearchDirectories().contains(tempDirectory));
 
             /* The file should be found, regardless if it was native */
-            boolean testFileWasFound = storage.findLibrary(testFileName) != null;
+            final boolean testFileWasFound = storage.findLibrary(testFileName) != null;
             assertTrue(testFileWasFound);
         }
     }
 
     @Test
     public void testCleanupTemporaryFolder() {
-        NativeLibraryStorage storage = nativeLibraryStorageWithCache(/* None needed */);
+        final NativeLibraryStorage storage = nativeLibraryStorageWithCache(/* None needed */);
         storage.getNativeStoreDirectory();
 
         /* The temporary native store directory should be our only search folder */
         assertEquals(1, storage.getSearchDirectories().size());
 
-        File searchDirectory = storage.getSearchDirectories().get(0);
+        final File searchDirectory = storage.getSearchDirectories().get(0);
         assertTrue(searchDirectory.exists());
 
         /* Test that it has been deleted */

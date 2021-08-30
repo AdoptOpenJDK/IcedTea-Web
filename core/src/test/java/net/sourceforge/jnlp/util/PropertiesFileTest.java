@@ -138,8 +138,8 @@ public class PropertiesFileTest {
         }
     }
 
-    @Test
-    public void testLoad() {
+    @Test(expected = IllegalStateException.class)
+    public void testLoadShouldFailIfPropertiesAreDirty() {
         try {
             propertiesFile.lock();
 
@@ -148,12 +148,8 @@ public class PropertiesFileTest {
 
             propertiesFile.setProperty("shouldNotRemainAfterLoad", "def");
             propertiesFile.load();
-
-            assertTrue(propertiesFile.containsPropertyKey("key"));
-            assertFalse(propertiesFile.containsPropertyKey("shouldNotRemainAfterLoad"));
         } finally {
             propertiesFile.unlock();
-
         }
     }
 

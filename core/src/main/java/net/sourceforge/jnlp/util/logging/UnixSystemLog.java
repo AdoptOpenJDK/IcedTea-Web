@@ -36,12 +36,12 @@ package net.sourceforge.jnlp.util.logging;
 import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.adoptopenjdk.icedteaweb.resources.CachedDaemonThreadPoolProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import static net.adoptopenjdk.icedteaweb.resources.DaemonThreadPoolProvider.createSingletonDaemonThreadPool;
 
 
 public class UnixSystemLog implements SingleStreamLogger {
@@ -50,7 +50,7 @@ public class UnixSystemLog implements SingleStreamLogger {
 
     private static final String PREAMBLE = "IcedTea-Web java error - for more info see itweb-settings debug options or console." +
             " See " + TextsProvider.ITW_BUGS + " for help.\nIcedTea-Web java error manual log:\n";
-    private final ExecutorService singleExecutor = Executors.newSingleThreadExecutor(new CachedDaemonThreadPoolProvider.DaemonThreadFactory());
+    private final ExecutorService singleExecutor = createSingletonDaemonThreadPool();
 
     @Override
     public void log(final String message) {

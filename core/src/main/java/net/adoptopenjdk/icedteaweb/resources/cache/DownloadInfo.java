@@ -6,24 +6,20 @@ import java.net.URL;
 
 public class DownloadInfo {
 
-    private final URL resourceHref;
-    private final VersionId version;
+    private final CacheKey key;
+
     private final long lastModified;
     private final long downloadedAt;
 
     public DownloadInfo(URL resourceHref, VersionId version, long lastModified) {
-        this.resourceHref = resourceHref;
-        this.version = version;
+        this.key = new CacheKey(resourceHref, version);
+
         this.lastModified = lastModified;
         this.downloadedAt = System.currentTimeMillis();
     }
 
-    URL getResourceHref() {
-        return resourceHref;
-    }
-
-    VersionId getVersion() {
-        return version;
+    CacheKey getCacheKey() {
+        return key;
     }
 
     long getLastModified() {

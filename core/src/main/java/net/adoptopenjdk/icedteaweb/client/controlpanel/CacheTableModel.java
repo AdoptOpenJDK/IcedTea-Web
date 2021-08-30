@@ -1,7 +1,6 @@
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
 import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.resources.cache.CacheFile;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -10,7 +9,7 @@ import java.util.List;
 
 public class CacheTableModel extends AbstractTableModel {
 
-    private final List<CacheFile> data = new ArrayList<>();
+    private final List<CacheFileInfo> data = new ArrayList<>();
 
     public final static String[] columns = {
             Translator.R("CVCPColName"),
@@ -24,15 +23,15 @@ public class CacheTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(final int rowIndex, final int columnIndex) {
-        final CacheFile cacheFile = data.get(rowIndex);
+        final CacheFileInfo cacheFileInfo = data.get(rowIndex);
         switch (columnIndex) {
-            case 0: return cacheFile.getInfoFile();
-            case 1: return cacheFile.getParentFile();
-            case 2: return cacheFile.getProtocol();
-            case 3: return cacheFile.getDomain();
-            case 4: return cacheFile.getSize();
-            case 5: return cacheFile.getLastModified();
-            case 6: return cacheFile.getJnlpPath();
+            case 0: return cacheFileInfo.getInfoFile();
+            case 1: return cacheFileInfo.getParentFile();
+            case 2: return cacheFileInfo.getProtocol();
+            case 3: return cacheFileInfo.getDomain();
+            case 4: return cacheFileInfo.getSize();
+            case 5: return cacheFileInfo.getLastModified();
+            case 6: return cacheFileInfo.getJnlpPath();
         }
         return null;
     }
@@ -62,9 +61,9 @@ public class CacheTableModel extends AbstractTableModel {
         return data.size();
     }
 
-    public void addAll(final Collection<CacheFile> cacheFiles) {
+    public void addAll(final Collection<CacheFileInfo> cacheFileInfos) {
         final int size = data.size();
-        data.addAll(cacheFiles);
+        data.addAll(cacheFileInfos);
         fireTableRowsInserted(size, data.size() - 1);
     }
 

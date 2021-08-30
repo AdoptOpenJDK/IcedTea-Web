@@ -37,16 +37,24 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class CachedDaemonThreadPoolProvider {
+public class DaemonThreadPoolProvider {
 
-    private static final ExecutorService DAEMON_THREAD_POOL = Executors.newFixedThreadPool(6, new DaemonThreadFactory());
+    private static final ExecutorService DAEMON_THREAD_POOL = createFixedDaemonThreadPool(6);
 
-    public static ExecutorService getThreadPool() {
+    public static ExecutorService globalFixedThreadPool() {
         return DAEMON_THREAD_POOL;
     }
 
-    public static ExecutorService createDaemonThreadPool() {
+    public static ExecutorService createCachedDaemonThreadPool() {
         return Executors.newCachedThreadPool(new DaemonThreadFactory());
+    }
+
+    public static ExecutorService createFixedDaemonThreadPool(final int numThreads) {
+        return Executors.newFixedThreadPool(numThreads, new DaemonThreadFactory());
+    }
+
+    public static ExecutorService createSingletonDaemonThreadPool() {
+        return Executors.newSingleThreadExecutor(new DaemonThreadFactory());
     }
 
     /**
@@ -56,7 +64,7 @@ public class CachedDaemonThreadPoolProvider {
      * Except creating new threads, the rest of class is complicated creation of
      * name.
      */
-    public static class DaemonThreadFactory implements ThreadFactory {
+    private static class DaemonThreadFactory implements ThreadFactory {
 
         private static final AtomicInteger poolNumber = new AtomicInteger(1);
 

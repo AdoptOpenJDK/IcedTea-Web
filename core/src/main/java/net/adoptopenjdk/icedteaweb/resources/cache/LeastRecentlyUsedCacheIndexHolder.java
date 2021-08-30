@@ -23,7 +23,7 @@ class LeastRecentlyUsedCacheIndexHolder {
 
     private static final Logger LOG = LoggerFactory.getLogger(LeastRecentlyUsedCacheIndexHolder.class);
 
-    private static ReentrantLock lock = new ReentrantLock();
+    private static final ReentrantLock lock = new ReentrantLock();
 
     private final InfrastructureFileDescriptor recentlyUsed;
 
@@ -136,8 +136,11 @@ class LeastRecentlyUsedCacheIndexHolder {
         } else {
             // the InfrastructureFileDescriptor was set to different location, move to it
             if (cachedIndexPropertiesFile.tryLock()) {
-                cachedIndexPropertiesFile.store();
-                cachedIndexPropertiesFile.unlock();
+                try {
+                    cachedIndexPropertiesFile.store();
+                } finally {
+                    cachedIndexPropertiesFile.unlock();
+                }
             }
             cachedIndexPropertiesFile = new PropertiesFile(recentlyUsedFile);
             return cachedIndexPropertiesFile;

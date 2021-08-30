@@ -2,6 +2,8 @@ package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.IpUtil;
 
@@ -12,6 +14,8 @@ import java.util.stream.Collectors;
 import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_SECURITY_SERVER_WHITELIST;
 
 public class UrlWhiteListUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UrlWhiteListUtils.class);
 
     private static List<WhitelistEntry> applicationUrlWhiteList;
 
@@ -28,10 +32,6 @@ public class UrlWhiteListUtils {
                 .filter(s -> !StringUtils.isBlank(s))
                 .map(UrlWhiteListUtils::parseEntry)
                 .collect(Collectors.toList());
-    }
-
-    public static boolean isUrlInApplicationUrlWhitelist(final URL url) {
-        return isUrlInWhitelist(url, getApplicationUrlWhiteList());
     }
 
     public static boolean isUrlInWhitelist(final URL url, final List<WhitelistEntry> whiteList) {
@@ -54,4 +54,5 @@ public class UrlWhiteListUtils {
         Assert.requireNonNull(wlUrlStr, "wlUrlStr");
         return WhitelistEntry.parse(wlUrlStr);
     }
+
 }
