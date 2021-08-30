@@ -1,13 +1,17 @@
 package net.adoptopenjdk.icedteaweb.resources;
 
 
+import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
+import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -17,12 +21,16 @@ import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.sourceforge.jnlp.cache.CacheUtil.isNonCacheable;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
+import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.getApplicationUrlWhiteList;
+import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.isUrlInWhitelist;
 
 class ResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(ResourceHandler.class);
 
     static Future<Resource> putIntoCache(final Resource resource, final Executor downloadExecutor) {
+        validateWithWhitelist(resource.getLocation());
+
         final CompletableFuture<Resource> result = new CompletableFuture<>();
         if (resource.isComplete()) {
             LOG.debug("Resource is already completed: {} ", resource.getSimpleName());
@@ -80,4 +88,13 @@ class ResourceHandler {
         return resource;
     }
 
+    private static void validateWithWhitelist(URL url) {
+        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
+        if (isUrlInWhitelist(url, getApplicationUrlWhiteList())) {
+            return;
+        }
+        BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
+        LOG.error("Resource URL not In Whitelist: {}", url);
+        JNLPRuntime.exit(-1);
+    }
 }

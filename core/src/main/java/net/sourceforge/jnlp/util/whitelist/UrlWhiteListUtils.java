@@ -2,8 +2,6 @@ package net.sourceforge.jnlp.util.whitelist;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 import net.adoptopenjdk.icedteaweb.StringUtils;
-import net.adoptopenjdk.icedteaweb.client.BasicExceptionDialog;
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
@@ -57,15 +55,4 @@ public class UrlWhiteListUtils {
         return WhitelistEntry.parse(wlUrlStr);
     }
 
-    public static void validateWithApplicationWhiteList(URL url) {
-        Assert.requireNonNull(url, "url");
-
-        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
-        final boolean found = isUrlInWhitelist(url, getApplicationUrlWhiteList());
-        if (!found) {
-            BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
-            LOG.error("Resource URL not In Whitelist: {}", url);
-            JNLPRuntime.exit(-1);
-        }
-    }
 }
