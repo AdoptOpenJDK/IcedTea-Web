@@ -106,6 +106,7 @@ class CacheIndexFile {
             final String content = loadFileAsUtf8String(file);
             final String[] lines = content.split(LINE_END);
 
+            entries.clear();
             Stream.of(lines)
                     .map(CacheAction::parse)
                     .forEach(entries::apply);

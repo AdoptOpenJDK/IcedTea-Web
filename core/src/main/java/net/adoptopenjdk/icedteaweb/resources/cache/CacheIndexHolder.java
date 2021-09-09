@@ -167,6 +167,6 @@ class CacheIndexHolder {
     }
 
     private String convertOldId(String id) {
-        return id.replace('-', File.pathSeparatorChar);
+        return id.replace('-', File.separatorChar);
     }
 }
