@@ -16,7 +16,6 @@ import static net.adoptopenjdk.icedteaweb.xmlparser.NodeUtils.getChildNodes;
  */
 class DeploymentRuleSetParser {
 
-    private static final String DEPLOYMENT_RULESET_ROOT_ELEMENT = "deploymentRulesSet";
     private static final String ID_ELEMENT = "id";
     private static final String RULE_SET_ELEMENT = "ruleset";
 
@@ -42,20 +41,10 @@ class DeploymentRuleSetParser {
      */
     public List<XmlRule> getRules(final XmlNode root) throws ParseException {
         // ensure it's a DeploymentRuleSet node
-        if (root == null || !root.getNodeName().equals(DEPLOYMENT_RULESET_ROOT_ELEMENT)) {
-            throw new ParseException("Root element is not a DeploymentRuleset element.");
+        if (root == null || !root.getNodeName().equals(RULE_SET_ELEMENT)) {
+            throw new ParseException("Root element is not a <" + RULE_SET_ELEMENT + "> element.");
         }
-        return processXmlParsingOfRuleSet(root);
-    }
-
-    private List<XmlRule> processXmlParsingOfRuleSet(final XmlNode parent) throws ParseException {
-        final XmlNode child = parent.getFirstChild();
-        final boolean isRuleSetElement = child.getNodeName().equals(RULE_SET_ELEMENT);
-        if (isRuleSetElement) {
-            return getRulesFromRuleset(child);
-        } else {
-            return new ArrayList<>();
-        }
+        return getRulesFromRuleset(root);
     }
 
     private List<XmlRule> getRulesFromRuleset(final XmlNode parent) throws ParseException {

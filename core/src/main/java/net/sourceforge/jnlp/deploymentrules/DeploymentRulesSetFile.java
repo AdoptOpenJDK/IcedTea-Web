@@ -34,8 +34,7 @@ class DeploymentRulesSetFile {
     public List<String> parseDeploymentRuleSet() throws ParseException {
         final File rulesetJarFile = new File(rulesetPath);
         if (rulesetJarFile.exists()) {
-            final String rawContent = getRulesetXmlContent(rulesetJarFile);
-            final String content = wrapInArtificialRoot(rawContent);
+            final String content = getRulesetXmlContent(rulesetJarFile);
             final XmlNode root = parseXml(content);
             final List<XmlRule> rules = extractRules(root);
 
@@ -61,16 +60,6 @@ class DeploymentRulesSetFile {
         } catch (IOException e) {
             throw new ParseException("file IO exception accessing the ruleset or some network issues", e);
         }
-    }
-
-    private String wrapInArtificialRoot(String content) throws ParseException {
-        final int idx = content.indexOf("<ruleset");
-        if (idx < 0) {
-            throw new ParseException("Could not find any <ruleset>");
-        }
-        final String prefix = content.substring(0, idx);
-        final String fullXml = content.substring(idx);
-        return prefix + "<deploymentRulesSet>" + fullXml + "</deploymentRulesSet>";
     }
 
     private XmlNode parseXml(String content) throws ParseException {
