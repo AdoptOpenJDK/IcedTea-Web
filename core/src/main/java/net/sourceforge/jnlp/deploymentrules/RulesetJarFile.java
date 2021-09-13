@@ -11,42 +11,33 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
 
 class RulesetJarFile {
 
     private static final String RULESET_XML = "ruleset.xml";
-    private static final String RUN = "run";
 
-    private final String rulesetPath;
+    private final File jarFile;
 
     public RulesetJarFile(String rulesetPath) {
-        this.rulesetPath = rulesetPath;
+        jarFile = new File(rulesetPath);
     }
 
-    public List<String> parseDeploymentRuleSet() throws ParseException {
-        final File rulesetJarFile = new File(rulesetPath);
-        if (rulesetJarFile.exists()) {
-            final String content = getRulesetXmlContent(rulesetJarFile);
-            final XmlNode root = parseXml(content);
-            final List<Rule> rules = extractRules(root);
+    public XmlNode getRulesetXml() throws ParseException {
+        final File rulesetJarFile = jarFile;
 
-            return rules.stream()
-                    .filter(rule -> Objects.equals(rule.getAction().getPermission(), RUN))
-                    .map(Rule::getLocation)
-                    .collect(Collectors.toList());
+        if (!rulesetJarFile.exists()) {
+            throw new RuntimeException("Ruleset jar file is missing");
         }
-        return Collections.emptyList();
+
+        final String content = getRulesetXmlContent(rulesetJarFile);
+        return parseXml(content);
     }
 
-    private String getRulesetXmlContent(File rulesetJarFile) throws ParseException {
+    public String getRulesetXmlContent(File rulesetJarFile) throws ParseException {
         try {
             final JarFile file = new JarFile(rulesetJarFile);
             final JarEntry entry = file.getJarEntry(RULESET_XML);
@@ -72,12 +63,7 @@ class RulesetJarFile {
         }
     }
 
-    private List<Rule> extractRules(XmlNode root) throws ParseException {
-        try {
-            return new RulesetParser().getRules(root);
-        } catch (ParseException e) {
-            throw new ParseException("Could not initialize the DeploymentRuleSetParser" + e.getMessage());
-        }
+    public boolean isNotPresent() {
+        return !jarFile.exists();
     }
-
 }
