@@ -1,9 +1,12 @@
 package net.sourceforge.jnlp.deploymentrules;
 
-class XmlRule {
+/**
+ * See https://docs.oracle.com/javase/8/docs/technotes/guides/deploy/deployment_rules.html#CIHDCEDE
+ */
+class Rule {
     private String location;
-    private XmlCertificate certificate;
-    private XmlAction action;
+    private Certificate certificate;
+    private Action action;
 
     public String getLocation() {
         return location;
@@ -13,19 +16,19 @@ class XmlRule {
         this.location = location;
     }
 
-    public XmlCertificate getCertificate() {
+    public Certificate getCertificate() {
         return certificate;
     }
 
-    public void setCertificate(final XmlCertificate certificate) {
+    public void setCertificate(final Certificate certificate) {
         this.certificate = certificate;
     }
 
-    public XmlAction getAction() {
+    public Action getAction() {
         return action;
     }
 
-    public void setAction(final XmlAction action) {
+    public void setAction(final Action action) {
         this.action = action;
     }
 }

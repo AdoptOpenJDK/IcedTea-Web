@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.xmlparser.ParserType.MALFORMED;
 
-class DeploymentRulesSetFile {
+class RulesetJarFile {
 
     private static final String RULESET_XML = "ruleset.xml";
     private static final String RUN = "run";
 
     private final String rulesetPath;
 
-    public DeploymentRulesSetFile(String rulesetPath) {
+    public RulesetJarFile(String rulesetPath) {
         this.rulesetPath = rulesetPath;
     }
 
@@ -36,11 +36,11 @@ class DeploymentRulesSetFile {
         if (rulesetJarFile.exists()) {
             final String content = getRulesetXmlContent(rulesetJarFile);
             final XmlNode root = parseXml(content);
-            final List<XmlRule> rules = extractRules(root);
+            final List<Rule> rules = extractRules(root);
 
             return rules.stream()
                     .filter(rule -> Objects.equals(rule.getAction().getPermission(), RUN))
-                    .map(XmlRule::getLocation)
+                    .map(Rule::getLocation)
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
@@ -72,9 +72,9 @@ class DeploymentRulesSetFile {
         }
     }
 
-    private List<XmlRule> extractRules(XmlNode root) throws ParseException {
+    private List<Rule> extractRules(XmlNode root) throws ParseException {
         try {
-            return new DeploymentRuleSetParser().getRules(root);
+            return new RulesetParser().getRules(root);
         } catch (ParseException e) {
             throw new ParseException("Could not initialize the DeploymentRuleSetParser" + e.getMessage());
         }

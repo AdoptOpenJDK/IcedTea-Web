@@ -28,7 +28,7 @@ public class UrlDeploymentRulesSetUtils {
     private static List<String> loadDeploymentRuleSetLinksFromConfiguration() {
         try {
             final String rulesetPath = JNLPRuntime.getConfiguration().getProperty(KEY_DEPLOYMENT_RULE_SET);
-            final DeploymentRulesSetFile rulesSetFile = new DeploymentRulesSetFile(rulesetPath);
+            final RulesetJarFile rulesSetFile = new RulesetJarFile(rulesetPath);
             return rulesSetFile.parseDeploymentRuleSet();
         } catch (ParseException e) {
             LOG.error("Please Check config property " + KEY_DEPLOYMENT_RULE_SET + ". This should point to a valid DeploymentRuleSet jar file: ", e);

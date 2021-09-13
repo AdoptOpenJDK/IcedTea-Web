@@ -5,7 +5,7 @@ package net.sourceforge.jnlp.deploymentrules;
  * Stores the attributes value from id tag permission and version.
  * If permission is run, then location which is the url whitelisted is permitted to be accessible.
  */
-class XmlAction {
+class Action {
 
     private String permission;
     private String version;

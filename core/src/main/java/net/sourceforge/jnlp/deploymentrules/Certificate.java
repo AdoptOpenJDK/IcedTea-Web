@@ -6,7 +6,7 @@ package net.sourceforge.jnlp.deploymentrules;
  * This is class is rarely used yet and can be extended when a
  * UI component to display the entire ruleset.xml file and edit it will be enhanced
  */
-class XmlCertificate {
+class Certificate {
 
     private String hash;
 
