@@ -115,10 +115,6 @@ class CacheImpl {
                 .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, key));
     }
 
-    void invalidateExistingCacheFile(final CacheKey key) {
-        cacheIndex.runSynchronized(idx -> idx.removeEntry(key));
-    }
-
     private CacheIndexEntry createNewInfoFileAndIndexEntry(CacheIndex idx, CacheKey key) {
         final File dir = makeNewCacheDir();
         final String entryId = entryIdFromCacheDir(dir);
@@ -286,6 +282,10 @@ class CacheImpl {
     private CacheFileInfoImpl createPaneObjectArray(CacheIndexEntry entry) {
         final CachedFile infoFile = getInfoFile(entry);
         return new CacheFileInfoImpl(infoFile, entry);
+    }
+
+    void invalidateExistingCacheFile(final CacheKey key) {
+        cacheIndex.runSynchronized(idx -> idx.removeEntry(key));
     }
 
     void deleteFromCache(CacheKey key) {
