@@ -72,12 +72,12 @@ interface StreamUnpacker {
 
     static StreamUnpacker getContentUnpacker(final DownloadDetails downloadDetails, final URL resourceHref) {
         if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(JAR_DIFF_MIME_TYPE)) {
-            final Map<String, String> querryParams = Optional.ofNullable(downloadDetails.downloadFrom.getQuery())
+            final Map<String, String> queryParams = Optional.ofNullable(downloadDetails.downloadFrom.getQuery())
                     .map(query -> Stream.of(query.split(Pattern.quote("&"))))
                     .map(stream -> stream.collect(Collectors.toMap(e -> e.split("=")[0], e -> e.split("=")[1])))
                     .orElseGet(Collections::emptyMap);
 
-            final VersionId currentVersionId = Optional.ofNullable(querryParams.get(CURRENT_VERSION_ID_QUERY_PARAM))
+            final VersionId currentVersionId = Optional.ofNullable(queryParams.get(CURRENT_VERSION_ID_QUERY_PARAM))
                     .map(VersionId::fromString)
                     .orElseThrow(() -> new IllegalArgumentException("Mime-Type " + JAR_DIFF_MIME_TYPE + " for non incremental request to " + downloadDetails.downloadFrom));
 
