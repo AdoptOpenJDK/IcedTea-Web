@@ -35,14 +35,14 @@ public class Cache {
      * @return true if the cache could and was cleared
      */
     public static boolean clearCache() {
-        return LeastRecentlyUsedCache.getInstance().clearCache();
+        return CacheImpl.getInstance().clearCache();
     }
 
     /**
      * This will remove all old cache items.
      */
     public static void cleanCache() {
-        LeastRecentlyUsedCache.getInstance().cleanCache();
+        CacheImpl.getInstance().cleanCache();
     }
 
     /**
@@ -61,12 +61,12 @@ public class Cache {
     }
     private static File getOrCreateCacheFile(final CacheKey key) {
         assertLocationIsCacheable(key.getLocation());
-        return LeastRecentlyUsedCache.getInstance().getOrCreateCacheFile(key);
+        return CacheImpl.getInstance().getOrCreateCacheFile(key);
     }
 
     public static File addToCache(DownloadInfo infoFromRemote, InputStream unpackedStream) throws IOException {
         assertLocationIsCacheable(infoFromRemote.getCacheKey().getLocation());
-        return LeastRecentlyUsedCache.getInstance().addToCache(infoFromRemote, unpackedStream);
+        return CacheImpl.getInstance().addToCache(infoFromRemote, unpackedStream);
     }
 
     /**
@@ -81,16 +81,16 @@ public class Cache {
     }
     private static void invalidateExistingCacheFile(final CacheKey key) {
         assertLocationIsCacheable(key.getLocation());
-        LeastRecentlyUsedCache.getInstance().invalidateExistingCacheFile(key);
+        CacheImpl.getInstance().invalidateExistingCacheFile(key);
     }
 
     public static void deleteFromCache(ResourceInfo info) {
-        LeastRecentlyUsedCache.getInstance().deleteFromCache(info.getCacheKey());
+        CacheImpl.getInstance().deleteFromCache(info.getCacheKey());
     }
 
     public static void deleteFromCache(URL resource, VersionString version) {
         assertLocationIsCacheable(resource);
-        LeastRecentlyUsedCache.getInstance().deleteFromCache(resource, version);
+        CacheImpl.getInstance().deleteFromCache(resource, version);
     }
 
     /**
@@ -107,7 +107,7 @@ public class Cache {
     }
     private static boolean isCached(final CacheKey key) {
         assertLocationIsCacheable(key.getLocation());
-        return LeastRecentlyUsedCache.getInstance().isCached(key);
+        return CacheImpl.getInstance().isCached(key);
     }
 
     public static ResourceInfo getInfo(final URL resource, final VersionId version) {
@@ -115,7 +115,7 @@ public class Cache {
     }
     public static ResourceInfo getInfo(final CacheKey key) {
         assertLocationIsCacheable(key.getLocation());
-        return LeastRecentlyUsedCache.getInstance().getResourceInfo(key).orElse(null);
+        return CacheImpl.getInstance().getResourceInfo(key).orElse(null);
     }
 
     /**
@@ -129,20 +129,20 @@ public class Cache {
      */
     public static boolean isAnyCached(final URL resource, final VersionString version) {
         assertLocationIsCacheable(resource);
-        return LeastRecentlyUsedCache.getInstance().getBestMatchingEntryInCache(resource, version).isPresent();
+        return CacheImpl.getInstance().getBestMatchingEntryInCache(resource, version).isPresent();
     }
 
     public static VersionId getBestMatchingVersionInCache(final URL resource, final VersionString version) {
         assertLocationIsCacheable(resource);
-        return LeastRecentlyUsedCache.getInstance().getBestMatchingEntryInCache(resource, version)
-                .map(LeastRecentlyUsedCacheEntry::getVersion)
+        return CacheImpl.getInstance().getBestMatchingEntryInCache(resource, version)
+                .map(CacheIndexEntry::getVersion)
                 .orElse(null);
     }
 
     public static List<VersionId> getAllVersionsInCache(final URL resourceHref) {
         assertLocationIsCacheable(resourceHref);
-        return LeastRecentlyUsedCache.getInstance().getAllEntriesInCache(resourceHref).stream()
-                .map(LeastRecentlyUsedCacheEntry::getVersion)
+        return CacheImpl.getInstance().getAllEntriesInCache(resourceHref).stream()
+                .map(CacheIndexEntry::getVersion)
                 .collect(Collectors.toList());
     }
 
@@ -162,7 +162,7 @@ public class Cache {
     }
     private static boolean isUpToDate(final CacheKey key, long lastModified) {
         assertLocationIsCacheable(key.getLocation());
-        return LeastRecentlyUsedCache.getInstance().isUpToDate(key, lastModified);
+        return CacheImpl.getInstance().isUpToDate(key, lastModified);
     }
 
     private static void assertLocationIsCacheable(URL location) {
@@ -179,14 +179,14 @@ public class Cache {
      * This method load all known IDs of applications
      */
     public static List<CacheIdInfo> getJnlpCacheIds() {
-        return LeastRecentlyUsedCache.getInstance().getCacheIds(".*", true, false);
+        return CacheImpl.getInstance().getCacheIds(".*", true, false);
     }
 
     /**
      * This method load all known IDs of applications
      */
     public static List<CacheIdInfo> getDomainCacheIds() {
-        return LeastRecentlyUsedCache.getInstance().getCacheIds(".*", false, true);
+        return CacheImpl.getInstance().getCacheIds(".*", false, true);
     }
 
     /**
@@ -195,15 +195,15 @@ public class Cache {
      * @param filter - regex to filter keys
      */
     public static List<CacheIdInfo> getCacheIds(final String filter) {
-        return LeastRecentlyUsedCache.getInstance().getCacheIds(filter, true, true);
+        return CacheImpl.getInstance().getCacheIds(filter, true, true);
     }
 
     public static void deleteFromCache(final String cacheId) {
-        LeastRecentlyUsedCache.getInstance().deleteFromCache(CacheIdInfoImpl.domainId(cacheId));
-        LeastRecentlyUsedCache.getInstance().deleteFromCache(CacheIdInfoImpl.jnlpPathId(cacheId));
+        CacheImpl.getInstance().deleteFromCache(CacheIdInfoImpl.domainId(cacheId));
+        CacheImpl.getInstance().deleteFromCache(CacheIdInfoImpl.jnlpPathId(cacheId));
     }
 
     public static void deleteFromCache(final CacheIdInfo cacheId) {
-        LeastRecentlyUsedCache.getInstance().deleteFromCache(cacheId);
+        CacheImpl.getInstance().deleteFromCache(cacheId);
     }
 }

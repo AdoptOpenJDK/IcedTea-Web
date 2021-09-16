@@ -18,14 +18,12 @@ package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.StringUtils;
-import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.PropertiesFile;
 
 import java.io.File;
-import java.net.URL;
 
 import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
 
@@ -35,9 +33,9 @@ import static net.adoptopenjdk.icedteaweb.i18n.Translator.R;
  * @author <a href="mailto:jmaxwell@users.sourceforge.net">Jon A. Maxwell (JAM)</a> - initial author
  * @version $Revision: 1.10 $
  */
-class CacheEntry implements ResourceInfo {
+class CachedFile implements ResourceInfo {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CacheEntry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CachedFile.class);
 
     static final String INFO_SUFFIX = ".info";
 
@@ -54,11 +52,11 @@ class CacheEntry implements ResourceInfo {
     /** info about the cached file */
     private final PropertiesFile properties;
 
-    CacheEntry(LeastRecentlyUsedCacheEntry lruEntry, File cacheFile, File infoFile) {
+    CachedFile(CacheIndexEntry lruEntry, File cacheFile, File infoFile) {
         this(lruEntry.getCacheKey(), cacheFile, infoFile);
     }
 
-    CacheEntry(CacheKey key, File cacheFile, File infoFile) {
+    CachedFile(CacheKey key, File cacheFile, File infoFile) {
         this.key = key;
         this.cacheFile = cacheFile;
         this.properties = new PropertiesFile(infoFile, R("CAutoGen"));

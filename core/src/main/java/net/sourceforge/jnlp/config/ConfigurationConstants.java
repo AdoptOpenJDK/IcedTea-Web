@@ -270,7 +270,8 @@ public interface ConfigurationConstants {
 
     String VV_POSSIBLE_BROWSER_VALUES = "VVPossibleBrowserValues";
     String ICEDTEA_SO = "IcedTeaPlugin.so";
-    String CACHE_INDEX_FILE_NAME = "recently_used";
+    String CACHE_INDEX_FILE_NAME = "recently_used.cache";
+    String OLD_CACHE_INDEX_FILE_NAME = "recently_used";
     String WINDIR = "WINDIR";
     String SECURITY_WORD = "security";
     String DEPLOYMENT_SUBDIR_DIR = "icedtea-web";
