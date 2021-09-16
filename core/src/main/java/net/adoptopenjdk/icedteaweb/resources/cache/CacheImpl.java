@@ -103,23 +103,46 @@ class CacheImpl {
         this.rootCacheDir = cacheDir;
     }
 
-    File getOrCreateCacheFile(CacheKey key) {
+    File getCacheFile(CacheKey key) {
         final CacheIndexEntry entry = cacheIndex.getSynchronized(idx ->
-                getOrCreateCacheEntry(idx, key)
+                getCacheEntry(idx, key)
         );
         return getCacheFile(entry);
     }
 
-    private CacheIndexEntry getOrCreateCacheEntry(CacheIndex idx, CacheKey key) {
+    private CacheIndexEntry getCacheEntry(CacheIndex idx, CacheKey key) {
         return idx.findAndMarkAsAccessed(key)
-                .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, key));
+                .orElseThrow(() -> new RuntimeException("Could not find entry for " + key));
     }
 
-    private CacheIndexEntry createNewInfoFileAndIndexEntry(CacheIndex idx, CacheKey key) {
+    File addToCache(DownloadInfo info, InputStream inputStream) throws IOException {
+        final List<IOException> ex = new ArrayList<>();
+
+        final CacheIndexEntry entry = cacheIndex.getSynchronized(idx -> createCacheEntry(idx, info.getCacheKey()));
+
+        final CachedFile infoFile = getInfoFile(entry);
+        final File cacheFile = infoFile.getCacheFile();
+        try {
+            LOG.debug("Downloading file: {} into: {}", info.getCacheKey().getLocation(), cacheFile.getCanonicalPath());
+            try (final OutputStream out = new FileOutputStream(cacheFile)) {
+                IOUtils.copy(inputStream, out);
+            }
+            infoFile.storeInfo(info.getDownloadedAt(), info.getLastModified(), cacheFile.length());
+        } catch (IOException e) {
+            ex.add(e);
+        }
+
+        if (!ex.isEmpty()) {
+            throw ex.get(0);
+        }
+
+        return cacheFile;
+    }
+
+    private CacheIndexEntry createCacheEntry(CacheIndex idx, CacheKey key) {
         final File dir = makeNewCacheDir();
-        final String entryId = entryIdFromCacheDir(dir);
         createInfoFile(dir);
-        return idx.createEntry(key, entryId);
+        return idx.createEntry(key, entryIdFromCacheDir(dir));
     }
 
     private File makeNewCacheDir() {
@@ -155,32 +178,6 @@ class CacheImpl {
         } catch (IOException e) {
             throw new RuntimeException("Failed to create info file in dir " + dir, e);
         }
-    }
-
-    File addToCache(DownloadInfo info, InputStream inputStream) throws IOException {
-        final List<IOException> ex = new ArrayList<>();
-
-        final CacheIndexEntry entry = cacheIndex.getSynchronized(idx ->
-                getOrCreateCacheEntry(idx, info.getCacheKey())
-        );
-
-        final CachedFile infoFile = getInfoFile(entry);
-        final File cacheFile = infoFile.getCacheFile();
-        try {
-            LOG.debug("Downloading file: {} into: {}", info.getCacheKey().getLocation(), cacheFile.getCanonicalPath());
-            try (final OutputStream out = new FileOutputStream(cacheFile)) {
-                IOUtils.copy(inputStream, out);
-            }
-            infoFile.storeInfo(info.getDownloadedAt(), info.getLastModified(), cacheFile.length());
-        } catch (IOException e) {
-            ex.add(e);
-        }
-
-        if (!ex.isEmpty()) {
-            throw ex.get(0);
-        }
-
-        return cacheFile;
     }
 
     Optional<CachedFile> getResourceInfo(CacheKey key) {
