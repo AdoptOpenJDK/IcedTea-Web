@@ -113,7 +113,7 @@ public class Cache {
     public static ResourceInfo getInfo(final URL resource, final VersionId version) {
         return getInfo(new CacheKey(resource, version));
     }
-    public static ResourceInfo getInfo(final CacheKey key) {
+    private static ResourceInfo getInfo(final CacheKey key) {
         assertLocationIsCacheable(key.getLocation());
         return CacheImpl.getInstance().getResourceInfo(key).orElse(null);
     }

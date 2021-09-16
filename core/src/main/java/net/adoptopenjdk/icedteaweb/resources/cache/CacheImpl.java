@@ -212,8 +212,8 @@ class CacheImpl {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isUpToDate(CacheKey key, long lastModified) {
-        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(key))
-                .map(e -> getInfoFile(e).isCurrent(lastModified))
+        final Boolean isUpToDate = getResourceInfo(key)
+                .map(cachedFile -> cachedFile.isCurrent(lastModified))
                 .orElse(false);
         LOG.info("isUpToDate: {} = {}", key, isUpToDate);
         return isUpToDate;
