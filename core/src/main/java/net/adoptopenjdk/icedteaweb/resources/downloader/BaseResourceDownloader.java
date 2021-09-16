@@ -188,7 +188,6 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
             final DownloadInfo downloadInfo = new DownloadInfo(resourceHref, version, downloadDetails.lastModified);
             final File cacheFile = Cache.addToCache(downloadInfo, unpackedContent);
-            resource.setLocalFile(cacheFile);
 
             final long expectedBytes = downloadDetails.totalSize;
             final long actualBytes = countingInputStream.numBytesRead();
@@ -199,6 +198,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 throw new IOException(String.format("Did read %d bytes from server but expected %d", actualBytes, expectedBytes));
             }
 
+            resource.setLocalFile(cacheFile);
             return actualBytes;
         }
     }
