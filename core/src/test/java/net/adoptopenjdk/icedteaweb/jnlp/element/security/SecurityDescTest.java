@@ -1,4 +1,4 @@
-/* 
+/*
 Copyright (C) 2012 Red Hat, Inc.
 
 This file is part of IcedTea.
@@ -154,6 +154,13 @@ public class SecurityDescTest {
     public void testGetHostWithFtpScheme() throws Exception {
         final URI codebase = new URI("ftp://example.com");
         final URI expected = new URI("ftp://example.com");
+        assertEquals(expected, SecurityDesc.getHost(codebase));
+    }
+
+    @Test
+    public void testGetHostWithWindowsFileScheme() throws Exception {
+        final URI codebase = new URI("file://C:/temp/RTA_installer_offline/scripts/RTA/jar/RTA.jnlp");
+        final URI expected = new URI("file://C");
         assertEquals(expected, SecurityDesc.getHost(codebase));
     }
 

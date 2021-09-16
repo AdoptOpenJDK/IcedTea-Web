@@ -1892,9 +1892,7 @@ public class JNLPClassLoader extends URLClassLoader {
         }
 
         // native search paths
-        for (File nativeDirectory : extLoader.nativeLibraryStorage.getSearchDirectories()) {
-            nativeLibraryStorage.addSearchDirectory(nativeDirectory);
-        }
+        nativeLibraryStorage.addSearchDirectories(extLoader.nativeLibraryStorage.getSearchDirectories());
 
         // security descriptors
         synchronized (jarLocationSecurityMap) {

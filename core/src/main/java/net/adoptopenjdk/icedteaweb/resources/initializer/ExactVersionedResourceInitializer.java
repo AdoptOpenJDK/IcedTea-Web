@@ -32,12 +32,14 @@ class ExactVersionedResourceInitializer extends BaseResourceInitializer {
     @Override
     public InitializationResult init() {
         if (!Cache.isCached(resource.getLocation(), versionId)) {
-            if (resource.forceUpdateRequested()) {
-                invalidateExistingEntryInCache(versionId);
-            } else {
-                return findDownloadUrl();
-            }
+            return findDownloadUrl();
         }
+
+        if (resource.forceUpdateRequested()) {
+            invalidateExistingEntryInCache(versionId);
+            return findDownloadUrl();
+        }
+
         return initFromCache(versionId);
     }
 

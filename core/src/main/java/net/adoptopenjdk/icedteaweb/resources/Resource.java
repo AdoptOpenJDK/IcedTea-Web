@@ -34,7 +34,6 @@ import java.util.concurrent.Future;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.INCOMPLETE;
-import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.validateWithApplicationWhiteList;
 
 /**
  * <p>
@@ -287,8 +286,6 @@ public class Resource {
     }
 
     Future<Resource> putIntoCache(final Executor downloadExecutor) {
-        validateWithApplicationWhiteList(location);
-
         synchronized (this) {
             if (futureForDownloaded == null) {
                 this.futureForDownloaded = ResourceHandler.putIntoCache(this, downloadExecutor);

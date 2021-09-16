@@ -25,7 +25,6 @@ import java.io.FileOutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
@@ -35,7 +34,6 @@ import java.util.zip.GZIPOutputStream;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
-import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.validateWithApplicationWhiteList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
