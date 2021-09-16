@@ -220,12 +220,6 @@ class CacheImpl {
     }
 
     Optional<CacheIndexEntry> getBestMatchingEntryInCache(final URL resourceHref, final VersionString version) {
-        return getAllMatchingEntryInCache(resourceHref, version).stream()
-                .filter(entry -> getInfoFile(entry).isCached())
-                .findFirst();
-    }
-
-    private List<CacheIndexEntry> getAllMatchingEntryInCache(final URL resourceHref, final VersionString version) {
         final List<CacheIndexEntry> all = new ArrayList<>(cacheIndex.getSynchronized(idx -> idx.findAllEntries(resourceHref, version)));
 
         if (all.size() > 1) {
@@ -234,19 +228,22 @@ class CacheImpl {
             all.sort(versionComparator);
         }
 
-        return all;
+        return all.stream()
+                .filter(entry -> getInfoFile(entry).isCached())
+                .findFirst();
     }
 
     List<CacheIndexEntry> getAllEntriesInCache(final URL resourceHref) {
-        final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion);
-        return cacheIndex.getSynchronized(idx -> {
-            final Set<CacheIndexEntry> allSet = idx.findAllEntries(resourceHref);
+        final List<CacheIndexEntry> all = new ArrayList<>(cacheIndex.getSynchronized(idx -> idx.findAllEntries(resourceHref)));
 
-            return allSet.stream()
-                    .filter(entry -> getInfoFile(entry).isCached())
-                    .sorted(versionComparator)
-                    .collect(Collectors.toList());
-        });
+        if (all.size() > 1) {
+            final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion);
+            all.sort(versionComparator);
+        }
+
+        return all.stream()
+                .filter(entry -> getInfoFile(entry).isCached())
+                .collect(Collectors.toList());
     }
 
     List<CacheIdInfo> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
