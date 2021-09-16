@@ -383,8 +383,7 @@ public class ResourceTracker {
             return;
         }
 
-        final int configuredThreadCount = Integer.parseInt(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT));
-        final int threadCount = Math.min(configuredThreadCount, resources.length);
+        final int threadCount = Math.min(getConfiguredThreadCount(), resources.length);
         final ExecutorService downloadExecutor = createFixedDaemonThreadPool(threadCount);
         try {
             final List<Future<Resource>> futures = Arrays.asList(resources).stream()
@@ -399,6 +398,15 @@ public class ResourceTracker {
         } finally {
             LOG.debug("Download done. Shutting down executor");
             downloadExecutor.shutdownNow();
+        }
+    }
+
+    private int getConfiguredThreadCount() {
+        try {
+            final String configValue = JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT);
+            return Integer.parseInt(configValue);
+        } catch (Exception e) {
+            return ConfigurationConstants.DEFAULT_PARALLEL_RESOURCE_DOWNLOAD_COUNT;
         }
     }
 

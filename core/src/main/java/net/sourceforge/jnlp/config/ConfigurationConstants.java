@@ -132,6 +132,7 @@ public interface ConfigurationConstants {
     String KEY_SECURITY_PROMPT_USER_FOR_JNLP = "deployment.security.sandbox.jnlp.enhanced";
 
     String KEY_PARALLEL_RESOURCE_DOWNLOAD_COUNT = "deployment.cache.parallelDownloadCount";
+    int DEFAULT_PARALLEL_RESOURCE_DOWNLOAD_COUNT = 6;
 
     /**
      * Boolean. Only install the custom authenticator if true
