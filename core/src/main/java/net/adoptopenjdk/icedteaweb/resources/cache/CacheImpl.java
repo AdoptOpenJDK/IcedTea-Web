@@ -224,21 +224,21 @@ class CacheImpl {
     }
 
     Optional<CacheIndexEntry> getBestMatchingEntryInCache(final URL resourceHref, final VersionString version) {
-        final Comparator<VersionId> versionIdComparator = version != null ? new VersionIdComparator(version) : VersionId::compareTo;
-        final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion, versionIdComparator);
-        return cacheIndex.getSynchronized(idx -> {
-            final Set<CacheIndexEntry> allSet = idx.findAllEntries(resourceHref, version);
-            final List<CacheIndexEntry> all = new ArrayList<>(allSet);
+        return getAllMatchingEntryInCache(resourceHref, version).stream()
+                .filter(entry -> getInfoFile(entry).isCached())
+                .findFirst();
+    }
+
+    private List<CacheIndexEntry> getAllMatchingEntryInCache(final URL resourceHref, final VersionString version) {
+        final List<CacheIndexEntry> all = new ArrayList<>(cacheIndex.getSynchronized(idx -> idx.findAllEntries(resourceHref, version)));
+
+        if (all.size() > 1) {
+            final Comparator<VersionId> versionIdComparator = version != null ? new VersionIdComparator(version) : VersionId::compareTo;
+            final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion, versionIdComparator);
             all.sort(versionComparator);
+        }
 
-            for (final CacheIndexEntry entry : all) {
-                if (getInfoFile(entry).isCached()) {
-                    return Optional.of(entry);
-                }
-            }
-
-            return Optional.empty();
-        });
+        return all;
     }
 
     List<CacheIndexEntry> getAllEntriesInCache(final URL resourceHref) {
