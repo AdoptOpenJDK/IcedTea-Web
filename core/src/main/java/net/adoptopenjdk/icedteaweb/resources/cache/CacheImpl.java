@@ -405,6 +405,8 @@ class CacheImpl {
      * This will remove all old cache items.
      */
     void cleanCache() {
+        LOG.debug("preparing to cleanup the cache");
+
         if (cannotClearCache()) {
             return;
         }

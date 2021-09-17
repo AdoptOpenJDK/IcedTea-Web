@@ -128,7 +128,7 @@ class CachedFile implements ResourceInfo {
         try {
             long cachedModified = getLastModified();
             final boolean isCurrent = lastModified > 0 && lastModified <= cachedModified;
-            LOG.debug("{}: lastModified cache:{} actual:{} -> {}", key, cachedModified, lastModified, isCurrent);
+            LOG.debug("{}: lastModified cache:{} actual:{} -> isCurrent = {}", key, cachedModified, lastModified, isCurrent);
             return isCurrent;
         } catch (Exception ex){
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
