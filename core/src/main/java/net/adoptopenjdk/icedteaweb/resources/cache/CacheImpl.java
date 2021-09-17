@@ -107,6 +107,11 @@ class CacheImpl {
         final CacheIndexEntry entry = cacheIndex.getSynchronized(idx ->
                 getCacheEntry(idx, key)
         );
+
+        if (!getInfoFile(entry).isCached()) {
+            throw new RuntimeException("Accessing incomplete file " + key);
+        }
+
         return getCacheFile(entry);
     }
 
@@ -182,7 +187,8 @@ class CacheImpl {
 
     Optional<CachedFile> getResourceInfo(CacheKey key) {
         return cacheIndex.getSynchronized(idx -> idx.findEntry(key))
-                .map(this::getInfoFile);
+                .map(this::getInfoFile)
+                .filter(CachedFile::isCached);
     }
 
     /**
@@ -193,9 +199,7 @@ class CacheImpl {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isCached(CacheKey key) {
-        final boolean isCached = getResourceInfo(key)
-                .map(CachedFile::isCached)
-                .orElse(false);
+        final boolean isCached = getResourceInfo(key).isPresent();
         LOG.info("isCached: {} = {}", key, isCached);
         return isCached;
     }
