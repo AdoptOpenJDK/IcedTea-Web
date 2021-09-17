@@ -409,6 +409,7 @@ class LeastRecentlyUsedCache {
             return;
         }
 
+        LOG.debug("cleanup cache");
         final File[] levelOneDirs = rootCacheDir.getFile().listFiles(File::isDirectory);
         if (isNullOrEmpty(levelOneDirs)) {
             LOG.debug("found no folders in the cache dir - clear cache index");

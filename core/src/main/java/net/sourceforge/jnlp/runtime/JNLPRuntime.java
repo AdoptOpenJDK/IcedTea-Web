@@ -837,12 +837,14 @@ public class JNLPRuntime {
             return;
         }
         try {
+            LOG.debug("Releasing shared lock on {}", PathsAndFiles.MAIN_LOCK.getFile().getAbsolutePath());
             fileLock.release();
+            LOG.debug("Closing channel");
             fileLock.channel().close();
             fileLock = null;
-            LOG.debug("Release shared lock on {}", PathsAndFiles.MAIN_LOCK.getFullPath());
-        } catch (IOException e) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            LOG.debug("Releasing done");
+        } catch (Exception e) {
+            LOG.error("Exception while releasing file lock in ", e);
         }
     }
 

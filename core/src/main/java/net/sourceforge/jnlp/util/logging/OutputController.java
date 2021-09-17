@@ -38,6 +38,7 @@ import net.adoptopenjdk.icedteaweb.os.OsUtil;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
+import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
 import net.sourceforge.jnlp.util.logging.headers.MessageWithHeader;
 
 import java.io.File;
@@ -50,6 +51,7 @@ import java.util.List;
 
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.DEBUG;
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.ERROR;
+import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.INFO;
 import static net.sourceforge.jnlp.util.logging.OutputControllerLevel.WARN;
 
 /**
@@ -62,8 +64,9 @@ public class OutputController implements BasicOutputController {
     private final List<MessageWithHeader> messageQue = new LinkedList<>();
     //itw logger have to be fully initialised before start
     private final Thread consumerThread = new Thread(new MessageQueConsumer(), "Output controller consumer daemon");
-    private final Thread shutdownThread = new Thread(this::flush);
+    private final Thread shutdownThread = new Thread(this::shutdownLogging);
     private boolean javaConsoleInitialized;
+    private long pollingInterval = 1000;
 
     //bounded to instance
     private class MessageQueConsumer implements Runnable {
@@ -76,7 +79,7 @@ public class OutputController implements BasicOutputController {
                         if (!messageQue.isEmpty()) {
                             flush();
                         }
-                        OutputController.this.wait(1000);
+                        OutputController.this.wait(pollingInterval);
                     }
 
                 } catch (Throwable t) {
@@ -92,6 +95,13 @@ public class OutputController implements BasicOutputController {
                 }
             }
         }
+    }
+
+    private synchronized void shutdownLogging() {
+        pollingInterval = 100;
+        final Header header = new Header(INFO, this.getClass().getName());
+        final MessageWithHeader message = new JavaMessage(header, "Increase polling interval for shutdown phase", null);
+        log(message);
     }
 
     public synchronized void flush() {
