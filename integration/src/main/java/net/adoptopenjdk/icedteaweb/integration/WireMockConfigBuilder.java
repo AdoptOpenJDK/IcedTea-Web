@@ -217,7 +217,7 @@ public class WireMockConfigBuilder implements
             );
             wireMock.stubFor(get(urlEqualTo("/" + jnlpFileName))
                     .willReturn(getResponse(wireMock.port(), testClass)
-                            .withHeaders(new HttpHeaders(headRequest.headers))
+                            .withHeaders(new HttpHeaders(getRequest.headers))
                     )
             );
         }
@@ -250,7 +250,7 @@ public class WireMockConfigBuilder implements
             );
             wireMock.stubFor(get(urlEqualTo("/" + jnlpFileName))
                     .willReturn(getResponse(wireMock.port(), testClass)
-                            .withHeaders(new HttpHeaders(headRequest.headers))
+                            .withHeaders(new HttpHeaders(getRequest.headers))
                     )
             );
         }
@@ -298,7 +298,7 @@ public class WireMockConfigBuilder implements
                 wireMock.stubFor(get(urlEqualTo("/resources/" + resourceFileName))
                         .withQueryParam(CURRENT_VERSION_ID_QUERY_PARAM, equalTo(requestedVersion.toString()))
                         .willReturn(getResponse
-                                .withHeaders(new HttpHeaders(headRequest.headers))
+                                .withHeaders(new HttpHeaders(getRequest.headers))
                         )
                 );
             }
@@ -307,7 +307,7 @@ public class WireMockConfigBuilder implements
                     .willReturn(headResponse.withHeaders(new HttpHeaders(headRequest.headers)))
             );
             wireMock.stubFor(get(urlEqualTo("/resources/" + resourceFileName))
-                    .willReturn(getResponse.withHeaders(new HttpHeaders(headRequest.headers)))
+                    .willReturn(getResponse.withHeaders(new HttpHeaders(getRequest.headers)))
             );
         }
 
