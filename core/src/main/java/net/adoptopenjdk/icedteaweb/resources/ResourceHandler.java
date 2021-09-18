@@ -9,6 +9,8 @@ import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
+import net.sourceforge.jnlp.deploymentrules.UrlDeploymentRulesSetUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -19,6 +21,7 @@ import java.util.concurrent.Future;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.sourceforge.jnlp.cache.CacheUtil.isNonCacheable;
+import static net.sourceforge.jnlp.deploymentrules.UrlDeploymentRulesSetUtils.isUrlInDeploymentRuleSet;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.getApplicationUrlWhiteList;
@@ -89,10 +92,12 @@ class ResourceHandler {
     }
 
     private static void validateWithWhitelist(URL url) {
-        // Validate with whitelist specified in deployment.properties. localhost is considered valid.
-        if (isUrlInWhitelist(url, getApplicationUrlWhiteList())) {
+        // Validate with whitelist specified in deployment.properties or deployment ruleset.
+        // localhost is considered valid.
+        if (isUrlInWhitelist(url, getApplicationUrlWhiteList()) || isUrlInDeploymentRuleSet(url)) {
             return;
         }
+
         BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
         LOG.error("Resource URL not In Whitelist: {}", url);
         JNLPRuntime.exit(-1);
