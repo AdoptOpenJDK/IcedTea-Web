@@ -110,6 +110,15 @@ public interface ConfigurationConstants {
     String KEY_SECURITY_EXPIRED_WARNING = "deployment.security.expired.warning";
 
     String KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING = "deployment.security.jsse.hostmismatch.warning";
+    
+    
+    /**
+     * Properties to manage to access Windows key stores
+     */
+    String KEY_SECURITY_USE_ROOTCA_STORE_TYPE_WINDOWS_ROOT = "deployment.security.use.rootca.store.type.windowsRoot";
+    
+    String KEY_SECURITY_USE_ROOTCA_STORE_TYPE_WINDOWS_MY = "deployment.security.use.rootca.store.type.windowsMy";        
+    
 
     /**
      * Boolean. Only show security prompts to user if true

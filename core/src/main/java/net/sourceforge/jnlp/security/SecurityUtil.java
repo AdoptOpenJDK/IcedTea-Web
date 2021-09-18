@@ -34,14 +34,10 @@ statement from your version.
 
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
-import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.security.KeyStores.Level;
-import net.sourceforge.jnlp.security.KeyStores.Type;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE_PASSWORD;
+import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE_TYPE;
 
-import javax.net.ssl.KeyManagerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,9 +50,15 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
-import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE;
-import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE_PASSWORD;
-import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.SSL_TRUST_STORE_TYPE;
+import javax.net.ssl.KeyManagerFactory;
+
+import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.security.KeyStores.Level;
+import net.sourceforge.jnlp.security.KeyStores.Type;
+import net.sourceforge.jnlp.security.windows.WindowsKeyStoresManager;
 
 public class SecurityUtil {
 
@@ -353,8 +355,14 @@ public class SecurityUtil {
     }
 
     public static void loadKeyStore(KeyStore ks, File f) throws IOException, NoSuchAlgorithmException, CertificateException {
-        try {
-            LOG.debug("Loading Keystore {}", f != null ? f.toString() : "Unknown");
+        try {       	
+        	if(WindowsKeyStoresManager.isWindowsStore(ks)) {
+        		LOG.debug("Loading Keystore {}", ks.getType());
+        	}
+        	else {        	
+        		LOG.debug("Loading Keystore {}", f != null ? f.toString() : "Unknown");
+        	}
+
             KeystorePasswordAttempter.INSTANCE.unlockKeystore(
                     new KeystorePasswordAttempter.KeystoreOperation(ks, f) {
 

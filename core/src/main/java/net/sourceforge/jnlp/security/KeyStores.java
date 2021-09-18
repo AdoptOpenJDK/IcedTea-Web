@@ -33,13 +33,6 @@ statement from your version.
 */
 package net.sourceforge.jnlp.security;
 
-import net.adoptopenjdk.icedteaweb.i18n.Translator;
-import net.adoptopenjdk.icedteaweb.logging.Logger;
-import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.config.PathsAndFiles;
-import net.sourceforge.jnlp.util.RestrictedFileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.security.AllPermission;
@@ -53,6 +46,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
+import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.security.windows.WindowsKeyStoresManager;
+import net.sourceforge.jnlp.security.windows.WindowsKeyStoresManager.WindowsKeyStoreType;
+import net.sourceforge.jnlp.util.RestrictedFileUtils;
+
 /**
  * The {@code KeyStores} class allows easily accessing the various KeyStores
  * used.
@@ -61,7 +63,24 @@ public final class KeyStores {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeyStores.class);
 
-    public static class KeyStoreWithPath {
+    public static class KeyStoreWrapContainer<T extends KeyStoreWrap>{
+    	private final T wrap;
+    	
+    	public KeyStoreWrapContainer(T t){
+    		this.wrap = t;
+    	}
+
+		public T getWrap() {
+			return wrap;
+		}
+    }
+    
+    public static interface KeyStoreWrap{
+    	public KeyStore getKs();
+    	public Family getFamily();
+    }
+    
+    public static class KeyStoreWithPath implements KeyStoreWrap {
 
         private final KeyStore ks;
         private final String path;
@@ -78,6 +97,40 @@ public final class KeyStores {
         public String getPath() {
             return path;
         }
+
+		@Override
+		public Family getFamily() {
+			return Family.JKS;
+		}
+    }
+    
+    public static class KeyStoreWindows implements KeyStoreWrap {
+
+        private final KeyStore ks;
+        private final WindowsKeyStoreType storeType;
+
+        public KeyStoreWindows(KeyStore ks, WindowsKeyStoreType storeType) {
+            this.ks = ks;
+            this.storeType = storeType;
+        }
+
+        public KeyStore getKs() {
+            return ks;
+        }
+
+        public WindowsKeyStoreType getStoreType() {
+            return storeType;
+        }
+
+		@Override
+		public Family getFamily() {
+			return Family.WINDOWS;
+		}
+    }  
+    
+    public enum Family {
+    	JKS,
+    	WINDOWS
     }
 
     /* this gets turned into user-readable strings, see toUserReadableString */
@@ -94,39 +147,62 @@ public final class KeyStores {
         CLIENT_CERTS,
     }
 
-    public static final Map<Integer, String> keystoresPaths = new HashMap<>();
+    public static final Map<Integer, String> keystoresLocations = new HashMap<>();
 
     private static final String KEYSTORE_TYPE = "JKS";
 
     /**
-     * Returns a KeyStore corresponding to the appropriate level level (user or
+     * Returns a KeyStoreWrapContainer corresponding to the appropriate level level (user or
      * system) and type.
      *
      * @param level whether the KeyStore desired is a user-level or system-level KeyStore
      * @param type  the type of KeyStore desired
      * @return a KeyStore containing certificates from the appropriate
      */
-    public static KeyStoreWithPath getKeyStore(Level level, Type type) {
+    public static KeyStoreWrapContainer<KeyStoreWrap> getWrapContainer(Level level, Type type) {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new AllPermission());
         }
 
-        final String location = getKeyStoreLocation(level, type).getFullPath();
+    	//The existence and accessibility of a Windows Key Store is checked if required by configuration
+        //Windows-ROOT	--> "deployment.security.use.rootca.store.type.windowsRoot=true"
+        //Windows-My 	--> "deployment.security.use.rootca.store.type.windowsMy=true"
+        
+        final WindowsKeyStoresManager windowsStore = WindowsKeyStoresManager.getInfo(type);
+        final String location;
+        
+        KeyStoreWrapContainer<KeyStoreWrap> keyStoreWrapContainer = null;
+        
+        if(windowsStore.isAccessible())
+        	location = windowsStore.getType().getStoreType();
+        else
+        	location = getKeyStoreLocation(level, type).getFullPath();
+
         KeyStore ks = null;
         try {
-            ks = createKeyStoreFromFile(new File(location), level == Level.USER);
+        	if(windowsStore.isAccessible()) {
+        		ks = createKeyStoreFromWindows(location);
+                keyStoreWrapContainer = new KeyStoreWrapContainer<KeyStoreWrap>(new KeyStoreWindows(ks, windowsStore.getType()));
+        		
+        	}
+        	else {
+        		ks = createKeyStoreFromFile(new File(location), level == Level.USER);
+                keyStoreWrapContainer = new KeyStoreWrapContainer<KeyStoreWrap>(new KeyStoreWithPath(ks, location));
+        		
+        	}
             //hashcode is used instead of instance so when no references are left
             //to keystore, then this will not be blocker for garbage collection
-            keystoresPaths.put(ks.hashCode(), location);
+        	keystoresLocations.put(ks.hashCode(), location);
         } catch (Exception e) {
             LOG.error("failed to get keystore " + level + " " + type + " -> " + location, e);
         }
-        return new KeyStoreWithPath(ks, location);
+        
+        return keyStoreWrapContainer;
     }
 
-    public static String getPathToKeystore(KeyStore k) {
-        final String s = keystoresPaths.get(k.hashCode());
+    public static String getLocationToKeystore(KeyStore k) {
+        final String s = keystoresLocations.get(k.hashCode());
         if (s == null) {
             return "unknown keystore location";
         }
@@ -141,24 +217,26 @@ public final class KeyStores {
      */
     public static List<KeyStore> getCertKeyStores() {
         final List<KeyStore> result = new ArrayList<>(10);
-        /* System-level JSSE certificates */
+
         KeyStore ks;
-        ks = getKeyStore(Level.SYSTEM, Type.JSSE_CERTS).getKs();
+        
+        /* System-level JSSE certificates */              
+        ks = getWrapContainer(Level.SYSTEM, Type.JSSE_CERTS).getWrap().getKs();        
         if (ks != null) {
             result.add(ks);
         }
         /* System-level certificates */
-        ks = getKeyStore(Level.SYSTEM, Type.CERTS).getKs();
+        ks = getWrapContainer(Level.SYSTEM, Type.CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level JSSE certificates */
-        ks = getKeyStore(Level.USER, Type.JSSE_CERTS).getKs();
+        ks = getWrapContainer(Level.USER, Type.JSSE_CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level certificates */
-        ks = getKeyStore(Level.USER, Type.CERTS).getKs();
+        ks = getWrapContainer(Level.USER, Type.CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -173,24 +251,25 @@ public final class KeyStores {
      */
     public static List<KeyStore> getCAKeyStores() {
         List<KeyStore> result = new ArrayList<>(10);
-        /* System-level JSSE CA certificates */
+        
         KeyStore ks;
-        ks = getKeyStore(Level.SYSTEM, Type.JSSE_CA_CERTS).getKs();
+        /* System-level JSSE CA certificates */
+        ks = getWrapContainer(Level.SYSTEM, Type.JSSE_CA_CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* System-level CA certificates */
-        ks = getKeyStore(Level.SYSTEM, Type.CA_CERTS).getKs();
+        ks = getWrapContainer(Level.SYSTEM, Type.CA_CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level JSSE CA certificates */
-        ks = getKeyStore(Level.USER, Type.JSSE_CA_CERTS).getKs();
+        ks = getWrapContainer(Level.USER, Type.JSSE_CA_CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
         /* User-level CA certificates */
-        ks = getKeyStore(Level.USER, Type.CA_CERTS).getKs();
+        ks = getWrapContainer(Level.USER, Type.CA_CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -208,12 +287,12 @@ public final class KeyStores {
         List<KeyStore> result = new ArrayList<>();
 
         KeyStore ks;
-        ks = getKeyStore(Level.SYSTEM, Type.CLIENT_CERTS).getKs();
+        ks = getWrapContainer(Level.SYSTEM, Type.CLIENT_CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
 
-        ks = getKeyStore(Level.USER, Type.CLIENT_CERTS).getKs();
+        ks = getWrapContainer(Level.USER, Type.CLIENT_CERTS).getWrap().getKs();
         if (ks != null) {
             result.add(ks);
         }
@@ -342,4 +421,18 @@ public final class KeyStores {
         }
         return ks;
     }
+    
+
+    private static KeyStore createKeyStoreFromWindows(String windowsStoreType) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
+        final KeyStore ks = KeyStore.getInstance(windowsStoreType);
+        if (ks!=null) {
+            LOG.debug("Keystore windows {} exists.", windowsStoreType);
+            SecurityUtil.loadKeyStore(ks, null);
+        } else {
+            LOG.debug("Keystore windows {} does not exists.", windowsStoreType);
+            SecurityUtil.loadKeyStore(ks, null);
+        }
+        return ks;
+    }	    
+        
 }
