@@ -26,6 +26,7 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.AccessWarningPaneComplexReturn;
 import net.sourceforge.jnlp.JNLPFile;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,8 +37,6 @@ import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.filechooser.FileSystemView;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.adoptopenjdk.icedteaweb.IcedTeaWebConstants.DOUBLE_QUOTE;
@@ -90,6 +89,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             sl.setIconLocation(iconLocation.get());
         }
         final String path = getDesktopLnkPath();
+        LOG.debug("Desktop Link Path : {}", path);
         sl.saveTo(path);
         // write shortcut path to list
         manageShortcutList(path);
@@ -210,34 +210,45 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
     }
 
     private final static String desktopPath() {
-        final char QUOT = '"';
+        final String QUOT = "\"";
         final String registryEntry = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders";
         final String desktopProperty = "Desktop";
+        final String typeName = "REG_SZ"; // type of value of Desktop property
+        final String chcp = "chcp"; // change code page
+        // Code Page Id for utf8.
+        // See https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers?redirectedfrom=MSDN
+        final String utf8PageCode = "65001";
 
-        final ProcessBuilder pb = new ProcessBuilder("reg", "query", QUOT + registryEntry + QUOT, "/v",
-                QUOT + desktopProperty + QUOT);
-
+        String[] cmds = new String[]{"cmd.exe", "/c", chcp, utf8PageCode, "&&", "reg", "query", QUOT + registryEntry + QUOT, "/v", QUOT + desktopProperty + QUOT};
+        ProcessBuilder pb = new ProcessBuilder();
+        pb.command(cmds);
+        pb.redirectErrorStream(true);
         try {
-            final Process p = pb.start();
-            p.waitFor(5, TimeUnit.SECONDS);
-            if (p.exitValue() == 0) {
-                try (final InputStream is = p.getInputStream()) {
-                    final String output = IOUtils.readContentAsUtf8String(is);
+            Process proc = pb.start();
+            proc.waitFor(5, TimeUnit.SECONDS);
+            try (final InputStream is = proc.getInputStream()) {
+                final String output = IOUtils.readContentAsUtf8String(is);
+                LOG.debug("Desktop Path Reg Query Result = \n{}", output);
+                if (proc.exitValue() == 0) {
                     if (output != null) {
-                        final String typeName = "REG_SZ";
                         final int typeIndex = output.indexOf(typeName);
                         if (typeIndex != -1) {
                             final String desktopPath = output.substring(typeIndex + typeName.length());
+                            LOG.debug("Desktop Path from Registry = {}", desktopPath);
                             if (desktopPath != null) {
                                 return desktopPath.trim();
                             }
                         }
                     }
+                } else {
+                    LOG.debug("Error in Desktop Path Reg Query : {} ", output);
                 }
             }
         } catch (final Exception e) {
-            LOG.warn("Could not retrieve path to client desktop folder from registry", e);
+            LOG.debug("Could not retrieve path to client desktop folder from registry : {}", e);
         }
-        return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
+        final String desktopPath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
+        LOG.debug("Desktop path from  Home Directory {}", desktopPath);
+        return desktopPath;
     }
 }
