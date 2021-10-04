@@ -35,7 +35,7 @@ class Rule {
     }
 
     public boolean matches(URL url) {
-        // TODO: implement according to https://docs.oracle.com/javase/8/docs/technotes/guides/deploy/deployment_rules.html#CIHDCEDE
+        // TODO: implement according to https://docs.oracle.com/javase/10/deploy/deployment-rule-set.htm#GUID-413F29CF-81B5-4154-9C52-22D993819C2B
         // Maybe take some inspiration from ParsedWhitelistEntry.matches(URL)
         return false;
     }
