@@ -39,4 +39,9 @@ class Rule {
         // Maybe take some inspiration from ParsedWhitelistEntry.matches(URL)
         return false;
     }
+
+    public boolean isAllowedToRun() {
+        // TODO: return true if this is allowed to run according to the action
+        return false;
+    }
 }

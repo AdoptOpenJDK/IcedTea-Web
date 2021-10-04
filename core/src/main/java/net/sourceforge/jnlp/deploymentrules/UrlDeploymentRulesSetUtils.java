@@ -34,7 +34,11 @@ public class UrlDeploymentRulesSetUtils {
             return true; // localhost need not be in whitelist
         }
 
-        return deploymentRuleSetList.stream().anyMatch(wlEntry -> wlEntry.matches(url));
+        return deploymentRuleSetList.stream()
+                .filter(wlEntry -> wlEntry.matches(url))
+                .findFirst()
+                .map(Rule::isAllowedToRun)
+                .orElse(Boolean.TRUE);
     }
 
     private static List<Rule> getApplicationLinkDeploymentRuleSetList() {
