@@ -35,39 +35,24 @@ statement from your version.
 package net.adoptopenjdk.icedteaweb.resources.cache;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
-import net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.ConversionResult;
-import net.adoptopenjdk.icedteaweb.testing.ServerAccess;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
-import net.sourceforge.jnlp.util.PropertiesFile;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Collectors;
 
-import static java.time.ZoneOffset.UTC;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.KEY_HREF;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.KEY_LAST_ACCESSED;
-import static net.adoptopenjdk.icedteaweb.resources.cache.LeastRecentlyUsedCacheIndex.convertPropertiesToEntries;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class LeastRecentlyUsedCacheIndexHolderTest {
+public class CacheIndexHolderTest {
 
     private static CacheKey key;
     private static URL url;
@@ -76,7 +61,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     private static final int noEntriesCacheFile = 1000;
 
     private File recentlyUsedFile;
-    private LeastRecentlyUsedCacheIndexHolder holder;
+    private CacheIndexHolder holder;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -91,31 +76,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     public void setup() throws IOException {
         final File cacheDir = temporaryFolder.newFolder();
         recentlyUsedFile = new File(cacheDir, ConfigurationConstants.CACHE_INDEX_FILE_NAME);
-        holder = new LeastRecentlyUsedCacheIndexHolder(new DummyInfrastructureFileDescriptor(recentlyUsedFile));
-    }
-
-    @Test
-    @Ignore("some of the CI machines are just too slow...")
-    public void testConversionTiming() {
-        final int noLoops = 1000;
-        fillCacheIndexFile();
-
-        final PropertiesFile propertiesFile = new PropertiesFile(recentlyUsedFile);
-        propertiesFile.load();
-
-        final long start = System.nanoTime();
-        for (int i = 0; i < noLoops; i++) {
-            final ConversionResult conversionResult = convertPropertiesToEntries(propertiesFile);
-            assertFalse(conversionResult.propertiesNeedToBeStored);
-            assertEquals(noEntriesCacheFile, conversionResult.entries.size());
-        }
-        final long end = System.nanoTime();
-
-        long avg = (end - start) / noLoops / 1000;
-        ServerAccess.logErrorReprint("Average = " + avg + "ns");
-
-        // wait more than 5000 microseconds for noEntries=1000 is bad
-        assertTrue("convertPropertiesToEntries() must not take longer than 5000µs, but took in avg " + avg + "µs", avg < 5000);
+        holder = new CacheIndexHolder(new DummyInfrastructureFileDescriptor(recentlyUsedFile));
     }
 
     @Test
@@ -126,7 +87,7 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
         // required as file system only stores seconds in lastModified()
         Thread.sleep(1010);
 
-        holder.runSynchronized(LeastRecentlyUsedCacheIndex::clear);
+        holder.runSynchronized(CacheIndex::clear);
         final long lmAfter = recentlyUsedFile.lastModified();
 
         assertTrue("modification timestamp hasn't changed! Before = " + lmBefore + " After = " + lmAfter, lmBefore < lmAfter);
@@ -165,28 +126,11 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
     @Test
     public void testAddEntry() {
         holder.runSynchronized(idx -> idx.createEntry(key, entryId));
-        final Optional<LeastRecentlyUsedCacheEntry> entry = holder.getSynchronized(idx -> idx.findUnDeletedEntry(key));
+        final Optional<CacheIndexEntry> entry = holder.getSynchronized(idx -> idx.findEntry(key));
         assertTrue(entry.isPresent());
         assertEquals(entry.get().getResourceHref(), url);
         assertEquals(entry.get().getVersion(), version);
         assertEquals(entry.get().getId(), entryId);
-    }
-
-    @Test
-    public void testSortingOfIndex() throws IOException {
-        // given
-        final List<String> ids = Arrays.asList("1-9", "0-1", "0-0", "1-3", "0-5");
-        prefillRecentlyUsedFile(ids);
-
-        final PropertiesFile propertiesFile = new PropertiesFile(recentlyUsedFile);
-        propertiesFile.load();
-
-        // when
-        final List<String> result = convertPropertiesToEntries(propertiesFile).entries.stream()
-                .map(LeastRecentlyUsedCacheEntry::getId)
-                .collect(Collectors.toList());
-
-        assertEquals(ids, result);
     }
 
     private void fillCacheIndexFile() {
@@ -197,19 +141,6 @@ public class LeastRecentlyUsedCacheIndexHolderTest {
                 idx.createEntry(new CacheKey(url, v), "2-" + i);
             }
         });
-    }
-
-    private void prefillRecentlyUsedFile(List<String> ids) throws IOException {
-        final LocalDateTime now = LocalDateTime.now();
-        final Properties props = new Properties();
-        for (int i = 0; i < ids.size(); i++) {
-            final String id = ids.get(i);
-            final long lastAccessed = now.minusHours(i).toEpochSecond(UTC);
-            props.setProperty(id + '.' + KEY_LAST_ACCESSED, Long.toString(lastAccessed));
-            props.setProperty(id + '.' + KEY_HREF, url.toString());
-        }
-
-        props.store(new FileOutputStream(recentlyUsedFile), null);
     }
 
     private static class DummyInfrastructureFileDescriptor extends InfrastructureFileDescriptor {

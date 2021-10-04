@@ -52,7 +52,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-public class CacheEntryTest {
+public class CachedFileTest {
 
     private static URL url;
     private static VersionId version;
@@ -75,7 +75,7 @@ public class CacheEntryTest {
     public void setUp() throws IOException {
         final File tmpDir = temporaryFolder.newFolder();
         cacheFile = new File(tmpDir, "example.jar");
-        infoFile = new File(tmpDir, CacheEntry.INFO_SUFFIX);
+        infoFile = new File(tmpDir, CachedFile.INFO_SUFFIX);
 
         FileUtils.saveFileUtf8("", infoFile);
         FileUtils.saveFileUtf8("Some content in cache file", cacheFile);
@@ -92,14 +92,14 @@ public class CacheEntryTest {
         long DOWNLOADED_AT = 888;
         long CONTENT_LENGTH = 777;
 
-        final CacheEntry firstEntry = createEntry();
+        final CachedFile firstEntry = createEntry();
         assertNotEquals(LAST_MODIFIED, firstEntry.getLastModified());
         assertNotEquals(DOWNLOADED_AT, firstEntry.getDownloadedAt());
         assertNotEquals(CONTENT_LENGTH, firstEntry.getSize());
 
         firstEntry.storeInfo(DOWNLOADED_AT, LAST_MODIFIED, CONTENT_LENGTH);
 
-        final CacheEntry secondEntry = createEntry();
+        final CachedFile secondEntry = createEntry();
         assertEquals(LAST_MODIFIED, secondEntry.getLastModified());
         assertEquals(DOWNLOADED_AT, secondEntry.getDownloadedAt());
         assertEquals(CONTENT_LENGTH, secondEntry.getSize());
@@ -107,7 +107,7 @@ public class CacheEntryTest {
 
     @Test
     public void verifyCachedIfFileExistsAndLengthIsSame() {
-        final CacheEntry entry = createEntry();
+        final CachedFile entry = createEntry();
         entry.storeInfo(downloadedAt, cacheFile.lastModified(), cacheFile.length());
 
         assertTrue(entry.isCached());
@@ -122,7 +122,7 @@ public class CacheEntryTest {
 
     @Test
     public void verifyNotCachedIfContentLengthsDiffer() {
-        final CacheEntry entry = createEntry();
+        final CachedFile entry = createEntry();
         entry.storeInfo(downloadedAt, cacheFile.lastModified(), cacheFile.length() + 1);
 
         assertFalse(entry.isCached());
@@ -130,7 +130,7 @@ public class CacheEntryTest {
 
     @Test
     public void verifyCurrentWhenCacheEntryHasSameTimeStamp() {
-        final CacheEntry entry = createEntry();
+        final CachedFile entry = createEntry();
         entry.storeInfo(downloadedAt, cacheFile.lastModified(), cacheFile.length());
 
         assertTrue(entry.isCurrent(cacheFile.lastModified()));
@@ -138,7 +138,7 @@ public class CacheEntryTest {
 
     @Test
     public void verifyCurrentWhenRemoteContentIsOlder() {
-        final CacheEntry entry = createEntry();
+        final CachedFile entry = createEntry();
         entry.storeInfo(downloadedAt, cacheFile.lastModified(), cacheFile.length());
 
         assertTrue(entry.isCurrent(cacheFile.lastModified() - 10));
@@ -146,13 +146,13 @@ public class CacheEntryTest {
 
     @Test
     public void verifyNotCurrentWhenRemoteContentIsNewer() {
-        final CacheEntry entry = createEntry();
+        final CachedFile entry = createEntry();
         entry.storeInfo(downloadedAt, cacheFile.lastModified(), cacheFile.length());
 
         assertFalse(entry.isCurrent(cacheFile.lastModified() + 10));
     }
 
-    private CacheEntry createEntry() {
-        return new CacheEntry(new CacheKey(url, version), cacheFile, infoFile);
+    private CachedFile createEntry() {
+        return new CachedFile(new CacheKey(url, version), cacheFile, infoFile);
     }
 }
