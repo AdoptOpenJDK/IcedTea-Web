@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.deploymentrules;
+package net.adoptopenjdk.icedteaweb.deploymentrules;
 
 /**
  * Action object of Rule from the ruleset file

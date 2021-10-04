@@ -9,8 +9,6 @@ import net.adoptopenjdk.icedteaweb.resources.downloader.ResourceDownloader;
 import net.adoptopenjdk.icedteaweb.resources.initializer.InitializationResult;
 import net.adoptopenjdk.icedteaweb.resources.initializer.ResourceInitializer;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
-import net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils;
-import net.sourceforge.jnlp.deploymentrules.UrlDeploymentRulesSetUtils;
 
 import java.io.File;
 import java.net.URL;
@@ -18,10 +16,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
+import static net.adoptopenjdk.icedteaweb.deploymentrules.UrlDeploymentRulesSetUtils.isUrlInDeploymentRuleSet;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.DOWNLOADED;
 import static net.adoptopenjdk.icedteaweb.resources.ResourceStatus.ERROR;
 import static net.sourceforge.jnlp.cache.CacheUtil.isNonCacheable;
-import static net.sourceforge.jnlp.deploymentrules.UrlDeploymentRulesSetUtils.isUrlInDeploymentRuleSet;
 import static net.sourceforge.jnlp.util.UrlUtils.FILE_PROTOCOL;
 import static net.sourceforge.jnlp.util.UrlUtils.decodeUrlQuietly;
 import static net.sourceforge.jnlp.util.whitelist.UrlWhiteListUtils.getApplicationUrlWhiteList;

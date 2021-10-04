@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.deploymentrules;
+package net.adoptopenjdk.icedteaweb.deploymentrules;
 
 import java.net.URL;
 

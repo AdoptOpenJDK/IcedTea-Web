@@ -1,4 +1,4 @@
-package net.sourceforge.jnlp.deploymentrules;
+package net.adoptopenjdk.icedteaweb.deploymentrules;
 
 import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
