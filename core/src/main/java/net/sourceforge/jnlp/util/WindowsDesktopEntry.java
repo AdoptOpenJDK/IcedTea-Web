@@ -16,8 +16,8 @@
 package net.sourceforge.jnlp.util;
 
 import mslinks.ShellLink;
-import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.LazyLoaded;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
@@ -122,7 +122,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         try {
             pathSuffix = file.getInformation().getShortcut().getMenu().getSubMenu();
         } catch (NullPointerException npe) {
-            LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, npe);
+            LOG.error("Dereferencing null while extracting suffix ", npe);
             pathSuffix = null;
         }
         if (pathSuffix == null) {
@@ -209,33 +209,29 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         return DOUBLE_QUOTE + url.toExternalForm() + DOUBLE_QUOTE;
     }
 
-    private final static String desktopPath() {
-        final String QUOT = "\"";
+    private static String desktopPath() {
+        final String QUOTE = "\"";
         final String registryEntry = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders";
         final String desktopProperty = "Desktop";
         final String typeName = "REG_SZ"; // type of value of Desktop property
-        final String chcp = "chcp"; // change code page
-        // Code Page Id for utf8.
-        // See https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers?redirectedfrom=MSDN
+        // Code Page Id for utf8. See https://docs.microsoft.com/en-us/windows/win32/intl/code-page-identifiers?redirectedfrom=MSDN
         final String utf8PageCode = "65001";
 
-        String[] cmds = new String[]{"cmd.exe", "/c", chcp, utf8PageCode, "&&", "reg", "query", QUOT + registryEntry + QUOT, "/v", QUOT + desktopProperty + QUOT};
-        ProcessBuilder pb = new ProcessBuilder();
-        pb.command(cmds);
+        final ProcessBuilder pb = new ProcessBuilder(
+                "cmd.exe", "/c", "chcp", utf8PageCode, "&&",
+                "reg", "query", QUOTE + registryEntry + QUOTE, "/v", QUOTE + desktopProperty + QUOTE);
         pb.redirectErrorStream(true);
         try {
-            Process proc = pb.start();
-            proc.waitFor(5, TimeUnit.SECONDS);
-            try (final InputStream is = proc.getInputStream()) {
+            final Process p = pb.start();
+            p.waitFor(5, TimeUnit.SECONDS);
+            try (final InputStream is = p.getInputStream()) {
                 final String output = IOUtils.readContentAsUtf8String(is);
-                LOG.debug("Desktop Path Reg Query Result = \n{}", output);
-                if (proc.exitValue() == 0) {
-                    if (output != null) {
+                if (p.exitValue() == 0) {
+                    if (!StringUtils.isBlank(output)) {
                         final int typeIndex = output.indexOf(typeName);
                         if (typeIndex != -1) {
                             final String desktopPath = output.substring(typeIndex + typeName.length());
-                            LOG.debug("Desktop Path from Registry = {}", desktopPath);
-                            if (desktopPath != null) {
+                            if (!StringUtils.isBlank(desktopPath)) {
                                 return desktopPath.trim();
                             }
                         }
@@ -247,8 +243,6 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
         } catch (final Exception e) {
             LOG.debug("Could not retrieve path to client desktop folder from registry : {}", e);
         }
-        final String desktopPath = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
-        LOG.debug("Desktop path from  Home Directory {}", desktopPath);
-        return desktopPath;
+        return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
     }
 }
