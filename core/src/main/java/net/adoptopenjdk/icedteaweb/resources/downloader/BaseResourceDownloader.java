@@ -180,8 +180,8 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         } else {
             final CountingInputStream countingInputStream = downloadDetails.inputStream;
 
-            final StreamUnpacker compressionUpacker = StreamUnpacker.getCompressionUnpacker(downloadDetails);
-            final InputStream unpackedStream = compressionUpacker.unpack(countingInputStream);
+            final StreamUnpacker compressionUnpacker = StreamUnpacker.getCompressionUnpacker(downloadDetails);
+            final InputStream unpackedStream = compressionUnpacker.unpack(countingInputStream);
 
             final StreamUnpacker contentUnpacker = StreamUnpacker.getContentUnpacker(downloadDetails, resourceHref);
             final InputStream unpackedContent = contentUnpacker.unpack(unpackedStream);
