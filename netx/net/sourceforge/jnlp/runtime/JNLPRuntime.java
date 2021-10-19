@@ -163,7 +163,7 @@ public class JNLPRuntime {
     private static boolean trustNone = false;
     
     /** allows 301.302.303.307.308 redirects to be followed when downloading resources*/
-    private static boolean allowRedirect = false;;
+    private static boolean allowRedirect = true;
     
     /** when this is true, ITW will not attempt any inet connections and will work only with what is in cache*/
     private static boolean offlineForced = false;
