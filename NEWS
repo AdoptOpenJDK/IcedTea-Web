@@ -8,6 +8,8 @@ GX  - http://bugs.gentoo.org/show_bug.cgi?id=X
 
 CVE-XXXX-YYYY: http://www.cve.mitre.org/cgi-bin/cvename.cgi?name=XXXX-YYYY
 
+New in release 1.8.8 (2021-10-28):
+* Application cannot be started with JDK 13 - AWTSecurityManager was removed / Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/438 fix https://github.com/AdoptOpenJDK/IcedTea-Web/issues/437
 
 New in release 1.8.7 (2021-05-27):
 * Backport of https://github.com/AdoptOpenJDK/IcedTea-Web/pull/467 fix https://github.com/AdoptOpenJDK/IcedTea-Web/issues/89
