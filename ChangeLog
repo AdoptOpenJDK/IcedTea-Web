@@ -1,3 +1,8 @@
+2021-10-28 Philippe Doussot <douphi@free.fr>
+
+	Release change
+	* Application cannot be started with JDK 13 - AWTSecurityManager was removed : Backport of #438 by https://github.com/AdoptOpenJDK/IcedTea-Web/pull/792
+
 2021-05-27 Philippe Doussot <douphi@free.fr>
 
         Release changes
