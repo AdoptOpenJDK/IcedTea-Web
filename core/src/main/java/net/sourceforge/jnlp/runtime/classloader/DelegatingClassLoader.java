@@ -2,7 +2,9 @@ package net.sourceforge.jnlp.runtime.classloader;
 
 import net.adoptopenjdk.icedteaweb.Assert;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.Objects;
 
 public class DelegatingClassLoader extends ClassLoader {
@@ -29,6 +31,11 @@ public class DelegatingClassLoader extends ClassLoader {
     protected URL findResource(String name) {
         return this.classLoader.getResource(name);
     }
+	
+    @Override
+    public Enumeration<URL> findResources(String name) throws IOException {
+        return this.classLoader.getResources(name);
+	}
 
     public int hashCode() {
         int result = 1;
