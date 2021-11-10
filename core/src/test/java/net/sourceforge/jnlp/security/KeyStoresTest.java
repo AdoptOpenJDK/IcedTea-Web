@@ -42,6 +42,7 @@ import org.junit.Test;
 import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.security.KeyStores.KeyStoreWrap;
+import net.sourceforge.jnlp.security.windows.WindowsKeyStoresManager;
 
 public class KeyStoresTest {
 
@@ -135,11 +136,16 @@ public class KeyStoresTest {
         
         KeyStoreWrap keyStoreWrap;
         
-        keyStoreWrap = KeyStores.getWrapContainer(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS).getWrap();        
-        Assert.assertEquals(keyStoreWrap.getFamily(), KeyStores.Family.WINDOWS);
+        final WindowsKeyStoresManager windowsStore = WindowsKeyStoresManager.getInfo(KeyStores.Type.CA_CERTS);
         
-        keyStoreWrap = KeyStores.getWrapContainer(KeyStores.Level.USER, KeyStores.Type.CA_CERTS).getWrap();        
-        Assert.assertEquals(keyStoreWrap.getFamily(), KeyStores.Family.WINDOWS);
+        if(windowsStore.isAccessible()) {
+        
+	        keyStoreWrap = KeyStores.getWrapContainer(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS).getWrap();        
+	        Assert.assertEquals(keyStoreWrap.getFamily(), KeyStores.Family.WINDOWS);
+	        
+	        keyStoreWrap = KeyStores.getWrapContainer(KeyStores.Level.USER, KeyStores.Type.CA_CERTS).getWrap();        
+	        Assert.assertEquals(keyStoreWrap.getFamily(), KeyStores.Family.WINDOWS);
+        }
     }    
 
 }
