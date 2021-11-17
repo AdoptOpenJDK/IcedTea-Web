@@ -503,7 +503,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             final URL jarUrl = new URL("http://localhost:" + port + "/jar03_dotdotN1.jar");
             assertTrue(Cache.isAnyCached(jnlpUrl, null));
             assertTrue(Cache.isAnyCached(jarUrl, null));
-            final File jarFile = Cache.getOrCreateCacheFile(jarUrl, null);
+            final File jarFile = Cache.getCacheFile(jarUrl, null);
             final File nestedDir = new File(jarFile.getAbsolutePath() + ".nested");
             assertTrue(nestedDir.isDirectory());
             assertTrue(new File(nestedDir.getAbsolutePath() + "/99a90686bfbe84e3f9dbeed8127bba85672ed73688d3c69191aa1ee70916a.jar").exists());

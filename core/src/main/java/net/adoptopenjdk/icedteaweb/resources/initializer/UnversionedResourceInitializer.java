@@ -18,23 +18,35 @@ import static net.adoptopenjdk.icedteaweb.resources.initializer.ResourceUrlCreat
 class UnversionedResourceInitializer extends BaseResourceInitializer {
     private static final Logger LOG = LoggerFactory.getLogger(UnversionedResourceInitializer.class);
 
-    private boolean isCached;
-    private ResourceInfo info;
-
     UnversionedResourceInitializer(Resource resource) {
         super(resource);
     }
 
     @Override
     public InitializationResult init() {
-        isCached = Cache.isCached(resource.getLocation(), null);
-        info = Cache.getInfo(resource.getLocation(), null);
+        boolean isCached = Cache.isCached(resource.getLocation(), null);
 
-        if (needsUpdateCheck()) {
+        if (!isCached) {
+            return findDownloadUrl();
+        } else if (needsUpdateCheck()) {
             return checkForUpdate();
         } else {
             return initFromCache();
         }
+    }
+
+    private InitializationResult findDownloadUrl() {
+        final List<URL> candidateUrls = getUrlCandidates();
+        LOG.debug("Candidate URLs for {}: {}", resource, candidateUrls);
+        return getBestUrlByPingingWithHeadRequest(candidateUrls)
+                .map(requestResult -> {
+                    LOG.debug("Found best URL for {}: {}", resource, requestResult);
+                    return initFromHeadResult(requestResult);
+                })
+                .orElseGet(() -> {
+                    LOG.debug("Failed to determine best URL for {} will try all of {}", resource, candidateUrls);
+                    return new InitializationResult(candidateUrls);
+                });
     }
 
     private InitializationResult checkForUpdate() {
@@ -71,10 +83,11 @@ class UnversionedResourceInitializer extends BaseResourceInitializer {
     }
 
     private boolean needsUpdateCheck() {
-        final boolean result = !isCached
+        final ResourceInfo info = Cache.getInfo(resource.getLocation(), null);
+
+        final boolean result = resource.forceUpdateRequested()
                 || info == null
-                || resource.getUpdatePolicy().shouldUpdate(info)
-                || resource.forceUpdateRequested();
+                || resource.getUpdatePolicy().shouldUpdate(info);
         LOG.debug("needsUpdateCheck: {} -> {}", resource.getLocation(), result);
         return result;
     }

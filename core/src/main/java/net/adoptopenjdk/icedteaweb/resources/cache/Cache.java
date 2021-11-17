@@ -56,12 +56,12 @@ public class Cache {
      * @return the file location in the cache, or {@code null} if no versions cached
      * @throws IllegalArgumentException if the resource is not cacheable
      */
-    public static File getOrCreateCacheFile(final URL resource, final VersionId version) {
-        return getOrCreateCacheFile(new CacheKey(resource, version));
+    public static File getCacheFile(final URL resource, final VersionId version) {
+        return getCacheFile(new CacheKey(resource, version));
     }
-    private static File getOrCreateCacheFile(final CacheKey key) {
+    private static File getCacheFile(final CacheKey key) {
         assertLocationIsCacheable(key.getLocation());
-        return CacheImpl.getInstance().getOrCreateCacheFile(key);
+        return CacheImpl.getInstance().getCacheFile(key);
     }
 
     public static File addToCache(DownloadInfo infoFromRemote, InputStream unpackedStream) throws IOException {
@@ -113,7 +113,7 @@ public class Cache {
     public static ResourceInfo getInfo(final URL resource, final VersionId version) {
         return getInfo(new CacheKey(resource, version));
     }
-    public static ResourceInfo getInfo(final CacheKey key) {
+    private static ResourceInfo getInfo(final CacheKey key) {
         assertLocationIsCacheable(key.getLocation());
         return CacheImpl.getInstance().getResourceInfo(key).orElse(null);
     }

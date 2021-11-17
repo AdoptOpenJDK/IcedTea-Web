@@ -103,27 +103,51 @@ class CacheImpl {
         this.rootCacheDir = cacheDir;
     }
 
-    File getOrCreateCacheFile(CacheKey key) {
+    File getCacheFile(CacheKey key) {
         final CacheIndexEntry entry = cacheIndex.getSynchronized(idx ->
-                getOrCreateCacheEntry(idx, key)
+                getCacheEntry(idx, key)
         );
+
+        if (!getInfoFile(entry).isCached()) {
+            throw new RuntimeException("Accessing incomplete file " + key);
+        }
+
         return getCacheFile(entry);
     }
 
-    private CacheIndexEntry getOrCreateCacheEntry(CacheIndex idx, CacheKey key) {
+    private CacheIndexEntry getCacheEntry(CacheIndex idx, CacheKey key) {
         return idx.findAndMarkAsAccessed(key)
-                .orElseGet(() -> createNewInfoFileAndIndexEntry(idx, key));
+                .orElseThrow(() -> new RuntimeException("Could not find entry for " + key));
     }
 
-    void invalidateExistingCacheFile(final CacheKey key) {
-        cacheIndex.runSynchronized(idx -> idx.removeEntry(key));
+    File addToCache(DownloadInfo info, InputStream inputStream) throws IOException {
+        final List<IOException> ex = new ArrayList<>();
+
+        final CacheIndexEntry entry = cacheIndex.getSynchronized(idx -> createCacheEntry(idx, info.getCacheKey()));
+
+        final CachedFile infoFile = getInfoFile(entry);
+        final File cacheFile = infoFile.getCacheFile();
+        try {
+            LOG.debug("Downloading file: {} into: {}", info.getCacheKey().getLocation(), cacheFile.getCanonicalPath());
+            try (final OutputStream out = new FileOutputStream(cacheFile)) {
+                IOUtils.copy(inputStream, out);
+            }
+            infoFile.storeInfo(info.getDownloadedAt(), info.getLastModified(), cacheFile.length());
+        } catch (IOException e) {
+            ex.add(e);
+        }
+
+        if (!ex.isEmpty()) {
+            throw ex.get(0);
+        }
+
+        return cacheFile;
     }
 
-    private CacheIndexEntry createNewInfoFileAndIndexEntry(CacheIndex idx, CacheKey key) {
+    private CacheIndexEntry createCacheEntry(CacheIndex idx, CacheKey key) {
         final File dir = makeNewCacheDir();
-        final String entryId = entryIdFromCacheDir(dir);
         createInfoFile(dir);
-        return idx.createEntry(key, entryId);
+        return idx.createEntry(key, entryIdFromCacheDir(dir));
     }
 
     private File makeNewCacheDir() {
@@ -161,35 +185,10 @@ class CacheImpl {
         }
     }
 
-    File addToCache(DownloadInfo info, InputStream inputStream) throws IOException {
-        final List<IOException> ex = new ArrayList<>();
-
-        final CacheIndexEntry entry = cacheIndex.getSynchronized(idx ->
-                getOrCreateCacheEntry(idx, info.getCacheKey())
-        );
-
-        final CachedFile infoFile = getInfoFile(entry);
-        final File cacheFile = infoFile.getCacheFile();
-        try {
-            LOG.debug("Downloading file: {} into: {}", info.getCacheKey().getLocation(), cacheFile.getCanonicalPath());
-            try (final OutputStream out = new FileOutputStream(cacheFile)) {
-                IOUtils.copy(inputStream, out);
-            }
-            infoFile.storeInfo(info.getDownloadedAt(), info.getLastModified(), cacheFile.length());
-        } catch (IOException e) {
-            ex.add(e);
-        }
-
-        if (!ex.isEmpty()) {
-            throw ex.get(0);
-        }
-
-        return cacheFile;
-    }
-
     Optional<CachedFile> getResourceInfo(CacheKey key) {
         return cacheIndex.getSynchronized(idx -> idx.findEntry(key))
-                .map(this::getInfoFile);
+                .map(this::getInfoFile)
+                .filter(CachedFile::isCached);
     }
 
     /**
@@ -200,9 +199,7 @@ class CacheImpl {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isCached(CacheKey key) {
-        final boolean isCached = getResourceInfo(key)
-                .map(CachedFile::isCached)
-                .orElse(false);
+        final boolean isCached = getResourceInfo(key).isPresent();
         LOG.info("isCached: {} = {}", key, isCached);
         return isCached;
     }
@@ -216,41 +213,38 @@ class CacheImpl {
      * @throws IllegalArgumentException if the resourceHref is not cacheable
      */
     boolean isUpToDate(CacheKey key, long lastModified) {
-        final Boolean isUpToDate = cacheIndex.getSynchronized(idx -> idx.findAndMarkAsAccessed(key))
-                .map(e -> getInfoFile(e).isCurrent(lastModified))
+        final Boolean isUpToDate = getResourceInfo(key)
+                .map(cachedFile -> cachedFile.isCurrent(lastModified))
                 .orElse(false);
         LOG.info("isUpToDate: {} = {}", key, isUpToDate);
         return isUpToDate;
     }
 
     Optional<CacheIndexEntry> getBestMatchingEntryInCache(final URL resourceHref, final VersionString version) {
-        final Comparator<VersionId> versionIdComparator = version != null ? new VersionIdComparator(version) : VersionId::compareTo;
-        final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion, versionIdComparator);
-        return cacheIndex.getSynchronized(idx -> {
-            final Set<CacheIndexEntry> allSet = idx.findAllEntries(resourceHref, version);
-            final List<CacheIndexEntry> all = new ArrayList<>(allSet);
+        final List<CacheIndexEntry> all = new ArrayList<>(cacheIndex.getSynchronized(idx -> idx.findAllEntries(resourceHref, version)));
+
+        if (all.size() > 1) {
+            final Comparator<VersionId> versionIdComparator = version != null ? new VersionIdComparator(version) : VersionId::compareTo;
+            final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion, versionIdComparator);
             all.sort(versionComparator);
+        }
 
-            for (final CacheIndexEntry entry : all) {
-                if (getInfoFile(entry).isCached()) {
-                    return Optional.of(entry);
-                }
-            }
-
-            return Optional.empty();
-        });
+        return all.stream()
+                .filter(entry -> getInfoFile(entry).isCached())
+                .findFirst();
     }
 
     List<CacheIndexEntry> getAllEntriesInCache(final URL resourceHref) {
-        final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion);
-        return cacheIndex.getSynchronized(idx -> {
-            final Set<CacheIndexEntry> allSet = idx.findAllEntries(resourceHref);
+        final List<CacheIndexEntry> all = new ArrayList<>(cacheIndex.getSynchronized(idx -> idx.findAllEntries(resourceHref)));
 
-            return allSet.stream()
-                    .filter(entry -> getInfoFile(entry).isCached())
-                    .sorted(versionComparator)
-                    .collect(Collectors.toList());
-        });
+        if (all.size() > 1) {
+            final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion);
+            all.sort(versionComparator);
+        }
+
+        return all.stream()
+                .filter(entry -> getInfoFile(entry).isCached())
+                .collect(Collectors.toList());
     }
 
     List<CacheIdInfo> getCacheIds(String filter, boolean includeJnlpPath, boolean includeDomain) {
@@ -286,6 +280,10 @@ class CacheImpl {
     private CacheFileInfoImpl createPaneObjectArray(CacheIndexEntry entry) {
         final CachedFile infoFile = getInfoFile(entry);
         return new CacheFileInfoImpl(infoFile, entry);
+    }
+
+    void invalidateExistingCacheFile(final CacheKey key) {
+        cacheIndex.runSynchronized(idx -> idx.removeEntry(key));
     }
 
     void deleteFromCache(CacheKey key) {

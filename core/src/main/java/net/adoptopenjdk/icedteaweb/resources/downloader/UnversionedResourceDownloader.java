@@ -22,10 +22,13 @@ class UnversionedResourceDownloader extends BaseResourceDownloader {
 
     @Override
     protected boolean isUpToDate(URL resourceHref, VersionId version, long lastModified) {
-        final boolean upToDate = Cache.isUpToDate(resourceHref, null, lastModified);
-        if (upToDate && resource.forceUpdateRequested()) {
-            invalidateExistingEntryInCache(null);
+        if (!Cache.isCached(resourceHref, null)) {
             return false;
+        }
+
+        final boolean upToDate = Cache.isUpToDate(resourceHref, null, lastModified);
+        if (!upToDate || resource.forceUpdateRequested()) {
+            invalidateExistingEntryInCache(null);
         }
         return upToDate;
     }
