@@ -151,18 +151,18 @@ public class IconsTest {
         checkColors(new Color(0, 0, 0, 255), new Color(0, 0, 0, 255), i.getImage(0));
 
         checkMiddle(new Color(0, 0, 0, 255), i.getImage(1));
-        checkUpLeft(new Color(255, 255, 255, 255), i.getImage(1));
+        checkUpLeft(new Color(0, 0, 0, 255), i.getImage(1));
         checkBottomRight(new Color(0, 0, 0, 255), i.getImage(1));
         checkBottomLeft(new Color(0, 0, 0, 255), i.getImage(1));
-        checkTopRight(new Color(254, 63, 0, 255), i.getImage(1));
+        checkTopRight(new Color(0, 0, 0, 255), i.getImage(1));
 
         checkColors(new Color(0, 0, 0, 255), new Color(0, 0, 0, 255), i.getImage(2));
         checkColors(new Color(0, 0, 0, 255), new Color(0, 0, 0, 255), i.getImage(3));
 
         Assert.assertEquals(new Color(5, 100, 168), new Color(i.getImage(3).getRGB(21, 21)));
         Assert.assertEquals(new Color(5, 100, 168), new Color(i.getImage(2).getRGB(42, 42)));
-        Assert.assertEquals(new Color(5, 100, 168), new Color(i.getImage(1).getRGB(94, 94)));
-        Assert.assertEquals(new Color(5, 100, 168), new Color(i.getImage(0).getRGB(188, 188)));
+        Assert.assertEquals(new Color(5, 100, 168), new Color(i.getImage(1).getRGB(84, 84)));
+        Assert.assertEquals(new Color(5, 100, 168), new Color(i.getImage(0).getRGB(168, 168)));
 
     }
 

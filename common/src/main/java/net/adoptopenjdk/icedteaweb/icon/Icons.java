@@ -148,7 +148,12 @@ class Icons {
         //fake header
         //http://www.daubnet.com/en/file-format-bmp
         final int size = e.getSizeInBytes() + fakingArray;
-        final int offset = fakingArray + 40 + 4 * e.getColorCount();
+
+        final int bitCount = read2Bytes(origArray, 14);
+        final int colorsUsed = read4Bytes(origArray, 32);
+
+        final int colorPaletteSize = ((colorsUsed == 0 && bitCount <= 8) ? (1 << bitCount) : colorsUsed);
+        final int offset = fakingArray + 40 + (4 * colorPaletteSize);
         final int tmpHeight = e.getHeight();
 
         img[0] = 'B';
@@ -174,4 +179,15 @@ class Icons {
         return img;
     }
 
+    private int read2Bytes(byte[] array, int offset) {
+        return array[offset]
+                + (array[offset + 1] << 8);
+    }
+
+    private int read4Bytes(byte[] array, int offset) {
+        return array[offset]
+                + (array[offset + 1] << 8)
+                + (array[offset + 2] << 16)
+                + (array[offset + 3] << 24);
+    }
 }
