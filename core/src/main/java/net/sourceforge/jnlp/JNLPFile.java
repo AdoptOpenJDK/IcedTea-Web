@@ -860,4 +860,9 @@ public class JNLPFile {
             return basicTitle;
         }
     }
+
+    public String getLocationHashCode() {
+        final String code = "" + Math.abs(getSourceLocation().hashCode());
+        return code;
+    }
 }
