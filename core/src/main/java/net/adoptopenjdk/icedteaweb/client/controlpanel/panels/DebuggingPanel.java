@@ -48,9 +48,9 @@ import java.awt.event.ItemListener;
 
 /**
  * This displays the options related to debugging.
- * 
+ *
  * @author Andrew Su (asu@redhat.com, andrew.su@utoronto.ca)
- * 
+ *
  */
 public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
@@ -58,19 +58,20 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
     public static String[] properties = {
             ConfigurationConstants.KEY_ENABLE_DEBUG_LOGGING,
             ConfigurationConstants.KEY_ENABLE_LOGGING_HEADERS,
+            ConfigurationConstants.KEY_ENABLE_LOGGING_OF_JNLP_FILE_CONTENT,
             ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
             ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
             ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
             ConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS,
             ConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG
-            
+
     };
-    
+
      private final DeploymentConfiguration config;
 
     /**
      * Create a new instance of the debugging panel.
-     * 
+     *
      * @param config
      *            loaded DeploymentConfiguration file.
      */
@@ -81,8 +82,8 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
 
         addComponents();
     }
-    
-    
+
+
     private void fileLoggingAct(JCheckBox source, JCheckBox... targets) {
         if (source.isSelected()) {
             for (JCheckBox target : targets) {
@@ -137,27 +138,29 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             }
         });
 
-        final JCheckBox[] debuggingOptions = { 
+        final JCheckBox[] debuggingOptions = {
                 new JCheckBox(Translator.R("DPEnableLogging")),
                 new JCheckBox(Translator.R("DPEnableHeaders")),
+                new JCheckBox(Translator.R("DPEnableJnlpContentLogging")),
                 new JCheckBox(Translator.R("DPEnableFile")),
                 new JCheckBox(Translator.R("DPEnableLegacyFileLog")),
                 new JCheckBox(Translator.R("DPEnableClientAppFileLogging")),
                 new JCheckBox(Translator.R("DPEnableStds")),
                 new JCheckBox(Translator.R("DPEnableSyslog"))
         };
-        
-        debuggingOptions[2].addActionListener(new ActionListener() {
+
+        debuggingOptions[3].addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                fileLoggingAct(debuggingOptions[2], debuggingOptions[3], debuggingOptions[4]);
+                fileLoggingAct(debuggingOptions[3], debuggingOptions[4], debuggingOptions[5]);
             }
 
         });
-        final String[] hints = { 
+        final String[] hints = {
                 (Translator.R("DPEnableLoggingHint")),
                 (Translator.R("DPEnableHeadersHint")),
+                (Translator.R("DPEnableJnlpContentLoggingHint")),
                 (Translator.R("DPEnableFileHint", LogConfig.getLogConfig().getIcedteaLogDir())),
                 (Translator.R("DPEnableLegacyFileLogHint")),
                 (Translator.R("DPEnableClientAppFileLoggingHint")),
@@ -192,16 +195,16 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
         for (int i = 0; i < properties.length; i++) {
             String s = config.getProperty(properties[i]);
             c.gridy++;
-            if (i == 2) {
+            if (i == 3) {
                 JLabel space = new JLabel("<html>" + Translator.R("CPDebuggingPossibilites") + ":</html>");
                 add(space, c);
                 c.gridy++;
             }
 
             //move  5th and 6th checkbox below  logsDestination
-            if (i == 3 || i == 4) {
+            if (i == 4 || i == 5) {
                 c.gridx += 1;
-                if (i == 4) {
+                if (i == 5) {
                     c.gridy--;
                 }
             } else {
@@ -213,7 +216,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             debuggingOptions[i].addItemListener(this);
             add(debuggingOptions[i], c);
 
-            if (i == 2) {
+            if (i == 3) {
                 c.gridx++;
                 JPanel resetTitlePanel = new JPanel(new BorderLayout(10, 0));
                 resetTitlePanel.add(logsDestinationReset, BorderLayout.LINE_START);
@@ -235,13 +238,13 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
         c.gridy++;
         consoleComboBox.addItemListener(this);
         add(consolePanel, c);
-        
+
         // pack the bottom so that it doesn't change size if resized.
         Component filler = Box.createRigidArea(new Dimension(1, 1));
         c.gridy++;
         c.weighty = 1;
         add(filler, c);
-        fileLoggingAct(debuggingOptions[2], debuggingOptions[3], debuggingOptions[4]);
+        fileLoggingAct(debuggingOptions[3], debuggingOptions[4], debuggingOptions[5]);
     }
 
     @Override
