@@ -193,7 +193,7 @@ public class JarCertVerifier implements CertVerifier {
 
     private boolean isSigned() {
         final boolean fullySigned = appVerifier.isFullySigned(certs, jarSignableEntries);
-        LOG.debug("App already has trusted publisher: {}", fullySigned);
+        LOG.debug("App is signed: {}", fullySigned);
         return fullySigned;
     }
 
