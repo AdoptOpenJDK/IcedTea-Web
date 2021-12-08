@@ -192,6 +192,8 @@ public interface ConfigurationConstants {
 
     String KEY_ENABLE_LOGGING_HEADERS = "deployment.log.headers"; //will add header OutputContorll.getHeader To all messages
 
+    String KEY_ENABLE_LOGGING_OF_JNLP_FILE_CONTENT = "deployment.log.jnlpFileContent";
+
     String KEY_ENABLE_LOGGING_TOFILE = "deployment.log.file";
 
     String KEY_ENABLE_APPLICATION_LOGGING_TOFILE = "deployment.log.file.clientapp"; //also client app will log to its separate file

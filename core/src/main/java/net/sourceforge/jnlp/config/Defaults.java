@@ -365,6 +365,11 @@ public class Defaults {
                     ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_LOGGING_OF_JNLP_FILE_CONTENT,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
                     String.valueOf(false),
                     ValidatorFactory.createBooleanValidator()

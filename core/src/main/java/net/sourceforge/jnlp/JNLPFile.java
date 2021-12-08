@@ -20,6 +20,7 @@ package net.sourceforge.jnlp;
 import net.adoptopenjdk.icedteaweb.IcedTeaWebConstants;
 import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.StringUtils;
+import net.adoptopenjdk.icedteaweb.io.IOUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.EntryPoint;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.AppletDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.application.ApplicationDesc;
@@ -45,6 +46,7 @@ import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,9 +61,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
 import static net.adoptopenjdk.icedteaweb.StringUtils.hasPrefixMatch;
+import static net.sourceforge.jnlp.config.ConfigurationConstants.KEY_ENABLE_LOGGING_OF_JNLP_FILE_CONTENT;
+import static net.sourceforge.jnlp.runtime.JNLPRuntime.getConfiguration;
 import static net.sourceforge.jnlp.util.LocaleUtils.localeMatches;
 
 /**
@@ -721,11 +726,19 @@ public class JNLPFile {
      */
     private void parse(InputStream input, URL location, URL forceCodebase) throws ParseException {
         try {
-            //if (location != null)
-            //  location = new URL(location, "."); // remove filename
+            final String logContent = getConfiguration().getProperty(KEY_ENABLE_LOGGING_OF_JNLP_FILE_CONTENT);
+            final InputStream in;
+            if ("true".equalsIgnoreCase(logContent)) {
+                final byte[] content = IOUtils.readContent(input);
+                LOG.debug("Parsing JNLP file\nlocation: {}\ncodebase: {}\ncontent:\n{}",
+                        location, forceCodebase, new String(content, UTF_8));
+                in = new ByteArrayInputStream(content);
+            } else {
+                in = input;
+            }
 
             final XMLParser xmlParser = XmlParserFactory.getParser(parserSettings.getParserType());
-            final XmlNode root = xmlParser.getRootNode(input);
+            final XmlNode root = xmlParser.getRootNode(in);
             final Parser parser = new Parser(this, location, root, parserSettings, forceCodebase); // true == allow extensions
 
             // JNLP tag information
