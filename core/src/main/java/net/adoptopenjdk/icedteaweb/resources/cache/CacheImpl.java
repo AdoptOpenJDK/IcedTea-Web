@@ -300,7 +300,7 @@ class CacheImpl {
         cacheIndex.runSynchronized(idx -> {
             final List<CacheIndexEntry> entriesToRemove = new ArrayList<>();
             idx.findAllEntries(resourceHref, version).stream()
-                .peek(entry -> entriesToRemove.add(entry))
+                .peek(entry -> entriesToRemove.add(entry)) // TODO : alternate to peek is to make deleteFilesFromCache return entry and use it in map
                 .forEach(entry -> deleteFilesFromCache(entry));
             entriesToRemove.forEach(entry -> idx.removeEntry(entry));
         });
@@ -315,7 +315,7 @@ class CacheImpl {
             final List<CacheIndexEntry> entriesToRemove = new ArrayList<>();
             allEntries.stream()
                     .filter(entry -> Objects.equals(idToDelete, idExtractor.apply(entry)))
-                    .peek(entry -> entriesToRemove.add(entry))
+                    .peek(entry -> entriesToRemove.add(entry)) // TODO : alternate to peek is to make deleteFilesFromCache return entry and use it in map
                     .forEach(entry -> deleteFilesFromCache(entry));
             entriesToRemove.forEach(entry -> idx.removeEntry(entry));
         });
