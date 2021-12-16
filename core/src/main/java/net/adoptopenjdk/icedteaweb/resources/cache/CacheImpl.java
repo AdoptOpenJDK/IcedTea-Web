@@ -207,7 +207,7 @@ class CacheImpl {
     /**
      * Returns whether there is a version of the URL contents in the cache and it is up to date.
      *
-     * @param key the key of the cache entry
+     * @param key          the key of the cache entry
      * @param lastModified time in millis since epoch of last modification
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the resourceHref is not cacheable
@@ -289,13 +289,21 @@ class CacheImpl {
     void deleteFromCache(CacheKey key) {
         cacheIndex.runSynchronized(idx -> idx
                 .findEntry(key)
-                .ifPresent(entry -> deleteFromCache(idx, entry)));
+                .ifPresent(entry -> {
+                     deleteFilesFromCache(entry);
+                     idx.removeEntry(entry);
+                })
+        );
     }
 
     void deleteFromCache(URL resourceHref, VersionString version) {
-        cacheIndex.runSynchronized(idx -> idx
-                .findAllEntries(resourceHref, version)
-                .forEach(entry -> deleteFromCache(idx, entry)));
+        cacheIndex.runSynchronized(idx -> {
+            final List<CacheIndexEntry> entriesToRemove = new ArrayList<>();
+            idx.findAllEntries(resourceHref, version).stream()
+                .peek(entry -> entriesToRemove.add(entry))
+                .forEach(entry -> deleteFilesFromCache(entry));
+            entriesToRemove.forEach(entry -> idx.removeEntry(entry));
+        });
     }
 
     void deleteFromCache(CacheIdInfo cacheId) {
@@ -304,9 +312,12 @@ class CacheImpl {
 
         cacheIndex.runSynchronized(idx -> {
             final List<CacheIndexEntry> allEntries = idx.getAllEntries();
+            final List<CacheIndexEntry> entriesToRemove = new ArrayList<>();
             allEntries.stream()
                     .filter(entry -> Objects.equals(idToDelete, idExtractor.apply(entry)))
-                    .forEach(entry -> deleteFromCache(idx, entry));
+                    .peek(entry -> entriesToRemove.add(entry))
+                    .forEach(entry -> deleteFilesFromCache(entry));
+            entriesToRemove.forEach(entry -> idx.removeEntry(entry));
         });
 
         if (OsUtil.isWindows()) {
@@ -325,7 +336,7 @@ class CacheImpl {
         }
     }
 
-    private void deleteFromCache(CacheIndex idx, CacheIndexEntry entry) {
+    private void deleteFilesFromCache(CacheIndexEntry entry) {
         final File cacheFile = getCacheFile(entry);
         final File directory = cacheFile.getParentFile();
 
@@ -338,8 +349,6 @@ class CacheImpl {
         } catch (IOException e) {
             LOG.error("Failed to delete '{}'. continue..." + directory.getAbsolutePath());
         }
-
-        idx.removeEntry(entry);
     }
 
     /**
