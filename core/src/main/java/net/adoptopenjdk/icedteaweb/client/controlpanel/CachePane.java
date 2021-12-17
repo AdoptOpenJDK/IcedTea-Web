@@ -23,7 +23,6 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
-import net.adoptopenjdk.icedteaweb.resources.cache.CachedFile;
 import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
@@ -196,10 +195,10 @@ public class CachePane extends JPanel {
                 int row = cacheTable.getSelectedRow();
                 try {
                     int modelRow = cacheTable.convertRowIndexToModel(row);
-                    CachedFile cachedFile = ((CachedFile) cacheTable.getModel().getValueAt(modelRow, 0));
-                    t.setText("content-length: " + cachedFile.getSize() + "\n" +
-                            "last-updated: " + cachedFile.getDownloadedAt() + "\n" +
-                            "last-modified: " + cachedFile.getLastModified()
+                    ResourceInfo resourceInfo = ((ResourceInfo) cacheTable.getModel().getValueAt(modelRow, 0));
+                    t.setText("content-length: " + resourceInfo.getSize() + "\n" +
+                            "last-updated: " + resourceInfo.getDownloadedAt() + "\n" +
+                            "last-modified: " + resourceInfo.getLastModified()
                     );
                 } catch (Exception ex) {
                     t.setText(ex.toString());
@@ -317,8 +316,8 @@ public class CachePane extends JPanel {
                             return;
                         }
                         int modelRow = cacheTable.convertRowIndexToModel(row);
-                        CachedFile cachedFile = ((CachedFile) cacheTable.getModel().getValueAt(modelRow, 0));
-                        Cache.deleteFromCache(cachedFile);
+                        ResourceInfo resourceInfo = ((ResourceInfo) cacheTable.getModel().getValueAt(modelRow, 0));
+                        Cache.deleteFromCache(resourceInfo);
                         ((CacheTableModel) cacheTable.getModel()).removeRow(modelRow);
                         cacheTable.getSelectionModel().clearSelection();
                     } catch (Exception exception) {
