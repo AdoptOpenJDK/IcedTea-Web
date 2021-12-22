@@ -54,6 +54,7 @@ import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -291,6 +292,7 @@ public class XDesktopEntryTest {
 
         public DummyJnlpWithTitle() throws MalformedURLException {
             super(new File("/some/path/blah.jar"));
+            sourceLocation = new URL("http://localhost:8080/test");
         }
 
         @Override
