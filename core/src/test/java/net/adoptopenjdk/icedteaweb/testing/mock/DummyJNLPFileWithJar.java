@@ -50,11 +50,6 @@ public class DummyJNLPFileWithJar extends JNLPFile {
         codeBase = codebaseRewritter;
         this.jarFiles = jarFiles;
         jarDescs = new JARDesc[jarFiles.length];
-        try {
-            sourceLocation = new URL("http://localhost:8080/test");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
 
         for (int i = 0; i < jarFiles.length; i++) {
             jarDescs[i] = makeJarDesc(jarFiles[i], i==main);
