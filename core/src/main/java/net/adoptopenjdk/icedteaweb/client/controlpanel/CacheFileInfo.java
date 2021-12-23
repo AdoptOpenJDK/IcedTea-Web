@@ -1,13 +1,13 @@
 package net.adoptopenjdk.icedteaweb.client.controlpanel;
 
-import net.adoptopenjdk.icedteaweb.resources.cache.CachedFile;
+import net.adoptopenjdk.icedteaweb.resources.cache.ResourceInfo;
 
 import java.io.File;
 import java.util.Date;
 
 public interface CacheFileInfo {
 
-    CachedFile getInfoFile();
+    ResourceInfo getInfoFile();
 
     File getParentFile();
 
