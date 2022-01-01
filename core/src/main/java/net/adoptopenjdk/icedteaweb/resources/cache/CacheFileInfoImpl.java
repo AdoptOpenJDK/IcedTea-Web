@@ -20,8 +20,8 @@ class CacheFileInfoImpl implements CacheFileInfo {
     }
 
     @Override
-    public String getInfoFile() {
-        return infoFile.toString();
+    public CachedFile getInfoFile() {
+        return infoFile;
     }
 
     @Override
@@ -55,6 +55,11 @@ class CacheFileInfoImpl implements CacheFileInfo {
     }
 
     @Override
+    public long getDownloadedAt() {
+        return infoFile.getDownloadedAt();
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         final Consumer<Object> appender = v -> sb.append(Optional.ofNullable(v).orElse("??")).append(" ;  ");
@@ -65,6 +70,7 @@ class CacheFileInfoImpl implements CacheFileInfo {
         appender.accept(getSize());
         appender.accept(getLastModified());
         appender.accept(getJnlpPath());
+        appender.accept(getDownloadedAt());
 
         return sb.toString();
     }

@@ -207,7 +207,7 @@ class CacheImpl {
     /**
      * Returns whether there is a version of the URL contents in the cache and it is up to date.
      *
-     * @param key the key of the cache entry
+     * @param key          the key of the cache entry
      * @param lastModified time in millis since epoch of last modification
      * @return whether the cache contains the version
      * @throws IllegalArgumentException if the resourceHref is not cacheable
@@ -287,31 +287,40 @@ class CacheImpl {
     }
 
     void deleteFromCache(CacheKey key) {
-        cacheIndex.runSynchronized(idx -> idx
-                .findEntry(key)
-                .ifPresent(entry -> deleteFromCache(idx, entry)));
+        final Optional<CacheIndexEntry> removedEntry = cacheIndex.getSynchronized(idx -> {
+                    final Optional<CacheIndexEntry> entryToRemove = idx.findEntry(key);
+                    entryToRemove.ifPresent(idx::removeEntry);
+                    return entryToRemove;
+                }
+        );
+
+        removedEntry.ifPresent(this::deleteFilesFromCache);
     }
 
     void deleteFromCache(URL resourceHref, VersionString version) {
-        cacheIndex.runSynchronized(idx -> idx
-                .findAllEntries(resourceHref, version)
-                .forEach(entry -> deleteFromCache(idx, entry)));
+        final Set<CacheIndexEntry> removedEntries = cacheIndex.getSynchronized(idx -> {
+            final Set<CacheIndexEntry> entriesToRemove = idx.findAllEntries(resourceHref, version);
+            entriesToRemove.forEach(idx::removeEntry);
+            return entriesToRemove;
+        });
+
+        removedEntries.forEach(this::deleteFilesFromCache);
     }
 
     void deleteFromCache(CacheIdInfo cacheId) {
         final String idToDelete = cacheId.getId();
         final Function<CacheIndexEntry, String> idExtractor = createExtractor(cacheId.getType());
 
-        cacheIndex.runSynchronized(idx -> {
-            final List<CacheIndexEntry> allEntries = idx.getAllEntries();
-            allEntries.stream()
+        final List<CacheIndexEntry> removedEntries = cacheIndex.getSynchronized(idx -> {
+            final List<CacheIndexEntry> entriesToRemove = idx.getAllEntries().stream()
                     .filter(entry -> Objects.equals(idToDelete, idExtractor.apply(entry)))
-                    .forEach(entry -> deleteFromCache(idx, entry));
+                    .collect(Collectors.toList());
+
+            entriesToRemove.forEach(idx::removeEntry);
+            return entriesToRemove;
         });
 
-        if (OsUtil.isWindows()) {
-            WindowsShortcutManager.removeWindowsShortcuts(idToDelete.toLowerCase());
-        }
+        removedEntries.forEach(this::deleteFilesFromCache);
     }
 
     private Function<CacheIndexEntry, String> createExtractor(CacheIdInfo.CacheIdType idType) {
@@ -325,7 +334,7 @@ class CacheImpl {
         }
     }
 
-    private void deleteFromCache(CacheIndex idx, CacheIndexEntry entry) {
+    private void deleteFilesFromCache(CacheIndexEntry entry) {
         final File cacheFile = getCacheFile(entry);
         final File directory = cacheFile.getParentFile();
 
@@ -338,8 +347,6 @@ class CacheImpl {
         } catch (IOException e) {
             LOG.error("Failed to delete '{}'. continue..." + directory.getAbsolutePath());
         }
-
-        idx.removeEntry(entry);
     }
 
     /**

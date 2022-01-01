@@ -3,6 +3,8 @@ package net.adoptopenjdk.icedteaweb.resources.cache;
 import net.adoptopenjdk.icedteaweb.client.controlpanel.CacheIdInfo;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.os.OsUtil;
+import net.sourceforge.jnlp.util.WindowsShortcutManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -199,11 +201,15 @@ public class Cache {
     }
 
     public static void deleteFromCache(final String cacheId) {
-        CacheImpl.getInstance().deleteFromCache(CacheIdInfoImpl.domainId(cacheId));
-        CacheImpl.getInstance().deleteFromCache(CacheIdInfoImpl.jnlpPathId(cacheId));
+        deleteFromCache(CacheIdInfoImpl.domainId(cacheId));
+        deleteFromCache(CacheIdInfoImpl.jnlpPathId(cacheId));
     }
 
     public static void deleteFromCache(final CacheIdInfo cacheId) {
         CacheImpl.getInstance().deleteFromCache(cacheId);
+
+        if (OsUtil.isWindows()) {
+            WindowsShortcutManager.removeWindowsShortcuts(cacheId.getId().toLowerCase());
+        }
     }
 }
