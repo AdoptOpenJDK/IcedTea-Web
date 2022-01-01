@@ -107,7 +107,7 @@ class CachedFile implements ResourceInfo {
         properties.setProperty(key, Long.toString(value));
     }
 
-    boolean exists() {
+    boolean isFile() {
         return properties.getStoreFile().isFile();
     }
 

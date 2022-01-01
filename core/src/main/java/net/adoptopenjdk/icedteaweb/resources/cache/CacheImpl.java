@@ -342,10 +342,10 @@ class CacheImpl {
             LOG.info("Deleting cache file: {}", cacheFile.getAbsolutePath());
             FileUtils.recursiveDelete(cacheFile, directory);
 
-            LOG.info("Deleting cached directory: {}", directory.getAbsolutePath());
+            LOG.info("Deleting cache directory: {}", directory.getAbsolutePath());
             FileUtils.recursiveDelete(directory, directory);
         } catch (IOException e) {
-            LOG.error("Failed to delete '{}'. continue..." + directory.getAbsolutePath());
+            LOG.error("Failed to delete '{}'. continue...", directory.getAbsolutePath());
         }
     }
 
@@ -439,7 +439,7 @@ class CacheImpl {
                     final File cacheFile = infoFile.getCacheFile();
                     final File directory = cacheFile.getParentFile();
 
-                    if (!infoFile.exists()) {
+                    if (!infoFile.isFile()) {
                         LOG.debug("missing info file for {}", entry.getResourceHref());
                         toRemoveFromIndex.add(entry);
                         deleteDir(directory);
@@ -452,6 +452,7 @@ class CacheImpl {
                         deleteDir(directory);
                         continue;
                     }
+
                     final long size = cacheFile.length();
                     if (maxSize >= 0 && curSize + size > maxSize) {
                         LOG.debug("Current cache size is {} - file {} has size {} and would exceed max cache size {}",
