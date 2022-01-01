@@ -287,42 +287,40 @@ class CacheImpl {
     }
 
     void deleteFromCache(CacheKey key) {
-        cacheIndex.runSynchronized(idx -> idx
-                .findEntry(key)
-                .ifPresent(entry -> {
-                     deleteFilesFromCache(entry);
-                     idx.removeEntry(entry);
-                })
+        final Optional<CacheIndexEntry> removedEntry = cacheIndex.getSynchronized(idx -> {
+                    final Optional<CacheIndexEntry> entryToRemove = idx.findEntry(key);
+                    entryToRemove.ifPresent(idx::removeEntry);
+                    return entryToRemove;
+                }
         );
+
+        removedEntry.ifPresent(this::deleteFilesFromCache);
     }
 
     void deleteFromCache(URL resourceHref, VersionString version) {
-        cacheIndex.runSynchronized(idx -> {
-            final List<CacheIndexEntry> entriesToRemove = new ArrayList<>();
-            idx.findAllEntries(resourceHref, version).stream()
-                .peek(entry -> entriesToRemove.add(entry))
-                .forEach(entry -> deleteFilesFromCache(entry));
-            entriesToRemove.forEach(entry -> idx.removeEntry(entry));
+        final Set<CacheIndexEntry> removedEntries = cacheIndex.getSynchronized(idx -> {
+            final Set<CacheIndexEntry> entriesToRemove = idx.findAllEntries(resourceHref, version);
+            entriesToRemove.forEach(idx::removeEntry);
+            return entriesToRemove;
         });
+
+        removedEntries.forEach(this::deleteFilesFromCache);
     }
 
     void deleteFromCache(CacheIdInfo cacheId) {
         final String idToDelete = cacheId.getId();
         final Function<CacheIndexEntry, String> idExtractor = createExtractor(cacheId.getType());
 
-        cacheIndex.runSynchronized(idx -> {
-            final List<CacheIndexEntry> allEntries = idx.getAllEntries();
-            final List<CacheIndexEntry> entriesToRemove = new ArrayList<>();
-            allEntries.stream()
+        final List<CacheIndexEntry> removedEntries = cacheIndex.getSynchronized(idx -> {
+            final List<CacheIndexEntry> entriesToRemove = idx.getAllEntries().stream()
                     .filter(entry -> Objects.equals(idToDelete, idExtractor.apply(entry)))
-                    .peek(entry -> entriesToRemove.add(entry))
-                    .forEach(entry -> deleteFilesFromCache(entry));
-            entriesToRemove.forEach(entry -> idx.removeEntry(entry));
+                    .collect(Collectors.toList());
+
+            entriesToRemove.forEach(idx::removeEntry);
+            return entriesToRemove;
         });
 
-        if (OsUtil.isWindows()) {
-            WindowsShortcutManager.removeWindowsShortcuts(idToDelete.toLowerCase());
-        }
+        removedEntries.forEach(this::deleteFilesFromCache);
     }
 
     private Function<CacheIndexEntry, String> createExtractor(CacheIdInfo.CacheIdType idType) {
