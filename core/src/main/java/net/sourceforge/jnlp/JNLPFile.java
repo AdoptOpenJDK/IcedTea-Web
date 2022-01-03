@@ -866,12 +866,14 @@ public class JNLPFile {
     }
 
     public String getShortcutName() {
-        String basicTitle = getInformation().getTitle();
+        String shortcutName;
+        final String basicTitle = getInformation().getTitle();
         if (StringUtils.isBlank(basicTitle)) {
-            return createShortcutNameFromLocation().replaceAll("\\.jnlp$", "");
+            shortcutName = createShortcutNameFromLocation().replaceAll("\\.jnlp$", "");
         } else {
-            return basicTitle;
+            shortcutName = basicTitle;
         }
+        return shortcutName + "_" + getLocationHashCode();
     }
 
     public String getLocationHashCode() {
