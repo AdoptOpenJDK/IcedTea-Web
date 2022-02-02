@@ -48,6 +48,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.currentTimeMillis;
+
 /**
  * Process & thread lockable access to a file. Creates file if it does not already exist.
  */
@@ -299,7 +301,7 @@ public class LockableFile {
     }
 
     /**
-     * This is an alternative approach to locking a file system wide.
+     * This is an alternative approach to locking a file system-wide.
      * <p>
      * This is not recommended as there are claims that this is not reliable.
      * Most likely there are issues with remote file systems but the claims do not go into detail.
@@ -315,11 +317,9 @@ public class LockableFile {
                 return;
             }
 
-            logger.debug("Trying to create lock file {}", lockFile.getPath());
             while (file.exists() && !tryLock()) {
                 try {
                     Thread.sleep(500);
-                    logger.debug("Trying to create lock file {}", lockFile.getPath());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -342,6 +342,7 @@ public class LockableFile {
                 logger.debug("Could not create lock file {}", lockFile.getPath());
                 return false;
             }
+            logger.debug("Created lock file {}", lockFile.getPath());
             lockFile.deleteOnExit();
             return true;
         }
@@ -352,16 +353,16 @@ public class LockableFile {
                 if (lockFile.exists()) {
                     logger.error("Failed to delete lock file {}", lockFile);
                 }
+            } else {
+                logger.error("Deleted lock file {}", lockFile);
             }
         }
 
         private void deleteStaleLockFile() throws IOException {
             final BasicFileAttributes attr = Files.readAttributes(lockFile.toPath(), BasicFileAttributes.class);
-            final long currentTime = System.currentTimeMillis();
-            final long createTime = attr.creationTime().toMillis();
-            final long ageInMillis = (currentTime - createTime);
+            final long ageInMillis = currentTimeMillis() - attr.creationTime().toMillis();
             if (ageInMillis > STALENESS_INTERVAL_IN_MILLIS) {
-                logger.debug("Deleting stale lock file {}", lockFile.getPath());
+                logger.debug("Found stale lock file {}", lockFile.getPath());
                 unlock();
             }
         }
