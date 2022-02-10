@@ -43,6 +43,7 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
+import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
 
@@ -873,11 +874,6 @@ public class JNLPFile {
         } else {
             shortcutName = basicTitle;
         }
-        return shortcutName + "_" + getLocationHashCode();
-    }
-
-    public String getLocationHashCode() {
-        final String code = "" + Math.abs(getSourceLocation().hashCode());
-        return code;
+        return shortcutName + JNLPRuntime.getExtensionPoint().uniqueShortcutSuffix(this);
     }
 }

@@ -358,9 +358,11 @@ public class XDesktopEntry implements GenericDesktopEntry {
         this.iconLocation = target.getAbsolutePath();
         LOG.debug("Cached desktop shortcut icon: " + target + " ,  With source from: " + cacheFile.getAbsolutePath());
     }
+
     private String getUniqueIconName(final String iconName) {
-        return file.getLocationHashCode() + "_" + iconName;
+        return Math.abs(file.getSourceLocation().hashCode()) + "_" + iconName;
     }
+
     private File convertToIco(final File source, final String targetName) {
         try {
             BufferedImage img = ImageIO.read(source);

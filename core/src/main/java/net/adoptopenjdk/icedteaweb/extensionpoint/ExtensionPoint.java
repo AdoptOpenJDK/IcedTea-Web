@@ -6,6 +6,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DefaultDownloa
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.sourceforge.jnlp.ItwJvmLauncher;
+import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.proxy.browser.FirefoxProxySelector;
 import net.sourceforge.jnlp.runtime.ItwMenuAndDesktopIntegration;
@@ -50,5 +51,9 @@ public interface ExtensionPoint {
 
     default List<String> getTranslationResources() {
         return emptyList();
+    }
+
+    default String uniqueShortcutSuffix(JNLPFile jnlpFile) {
+        return "";
     }
 }
