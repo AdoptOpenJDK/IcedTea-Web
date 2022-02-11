@@ -350,9 +350,9 @@ public class LockableFile {
         @Override
         public void unlock() throws IOException {
             if (lockFile.delete()) {
-                logger.error("Deleted lock file {}", lockFile);
+                logger.debug("Deleted lock file {}", lockFile);
             } else if (lockFile.exists()) {
-                logger.error("Failed to delete lock file {}", lockFile);
+                logger.debug("Failed to delete lock file {}", lockFile);
             }
         }
 
