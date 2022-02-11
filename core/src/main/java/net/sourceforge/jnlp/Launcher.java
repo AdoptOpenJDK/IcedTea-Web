@@ -656,9 +656,11 @@ public class Launcher {
                 doPerApplicationAppContextHacks();
 
                 if (file.isApplication()) {
+                    LOG.debug("Launching Application");
                     application = launchApplication(file);
                 }
                 else if (file.isApplet()) {
+                    LOG.debug("Launching Applet");
                     application = launchApplet(file, cont);
                 }
                 else if (file.isInstaller()) {
