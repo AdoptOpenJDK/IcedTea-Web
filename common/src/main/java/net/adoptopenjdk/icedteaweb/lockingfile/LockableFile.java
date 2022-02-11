@@ -352,7 +352,7 @@ public class LockableFile {
             if (lockFile.delete()) {
                 logger.debug("Deleted lock file {}", lockFile);
             } else if (lockFile.exists()) {
-                logger.debug("Failed to delete lock file {}", lockFile);
+                logger.info("Failed to delete lock file {}", lockFile);
             }
         }
 
