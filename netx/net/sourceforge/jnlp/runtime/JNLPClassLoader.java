@@ -1559,6 +1559,12 @@ public class JNLPClassLoader extends URLClassLoader {
      */
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
+        synchronized (getClassLoadingLock(name)) {
+            return loadClassImpl(name);
+        }
+    }
+
+    private Class<?> loadClassImpl(String name) throws ClassNotFoundException {
         Class<?> result = findLoadedClassAll(name);
 
         // try parent classloader
