@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.HTTP_AGENT;
@@ -823,16 +824,19 @@ public class JNLPFile {
      * @return the download options to use for downloading jars listed in this jnlp file.
      */
     public DownloadOptions getDownloadOptions() {
-        boolean usePack = false;
-        boolean useVersion = false;
-        ResourcesDesc desc = getResources();
-        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.packEnabled"))) {
-            usePack = true;
-        }
-        if (Boolean.valueOf(desc.getPropertiesMap().get("jnlp.versionEnabled"))) {
-            useVersion = true;
-        }
+        final ResourcesDesc desc = getResources();
+        final boolean usePack = parseBoolean(desc.getPropertiesMap().get("jnlp.packEnabled")) && packIsSupportedByCurrentJvm();
+        final boolean useVersion = parseBoolean(desc.getPropertiesMap().get("jnlp.versionEnabled"));
         return new DownloadOptions(usePack, useVersion);
+    }
+
+    private boolean packIsSupportedByCurrentJvm() {
+        try {
+            final Class<?> c = getClass().getClassLoader().loadClass("java.util.jar.Pack200");
+            return  c != null;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     /**
