@@ -834,7 +834,7 @@ public class JNLPFile {
         try {
             final Class<?> c = getClass().getClassLoader().loadClass("java.util.jar.Pack200");
             return  c != null;
-        } catch (ClassNotFoundException e) {
+        } catch (Exception | Error e) {
             return false;
         }
     }
