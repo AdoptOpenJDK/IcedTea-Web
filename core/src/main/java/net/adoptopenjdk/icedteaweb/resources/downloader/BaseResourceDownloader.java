@@ -117,7 +117,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         globalFixedThreadPool().execute(() -> {
             try {
                 result.complete(tryDownloading(url));
-            } catch (Exception e) {
+            } catch (Exception | Error e) {
                 result.completeExceptionally(e);
             }
         });
