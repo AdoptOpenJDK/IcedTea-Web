@@ -762,7 +762,8 @@ public final class Parser {
         String sizeInString = getAttribute(node, IconDesc.SIZE_ATTRIBUTE, "-1");
         try {
             size = Integer.parseInt(sizeInString);
-        } catch (NumberFormatException numberFormatException) {
+              } 
+        catch (NumberFormatException numberFormatException) {
             String[] widthXheight = sizeInString.split("x");
             width = Integer.parseInt(WidthXHeight[0]);
             height = Integer.parseInt(WidthXHeight[1]);
