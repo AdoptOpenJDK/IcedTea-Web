@@ -764,7 +764,7 @@ public final class Parser {
             size = Integer.parseInt(sizeInString);
               } 
         catch (NumberFormatException numberFormatException) {
-            String[] widthXheight = sizeInString.split("x");
+            String[] WidthXHeight = sizeInString.split("x");
             width = Integer.parseInt(WidthXHeight[0]);
             height = Integer.parseInt(WidthXHeight[1]);
         }
