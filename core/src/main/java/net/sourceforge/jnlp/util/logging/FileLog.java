@@ -56,7 +56,7 @@ public final class FileLog {
 
     private static final String DEFAULT_LOGGER_NAME = TextsProvider.ITW + " file-logger";
     private static final String TIME_SEPARATOR = OsUtil.isWindows() ? "_" : ":";
-    private static final SimpleDateFormat FILE_LOG_NAME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd_HH" + TIME_SEPARATOR + "mm" + TIME_SEPARATOR + "ss.S");
+    public static final SimpleDateFormat FILE_LOG_NAME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd_HH" + TIME_SEPARATOR + "mm" + TIME_SEPARATOR + "ss.S");
 
     private static String logFileNamePrefix;
     private static String logFileNamePostfix;
