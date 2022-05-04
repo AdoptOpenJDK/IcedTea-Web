@@ -58,7 +58,7 @@ public final class FileLog {
     private static final String TIME_SEPARATOR = OsUtil.isWindows() ? "_" : ":";
     private static final SimpleDateFormat FILE_LOG_NAME_FORMATTER = new SimpleDateFormat("yyyy-MM-dd_HH" + TIME_SEPARATOR + "mm" + TIME_SEPARATOR + "ss.S");
 
-    private static final String logFileNamePrefix;
+    private static String logFileNamePrefix;
     private static String logFileNamePostfix;
 
     static {
@@ -87,6 +87,10 @@ public final class FileLog {
 
     public static void setLogFileNamePostfix(String logFileNamePostfix) {
         FileLog.logFileNamePostfix = Assert.requireNonBlank(logFileNamePostfix, "logFileNamePostfix");
+    }
+
+    public static void setLogFileNamePrefix(String logFileNamePrefix) {
+        FileLog.logFileNamePrefix = Assert.requireNonBlank(logFileNamePrefix, "logFileNamePrefix");
     }
 
     public static SingleStreamLogger createFileLog() {
