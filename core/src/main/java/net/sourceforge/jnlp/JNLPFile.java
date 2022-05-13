@@ -832,7 +832,7 @@ public class JNLPFile {
 
     private boolean packIsSupportedByCurrentJvm() {
         try {
-            final Class<?> c = getClass().getClassLoader().loadClass("java.util.jar.Pack200");
+            final Class<?> c = ClassLoader.getSystemClassLoader().loadClass("java.util.jar.Pack200");
             return  c != null;
         } catch (Exception | Error e) {
             return false;
