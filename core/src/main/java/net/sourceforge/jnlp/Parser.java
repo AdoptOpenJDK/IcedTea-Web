@@ -758,7 +758,16 @@ public final class Parser {
     private IconDesc getIcon(XmlNode node) throws ParseException {
         int width = Integer.parseInt(getAttribute(node, IconDesc.WIDTH_ATTRIBUTE, "-1"));
         int height = Integer.parseInt(getAttribute(node, IconDesc.HEIGHT_ATTRIBUTE, "-1"));
-        int size = Integer.parseInt(getAttribute(node, IconDesc.SIZE_ATTRIBUTE, "-1"));
+        int size = -1;
+        String sizeInString = getAttribute(node, IconDesc.SIZE_ATTRIBUTE, "-1");
+        try {
+            size = Integer.parseInt(sizeInString);
+        } 
+        catch (NumberFormatException NumberFormatException) {
+            String[] WidthXHeight = sizeInString.split("x");
+            width = Integer.parseInt(WidthXHeight[0]);
+            height = Integer.parseInt(WidthXHeight[1]);
+        }
         int depth = Integer.parseInt(getAttribute(node, IconDesc.DEPTH_ATTRIBUTE, "-1"));
         URL location = getRequiredURL(node, IconDesc.HREF_ATTRIBUTE, base, strict);
 
