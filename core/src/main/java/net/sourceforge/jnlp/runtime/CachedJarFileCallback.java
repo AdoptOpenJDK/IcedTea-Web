@@ -94,6 +94,7 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
         }
 
         if (localUrl == null) {
+            LOG.info("could not find mapping for {} - falling back to downloading without caching", url);
             /*
              * If the jar url is not known, treat it as it would be treated in
              * general by URLJarFile.

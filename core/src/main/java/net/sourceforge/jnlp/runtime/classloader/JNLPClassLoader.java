@@ -581,6 +581,7 @@ public class JNLPClassLoader extends URLClassLoader {
     private void initializeReadJarPermissions() {
 
         JARDesc[] jars = resources.getJARs();
+        int counter = 0;
         for (JARDesc jar : jars) {
             Permission p = getReadPermission(jar);
 
@@ -588,9 +589,11 @@ public class JNLPClassLoader extends URLClassLoader {
                 LOG.info("Unable to add permission for {}", jar.getLocation());
             } else {
                 resourcePermissions.add(p);
-                LOG.info("Permission added: {}", p.toString());
+                LOG.debug("Permission added: {}", p.toString());
+                counter++;
             }
         }
+        LOG.info("Added permissions for {} jars", counter);
     }
 
     private Permission getReadPermission(JARDesc jar) {

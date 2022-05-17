@@ -106,6 +106,7 @@ public class NativeLibraryStorage {
         LOG.info("Activate native: {}", jarLocation);
         final File localFile = tracker.getCacheFile(jarLocation);
         if (localFile == null || !localFile.isFile()) {
+            LOG.debug("No local file found for {}", jarLocation);
             return;
         }
 
