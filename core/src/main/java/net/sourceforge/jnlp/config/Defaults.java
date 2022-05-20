@@ -183,6 +183,21 @@ public class Defaults {
             ),
 
             /*
+             * Windows certificates key stores
+             */
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_USE_ROOTCA_STORE_TYPE_WINDOWS_ROOT,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_USE_ROOTCA_STORE_TYPE_WINDOWS_MY,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),               
+            
+            
+            /*
              * security access and control
              */
             Setting.createDefault(

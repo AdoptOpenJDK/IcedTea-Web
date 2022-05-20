@@ -42,6 +42,9 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
+import net.sourceforge.jnlp.security.KeyStores.KeyStoreWrap;
+import net.sourceforge.jnlp.security.KeyStores.KeyStoreWindows;
+import net.sourceforge.jnlp.security.KeyStores.KeyStoreWithPath;
 import net.sourceforge.jnlp.security.KeyStores.Level;
 import net.sourceforge.jnlp.security.SecurityUtil;
 import net.sourceforge.jnlp.util.RestrictedFileUtils;
@@ -111,7 +114,7 @@ public class CertificatePane extends JPanel {
         };
 
     JTabbedPane tabbedPane;
-    JTextField certPath = new JTextField();
+    JTextField certLocation = new JTextField();
     private final JTable userTable;
     private final JTable systemTable;
     private JComboBox<CertificateType> certificateTypeCombo;
@@ -120,6 +123,7 @@ public class CertificatePane extends JPanel {
 
     /** JComponents that should be disabled for system store */
     private final List<JComponent> disableForSystem;
+    private final List<JComponent> disableForWindowsStores;    
 
     private Window parent;
     private JComponent defaultFocusComponent = null;
@@ -128,7 +132,7 @@ public class CertificatePane extends JPanel {
      * The Current KeyStore. Only one table/tab is visible for interaction to
      * the user. This KeyStore corresponds to that.
      */
-    private KeyStores.KeyStoreWithPath keyStore = null;
+    private KeyStoreWrap keyStoreWrap = null;
 
     public CertificatePane(Window parent) {
         super();
@@ -139,6 +143,7 @@ public class CertificatePane extends JPanel {
         systemTable = new JTable(null);
         systemTable.setAutoCreateRowSorter(true);
         disableForSystem = new ArrayList<>();
+        disableForWindowsStores  = new ArrayList<>();
 
         addComponents();
 
@@ -157,7 +162,7 @@ public class CertificatePane extends JPanel {
      */
     private void initializeKeyStore() {
         try {
-            keyStore = KeyStores.getKeyStore(currentKeyStoreLevel, currentKeyStoreType);
+        	keyStoreWrap = KeyStores.getWrapContainer(currentKeyStoreLevel, currentKeyStoreType).getWrap();       	
         } catch (Exception e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         }
@@ -224,24 +229,24 @@ public class CertificatePane extends JPanel {
         for (int i = 0; i < buttonNames.length; i++) {
             button = new JButton(buttonNames[i]);
             maxWidth = Math.max(maxWidth, button.getMinimumSize().width);
-        }
-
+        }       
         for (int i = 0; i < buttonNames.length; i++) {
             button = new JButton(buttonNames[i]);
             button.setMnemonic(buttonMnemonics[i]);
             button.addActionListener(listeners[i]);
-            button.setSize(maxWidth, button.getSize().height);
+            button.setSize(maxWidth, button.getSize().height);           
             // import and remove buttons
             if (i == 0 || i == 2) {
-                disableForSystem.add(button);
+            	disableForSystem.add(button);
+            	disableForWindowsStores.add(button);
             }
             buttonPanel.add(button);
         }
 
         tablePanel.add(tabbedPane, BorderLayout.CENTER);
         JPanel buttonPanelWrapper = new JPanel(new BorderLayout());
-        certPath.setEditable(false);
-        buttonPanelWrapper.add(certPath, BorderLayout.CENTER);
+        certLocation.setEditable(false);
+        buttonPanelWrapper.add(certLocation, BorderLayout.CENTER);
         buttonPanelWrapper.add(buttonPanel, BorderLayout.EAST);
         tablePanel.add(buttonPanelWrapper, BorderLayout.SOUTH);
         main.add(certificateTypePanel, BorderLayout.NORTH);
@@ -277,9 +282,9 @@ public class CertificatePane extends JPanel {
         try {
 
             //Get all of the X509Certificates and put them into an ArrayList
-            aliases = keyStore.getKs().aliases();
+            aliases = keyStoreWrap.getKs().aliases();
             while (aliases.hasMoreElements()) {
-                Certificate c = keyStore.getKs().getCertificate(aliases.nextElement());
+                Certificate c = keyStoreWrap.getKs().getCertificate(aliases.nextElement());
                 if (c instanceof X509Certificate) {
                     certs.add((X509Certificate) c);
                 }
@@ -308,15 +313,40 @@ public class CertificatePane extends JPanel {
         initializeKeyStore();
         readKeyStore();
         try {
-            File src = new File(keyStore.getPath());
-            File resolved = src.getCanonicalFile();
-            if (resolved.equals(src)) {
-                certPath.setText(keyStore.getPath());
-                LOG.info(keyStore.getPath());
-            } else {
-                certPath.setText(keyStore.getPath() + " -> " + resolved.getCanonicalPath());
-                LOG.info("{} -> {}", keyStore.getPath(), resolved.getCanonicalPath());
-            }
+        	
+        	KeyStores.Family keyStoreFamily =  keyStoreWrap.getFamily();
+        	
+        	switch(keyStoreFamily) {
+        		
+	        	case JKS:
+	        		KeyStoreWithPath keyStorePath = (KeyStoreWithPath)keyStoreWrap;
+	        		
+		            File src = new File(keyStorePath.getPath());
+		            File resolved = src.getCanonicalFile();
+		            if (resolved.equals(src)) {
+		                certLocation.setText(keyStorePath.getPath());
+		                LOG.info(keyStorePath.getPath());
+		            } else {
+		                certLocation.setText(keyStorePath.getPath() + " -> " + resolved.getCanonicalPath());
+		                LOG.info("{} -> {}", keyStorePath.getPath(), resolved.getCanonicalPath());
+		            }	
+		            
+		            if(currentKeyStoreLevel == Level.USER) {
+		                for (JComponent component : disableForSystem) {
+		                    component.setEnabled(true);
+		                } 
+	                }
+	        	case WINDOWS:
+	        		KeyStoreWindows keyStoreWin = (KeyStoreWindows)keyStoreWrap;
+	        		
+	        		certLocation.setText(keyStoreWin.getStoreType().getDescription());
+	        		
+	                for (JComponent component : disableForWindowsStores) {
+	                    component.setEnabled(false);
+	                }        		
+	        		
+	        		LOG.info(keyStoreWin.getStoreType().getDescription());
+        	}
         } catch (Exception ex) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
         }
@@ -380,6 +410,7 @@ public class CertificatePane extends JPanel {
      * or vice versa). Changes the currentKeyStore Enables or disables buttons.
      */
     private class TabChangeListener implements ChangeListener {
+
         @Override
         public void stateChanged(ChangeEvent e) {
             JTabbedPane source = (JTabbedPane) e.getSource();
@@ -388,7 +419,8 @@ public class CertificatePane extends JPanel {
                     currentKeyStoreLevel = Level.USER;
                     for (JComponent component : disableForSystem) {
                         component.setEnabled(true);
-                    }
+                    }                  
+                    
                     break;
                 case 1:
                     currentKeyStoreLevel = Level.SYSTEM;
@@ -410,11 +442,11 @@ public class CertificatePane extends JPanel {
             int returnVal = chooser.showOpenDialog(parent);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
-                    KeyStore ks = keyStore.getKs();
+                    KeyStore ks = keyStoreWrap.getKs();
                     if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
                         char[] password = getPassword(R("CVImportPasswordMessage"));
                         if (password != null) {
-                            final KeyStore caks = KeyStores.getKeyStore(currentKeyStoreLevel, KeyStores.Type.CA_CERTS).getKs();
+                            final KeyStore caks = KeyStores.getWrapContainer(currentKeyStoreLevel, KeyStores.Type.CA_CERTS).getWrap().getKs();
                             final int caksSize = caks.size();
                             CertificateUtils.addPKCS12ToKeyStore(chooser.getSelectedFile(), ks, password, caks);
                             if (caks.size() > caksSize) {
@@ -475,16 +507,16 @@ public class CertificatePane extends JPanel {
                     JFileChooser chooser = new JFileChooser();
                     int returnVal = chooser.showSaveDialog(parent);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        String alias = keyStore.getKs().getCertificateAlias(certs
+                        String alias = keyStoreWrap.getKs().getCertificateAlias(certs
                                                         .get(selectedRow));
                         if (alias != null) {
                             if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
                                 char[] password = getPassword(R("CVExportPasswordMessage"));
                                 if (password != null) {
-                                    CertificateUtils.dumpPKCS12(alias, chooser.getSelectedFile(), keyStore.getKs(), password);
+                                    CertificateUtils.dumpPKCS12(alias, chooser.getSelectedFile(), keyStoreWrap.getKs(), password);
                                 }
                             } else {
-                                Certificate c = keyStore.getKs().getCertificate(alias);
+                                Certificate c = keyStoreWrap.getKs().getCertificate(alias);
                                 PrintStream ps = new PrintStream(chooser.getSelectedFile().getAbsolutePath());
                                 CertificateUtils.dump(c, ps);
                             }
@@ -516,7 +548,7 @@ public class CertificatePane extends JPanel {
                 int selectedRow = table.getSelectedRow();
 
                 if (selectedRow != -1) {
-                    String alias = keyStore.getKs().getCertificateAlias(certs.get(selectedRow));
+                    String alias = keyStoreWrap.getKs().getCertificateAlias(certs.get(selectedRow));
                     if (alias != null) {
 
                         int i = JOptionPane.showConfirmDialog(parent,
@@ -524,12 +556,12 @@ public class CertificatePane extends JPanel {
                                                         R("CVRemoveConfirmTitle"),
                                                         JOptionPane.YES_NO_OPTION);
                         if (i == 0) {
-                            keyStore.getKs().deleteEntry(alias);
+                        	keyStoreWrap.getKs().deleteEntry(alias);
                             File keyStoreFile = KeyStores.getKeyStoreLocation(currentKeyStoreLevel, currentKeyStoreType).getFile();
                             if (!keyStoreFile.isFile()) {
                                 RestrictedFileUtils.createRestrictedFile(keyStoreFile);
                             }
-                            SecurityUtil.storeKeyStore(keyStore.getKs(), keyStoreFile);
+                            SecurityUtil.storeKeyStore(keyStoreWrap.getKs(), keyStoreFile);
                         }
                     }
                     repopulateTables();

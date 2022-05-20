@@ -126,7 +126,7 @@ public class CertificateUtils {
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(bis, password);
-        KeyStore systemCa = KeyStores.getKeyStore(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS).getKs();
+        KeyStore systemCa = KeyStores.getWrapContainer(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS).getWrap().getKs();
 
         Enumeration<String> aliasList = keyStore.aliases();
 
@@ -182,7 +182,7 @@ public class CertificateUtils {
                     // Verify against this entry
                     final String alias = aliases.nextElement();
                     if (c.equals(keyStore.getCertificate(alias))) {
-                        LOG.debug("{} found in cacerts ({})", c.getSubjectX500Principal().getName(), KeyStores.getPathToKeystore(keyStore));
+                        LOG.debug("{} found in cacerts ({})", c.getSubjectX500Principal().getName(), KeyStores.getLocationToKeystore(keyStore));
                         return true;
                     } // else continue
                 }
