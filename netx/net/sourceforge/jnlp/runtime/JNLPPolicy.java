@@ -17,13 +17,14 @@
 package net.sourceforge.jnlp.runtime;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.security.*;
 import java.util.Enumeration;
+import java.util.PropertyPermission;
 
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.config.PathsAndFiles;
+import net.sourceforge.jnlp.util.UrlUtils;
 import net.sourceforge.jnlp.util.logging.OutputController;
 
 /**
@@ -55,6 +56,9 @@ public class JNLPPolicy extends Policy {
     /** the user-level policy for jnlps */
     private Policy userJnlpPolicy = null;
 
+    private static URL pacUrl;
+    private static URL pacFuncsUrl;
+
     protected JNLPPolicy() {
         shellSource = JNLPPolicy.class.getProtectionDomain().getCodeSource();
         systemSource = Policy.class.getProtectionDomain().getCodeSource();
@@ -77,6 +81,10 @@ public class JNLPPolicy extends Policy {
 
         if (isSystemJar(source)) {
             return getAllPermissions();
+        }
+
+        if (isPacFile(source)) {
+            return getPacPermissions();
         }
 
         // if we check the SecurityDesc here then keep in mind that
@@ -145,6 +153,18 @@ public class JNLPPolicy extends Policy {
         return result;
     }
 
+    public static void enablePac(URL inputPacUrl, URL inputPacFuncsUrl) {
+        pacUrl = inputPacUrl;
+        pacFuncsUrl = inputPacFuncsUrl;
+    }
+
+    private Permissions getPacPermissions() {
+        Permissions result = new Permissions();
+        result.add(new SocketPermission("*", "resolve"));
+        result.add(new PropertyPermission("java.vm.name", "read"));
+        return result;
+    }
+
     /**
      * Returns true if the CodeSource corresponds to a system jar. That is,
      * it's part of the JRE.
@@ -169,6 +189,21 @@ public class JNLPPolicy extends Policy {
         }
 
         return false;
+    }
+
+    private boolean isPacFile(CodeSource source) {
+        if (source == null || source.getLocation() == null) {
+            return false;
+        }
+
+        if (pacUrl == null || pacFuncsUrl == null) {
+            return false;
+        }
+
+        URL sourceLocation = source.getLocation();
+
+        return UrlUtils.urlEquals(sourceLocation, pacFuncsUrl) ||
+               UrlUtils.urlEquals(sourceLocation, pacUrl);
     }
 
     /**

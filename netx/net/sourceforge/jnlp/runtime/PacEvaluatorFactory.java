@@ -64,7 +64,7 @@ public class PacEvaluatorFactory {
         }
 
         if (properties == null) {
-            return new FakePacEvaluator();
+            return new NashornBasedPacEvaluator(pacUrl);
         }
 
         String available = properties.getProperty("rhino.available");
@@ -92,6 +92,6 @@ public class PacEvaluatorFactory {
             }
         }
 
-        return new FakePacEvaluator();
+        return new NashornBasedPacEvaluator(pacUrl);
     }
 }
