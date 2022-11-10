@@ -359,9 +359,11 @@ jobs:
 
       - name: Cygwin git configuration
         shell: bash
-        run: mkdir $HOME && git config --system core.autocrlf false
+        run: mkdir $HOME && git config --system core.autocrlf false && git config --system --add safe.directory '*'
 
       - uses: actions/checkout@v2
+        with:
+          set-safe-directory: false
 
       - name: Install Dependencies
         run: |
