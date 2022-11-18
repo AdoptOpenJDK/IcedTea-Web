@@ -43,6 +43,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class FileLogTest {
 
@@ -57,7 +58,7 @@ public class FileLogTest {
     @BeforeClass
     public static void prepareTmpFiles() throws IOException {
         for (int i = 0; i < loggingTargets.length; i++) {
-            loggingTargets[i] = File.createTempFile("fileLogger", "iteTest");
+            loggingTargets[i] = Files.createTempFile("fileLogger", "iteTest").toFile();
             loggingTargets[i].deleteOnExit();
         }
         //delete first half of the files, logger should handle both cases

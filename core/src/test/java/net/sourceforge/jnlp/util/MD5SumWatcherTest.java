@@ -40,6 +40,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertFalse;
@@ -52,7 +53,7 @@ public class MD5SumWatcherTest {
 
     @Before
     public void createNewFile() throws Exception {
-        file = File.createTempFile("md5sumwatchertest", "tmp");
+        file = Files.createTempFile("md5sumwatchertest", "tmp").toFile();
         file.deleteOnExit();
         watcher = new MD5SumWatcher(file);
     }

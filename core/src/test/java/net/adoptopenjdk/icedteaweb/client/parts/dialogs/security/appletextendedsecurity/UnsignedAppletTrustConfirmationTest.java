@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -107,7 +108,7 @@ public class UnsignedAppletTrustConfirmationTest {
     @BeforeClass
     public static void backupAppTrust() throws IOException{
         PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().createNewFile();
-        backup = File.createTempFile("appletExtendedSecurity", "itwUnittest");
+        backup = Files.createTempFile("appletExtendedSecurity", "itwUnittest").toFile();
         backup.deleteOnExit();
         FirefoxProfilesOperator.copyFile(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), backup);
     }

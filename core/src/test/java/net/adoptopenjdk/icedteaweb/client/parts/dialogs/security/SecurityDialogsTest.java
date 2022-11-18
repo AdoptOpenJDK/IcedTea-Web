@@ -66,6 +66,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.HashSet;
 
 @Ignore
@@ -142,7 +143,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
     @BeforeClass
     public static void backupAppletSecurity() throws IOException {
         if (PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().exists()) {
-            appletSecurityBackup = File.createTempFile("appletSecurity", "itwTestBackup");
+            appletSecurityBackup = Files.createTempFile("appletSecurity", "itwTestBackup").toFile();
             FirefoxProfilesOperator.copyFile(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), appletSecurityBackup);
         }
     }

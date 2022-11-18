@@ -11,6 +11,7 @@ import org.junit.Test;
 import javax.swing.JButton;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,7 @@ public class AppTrustWarningPanelTest {
 
 
     public static void backupAppletSecurity() throws IOException {
-        appletSecurityBackup = File.createTempFile("appletSecurity", "itwTestBackup");
+        appletSecurityBackup = Files.createTempFile("appletSecurity", "itwTestBackup").toFile();
         FirefoxProfilesOperator.copyFile(PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile(), appletSecurityBackup);
     }
 

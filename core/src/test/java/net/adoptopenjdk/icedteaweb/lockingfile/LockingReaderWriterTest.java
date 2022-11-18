@@ -24,6 +24,7 @@ import org.junit.Test;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class LockingReaderWriterTest {
 
     @Before
     public void setUp() throws IOException {
-        storagefile = File.createTempFile("foo", "bar");
+        storagefile = Files.createTempFile("foo", "bar").toFile();
     }
 
     @Test

@@ -45,6 +45,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.AbstractMap;
 
 import static org.junit.Assert.assertEquals;
@@ -55,7 +56,7 @@ public class DeploymentPropertiesModifierTest {
 
     @Test
     public void testSetProperties() throws IOException {
-        File tempUserFile = File.createTempFile("userDeploy", "");
+        File tempUserFile = Files.createTempFile("userDeploy", "").toFile();
         tempUserFile.deleteOnExit();
 
         deploymentFile = tempUserFile;
@@ -75,7 +76,7 @@ public class DeploymentPropertiesModifierTest {
 
     @Test
     public void testRestoreProperties() throws IOException {
-        File tempUserFile = File.createTempFile("userDeploy", "");
+        File tempUserFile = Files.createTempFile("userDeploy", "").toFile();
         tempUserFile.deleteOnExit();
 
         deploymentFile = tempUserFile;
@@ -99,7 +100,7 @@ public class DeploymentPropertiesModifierTest {
 
     @Test(expected = IllegalStateException.class)
     public void testRestorePropertiesRequiresPropertiesSetFirst() throws IOException {
-        File tempUserFile = File.createTempFile("userDeploy", "");
+        File tempUserFile = Files.createTempFile("userDeploy", "").toFile();
         tempUserFile.deleteOnExit();
 
         deploymentFile = tempUserFile;
@@ -115,7 +116,7 @@ public class DeploymentPropertiesModifierTest {
 
     @Test (expected = IllegalStateException.class)
     public void testUsingSameDeploymentPropertiesModifierThrowsException() throws IOException {
-        File tempUserFile = File.createTempFile("userDeploy", "");
+        File tempUserFile = Files.createTempFile("userDeploy", "").toFile();
         tempUserFile.deleteOnExit();
 
         deploymentFile = tempUserFile;
@@ -135,7 +136,7 @@ public class DeploymentPropertiesModifierTest {
 
     @Test
     public void testUsingDifferentDeploymentPropertiesModifier() throws IOException {
-        File tempUserFile = File.createTempFile("userDeploy", "");
+        File tempUserFile = Files.createTempFile("userDeploy", "").toFile();
         tempUserFile.deleteOnExit();
 
         deploymentFile = tempUserFile;
@@ -157,7 +158,7 @@ public class DeploymentPropertiesModifierTest {
     
      @Test
     public void testMultipleDeploymentPropertiesModifier() throws IOException {
-        File tempUserFile = File.createTempFile("userDeploy", "");
+        File tempUserFile = Files.createTempFile("userDeploy", "").toFile();
         tempUserFile.deleteOnExit();
 
         String content = "a.b=12\nc.d=34\ne.f=56\ng.h=78\ni.j=90";

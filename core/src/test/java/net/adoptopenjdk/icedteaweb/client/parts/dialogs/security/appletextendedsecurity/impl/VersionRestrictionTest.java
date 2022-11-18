@@ -35,6 +35,7 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.appletextended
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -65,7 +66,7 @@ public class VersionRestrictionTest extends NoStdOutErrTest {
 
     @Before
     public void prepareNewTestFile() throws IOException {
-        testFile = File.createTempFile("itwAES", "testFile");
+        testFile = Files.createTempFile("itwAES", "testFile").toFile();
         testFile.deleteOnExit();
     }
 

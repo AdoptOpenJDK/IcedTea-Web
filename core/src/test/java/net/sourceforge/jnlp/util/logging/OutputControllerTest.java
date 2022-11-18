@@ -48,6 +48,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Random;
 
 public class OutputControllerTest {
@@ -181,7 +182,7 @@ public class OutputControllerTest {
                     ByteArrayOutputStream os2 = new ByteArrayOutputStream();
                     OutputController oc = new OutputController(os1, os2);
 
-                    File f = File.createTempFile("replacedFilelogger", "itwTest");
+                    File f = Files.createTempFile("replacedFilelogger", "itwTest").toFile();
                     f.deleteOnExit();
                     oc.setFileLog(new WriterBasedFileLog(f.getAbsolutePath(), false));
                     LogConfig.getLogConfig().setLogToFile(true);
@@ -295,8 +296,8 @@ public class OutputControllerTest {
         ByteArrayOutputStream os1 = new ByteArrayOutputStream();
         ByteArrayOutputStream os2 = new ByteArrayOutputStream();
         OutputController oc = new OutputController(os1, os2);
-        File f1 = File.createTempFile("replacedFilelogger", "itwTest");
-        File f2 = File.createTempFile("replacedFilelogger", "itwTest");
+        File f1 = Files.createTempFile("replacedFilelogger", "itwTest").toFile();
+        File f2 = Files.createTempFile("replacedFilelogger", "itwTest").toFile();
         f1.deleteOnExit();
         f2.deleteOnExit();
         oc.setFileLog(new WriterBasedFileLog(f1.getAbsolutePath(), false));

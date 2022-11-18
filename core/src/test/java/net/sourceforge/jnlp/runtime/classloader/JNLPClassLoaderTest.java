@@ -265,7 +265,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     public void tryNullManifest() throws Exception {
         File tempDirectory = temporaryFolder.newFolder();
         File jarLocation = new File(tempDirectory, "test-npe.jar");
-        File dummyContent = File.createTempFile("dummy", "context", tempDirectory);
+        File dummyContent = Files.createTempFile(tempDirectory.toPath(), "dummy", "context").toFile();
 
         /* Test with-out any attribute specified specified */
         FileTestUtils.createJarWithoutManifestContents(jarLocation, dummyContent);
@@ -289,7 +289,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         //for this test is enough to not crash jvm
         final boolean verifyBackup = JNLPRuntime.isVerifying();
         final File dir = temporaryFolder.newFolder();
-        final File dirHolder = File.createTempFile("pf-", ".jar", dir);
+        final File dirHolder = Files.createTempFile(dir.toPath(), "pf-", ".jar").toFile();
         final File jarLocation = new File(dirHolder.getParentFile(), "pf.jar");
         try {
             //it is invalid jar, so we have to disable checks first

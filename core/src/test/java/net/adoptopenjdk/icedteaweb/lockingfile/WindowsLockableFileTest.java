@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.OS_NAME;
 
@@ -31,7 +32,7 @@ public class WindowsLockableFileTest {
 
     @Test
     public void testLockUnlockOkExists() throws IOException {
-        File f = File.createTempFile("itw", "lockingFile");
+        File f = Files.createTempFile("itw", "lockingFile").toFile();
         f.deleteOnExit();
         LockableFile lf = LockableFile.getInstance(f);
         lf.lock();
@@ -40,7 +41,7 @@ public class WindowsLockableFileTest {
 
     @Test
     public void testLockUnlockOkNotExists() throws IOException {
-        File f = File.createTempFile("itw", "lockingFile");
+        File f = Files.createTempFile("itw", "lockingFile").toFile();
         f.delete();
         LockableFile lf = LockableFile.getInstance(f);
         lf.lock();
@@ -49,7 +50,7 @@ public class WindowsLockableFileTest {
 
     @Test
     public void testLockUnlockNoOkNotExists() throws IOException {
-        File parent = File.createTempFile("itw", "lockingFile");
+        File parent = Files.createTempFile("itw", "lockingFile").toFile();
         parent.deleteOnExit();
         File f = new File(parent, "itwLcokingRelict");
         f.delete();
