@@ -143,7 +143,6 @@ dnl PR46074 (gcc) - Missing java.net cookie code required by IcedTea plugin
 dnl IT563 - NetX uses sun.security code
 dnl IT605 - NetX depends on sun.misc HexDumpEncoder or sun.security.util.HexDumpEncoder
 dnl IT570 - NetX depends on sun.applet.AppletViewPanel
-dnl IT571 - NetX depends on com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager.java
 dnl IT573 - Plugin depends on sun.awt,X11.XEmbeddedFrame.java
 dnl IT575 - Plugin depends on com.sun/jndi.toolkit.url.UrlUtil
 dnl IT576 - Plugin depends on sun.applet.AppletImageRef
@@ -172,7 +171,6 @@ else
   IT_CHECK_FOR_CLASS(SUN_MISC_LAUNCHER, [sun.misc.Launcher], [some.pkg], [$JAVA_BASE])
 fi
 IT_CHECK_FOR_CLASS(SUN_SECURITY_VALIDATOR_VALIDATOREXCEPTION, [sun.security.validator.ValidatorException], [some.pkg], [$JAVA_BASE])
-IT_CHECK_FOR_CLASS(COM_SUN_NET_SSL_INTERNAL_SSL_X509EXTENDEDTRUSTMANAGER, [com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILE, [sun.net.www.protocol.jar.URLJarFile], [some.pkg], [$JAVA_BASE])
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_JAR_URLJARFILECALLBACK, [sun.net.www.protocol.jar.URLJarFileCallBack], [some.pkg], [$JAVA_BASE])
 if test "x$build_linux" = xyes ; then
@@ -186,9 +184,10 @@ if test "x$build_windows" = xyes ; then
 fi
 IT_CHECK_FOR_CLASS(COM_SUN_JNDI_TOOLKIT_URL_URLUTIL, [com.sun.jndi.toolkit.url.UrlUtil], [some.pkg], [$JAVA_NAMING])
 IT_CHECK_FOR_CLASS(SUN_NET_WWW_PROTOCOL_HTTP_HANDLER, [sun.net.www.protocol.http.Handler], [some.pkg], [$JAVA_BASE])
-IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef], [sun.applet], [$JAVA_DESKTOP])
-
-IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY
+if test "$enable_pluginjar" = yes ; then
+  IT_CHECK_FOR_CLASS(SUN_APPLET_APPLETIMAGEREF, [sun.applet.AppletImageRef], [sun.applet], [$JAVA_DESKTOP])
+  IT_CHECK_FOR_SUN_APPLET_ACCESSIBILITY
+fi
 IT_CHECK_GLIB_VERSION
 IT_CHECK_XULRUNNER_MIMEDESCRIPTION_CONSTCHAR
 IT_CHECK_XULRUNNER_REQUIRES_C11

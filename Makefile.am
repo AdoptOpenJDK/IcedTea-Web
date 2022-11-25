@@ -195,6 +195,9 @@ else
   NETX_EXCLUDE_SRCS=net.sourceforge.jnlp.MalformedXMLParser.java net.sourceforge.jnlp.util.WindowsDesktopEntry.java
 endif
 endif
+if !ENABLE_PLUGINJAR
+  NETX_EXCLUDE_SRCS+= net.sourceforge.jnlp.NetxPanel sun.applet.AppletViewerPanelAccess.java
+endif
 
 # Flags
 # macOS requires this flag, see https://youtrack.jetbrains.com/issue/IDEA-72010
@@ -246,6 +249,7 @@ export ICEDTEAPLUGIN_TARGET = stamps/liveconnect-dist.stamp
 export PLUGIN_DIR=$(TOP_BUILD_DIR)/plugin/icedteanp
 export PLUGIN_SRCDIR=$(TOP_SRC_DIR)/plugin/icedteanp
 export JSOBJECT_DIRS = netscape
+export SUN_DIR = sun
 export SUN_APPLET_DIRS = sun/applet
 export PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
 export LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
@@ -283,7 +287,7 @@ if ENABLE_DOCS
 JAVADOC_OPTS=-use -keywords -encoding UTF-8 -splitIndex \
  -bottom '<font size="-1"> <a href="http://icedtea.classpath.org/bugzilla">Submit a bug or feature</a></font>'
 if HAVE_JAVA9
-JAVADOC_OPTS+=-source $(IT_LANGUAGE_SOURCE_VERSION)
+JAVADOC_OPTS+=-source $(IT_LANGUAGE_SOURCE_VERSION) --ignore-source-errors
 endif
 if JAVADOC_SUPPORTS_J_OPTIONS
 JAVADOC_MEM_OPTS=-J-Xmx1024m -J-Xms128m
@@ -956,11 +960,11 @@ stamps/netx-dist.stamp: stamps/netx.stamp $(TOP_BUILD_DIR)/netx.manifest stamps/
 	(cd $(NETX_DIR) ; \
 	 mkdir -p lib ; \
 	 $(SYSTEM_JDK_DIR)/bin/jar cfm lib/classes.jar \
-	  $(TOP_BUILD_DIR)/netx.manifest javax/jnlp net sun; \
+	  $(TOP_BUILD_DIR)/netx.manifest javax/jnlp net $(SUN_DIR); \
 	 cp -pPR $(SRC_DIR_LINK) $(NETX_SRCDIR) src; \
 	 find src -type f -exec chmod 640 '{}' ';' -o -type d -exec chmod 750 '{}' ';'; \
 	 cd src ; \
-	 $(ZIP) -qr $(NETX_DIR)/lib/src.zip javax net sun)
+	 $(ZIP) -qr $(NETX_DIR)/lib/src.zip javax net $(SUN_DIR))
 	mkdir -p stamps
 	touch $@
 
