@@ -166,10 +166,13 @@ public final class DeploymentConfiguration {
      * @throws ConfigurationException if it encounters a fatal error.
      */
     public void load() throws ConfigurationException {
+        LOG.debug("Start DeploymentConfiguration.load()");
         try {
             load(true);
         } catch (final MalformedURLException ex) {
             throw new ConfigurationException(ex.toString());
+        } finally {
+            LOG.debug("End DeploymentConfiguration.load()");
         }
     }
 
