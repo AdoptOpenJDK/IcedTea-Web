@@ -220,6 +220,7 @@ public class JNLPRuntime {
      * @throws IllegalStateException if the runtime was previously initialized
      */
     public static void initialize() throws IllegalStateException {
+        LOG.debug("Begin JNLPRuntime.initialize()");
         checkInitialized();
 
         try {
@@ -256,7 +257,10 @@ public class JNLPRuntime {
 
         ServiceManager.setServiceManagerStub(new XServiceManagerStub()); // ignored if we're running under Web Start
 
+        LOG.debug("Start get JavaPolicy");
         policy = new JNLPPolicy();
+        LOG.debug("Finished get JavaPolicy");
+
         security = new JNLPSecurityManager(); // side effect: create JWindow
 
         doMainAppContextHacks();
@@ -267,6 +271,7 @@ public class JNLPRuntime {
         }
 
         securityDialogMessageHandler = startSecurityThreads();
+        LOG.debug("Started Security Thread");
 
         // wire in custom authenticator for SSL connections
         try {
@@ -286,8 +291,10 @@ public class JNLPRuntime {
 
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
+        LOG.debug("Start Proxy Selector");
         ProxySelector proxySelector = getExtensionPoint().createProxySelector(getConfiguration());
         ProxySelector.setDefault(proxySelector);
+        LOG.debug("Finished Proxy Selector");
 
         // Restrict access to netx classes
         Security.setProperty("package.access",
@@ -296,12 +303,13 @@ public class JNLPRuntime {
         URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
 
         initialized = true;
-
+        LOG.debug("End JNLPRuntime.initialize()");
     }
 
     public static void reloadPolicy() {
+        LOG.debug("Start JNLPRuntime.reloadPolicy()");
         policy.refresh();
-
+        LOG.debug("End JNLPRuntime.reloadPolicy()");
     }
 
     /**
