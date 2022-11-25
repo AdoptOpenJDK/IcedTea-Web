@@ -396,6 +396,8 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void downloadPackGzFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+        if (downloadFrom.equals(downloadTo))
+            downloadFrom = new URL(downloadFrom + ".pack.gz");        
         downloadFile(connection, downloadFrom);
 
         uncompressPackGz(downloadFrom, downloadTo, resource.getDownloadVersion());
@@ -405,6 +407,8 @@ public class ResourceDownloader implements Runnable {
     }
 
     private void downloadGZipFile(URLConnection connection, URL downloadFrom, URL downloadTo) throws IOException {
+        if (downloadFrom.equals(downloadTo))
+            downloadFrom = new URL(downloadFrom + ".gz");        
         downloadFile(connection, downloadFrom);
 
         uncompressGzip(downloadFrom, downloadTo, resource.getDownloadVersion());
