@@ -338,7 +338,7 @@ public final class FileUtils {
             return;
         }
 
-        if (!(file.getCanonicalPath().startsWith(base.getCanonicalPath()))) {
+        if (!(file.getCanonicalFile().toPath().startsWith(base.getCanonicalFile().toPath()))) {
             throw new IOException("Trying to delete a file outside Netx's basedir: "
                     + file.getCanonicalPath());
         }
