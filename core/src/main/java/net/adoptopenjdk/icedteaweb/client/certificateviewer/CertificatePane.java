@@ -411,7 +411,8 @@ public class CertificatePane extends JPanel {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 try {
                     KeyStore ks = keyStore.getKs();
-                    if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS) {
+                    LOG.debug("Importing Cert " + chooser.getSelectedFile().getName() + " into " + keyStore.getPath());
+                    if (currentKeyStoreType == KeyStores.Type.CLIENT_CERTS && !JNLPRuntime.getExtensionPoint().enableClientCertImportWithoutPassword()) {
                         char[] password = getPassword(R("CVImportPasswordMessage"));
                         if (password != null) {
                             final KeyStore caks = KeyStores.getKeyStore(currentKeyStoreLevel, KeyStores.Type.CA_CERTS).getKs();
@@ -433,7 +434,6 @@ public class CertificatePane extends JPanel {
                         CertificateUtils.addToKeyStore(chooser.getSelectedFile(), ks);
                     }
                     storeKeyStore(ks, currentKeyStoreType);
-
                     repopulateTables();
                 } catch (Exception ex) {
                     // TODO: handle exception

@@ -56,4 +56,8 @@ public interface ExtensionPoint {
     default String uniqueShortcutSuffix(JNLPFile jnlpFile) {
         return "";
     }
+
+    default boolean enableClientCertImportWithoutPassword() {
+        return false;
+    }
 }
