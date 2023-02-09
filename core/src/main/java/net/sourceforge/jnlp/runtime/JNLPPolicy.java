@@ -89,7 +89,10 @@ public class JNLPPolicy extends Policy {
         systemPolicy = Policy.getPolicy();
 
         systemJnlpPolicy = getPolicyFromConfig(ConfigurationConstants.KEY_SYSTEM_SECURITY_POLICY);
-        userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
+
+        if (Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_USER_SECURITY_POLICY_CHECK))) {
+            userJnlpPolicy = getPolicyFromUrl(PathsAndFiles.JAVA_POLICY.getFullPath());
+        }
 
         String jre = JavaSystemProperties.getJavaHome();
         jreExtDir = (new File(jre + File.separator + "lib" + File.separator + "ext")).toURI();

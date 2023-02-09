@@ -127,6 +127,11 @@ public class Defaults {
                     ValidatorFactory.createUrlValidator()
             ),
             Setting.createDefault(
+                    ConfigurationConstants.KEY_USER_SECURITY_POLICY_CHECK,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
                     ConfigurationConstants.KEY_USER_TRUSTED_CA_CERTS,
                     USER_CACERTS.getDefaultFullPath(),
                     ValidatorFactory.createFilePathValidator()

@@ -81,6 +81,8 @@ public interface ConfigurationConstants {
 
     String KEY_USER_SECURITY_POLICY = "deployment.user.security.policy";
 
+    String KEY_USER_SECURITY_POLICY_CHECK = "deployment.user.security.policy.check";
+
     String KEY_USER_TRUSTED_CA_CERTS = "deployment.user.security.trusted.cacerts";
 
     String KEY_USER_TRUSTED_JSSE_CA_CERTS = "deployment.user.security.trusted.jssecacerts";
