@@ -8,7 +8,7 @@ import java.util.Objects;
  */
 public abstract class BaseLogger implements Logger {
 
-    protected static String expand(final String msg, final Object[] args) {
+    protected String expand(final String msg, final Object[] args) {
         return new StringFormatter().expand(msg, args);
     }
 }

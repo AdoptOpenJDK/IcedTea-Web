@@ -11,7 +11,7 @@ public class BaseLoggerTest {
         final String message = null;
         final Object[] args = {"ONE"};
 
-        assertThat(BaseLogger.expand(message, args), is("null"));
+        assertThat(BaseLogger.doExpand(message, args), is("null"));
     }
 
     @Test
@@ -19,7 +19,7 @@ public class BaseLoggerTest {
         final String message = "Message without arguments stay unchanged.";
         final Object[] args = {};
 
-        assertThat(BaseLogger.expand(message, args), is("Message without arguments stay unchanged."));
+        assertThat(BaseLogger.doExpand(message, args), is("Message without arguments stay unchanged."));
     }
 
     @Test
@@ -27,7 +27,7 @@ public class BaseLoggerTest {
         final String message = "Message with null arguments stay unchanged.";
         final Object[] args = null;
 
-        assertThat(BaseLogger.expand(message, args), is("Message with null arguments stay unchanged."));
+        assertThat(BaseLogger.doExpand(message, args), is("Message with null arguments stay unchanged."));
     }
 
     @Test
@@ -35,7 +35,7 @@ public class BaseLoggerTest {
         final String message = "This is a message with {} argument.";
         final Object[] args = {"ONE"};
 
-        assertThat(BaseLogger.expand(message, args), is("This is a message with ONE argument."));
+        assertThat(BaseLogger.doExpand(message, args), is("This is a message with ONE argument."));
     }
 
     @Test
@@ -43,7 +43,7 @@ public class BaseLoggerTest {
         final String message = "This is a message with the arguments {} and {}.";
         final Object[] args = {"ONE", 2};
 
-        assertThat(BaseLogger.expand(message, args), is("This is a message with the arguments ONE and 2."));
+        assertThat(BaseLogger.doExpand(message, args), is("This is a message with the arguments ONE and 2."));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class BaseLoggerTest {
         final String message = "This is a message with the arguments {} and {}.";
         final Object[] args = {"ONE", 2, "abc"};
 
-        assertThat(BaseLogger.expand(message, args), is("This is a message with the arguments ONE and 2."));
+        assertThat(BaseLogger.doExpand(message, args), is("This is a message with the arguments ONE and 2."));
     }
 
     @Test
@@ -59,6 +59,6 @@ public class BaseLoggerTest {
         final String message = "This is a message with the arguments {} and {}.";
         final Object[] args = {"ONE"};
 
-        assertThat(BaseLogger.expand(message, args), is("This is a message with the arguments ONE and {}."));
+        assertThat(BaseLogger.doExpand(message, args), is("This is a message with the arguments ONE and {}."));
     }
 }
