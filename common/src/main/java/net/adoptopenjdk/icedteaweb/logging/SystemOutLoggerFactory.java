@@ -47,7 +47,7 @@ class SystemOutLoggerFactory implements LoggerFactoryImpl {
 
         @Override
         public void debug(final String msg, final Object... arguments) {
-            log(DEBUG, expand(msg, arguments), null);
+            log(DEBUG, doExpand(msg, arguments), null);
         }
 
         @Override
@@ -62,7 +62,7 @@ class SystemOutLoggerFactory implements LoggerFactoryImpl {
 
         @Override
         public void info(final String msg, final Object... arguments) {
-            log(INFO, expand(msg, arguments), null);
+            log(INFO, doExpand(msg, arguments), null);
         }
 
         @Override
@@ -77,7 +77,7 @@ class SystemOutLoggerFactory implements LoggerFactoryImpl {
 
         @Override
         public void warn(final String msg, final Object... arguments) {
-            log(WARNING, expand(msg, arguments), null);
+            log(WARNING, doExpand(msg, arguments), null);
         }
 
         @Override
@@ -92,7 +92,7 @@ class SystemOutLoggerFactory implements LoggerFactoryImpl {
 
         @Override
         public void error(final String msg, final Object... arguments) {
-            log(ERROR, expand(msg, arguments), null);
+            log(ERROR, doExpand(msg, arguments), null);
         }
 
         @Override

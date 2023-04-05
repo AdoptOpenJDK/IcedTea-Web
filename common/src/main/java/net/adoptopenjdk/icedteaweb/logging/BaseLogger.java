@@ -8,13 +8,13 @@ import java.util.Objects;
  */
 public abstract class BaseLogger implements Logger {
 
-    protected String expand(final String msg, final Object[] args) {
-        return new StringFormatter().expand(msg, args);
+    protected static String doExpand(final String msg, final Object[] args) {
+        return new StringFormatter().doExpand(msg, args);
     }
 }
 
 class StringFormatter {
-    String expand(final String msg, final Object[] args) {
+    String doExpand(final String msg, final Object[] args) {
         if (msg == null) {
             return "null";
         }
