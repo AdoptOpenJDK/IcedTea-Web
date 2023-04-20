@@ -47,4 +47,8 @@ class CacheKey {
     public int hashCode() {
         return Objects.hash(locationString, version);
     }
+
+    public boolean matches(URL resource) {
+        return resource != null && locationString.equals(resource.toString());
+    }
 }

@@ -490,7 +490,7 @@ public class JNLPClassLoader extends URLClassLoader {
             // for this codebase/jnlp yet. Create one.
             if (baseLoader == null
                     || (file.isApplication()
-                    && !baseLoader.getJNLPFile().getFileLocation().equals(file.getFileLocation()))) {
+                    && (file.getFileLocation() == null || !baseLoader.getJNLPFile().getFileLocation().toString().equals(file.getFileLocation().toString())))) {
 
                 loader = createInstance(file, policy, mainName, enableCodeBase);
             } else {
@@ -536,7 +536,7 @@ public class JNLPClassLoader extends URLClassLoader {
         synchronized (getUniqueKeyLock(uniqueKey)) {
             loader = uniqueKeyToLoader.get(uniqueKey);
 
-            if (loader == null || !location.equals(loader.getJNLPFile().getFileLocation())) {
+            if (loader == null || loader.getJNLPFile().getFileLocation() == null || !location.toString().equals(loader.getJNLPFile().getFileLocation().toString())) {
                 final JNLPFile jnlpFile = new JNLPFileFactory().create(location, uniqueKey, version, settings, policy);
 
                 loader = getInstance(jnlpFile, policy, mainName, enableCodeBase);

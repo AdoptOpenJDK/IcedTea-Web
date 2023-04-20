@@ -52,16 +52,17 @@ class LocateJnlpClassLoader {
      */
     static JNLPClassLoader getLoaderByJnlpFile(final JNLPClassLoader rootClassLoader, URL urlToJnlpFile) {
 
-        if (rootClassLoader == null)
+        if (rootClassLoader == null) {
             return null;
+        }
 
         JNLPFile file = rootClassLoader.getJNLPFile();
 
-        if (urlToJnlpFile == null)
+        if (urlToJnlpFile == null) {
             urlToJnlpFile = rootClassLoader.getJNLPFile().getFileLocation();
-
-        if (file.getFileLocation().equals(urlToJnlpFile))
+        } else if (file.getFileLocation().toString().equals(urlToJnlpFile.toString())) {
             return rootClassLoader;
+        }
 
         for (JNLPClassLoader loader : rootClassLoader.getLoaders()) {
             if (rootClassLoader != loader) {
@@ -89,7 +90,8 @@ class LocateJnlpClassLoader {
             ResourcesDesc resources = loader.getJNLPFile().getResources();
 
             for (JARDesc eachJar : resources.getJARs()) {
-                if (ref.equals(eachJar.getLocation()) &&
+                if (eachJar.getLocation() != null &&
+                        ref.toString().equals(eachJar.getLocation().toString()) &&
                         (resourceVersion == null || resourceVersion.equals(eachJar.getVersion())))
                     return loader;
             }
