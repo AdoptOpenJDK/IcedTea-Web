@@ -170,7 +170,7 @@ function sedBashCompletion() {
   mkdir -p $BASHD_TARGET
   OPTIONS=`$OPTIONS_COMMAND $1`; \
   echo $OPTIONS ; \
-  cat $SCRIPT_DIR/completion.in/$1.bash.in |   sed "s/@OPTIONS@/${OPTIONS}/" > $BASHD_TARGET/$1.bash
+  cat $SCRIPT_DIR/completion.in/$1.bash.in | sed "s/@OPTIONS@/${OPTIONS}/" > $BASHD_TARGET/$1
 }
 
 function sedDesktopIcons() {
