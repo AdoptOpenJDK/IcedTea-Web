@@ -93,8 +93,8 @@ class ResourceHandler {
         if (isUrlInWhitelist(url, getApplicationUrlWhiteList())) {
             return;
         }
-        BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
         LOG.error("Resource URL not In Whitelist: {}", url);
+        BasicExceptionDialog.show(new SecurityException(Translator.R("SWPInvalidURL") + ": " + url));
         JNLPRuntime.exit(-1);
     }
 }

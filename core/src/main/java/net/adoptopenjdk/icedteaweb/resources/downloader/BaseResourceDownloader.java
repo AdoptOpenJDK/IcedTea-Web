@@ -75,7 +75,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .map(Optional::get)
                 .findFirst()
                 .orElseGet(() -> {
-                    LOG.error("could not download resource {} from any of theses urls {} {}", resource, downloadUrls, exceptionMessage());
+                    LOG.error("Could not download resource {} from any of theses urls {} {}", resource, downloadUrls, exceptionMessage());
                     resource.setStatus(ERROR);
                     checkForProxyError();
                     return resource;
@@ -107,6 +107,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
         for (final Exception excp : downLoadExceptions) {
             final Throwable cause = excp.getCause();
             if (cause instanceof IOException && !(cause instanceof FileNotFoundException) && cause.getMessage().toLowerCase().contains("proxy")) {
+                LOG.debug("checkForProxyError : show Exception Dialog for exception :  {} cause : {}", excp.getMessage(), cause.getMessage());
                 BasicExceptionDialog.willBeShown();
                 SwingUtils.invokeLater(() -> {
                     BasicExceptionDialog.show((IOException) cause);
@@ -123,6 +124,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             try {
                 result.complete(tryDownloading(url));
             } catch (Exception | Error e) {
+                LOG.debug("downloadFrom exception: {}", e.getMessage());
                 result.completeExceptionally(e);
             }
         });
@@ -136,6 +138,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
             if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(ERROR_MIME_TYPE)) {
                 final String serverResponse = StreamUtils.readStreamAsString(downloadDetails.inputStream);
+                LOG.debug("Server Error for {}", resource);
                 throw new RuntimeException("Server error: " + serverResponse);
             }
 
