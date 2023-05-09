@@ -18,7 +18,14 @@
 package net.adoptopenjdk.icedteaweb.jnlp.element.resource;
 
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
+import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.JNLPFileFactory;
+import net.adoptopenjdk.icedteaweb.i18n.Translator;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +39,8 @@ import java.util.Map;
  * @version $Revision: 1.8 $
  */
 public class ExtensionDesc {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExtensionDesc.class);
     public static final String EXT_DOWNLOAD_ELEMENT = "ext-download";
     public static final String HREF_ATTRIBUTE = "href";
     public static final String DOWNLOAD_ATTRIBUTE = "download";
@@ -57,6 +66,9 @@ public class ExtensionDesc {
 
     /** eager ext parts */
     private final List<String> eagerExtParts = new ArrayList<>();
+
+    /** the JNLPFile the extension refers to */
+    private JNLPFile file;
 
     /**
      * Create an extension descriptor.
@@ -107,5 +119,35 @@ public class ExtensionDesc {
      */
     public URL getLocation() {
         return location;
+    }
+
+    /**
+     * Resolves the extension by creating a JNLPFile from the file
+     * specified by the extension's location property.
+     *
+     * @throws IOException if the extension JNLPFile could not be resolved.
+     * @throws ParseException if the extension JNLPFile could not be
+     * parsed or was not a component or installer descriptor.
+     */
+    public void resolve() throws ParseException, IOException {
+        if (file == null) {
+            file = new JNLPFileFactory().create(location);
+
+            LOG.debug("Resolve: {}", file.getInformation().getTitle());
+
+            // check for it being an extension descriptor
+            if (!file.isComponent() && !file.isInstaller()) {
+                 throw new ParseException(Translator.R("JInvalidExtensionDescriptor", name, location));
+            }
+        }
+
+    }
+
+    /**
+     * @return a JNLPFile for the extension, or null if the JNLP
+     * file has not been resolved.
+     */
+    public JNLPFile getJNLPFile() {
+        return file;
     }
 }
