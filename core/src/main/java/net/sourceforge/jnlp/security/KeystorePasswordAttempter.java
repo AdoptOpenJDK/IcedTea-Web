@@ -59,7 +59,7 @@ import java.util.Map;
 
 class KeystorePasswordAttempter {
 
-    private final static Logger LOG = LoggerFactory.getLogger(KeystorePasswordAttempter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KeystorePasswordAttempter.class);
 
     private static final char[] DEFAULT_PASSWORD = "changeit".toCharArray();
 
@@ -76,19 +76,7 @@ class KeystorePasswordAttempter {
         }
     }
 
-    /**
-     * This password can read any keystore. But if you save with him, integrity
-     * of keystore will be lost for ever.
-     */
-    static class AlmightyPassword extends SavedPassword {
-
-        public AlmightyPassword() {
-            super(null);
-        }
-
-    }
-
-    static abstract class KeystoreOperation {
+    abstract static class KeystoreOperation {
 
         protected final KeyManagerFactory kmf;
         protected final KeyStore ks;
@@ -103,10 +91,6 @@ class KeystorePasswordAttempter {
 
         public KeystoreOperation(KeyStore ks, String alias, Key key, Certificate[] certChain) {
             this(null, ks, alias, key, certChain, null);
-        }
-
-        public KeystoreOperation(KeyStore ks, String alias, Key key, Certificate[] certChain, File f) {
-            this(null, ks, alias, key, certChain, f);
         }
 
         public KeystoreOperation(KeyManagerFactory kmf, KeyStore ks) {
@@ -127,10 +111,10 @@ class KeystorePasswordAttempter {
         abstract String getId();
 
     }
-    //static final KeystorePasswordAttempter INSTANCE = new KeystorePasswordAttempter(new SavedPassword(getTrustedCertsPassword()), new AlmightyPassword());
+
     static final KeystorePasswordAttempter INSTANCE = new KeystorePasswordAttempter(new SavedPassword(getTrustedCertsPassword()));
     private final List<SavedPassword> passes;
-    private final Map<KeyStore, SavedPassword> successfulPerKeystore = new HashMap<>();
+    private final Map<String, SavedPassword> successfulPerKeystore = new HashMap<>();
 
     private KeystorePasswordAttempter(SavedPassword... initialPasswords) {
         passes = new ArrayList<>(initialPasswords.length);
@@ -138,27 +122,32 @@ class KeystorePasswordAttempter {
     }
 
     Key unlockKeystore(KeystoreOperation operation) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
-        SavedPassword successfulKey = successfulPerKeystore.get(operation.ks);
+        final String keyStorePath = operation.f != null ? operation.f.getCanonicalPath() : "Unknown";
+        final SavedPassword successfulKey = successfulPerKeystore.get(keyStorePath);
+        LOG.debug("unlockKeyStore: For file {}, found successful pass = {} ",   keyStorePath, successfulKey != null);
+
         Exception firstEx = null;
         String messages = "";
-        final String keyStoreFileName = operation.f != null ? operation.f.toString() : "Unknown";
-        List<SavedPassword>  localPasses = new ArrayList<>();
-        if (successfulKey != null){
+        final List<SavedPassword>  localPasses = new ArrayList<>();
+        if (successfulKey != null) {
             //successful must be first. If it is not, then writing to keystore by illegal password, will kill keystore's integrity
             localPasses.add(successfulKey);
         }
         localPasses.addAll(passes);
         for (int i = 0; i < localPasses.size(); i++) {
-            SavedPassword pass = localPasses.get(i);
+            final SavedPassword pass = localPasses.get(i);
             try {
-                LOG.debug("Operating Keystore {}", keyStoreFileName);
+                LOG.debug("unlockKeyStore: Operating Keystore {}", keyStorePath);
                 //we expect, that any keystore is loaded before read.
                 //so we are writing by correct password
                 //if no successful password was provided during reading, then finish(firstEx); will save us from overwrite
-                Key result = operation.operateKeystore(pass.pass);
+                final Key result = operation.operateKeystore(pass.pass);
                 //ok we were successful
                 //save the loading password for storing purposes (and another reading too)
-                 successfulPerKeystore.put(operation.ks, pass);
+                if (operation.f != null) {
+                    LOG.debug("unlockKeyStore: Store successful pass for file {}",  keyStorePath);
+                    successfulPerKeystore.put(keyStorePath, pass);
+                }
                 return result;
             } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | IOException | CertificateException ex) {
                 if (firstEx == null) {
@@ -168,24 +157,24 @@ class KeystorePasswordAttempter {
                 LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
                 //tried all known, ask for new or finally die
                 if (i + 1 == localPasses.size()) {
-                    String s1 = Translator.R("KSresultUntilNow", messages, operation.getId(), keyStoreFileName, "" + (i + 1));
+                    String s1 = Translator.R("KSresultUntilNow", messages, operation.getId(), keyStorePath, localPasses.size());
                     LOG.info(s1);
-                    LOG.info("Invalid password For keystore {} ?", keyStoreFileName);
+                    LOG.info("Invalid password For keystore {} ?", keyStorePath);
                     if (JNLPRuntime.isHeadless()) {
                         OutputController.getLogger().printOutLn(s1 + "\n" + Translator.R("KSheadlesWarning"));
-                        String s = OutputController.getLogger().readLine();
+                        final String s = OutputController.getLogger().readLine();
                         if (s == null || s.trim().isEmpty()) {
                             finish(firstEx);
+                        } else {
+                            addPnewPassword(s, localPasses);
                         }
-                        //if input is null or empty , exception is thrown from finish method
-                        addPnewPassword(s, localPasses);
                     } else {
-                        String s = JOptionPane.showInputDialog(null, s1 + "\n" + Translator.R("KSnwPassHelp"), Translator.R("KSTitle"), JOptionPane.OK_CANCEL_OPTION);
+                        final String s = JOptionPane.showInputDialog(null, s1 + "\n" + Translator.R("KSnwPassHelp"), Translator.R("KSTitle"), JOptionPane.OK_CANCEL_OPTION);
                         if (s == null) {
                             finish(firstEx);
+                        } else {
+                            addPnewPassword(s, localPasses);
                         }
-                        //if input is null, exception is thrown from finish method
-                        addPnewPassword(s, localPasses);
                     }
                     //user already read all messages, now show only last one
                     messages = "";
@@ -216,5 +205,4 @@ class KeystorePasswordAttempter {
             throw new RuntimeException("Unexpected exception", ex);
         }
     }
-
 }
