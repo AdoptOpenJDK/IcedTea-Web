@@ -18,6 +18,7 @@ package net.sourceforge.jnlp.runtime;
 
 import static net.sourceforge.jnlp.runtime.Translator.R;
 
+import java.awt.AWTPermission;
 import java.awt.Window;
 import java.net.SocketPermission;
 import java.security.AccessControlException;
@@ -343,7 +344,6 @@ class JNLPSecurityManager extends SecurityManager {
      * warning banner, and adds the window to the list of windows to
      * be disposed when the calling application exits.
      */
-    @Override
     public boolean checkTopLevelWindow(Object window) {
         ApplicationInstance app = getApplication();
 
@@ -362,7 +362,12 @@ class JNLPSecurityManager extends SecurityManager {
         // todo: set awt.appletWarning to custom message
         // todo: logo on with glass pane on JFrame/JWindow?
 
-        return super.checkTopLevelWindow(window);
+        try {
+            checkPermission(new AWTPermission("showWindowWithoutWarningBanner"));
+            return true;
+        } catch (Exception se) {
+            return false;
+        }
     }
 
     /**
@@ -432,7 +437,6 @@ class JNLPSecurityManager extends SecurityManager {
      * @exception  SecurityException  if the caller does not have
      *             permission to accesss the AWT event queue.
      */
-    @Override
     public void checkAwtEventQueueAccess() {
         /*
          * this is the templace of the code that should allow applets access to
@@ -446,7 +450,7 @@ class JNLPSecurityManager extends SecurityManager {
         // If we're about to allow access to the main EventQueue,
         // and anything untrusted is on the class context stack,
         // disallow access.
-        super.checkAwtEventQueueAccess();
+        checkPermission(new AWTPermission("accessEventQueue"));
         // }
     }
 

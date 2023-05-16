@@ -32,7 +32,7 @@ obligated to do so. If you do not wish to do so, delete this exception
 statement from your version.*/
 /**
  *package generally about showing various security prompts
- *<h3>Following diagram shows how dialog is handled when some application/appelt needs to show it</h3>
+ *<h2>Following diagram shows how dialog is handled when some application/appelt needs to show it</h2>
  *
  *<pre>
 {@code
