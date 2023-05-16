@@ -12,12 +12,14 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.Resource;
 import net.adoptopenjdk.icedteaweb.resources.cache.Cache;
 import net.adoptopenjdk.icedteaweb.resources.cache.DownloadInfo;
+import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -73,7 +75,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
                 .map(Optional::get)
                 .findFirst()
                 .orElseGet(() -> {
-                    LOG.error("could not download resource {} from any of theses urls {} {}", resource, downloadUrls, exceptionMessage());
+                    LOG.error("Could not download resource {} from any of theses urls {} {}", resource, downloadUrls, exceptionMessage());
                     resource.setStatus(ERROR);
                     checkForProxyError();
                     return resource;
@@ -104,9 +106,13 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private void checkForProxyError() {
         for (final Exception excp : downLoadExceptions) {
             final Throwable cause = excp.getCause();
-            if (cause instanceof IOException && cause.getMessage().toLowerCase().contains("proxy")) {
-                BasicExceptionDialog.show((IOException) cause);
-                JNLPRuntime.exit(-1);
+            if (cause instanceof IOException && !(cause instanceof FileNotFoundException) && cause.getMessage().toLowerCase().contains("proxy")) {
+                LOG.debug("checkForProxyError : show Exception Dialog for exception :  {} cause : {}", excp.getMessage(), cause.getMessage());
+                BasicExceptionDialog.willBeShown();
+                SwingUtils.invokeLater(() -> {
+                    BasicExceptionDialog.show((IOException) cause);
+                    JNLPRuntime.exit(-1, false);
+                });
             }
         }
     }
@@ -118,6 +124,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             try {
                 result.complete(tryDownloading(url));
             } catch (Exception | Error e) {
+                LOG.debug("downloadFrom exception: {}", e.getMessage());
                 result.completeExceptionally(e);
             }
         });
@@ -131,6 +138,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
 
             if (downloadDetails.contentType != null && downloadDetails.contentType.startsWith(ERROR_MIME_TYPE)) {
                 final String serverResponse = StreamUtils.readStreamAsString(downloadDetails.inputStream);
+                LOG.debug("Server Error for {}", resource);
                 throw new RuntimeException("Server error: " + serverResponse);
             }
 

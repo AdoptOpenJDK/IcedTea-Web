@@ -894,10 +894,17 @@ public class JNLPRuntime {
         return pluginDebug;
     }
 
-    public static <T> T exit(int i) {
-        waitForExceptionDialogsToBeClosed();
+    public static <T> T exit(int i, boolean waitToCloseExceptionDialogs) {
+        LOG.debug("JNLPRuntime,exit()");
+        if (waitToCloseExceptionDialogs) {
+            waitForExceptionDialogsToBeClosed();
+        }
         System.exit(i);
         return null;
+    }
+
+    public static <T> T exit(int i) {
+        return exit(i, true);
     }
 
     public static void waitForExceptionDialogsToBeClosed() {

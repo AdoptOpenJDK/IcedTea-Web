@@ -35,6 +35,8 @@ package net.adoptopenjdk.icedteaweb.client;
 
 import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.JNLPSplashScreen;
 import net.adoptopenjdk.icedteaweb.jnlp.element.information.IconKind;
+import net.adoptopenjdk.icedteaweb.logging.Logger;
+import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.ResourceTracker;
 import net.adoptopenjdk.icedteaweb.ui.swing.SwingUtils;
 import net.sourceforge.jnlp.AbstractLaunchHandler;
@@ -53,6 +55,7 @@ import java.net.URL;
  */
 public class GuiLaunchHandler extends AbstractLaunchHandler {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GuiLaunchHandler.class);
     private volatile JNLPSplashScreen splashScreen = null;
     private final Object mutex = new Object();
 
@@ -67,6 +70,7 @@ public class GuiLaunchHandler extends AbstractLaunchHandler {
 
     @Override
     public void handleLaunchError(final LaunchException exception) {
+        LOG.debug("HandleLaunchError Sbow BasicExceptionDialog {}", exception.getMessage());
         BasicExceptionDialog.willBeShown();
         SwingUtils.invokeLater(() -> {
             closeSplashScreen();
