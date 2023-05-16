@@ -127,10 +127,10 @@ class KeystorePasswordAttempter {
         abstract String getId();
 
     }
-    //static final KeystorePasswordAttempter INSTANCE = new KeystorePasswordAttempter(new SavedPassword(getTrustedCertsPassword()), new AlmightyPassword());
+
     static final KeystorePasswordAttempter INSTANCE = new KeystorePasswordAttempter(new SavedPassword(getTrustedCertsPassword()));
     private final List<SavedPassword> passes;
-    private final Map<KeyStore, SavedPassword> successfulPerKeystore = new HashMap<>();
+    private final Map<String, SavedPassword> successfulPerKeystore = new HashMap<>();
 
     private KeystorePasswordAttempter(SavedPassword... initialPasswords) {
         passes = new ArrayList<>(initialPasswords.length);
@@ -138,10 +138,12 @@ class KeystorePasswordAttempter {
     }
 
     Key unlockKeystore(KeystoreOperation operation) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
-        SavedPassword successfulKey = successfulPerKeystore.get(operation.ks);
+        final String keyStoreFileName = operation.f != null ? operation.f.getAbsolutePath() : "Unknown";
+        SavedPassword successfulKey = successfulPerKeystore.get(keyStoreFileName);
+        LOG.debug("unlockKeyStore: For file {}, found successful pass = {} ",   keyStoreFileName, successfulKey != null);
+
         Exception firstEx = null;
         String messages = "";
-        final String keyStoreFileName = operation.f != null ? operation.f.toString() : "Unknown";
         List<SavedPassword>  localPasses = new ArrayList<>();
         if (successfulKey != null){
             //successful must be first. If it is not, then writing to keystore by illegal password, will kill keystore's integrity
@@ -151,14 +153,17 @@ class KeystorePasswordAttempter {
         for (int i = 0; i < localPasses.size(); i++) {
             SavedPassword pass = localPasses.get(i);
             try {
-                LOG.debug("Operating Keystore {}", keyStoreFileName);
+                LOG.debug("unlockKeyStore: Operating Keystore {}", keyStoreFileName);
                 //we expect, that any keystore is loaded before read.
                 //so we are writing by correct password
                 //if no successful password was provided during reading, then finish(firstEx); will save us from overwrite
                 Key result = operation.operateKeystore(pass.pass);
                 //ok we were successful
                 //save the loading password for storing purposes (and another reading too)
-                 successfulPerKeystore.put(operation.ks, pass);
+                if (!keyStoreFileName.equals("Unknown")) {
+                    LOG.debug("Store successful pass for key {}",  keyStoreFileName);
+                    successfulPerKeystore.put(keyStoreFileName, pass);
+                }
                 return result;
             } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | IOException | CertificateException ex) {
                 if (firstEx == null) {
@@ -216,5 +221,4 @@ class KeystorePasswordAttempter {
             throw new RuntimeException("Unexpected exception", ex);
         }
     }
-
 }
