@@ -16,10 +16,12 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
+import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.DeploymentConfiguration;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
@@ -34,7 +36,9 @@ import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 /**
  * Represents a running instance of an application described in a
  * JNLPFile. This class provides a way to track the application's
@@ -130,9 +134,9 @@ public class ApplicationInstance {
      * Install the environment variables.
      */
     private void installEnvironment() {
-        final PropertyDesc[] props = file.getResources().getProperties();
+        final List<PropertyDesc> props = collectPropertiesFromJnlpHierarchy(new ArrayList<>(), file);
 
-        if (!(props.length == 0)) {
+        if (!(props.size() == 0)) {
             final CodeSource cs = new CodeSource(null, (java.security.cert.Certificate[]) null);
 
             final JNLPClassLoader loader = this.loader;
@@ -142,6 +146,7 @@ public class ApplicationInstance {
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
                 for (PropertyDesc propDesc : props) {
+                    LOG.debug("Setting Property {}", propDesc.getKey());
                     System.setProperty(propDesc.getKey(), propDesc.getValue());
                 }
                 return null;
@@ -274,6 +279,31 @@ public class ApplicationInstance {
      */
     public boolean isSigned() {
         return isSigned;
+    }
+
+    /**
+     * Collects properties from the full hierarchy of JNLP files
+     *
+     * @param props a list of all properties collected so far
+     * @param jnlpFile the current tip of the jnlp hierarchy
+     * @return a list of properties collected from the full hierarchy of JNLP files
+     */
+    private List<PropertyDesc> collectPropertiesFromJnlpHierarchy(List<PropertyDesc> props, JNLPFile jnlpFile) {
+        // Collect properties from the current jnlp file
+        props.addAll(Arrays.asList(jnlpFile.getResources().getProperties()));
+        for (ExtensionDesc ext : jnlpFile.getResources().getExtensions()) {
+            // Recursively look for extension jnlp files to collect their properties
+            try {
+                ext.resolve();
+                JNLPFile extFile = ext.getJNLPFile();
+                if (extFile != null) {
+                    collectPropertiesFromJnlpHierarchy(props, extFile);
+                }
+            } catch (ParseException | IOException e) {
+                LOG.debug("Could not resolve JNLP file {} (declared properties won't be set): {} ", ext.getName(),  e.getMessage());
+            }
+        }
+        return props;
     }
 
 }
