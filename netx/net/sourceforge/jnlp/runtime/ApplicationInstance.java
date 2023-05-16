@@ -27,10 +27,15 @@ import java.security.AccessController;
 import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.event.EventListenerList;
 
 import sun.awt.AppContext;
+import net.sourceforge.jnlp.ExtensionDesc;
+import net.sourceforge.jnlp.ParseException;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.PropertyDesc;
 import net.sourceforge.jnlp.SecurityDesc;
@@ -314,7 +319,7 @@ public class ApplicationInstance {
      * Install the environment variables.
      */
     void installEnvironment() {
-        final PropertyDesc props[] = file.getResources().getProperties();
+        final List<PropertyDesc> props = collectPropertiesFromJnlpHierarchy(new ArrayList<>(), file);
 
         CodeSource cs = new CodeSource((URL) null, (java.security.cert.Certificate[]) null);
 
@@ -331,12 +336,40 @@ public class ApplicationInstance {
             public Object run() {
                 for (PropertyDesc propDesc : props) {
                     System.setProperty(propDesc.getKey(), propDesc.getValue());
+                    OutputController.getLogger().log(OutputController.Level.MESSAGE_DEBUG,
+                            "Setting property: " + propDesc.getKey() + " = " + propDesc.getValue());
                 }
 
                 return null;
             }
         };
         AccessController.doPrivileged(installProps, acc);
+    }
+
+    /**
+     * Collects properties from the full hierarchy of JNLP files
+     *
+     * @param props a list of all properties collected so far
+     * @param jnlpFile the current tip of the jnlp hierarchy
+     * @return a list of properties collected from the full hierarchy of JNLP files
+     */
+    private List<PropertyDesc> collectPropertiesFromJnlpHierarchy(List<PropertyDesc> props, JNLPFile jnlpFile) {
+        // Collect properties from the current jnlp file
+        props.addAll(Arrays.asList(jnlpFile.getResources().getProperties()));
+        for (ExtensionDesc ext : jnlpFile.getResources().getExtensions()) {
+            // Recursively look for extension jnlp files to collect their properties
+            try {
+                ext.resolve();
+                JNLPFile extFile = ext.getJNLPFile();
+                if (extFile != null) {
+                    collectPropertiesFromJnlpHierarchy(props, extFile);
+                }
+            } catch (ParseException | IOException e) {
+                OutputController.getLogger().log(OutputController.Level.WARNING_ALL,
+                        "Could not resolve JNLP file " + ext.getName() + " (declared properties won't be set): " + e.getMessage());
+            }
+        }
+        return props;
     }
 
     /**
