@@ -10,10 +10,12 @@ import static net.adoptopenjdk.icedteaweb.Assert.requireNonNull;
 class CacheKey {
 
     private final URL location;
+    private final String locationString;
     private final VersionId version;
 
     public CacheKey(final URL location, final VersionId version) {
         this.location = requireNonNull(location, "location");
+        this.locationString = location.toString();
         this.version = version;
     }
 
@@ -28,7 +30,7 @@ class CacheKey {
     @Override
     public String toString() {
         return "CacheKey{" +
-                "location=" + location +
+                "location=" + locationString +
                 ", version=" + version +
                 '}';
     }
@@ -38,11 +40,15 @@ class CacheKey {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CacheKey cacheKey = (CacheKey) o;
-        return location.equals(cacheKey.location) && Objects.equals(version, cacheKey.version);
+        return Objects.equals(locationString, cacheKey.locationString) && Objects.equals(version, cacheKey.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(location, version);
+        return Objects.hash(locationString, version);
+    }
+
+    public boolean matches(URL resource) {
+        return resource != null && locationString.equals(resource.toString());
     }
 }

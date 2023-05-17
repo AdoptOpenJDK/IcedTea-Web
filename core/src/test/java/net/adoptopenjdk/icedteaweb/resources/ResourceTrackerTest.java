@@ -82,10 +82,10 @@ public class ResourceTrackerTest extends NoStdOutErrTest {
         Assert.assertNull("first url should be null", u[0]);
         Assert.assertNull("first normalized url should be null", n[0]);
         for (int i = 1; i < CHANGE_BORDER; i++) {
-            Assert.assertTrue("url " + i + " must be equals too normalized url " + i, u[i].equals(n[i]));
+            Assert.assertTrue("url " + i + " must be equals too normalized url " + i, u[i].toString().equals(n[i].toString()));
         }
         for (int i = CHANGE_BORDER; i < n.length; i++) {
-            Assert.assertFalse("url " + i + " must be normalized (and so not equals) too normalized url " + i, u[i].equals(n[i]));
+            Assert.assertFalse("url " + i + " must be normalized (and so not equals) too normalized url " + i, u[i].toString().equals(n[i].toString()));
         }
     }
 

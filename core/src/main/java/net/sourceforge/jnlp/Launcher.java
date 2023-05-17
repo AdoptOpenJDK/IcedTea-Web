@@ -309,7 +309,7 @@ public class Launcher {
             }
             if (!isLocal && haveHref) {
                 //this is case when remote file have href to different file
-                if (!location.equals(file.getSourceLocation())) {
+                if (file.getSourceLocation() == null || !location.toString().equals(file.getSourceLocation().toString())) {
                     //mark local true, so the following condition will be true and
                     //new jnlp file will be downloaded
                     isLocal = true;

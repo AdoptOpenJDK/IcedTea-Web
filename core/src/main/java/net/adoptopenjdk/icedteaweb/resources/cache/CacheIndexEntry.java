@@ -50,7 +50,7 @@ class CacheIndexEntry implements Comparable<CacheIndexEntry> {
     }
 
     boolean matches(URL resource) {
-        return key.getLocation().equals(resource);
+        return key.matches(resource);
     }
 
     boolean matches(CacheKey key) {

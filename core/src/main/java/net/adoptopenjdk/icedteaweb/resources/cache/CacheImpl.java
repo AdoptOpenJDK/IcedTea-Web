@@ -214,6 +214,10 @@ class CacheImpl {
      */
     boolean isUpToDate(CacheKey key, long lastModified) {
         final Boolean isUpToDate = getResourceInfo(key)
+                .map(cachedFile -> {
+                    LOG.debug("found {} for {}", cachedFile.getCacheKey(), key);
+                    return cachedFile;
+                })
                 .map(cachedFile -> cachedFile.isCurrent(lastModified))
                 .orElse(false);
         LOG.info("isUpToDate: {} = {}", key, isUpToDate);
