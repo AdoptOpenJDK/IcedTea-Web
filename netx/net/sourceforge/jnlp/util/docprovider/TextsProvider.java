@@ -498,12 +498,14 @@ public abstract class TextsProvider {
                 os.flush();
             }
         }
-        JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand);
-        TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
+        ArrayList<TextsProvider> providers = new ArrayList<TextsProvider>();
+        providers.add(new JavaWsTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand));
+        providers.add(new ItwebSettingsTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand));
+        providers.add(new PolicyEditorTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand));
+        providers.add(new IcedTeaWebTextsProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand));
+        if (!System.getProperty("PLUGIN_JAR", "").isEmpty()) {
+            providers.add(new ItwebPluginTextProvider(encoding, new HtmlFormatter(allowContext, allowLogo, includeXmlHeader), titles, expand));
+        }
         for (TextsProvider provider : providers) {
             provider.setAuthorFilePath(authorFileFromUserInput);
             provider.writeToDir(dir);
@@ -516,12 +518,14 @@ public abstract class TextsProvider {
     }
 
     public static void generateManText(String encoding, File dir, boolean titles, boolean expand) throws IOException {
-        JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new ManFormatter(), titles, expand);
-        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new ManFormatter(), titles, expand);
-        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new ManFormatter(), titles, expand);
-        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(encoding, new ManFormatter(), titles, expand);
-        ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new ManFormatter(), titles, expand);
-        TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
+        ArrayList<TextsProvider> providers = new ArrayList<TextsProvider>();
+        providers.add(new JavaWsTextsProvider(encoding, new ManFormatter(), titles, expand));
+        providers.add(new ItwebSettingsTextsProvider(encoding, new ManFormatter(), titles, expand));
+        providers.add(new PolicyEditorTextsProvider(encoding, new ManFormatter(), titles, expand));
+        providers.add(new IcedTeaWebTextsProvider(encoding, new ManFormatter(), titles, expand));
+        if (!System.getProperty("PLUGIN_JAR", "").isEmpty()) {
+            providers.add(new ItwebPluginTextProvider(encoding, new ManFormatter(), titles, expand));
+        }
         for (TextsProvider provider : providers) {
             provider.setAuthorFilePath(authorFileFromUserInput);
             provider.writeToDir(dir);
@@ -534,12 +538,14 @@ public abstract class TextsProvider {
     }
 
     public static void generatePlainTextDocs(String encoding, File dir, String indent, int lineWidth, boolean titles, boolean expand) throws IOException {
-        JavaWsTextsProvider javaws = new JavaWsTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        ItwebSettingsTextsProvider itws = new ItwebSettingsTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        PolicyEditorTextsProvider pe = new PolicyEditorTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        IcedTeaWebTextsProvider itw = new IcedTeaWebTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        ItwebPluginTextProvider pl = new ItwebPluginTextProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand);
-        TextsProvider[] providers = new TextsProvider[]{javaws, itws, pe, itw, pl};
+        ArrayList<TextsProvider> providers = new ArrayList<TextsProvider>();
+        providers.add(new JavaWsTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand));
+        providers.add(new ItwebSettingsTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand));
+        providers.add(new PolicyEditorTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand));
+        providers.add(new IcedTeaWebTextsProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand));
+        if (!System.getProperty("PLUGIN_JAR", "").isEmpty()) {
+            providers.add(new ItwebPluginTextProvider(encoding, new PlainTextFormatter(indent, lineWidth), titles, expand));
+        }
         for(TextsProvider provider : providers){
             provider.setAuthorFilePath(authorFileFromUserInput);
             provider.writeToDir(dir);
