@@ -241,8 +241,7 @@ export NETX_PKGS = javax.jnlp net.sourceforge.nanoxml net.sourceforge.jnlp \
 	net.sourceforge.jnlp.controlpanel net.sourceforge.jnlp.event \
 	net.sourceforge.jnlp.runtime net.sourceforge.jnlp.security \
 	net.sourceforge.jnlp.security.viewer net.sourceforge.jnlp.services \
-	net.sourceforge.jnlp.tools net.sourceforge.jnlp.util \
-	sun.applet
+	net.sourceforge.jnlp.tools net.sourceforge.jnlp.util
 
 if ENABLE_PLUGINJAR
 export ICEDTEAPLUGIN_TARGET = stamps/liveconnect-dist.stamp
@@ -251,6 +250,7 @@ export PLUGIN_SRCDIR=$(TOP_SRC_DIR)/plugin/icedteanp
 export JSOBJECT_DIRS = netscape
 export SUN_DIR = sun
 export SUN_APPLET_DIRS = sun/applet
+export SUN_APPLET_PKGS = sun.applet
 export PLUGIN_PKGS = sun.applet netscape.security netscape.javascript
 export LIVECONNECT_SRCS = $(PLUGIN_SRCDIR)/java
 export LIVECONNECT_DIR = $(JSOBJECT_DIRS) $(SUN_APPLET_DIRS)
@@ -898,7 +898,7 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	mkdir "$$PLAIN_DOCS_TARGET_DIR" ; \
 	mkdir "$$MAN_DOCS_TARGET_DIR" ; \
 	HTML_DOCS_INDEX="$$HTML_DOCS_TARGET_DIR/index.html" ; \
-	TP_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.util.docprovider.TextsProvider" ; \
+	TP_COMMAND="$(SYSTEM_JRE_DIR)/bin/java --add-exports=java.base/sun.security.action=ALL-UNNAMED -DPLUGIN_JAR=$(PLUGIN_JAR) -cp $(NETX_DIR) net.sourceforge.jnlp.util.docprovider.TextsProvider" ; \
 	TP_TAIL="false $(FULL_VERSION)" ; \
 	LANG_BACKUP=$$LANG ; \
 	echo "<html><head><title>$(PLUGIN_VERSION)</title></head>" > "$$HTML_DOCS_INDEX" ; \
@@ -1189,7 +1189,7 @@ if ENABLE_DOCS
 	 -windowtitle 'IcedTea-Web: NetX ' \
 	 -header '<strong>IcedTea-Web<br/>NetX</strong>' \
 	 $(call composeclasspath, $(MSLINKS_JAR) $(TAGSOUP_JAR) $(RHINO_JAR)) \
-	 $(NETX_PKGS)
+	 $(NETX_PKGS) $(SUN_APPLET_PKGS)
 endif
 	mkdir -p stamps
 	touch stamps/netx-docs.stamp
