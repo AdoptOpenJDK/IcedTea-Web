@@ -186,7 +186,9 @@ public class JvmUtils {
                 "-XX:+ScavengeBeforeFullGC",
                 "-XX:-ScavengeBeforeFullGC",
                 "-XX:+UseParallelScavenge",
-                "-XX:-UseParallelScavenge"
+                "-XX:-UseParallelScavenge",
+                "-XX:+UseShenandoahGC",
+                "-XX:-UseShenandoahGC"
         };
     }
 
