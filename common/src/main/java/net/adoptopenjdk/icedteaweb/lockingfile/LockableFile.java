@@ -43,7 +43,10 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -345,6 +348,8 @@ public class LockableFile {
                 return false;
             }
             logger.debug("Created lock file {}", lockFile.getPath());
+            Files.getFileAttributeView(lockFile.toPath(), BasicFileAttributeView.class)
+                    .setTimes(null, null, FileTime.from(Instant.now()));
             lockFile.deleteOnExit();
             return true;
         }
