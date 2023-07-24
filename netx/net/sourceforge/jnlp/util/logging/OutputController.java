@@ -43,6 +43,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.logging.headers.Header;
 import net.sourceforge.jnlp.util.logging.headers.JavaMessage;
@@ -106,6 +110,8 @@ public class OutputController {
     private PrintStreamLogger outLog;
     private PrintStreamLogger errLog;
     private final List<MessageWithHeader> messageQue = new LinkedList<>();
+    private ReentrantLock mqLock = new ReentrantLock();
+    private Condition mqNotEmpty = mqLock.newCondition();
     private final MessageQueConsumer messageQueConsumer = new MessageQueConsumer();
     Thread consumerThread;
      /*stdin reader for headless dialogues*/
@@ -118,13 +124,13 @@ public class OutputController {
         public void run() {
             while (true) {
                 try {
-                    synchronized (OutputController.this) {
-                        OutputController.this.wait(1000);
-                        if (!(OutputController.this == null || messageQue.isEmpty())) {
-                            flush();
-                        }
+                    mqLock.lock();
+                    try {
+                        mqNotEmpty.await(1, TimeUnit.SECONDS);
+                    } finally {
+                        mqLock.unlock();
                     }
-
+                    flush();
                 } catch (Throwable t) {
                     OutputController.getLogger().log(t);
                 }
@@ -132,13 +138,21 @@ public class OutputController {
         }
     };
 
-    public synchronized void flush() {
+    private boolean isMqEmpty() {
+        mqLock.lock();
+        try {
+            return messageQue.isEmpty();
+        } finally {
+            mqLock.unlock();
+        }
+    }
 
-        while (!messageQue.isEmpty()) {
+    public void flush() {
+        while(!isMqEmpty()) {
             consume();
         }
     }
-    
+
     public void close() throws Exception {
         flush();
         if (LogConfig.getLogConfig().isLogToFile()){
@@ -146,9 +160,17 @@ public class OutputController {
         }
     }
 
+    private MessageWithHeader getNextMessage() {
+        mqLock.lock();
+        try {
+            return messageQue.remove(0);
+        } finally {
+            mqLock.unlock();
+        }
+    }
+
     private void consume() {
-        MessageWithHeader s = messageQue.get(0);
-        messageQue.remove(0);
+        MessageWithHeader s = getNextMessage();
         //filtering is done in console during runtime
         if (LogConfig.getLogConfig().isLogToConsole()) {
             JavaConsole.getConsole().addMessage(s);
@@ -248,8 +270,11 @@ public class OutputController {
     public void startConsumer() {
         consumerThread.start();
         //some messages were probably posted before start of consumer
-        synchronized (this) {
-            this.notifyAll();
+        mqLock.lock();
+        try {
+            mqNotEmpty.signalAll();
+        } finally {
+            mqLock.unlock();
         }
     }
 
@@ -335,9 +360,14 @@ public class OutputController {
         log(new JavaMessage(new Header(level, false), s));
     }
 
-    synchronized void log(MessageWithHeader l){
-        messageQue.add(l);
-        this.notifyAll();
+    void log(MessageWithHeader l){
+        mqLock.lock();
+        try {
+            messageQue.add(l);
+            mqNotEmpty.signalAll();
+        } finally {
+            mqLock.unlock();
+        }
     }
     
     
