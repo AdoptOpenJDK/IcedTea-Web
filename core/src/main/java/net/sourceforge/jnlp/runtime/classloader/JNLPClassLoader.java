@@ -550,6 +550,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Load the extensions specified in the JNLP file.
      */
     private void initializeExtensions() {
+        LOG.debug("initializeExtensions");
         final List<Exception> exceptions = new ArrayList<>();
         final List<JNLPClassLoader> loaderList = new ArrayList<>();
         loaderList.add(this);
@@ -1705,7 +1706,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * Find the resources in this, the parent, or the extension class loaders.
      */
     private Enumeration<URL> findResourcesBySearching(String name) throws IOException {
-        List<URL> lresources = new ArrayList<>();
+        Set<URL> lresources = new HashSet<>();
         Enumeration<URL> e = null;
 
         for (JNLPClassLoader loader : loaders) {
