@@ -97,7 +97,7 @@ public class ResourceTracker {
     /**
      * the resources known about by this resource tracker
      */
-    private final Map<URL, Resource> resources = new HashMap<>();
+    private final Map<String, Resource> resources = new HashMap<>();
 
     /**
      * whether to download parts before requested
@@ -166,10 +166,10 @@ public class ResourceTracker {
      */
     private boolean addToResources(Resource resource) {
         synchronized (resources) {
-            final Resource existingResource = resources.get(resource.getLocation());
+            final Resource existingResource = resources.get(resource.getLocation().toString());
 
             if (existingResource == null) {
-                resources.put(resource.getLocation(), resource);
+                resources.put(resource.getLocation().toString(), resource);
                 return true;
             }
 
@@ -203,7 +203,7 @@ public class ResourceTracker {
     public void removeResource(URL location) {
         synchronized (resources) {
             Resource resource = getResource(location);
-            resources.remove(resource.getLocation());
+            resources.remove(resource.getLocation().toString());
         }
     }
 
@@ -362,7 +362,7 @@ public class ResourceTracker {
     private Resource getResource(URL location) {
         final URL normalizedLocation = normalizeUrlQuietly(location);
         synchronized (resources) {
-            final Resource result = resources.get(normalizedLocation);
+            final Resource result = resources.get(normalizedLocation.toString());
             if (result == null) {
                 throw new IllegalResourceDescriptorException("Location " + location + " does not specify a resource being tracked.");
             }
