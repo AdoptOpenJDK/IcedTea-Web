@@ -73,28 +73,29 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
     }
 
     /* our managed cache */
-    private final Map<URL, URL> mapping;
+    private final Map<String, URL> mapping;
 
     private CachedJarFileCallback() {
-        mapping = new ConcurrentHashMap<URL, URL>();
+        mapping = new ConcurrentHashMap<String, URL>();
     }
 
     public void addMapping(URL remoteUrl, URL localUrl) {
-        mapping.put(remoteUrl, localUrl);
+        LOG.debug("CachedJarFileCallback.addMapping : {} -> {} ", remoteUrl, localUrl);
+        mapping.put(remoteUrl.toString(), localUrl);
     }
 
     @Override
     public java.util.jar.JarFile retrieve(URL url) throws IOException {
-        URL localUrl = mapping.get(url);
+        URL localUrl = mapping.get(url.toString());
         if (localUrl == null) {
             if (url.getRef() != null) {
                 url = new URL(url.toString().substring(0, url.toString().lastIndexOf(url.getRef()) - 1));
-                localUrl = mapping.get(url);
+                localUrl = mapping.get(url.toString());
             }
         }
 
         if (localUrl == null) {
-            LOG.info("could not find mapping for {} - falling back to downloading without caching", url);
+            LOG.info("CachedJarFileCallback.retrieve : could not find mapping for {} - falling back to downloading without caching", url);
             /*
              * If the jar url is not known, treat it as it would be treated in
              * general by URLJarFile.
@@ -112,7 +113,7 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
                 // 2) For the plug-in, we want to cache files from class-path so we do it manually
                 returnFile.getManifest().getMainAttributes().putValue(Attributes.Name.CLASS_PATH.toString(), "");
 
-                LOG.debug("Class-Path attribute cleared for {}", returnFile.getName());
+                LOG.debug("Class-Path attribute cleared for Cached Jar {}", returnFile.getName());
 
             } catch (NullPointerException npe) {
                 // Discard NPE here. Maybe there was no manifest, maybe there were no attributes, etc.
