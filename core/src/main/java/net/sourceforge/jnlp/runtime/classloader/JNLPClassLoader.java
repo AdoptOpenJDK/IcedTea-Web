@@ -256,7 +256,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * classloading threads. See loadClass(String) and
      * CodebaseClassLoader.findClassNonRecursive(String).
      */
-    final Map<URL, SecurityDesc> jarLocationSecurityMap = Collections.synchronizedMap(new HashMap<>());
+    final Map<String, SecurityDesc> jarLocationSecurityMap = Collections.synchronizedMap(new HashMap<>());
 
     /*Set to prevent once tried-to-get resources to be tried again*/
     private final Set<URL> alreadyTried = Collections.synchronizedSet(new HashSet<>());
@@ -822,7 +822,7 @@ public class JNLPClassLoader extends URLClassLoader {
         for (JARDesc jarDesc : validJars) {
             final URL codebase = getJnlpFileCodebase();
             final SecurityDesc jarSecurity = securityDelegate.getCodebaseSecurityDesc(jarDesc, codebase);
-            jarLocationSecurityMap.put(jarDesc.getLocation(), jarSecurity);
+            jarLocationSecurityMap.put(jarDesc.getLocation().toString(), jarSecurity);
         }
 
         activateJars(initialJars);
@@ -1254,7 +1254,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
                                     addURL(fakeRemote);
 
-                                    jarLocationSecurityMap.put(fakeRemote, jarSecurity);
+                                    jarLocationSecurityMap.put(fakeRemote.toString(), jarSecurity);
 
                                 } catch (MalformedURLException mfue) {
                                     LOG.error("Unable to add extracted nested jar to classpath", mfue);
@@ -1566,7 +1566,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
                 final SecurityDesc security = securityDelegate.getJarPermissions(file.getCodeBase());
 
-                jarLocationSecurityMap.put(remoteURL, security);
+                jarLocationSecurityMap.put(remoteURL.toString(), security);
 
                 return null;
             });
@@ -1846,7 +1846,7 @@ public class JNLPClassLoader extends URLClassLoader {
      * @return The SecurityDescriptor for that source
      */
     private SecurityDesc getCodeSourceSecurity(URL source) {
-        SecurityDesc sec = jarLocationSecurityMap.get(source);
+        SecurityDesc sec = jarLocationSecurityMap.get(source.toString());
         synchronized (alreadyTried) {
             if (sec == null && !alreadyTried.contains(source)) {
                 alreadyTried.add(source);
@@ -1855,7 +1855,7 @@ public class JNLPClassLoader extends URLClassLoader {
                 try {
                     JARDesc des = new JARDesc(source, null, null, false, false, false, false);
                     addNewJar(des);
-                    sec = jarLocationSecurityMap.get(source);
+                    sec = jarLocationSecurityMap.get(source.toString());
                 } catch (Throwable t) {
                     LOG.error("Error while getting security", t);
                     sec = null;
@@ -1900,7 +1900,7 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // security descriptors
         synchronized (jarLocationSecurityMap) {
-            for (URL key : extLoader.jarLocationSecurityMap.keySet()) {
+            for (String key : extLoader.jarLocationSecurityMap.keySet()) {
                 jarLocationSecurityMap.put(key, extLoader.jarLocationSecurityMap.get(key));
             }
         }
@@ -2102,9 +2102,13 @@ public class JNLPClassLoader extends URLClassLoader {
 
         // Permissions for all remote hosting urls
         synchronized (jarLocationSecurityMap) {
-            for (URL u : jarLocationSecurityMap.keySet()) {
-                permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u),
-                        "connect, accept"));
+            for (String urlString : jarLocationSecurityMap.keySet()) {
+                try {
+                    URL u = new URL(urlString);
+                    permissions.add(new SocketPermission(UrlUtils.getHostAndPort(u), "connect, accept"));
+                } catch (MalformedURLException mue) {
+                    LOG.debug("Could not add SocketPermission for url : {}", urlString);
+                }
             }
         }
 
