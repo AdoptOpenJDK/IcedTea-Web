@@ -35,8 +35,8 @@ public class JarIndexAccess {
                 LOG.debug(CLASS_SUN_MISC_JAR_INDEX + " not found - Running jdk9+ ?");
                 jarIndexClass = Class.forName(CLASS_JDK_INTERNAL_UTIL_JAR_JAR_INDEX);
             } catch (ClassNotFoundException exx) {
-                LOG.error(CLASS_JDK_INTERNAL_UTIL_JAR_JAR_INDEX + " not found");
-                throw new RuntimeException("JarIndex not found!");
+                LOG.debug(CLASS_JDK_INTERNAL_UTIL_JAR_JAR_INDEX + " not found");
+                jarIndexClass = JarIndexDummy.class;
             }
         }
     }
@@ -78,5 +78,19 @@ public class JarIndexAccess {
         final Method method = jarIndexClass.getMethod(METHOD_GET, String.class);
         final Object o = method.invoke(parent, replace);
         return (LinkedList<String>) o;
+    }
+
+    /**
+     * Because starting of JAVA 21 the JarIndex is no longer supported we provide a dummy implementation which always returns {@code null}.
+     */
+    @SuppressWarnings("unused")
+    private static class JarIndexDummy {
+        public static Object getJarIndex(JarFile jar) {
+            return null;
+        }
+
+        public Object get(String fileName) {
+            return null;
+        }
     }
 }
