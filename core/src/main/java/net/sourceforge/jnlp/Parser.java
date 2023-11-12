@@ -531,7 +531,7 @@ public final class Parser {
                 LOG.warn(s);
             }
         } else {
-            LOG.info("good - your JRE - {} - match requested JRE - {}", jreVersion, version.toString());
+            LOG.info("good - your JRE - {} - matches requested JRE - {}", jreVersion, version.toString());
         }
     }
 

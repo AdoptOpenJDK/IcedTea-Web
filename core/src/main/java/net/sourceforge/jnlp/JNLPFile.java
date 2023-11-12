@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -619,7 +620,7 @@ public class JNLPFile {
     private List<ResourcesDesc> getResourcesDescs(Locale locale, String os, String arch) {
         return resources.stream()
                 .filter(rescDesc -> hasPrefixMatch(os, rescDesc.getOS()))
-                .filter(rescDesc -> hasPrefixMatch(arch, rescDesc.getArch()))
+                .filter(rescDesc -> Arrays.stream(rescDesc.getArch()).anyMatch(archStr -> Objects.equals(arch, archStr)))
                 .filter(rescDesc -> localeMatches(rescDesc.getLocales(), locale))
                 .collect(toList());
     }
