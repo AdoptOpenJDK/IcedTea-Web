@@ -44,6 +44,7 @@ import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class UrlUtilsTest {
@@ -90,12 +91,15 @@ public class UrlUtilsTest {
         }
 
         // Test file URL with file URL encoding turned off
-        assertFalse("file://example/%20test".equals(
-                  UrlUtils.normalizeUrl(new URL("file://example/ test"), false).toString()));
+        assertNotEquals("file://example/%20test",
+                UrlUtils.normalizeUrl(new URL("file://example/ test"), false).toString());
 
         // Test file URL with file URL encoding turned on
         assertEquals("file://example/%20test",
                   UrlUtils.normalizeUrl(new URL("file://example/ test"), true).toString());
+
+        final String largeUrl = "https://www.kursweb.ch/webstart/webstart.selfsigned.jnlp?db=C:%5CUsers%5CFabian%5Cmerkisoft%5Cferienplausch-uster%5C&name=C:%5CUsers%5CFabian%5Cmerkisoft%5Cferienplausch-uster%5C";
+        assertEquals(largeUrl, UrlUtils.normalizeUrl(new URL(largeUrl)).toString());
 
         // PR1465: Test that RFC2396-compliant URLs are not touched
         // Example taken from bug report: http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1465
@@ -138,8 +142,7 @@ public class UrlUtilsTest {
             assertEquals("Encoded url as file", testFile.getAbsoluteFile(), UrlUtils.decodeUrlAsFile(encodedUrl));
         }
     }
-    
-     
+
     @Test
     public void testNormalizeUrlSlashStrings() throws Exception {
         String u11 = UrlUtils.sanitizeLastSlash("http://aa.bb/aaa/bbb////");
@@ -152,7 +155,7 @@ public class UrlUtilsTest {
         assertEquals(u1, u2);
         assertEquals(u1, ("http://aa.bb/aaa\\bbb"));
     }
-    
+
     @Test
     public void testNormalizeUrlSlashUrls() throws Exception {
         URL u11 = UrlUtils.sanitizeLastSlash(new URL("http://aa.bb/aaa/bbb////"));
@@ -203,30 +206,30 @@ public class UrlUtilsTest {
 
         URL l2  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\hchkr\\"));
          assertEquals(l2, new URL("http://aaa.bb/xyz\\hchkr"));
-         
+
          URL l3  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\hchkr"));
          assertEquals(l3, new URL("http://aaa.bb/xyz"));
-         
+
          URL l4  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\jar.jar"));
          assertEquals(l4, new URL("http://aaa.bb/xyz"));
-         
+
          URL l5  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz\\"));
          assertEquals(l5, new URL("http://aaa.bb/xyz"));
-         
+
          URL l6  = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz"));
          assertEquals(l6, new URL("http://aaa.bb"));
-         
+
          URL l7  = UrlUtils.removeFileName(new URL("http://aaa.bb/jar.jar"));
          assertEquals(l7, new URL("http://aaa.bb"));
-         
+
          URL l8  = UrlUtils.removeFileName(new URL("http://aaa.bb/"));
          assertEquals(l8, new URL("http://aaa.bb"));
-         
+
          URL l9  = UrlUtils.removeFileName(new URL("http://aaa.bb"));
          assertEquals(l9, new URL("http://aaa.bb"));
-        
+
     }
-    
+
      @Test
     public void removeFileName3() throws Exception {
         URL l1 = UrlUtils.removeFileName(new URL("http://aaa.bb/xyz/hchkr/jar.jar?someParam=some&param=very\\evil\\"));
@@ -254,7 +257,7 @@ public class UrlUtilsTest {
         assertEquals(l8, new URL("http://aaa.bb"));
 
     }
-    
+
     @Test
     public void testUrlEquals() throws Exception {
         final URL n1 = null, n2 = null, u1 = new URL("http://example.com"), u2 = u1, u3 = new URL("http://example.com");
@@ -336,7 +339,7 @@ public class UrlUtilsTest {
         Assert.assertFalse(UrlUtils.compareNullableStrings("BBB", "aaa", false));
 
     }
-    
+
     @Test
     public void sanitizePortTest() throws MalformedURLException {
         Assert.assertEquals(0, UrlUtils.getSanitizedPort(new URL("http://aaa.cz:0")));
@@ -347,7 +350,7 @@ public class UrlUtilsTest {
         Assert.assertEquals(80, UrlUtils.getSanitizedPort(new URL("http://aaa.cz")));
         Assert.assertEquals(443, UrlUtils.getSanitizedPort(new URL("https://aaa.cz")));
         Assert.assertEquals(21, UrlUtils.getSanitizedPort(new URL("ftp://aaa.cz")));
-        
+
    }
 
     @Test
@@ -369,7 +372,7 @@ public class UrlUtilsTest {
         Assert.assertEquals("aa.bb:80", UrlUtils.getHostAndPort(new URL("http://aa.bb")));
         Assert.assertEquals("aa.bb:80", UrlUtils.getHostAndPort(new URL("http://aa.bb:80/a/b/c")));
     }
-    
+
     @Test
     public void ensureSlashTailTest() {
         Assert.assertEquals("a/", UrlUtils.ensureSlashTail("a"));
@@ -377,18 +380,18 @@ public class UrlUtilsTest {
         Assert.assertEquals("aa/a/", UrlUtils.ensureSlashTail("aa/a/"));
         Assert.assertEquals("/aa/a/", UrlUtils.ensureSlashTail("/aa/a/"));
         Assert.assertEquals("/aa/a/", UrlUtils.ensureSlashTail("/aa/a"));
-        
+
         Assert.assertEquals("aa\\a\\", UrlUtils.ensureSlashTail("aa\\a"));
         Assert.assertEquals("aa\\a\\", UrlUtils.ensureSlashTail("aa\\a\\"));
         Assert.assertEquals("\\aa\\a\\", UrlUtils.ensureSlashTail("\\aa\\a\\"));
         Assert.assertEquals("\\aa\\a\\", UrlUtils.ensureSlashTail("\\aa\\a"));
-        
+
         Assert.assertEquals("\\aa/a/", UrlUtils.ensureSlashTail("\\aa/a"));
         Assert.assertEquals("//aa\\a/", UrlUtils.ensureSlashTail("//aa\\a"));
         Assert.assertEquals("\\aa/a/", UrlUtils.ensureSlashTail("\\aa/a/"));
         Assert.assertEquals("\\aa/a\\", UrlUtils.ensureSlashTail("\\aa/a\\"));
     }
-    
+
      @Test
     public void ensureSlashTailTest3() throws MalformedURLException {
         Assert.assertEquals("http://aa.bb:2/aa/", UrlUtils.ensureSlashTail(new URL("http://aa.bb:2/aa")).toExternalForm());
