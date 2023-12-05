@@ -101,6 +101,9 @@ public class UrlUtilsTest {
         final String largeUrl = "https://www.kursweb.ch/webstart/webstart.selfsigned.jnlp?db=C:%5CUsers%5CFabian%5Cmerkisoft%5Cferienplausch-uster%5C&name=C:%5CUsers%5CFabian%5Cmerkisoft%5Cferienplausch-uster%5C";
         assertEquals(largeUrl, UrlUtils.normalizeUrl(new URL(largeUrl)).toString());
 
+        final String largeUrlWithPort = "https://www.kursweb.ch:443/webstart/webstart.selfsigned.jnlp?db=C:%5CUsers%5CFabian%5Cmerkisoft%5Cferienplausch-uster%5C&name=C:%5CUsers%5CFabian%5Cmerkisoft%5Cferienplausch-uster%5C";
+        assertEquals(largeUrl, UrlUtils.normalizeUrl(new URL(largeUrl)).toString());
+
         // PR1465: Test that RFC2396-compliant URLs are not touched
         // Example taken from bug report: http://icedtea.classpath.org/bugzilla/show_bug.cgi?id=1465
         String rfc2396Valid = "https://example.com/,DSID=64c19c5b657df383835706571a7c7216,DanaInfo=example.com,CT=java+JICAComponents/JICA-sicaN.jar";
@@ -309,7 +312,9 @@ public class UrlUtilsTest {
     @KnownToFail
     @Ignore
     public void notNullUrlCompareWithPorts() throws Exception {
-        final URL u1 = new URL("http://example.com:1"), u2 = new URL("http://example.com:1"), u3 = new URL("http://example.com:3");
+        final URL u1 = new URL("http://example.com:1");
+        final URL u2 = new URL("http://example.com:1");
+        final URL u3 = new URL("http://example.com:3");
         Assert.assertTrue(UrlUtils.notNullUrlEquals(u1, u2));
         Assert.assertFalse(UrlUtils.notNullUrlEquals(u1, u3));
         Assert.assertFalse(UrlUtils.notNullUrlEquals(u2, u3));
