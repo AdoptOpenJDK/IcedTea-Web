@@ -44,6 +44,7 @@ import sun.security.x509.NetscapeCertTypeExtension;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.security.CodeSigner;
 import java.security.KeyStore;
 import java.security.Timestamp;
@@ -64,6 +65,7 @@ import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
 import java.util.zip.ZipException;
 
+import static java.lang.Boolean.TRUE;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
 /**
@@ -609,12 +611,24 @@ public class JarCertVerifier implements CertVerifier {
 
                 final NetscapeCertTypeExtension extn = new NetscapeCertTypeExtension(encoded);
 
-                if (!extn.get(NetscapeCertTypeExtension.OBJECT_SIGNING)) {
+                if (!hasObjectSigningExtension(extn)) {
                     certs.get(certPath).setBadNetscapeCertType();
                 }
             }
         } catch (IOException e) {
             //
+        }
+    }
+
+    private static boolean hasObjectSigningExtension(NetscapeCertTypeExtension extn) throws IOException {
+        // method return type of "NetscapeCertTypeExtension.get()" has changed from Boolean to boolean with Java 21
+        try {
+            final Method getMethod = NetscapeCertTypeExtension.class.getDeclaredMethod("get", String.class);
+            final Object result = getMethod.invoke(extn, NetscapeCertTypeExtension.OBJECT_SIGNING);
+            return result == TRUE;
+        } catch (Exception e) {
+            LOG.error("Failed to get object_signing from extension", e);
+            return false;
         }
     }
 
