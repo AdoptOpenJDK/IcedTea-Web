@@ -35,6 +35,7 @@ import net.sourceforge.jnlp.runtime.classloader.DelegatingClassLoader;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader;
 import net.sourceforge.jnlp.services.InstanceExistsException;
 import net.sourceforge.jnlp.services.ServiceUtil;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.text.html.parser.ParserDelegator;
@@ -309,7 +310,7 @@ public class Launcher {
             }
             if (!isLocal && haveHref) {
                 //this is case when remote file have href to different file
-                if (file.getSourceLocation() == null || !location.toString().equals(file.getSourceLocation().toString())) {
+                if (!UrlUtils.equalUrls(location, file.getSourceLocation())) {
                     //mark local true, so the following condition will be true and
                     //new jnlp file will be downloaded
                     isLocal = true;

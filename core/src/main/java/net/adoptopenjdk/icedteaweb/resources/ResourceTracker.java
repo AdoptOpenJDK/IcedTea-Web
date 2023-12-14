@@ -24,6 +24,7 @@ import net.sourceforge.jnlp.DownloadOptions;
 import net.sourceforge.jnlp.cache.CacheUtil;
 import net.sourceforge.jnlp.config.ConfigurationConstants;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
+import net.sourceforge.jnlp.util.UrlKey;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import javax.jnlp.DownloadServiceListener;
@@ -97,7 +98,7 @@ public class ResourceTracker {
     /**
      * the resources known about by this resource tracker
      */
-    private final Map<String, Resource> resources = new HashMap<>();
+    private final Map<UrlKey, Resource> resources = new HashMap<>();
 
     /**
      * whether to download parts before requested
@@ -166,10 +167,11 @@ public class ResourceTracker {
      */
     private boolean addToResources(Resource resource) {
         synchronized (resources) {
-            final Resource existingResource = resources.get(resource.getLocation().toString());
+            final UrlKey urlKey = new UrlKey(resource.getLocation());
+            final Resource existingResource = resources.get(urlKey);
 
             if (existingResource == null) {
-                resources.put(resource.getLocation().toString(), resource);
+                resources.put(urlKey, resource);
                 return true;
             }
 
@@ -203,7 +205,7 @@ public class ResourceTracker {
     public void removeResource(URL location) {
         synchronized (resources) {
             Resource resource = getResource(location);
-            resources.remove(resource.getLocation().toString());
+            resources.remove(new UrlKey(resource.getLocation()));
         }
     }
 
@@ -362,7 +364,7 @@ public class ResourceTracker {
     private Resource getResource(URL location) {
         final URL normalizedLocation = normalizeUrlQuietly(location);
         synchronized (resources) {
-            final Resource result = resources.get(normalizedLocation.toString());
+            final Resource result = resources.get(new UrlKey(normalizedLocation));
             if (result == null) {
                 throw new IllegalResourceDescriptorException("Location " + location + " does not specify a resource being tracked.");
             }

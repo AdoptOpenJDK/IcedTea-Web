@@ -52,6 +52,7 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.runtime.classloader.JNLPClassLoader.SigningState;
 import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
 import net.sourceforge.jnlp.util.ClasspathMatcher.ClasspathMatchers;
+import net.sourceforge.jnlp.util.UrlKey;
 import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.net.MalformedURLException;
@@ -77,7 +78,7 @@ public class ManifestAttributesChecker {
     private final SecurityDelegate securityDelegate;
 
     public ManifestAttributesChecker(final SecurityDesc security, final JNLPFile file,
-            final SigningState signing, final SecurityDelegate securityDelegate) {
+                                     final SigningState signing, final SecurityDelegate securityDelegate) {
         this.security = security;
         this.file = file;
         this.signing = signing;
@@ -122,7 +123,7 @@ public class ManifestAttributesChecker {
             }
 
             if (attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALAC) ||
-                   attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
+                    attributesCheck.contains(MANIFEST_ATTRIBUTES_CHECK.ALL)) {
                 checkApplicationLibraryAllowableCodebaseAttribute();
             } else {
                 LOG.warn("check on {} skipped because property of deployment.manifest.attributes.check was not set to ALL or includes {} in the combination of options", "Application Library Allowable Codebase", "ALAC");
@@ -142,7 +143,7 @@ public class ManifestAttributesChecker {
         final List<String> configs = JNLPRuntime.getConfiguration().getPropertyAsList(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK);
         List<MANIFEST_ATTRIBUTES_CHECK> manifestAttributesCheckList = new ArrayList<>();
         for (String attribute : configs) {
-            for (MANIFEST_ATTRIBUTES_CHECK manifestAttribute  : MANIFEST_ATTRIBUTES_CHECK.values()) {
+            for (MANIFEST_ATTRIBUTES_CHECK manifestAttribute : MANIFEST_ATTRIBUTES_CHECK.values()) {
                 if (manifestAttribute.toString().equals(attribute)) {
                     manifestAttributesCheckList.add(manifestAttribute);
                 }
@@ -331,12 +332,12 @@ public class ManifestAttributesChecker {
         final URL codebase = file.getCodeBase();
 
         //cases
-        final Map<String, Set<URL>> usedUrls = new HashMap<>();
+        final Map<UrlKey, Set<URL>> usedUrls = new HashMap<>();
         final URL sourceLocation = file.getSourceLocation();
         final ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
         if ((sourceLocation != null) && !FILE_PROTOCOL.equals(sourceLocation.getProtocol())) {
             final URL urlWithoutFileName = UrlUtils.removeFileName(sourceLocation);
-            usedUrls.computeIfAbsent(urlWithoutFileName.toString(), url -> new HashSet<>()).add(sourceLocation);
+            usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(sourceLocation);
         }
         for (ResourcesDesc resourcesDesc : resourcesDescs) {
             ExtensionDesc[] ex = resourcesDesc.getExtensions();
@@ -344,7 +345,7 @@ public class ManifestAttributesChecker {
                 for (ExtensionDesc extensionDesc : ex) {
                     if (extensionDesc != null) {
                         final URL urlWithoutFileName = UrlUtils.removeFileName(extensionDesc.getLocation());
-                        usedUrls.computeIfAbsent(urlWithoutFileName.toString(), url -> new HashSet<>()).add(extensionDesc.getLocation());
+                        usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(extensionDesc.getLocation());
                     }
                 }
             }
@@ -353,7 +354,7 @@ public class ManifestAttributesChecker {
                 for (JARDesc jarDesc : jars) {
                     if (jarDesc != null) {
                         final URL urlWithoutFileName = UrlUtils.removeFileName(jarDesc.getLocation());
-                        usedUrls.computeIfAbsent(urlWithoutFileName.toString(), url -> new HashSet<>()).add(jarDesc.getLocation());
+                        usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(jarDesc.getLocation());
                     }
                 }
             }
@@ -367,19 +368,15 @@ public class ManifestAttributesChecker {
         }
         final Set<URL> notOkUrls = new HashSet<>();
         final boolean skipResourcesFromFileSystem = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ASSUME_FILE_STEM_IN_CODEBASE));
-        for (String urlString : usedUrls.keySet()) {
-            try {
-                final URL u = new URL(urlString);
-                if (UrlUtils.urlRelativeTo(u, codebase)) {
-                    LOG.debug("OK - '{}' is from codebase '{}'.", u, codebase);
-                } else if (skipResourcesFromFileSystem && FILE_PROTOCOL.equals(u.getProtocol())) {
-                    LOG.debug("OK - '{}' is from file system", u);
-                } else {
-                    notOkUrls.add(u);
-                    LOG.warn("Warning! '{}' is NOT from codebase '{}'.", u, codebase);
-                }
-            } catch (MalformedURLException mue) {
-                LOG.debug("Malformed URL checkApplicationLibraryAllowableCodebaseAttribute '{}'.", urlString);
+        for (UrlKey urlKey : usedUrls.keySet()) {
+            final URL u = urlKey.getUrl();
+            if (UrlUtils.urlRelativeTo(u, codebase)) {
+                LOG.debug("OK - '{}' is from codebase '{}'.", u, codebase);
+            } else if (skipResourcesFromFileSystem && FILE_PROTOCOL.equals(u.getProtocol())) {
+                LOG.debug("OK - '{}' is from file system", u);
+            } else {
+                notOkUrls.add(u);
+                LOG.warn("Warning! '{}' is NOT from codebase '{}'.", u, codebase);
             }
         }
         if (notOkUrls.isEmpty()) {
@@ -397,7 +394,7 @@ public class ManifestAttributesChecker {
         }
 
         final Set<URL> notOkResources = notOkUrls.stream()
-                .flatMap(notOk -> usedUrls.get(notOk.toString()).stream())
+                .flatMap(notOk -> usedUrls.get(new UrlKey(notOk)).stream())
                 .collect(Collectors.toSet());
 
         notOkResources.forEach(url -> LOG.warn("The resource '{}' is not from codebase '{}'", url, codebase));
@@ -411,16 +408,12 @@ public class ManifestAttributesChecker {
                 return;
             }
         } else {
-            for (String foundUrlString : usedUrls.keySet()) {
-                try {
-                    URL foundUrl = new URL(foundUrlString);
-                    if (!att.matches(foundUrl)) {
-                        throw new LaunchException("The resources " + usedUrls.get(foundUrlString) + " do not match the location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
-                    } else {
-                        LOG.debug("The resources from {} do  match the location in Application-Library-Allowable-Codebase Attribute {}. Continuing.", foundUrl, att);
-                    }
-                } catch (MalformedURLException mue) {
-                   throw new LaunchException("Malformed URL " + foundUrlString + ". Resources do not match the location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
+            for (UrlKey foundUrlKey : usedUrls.keySet()) {
+                URL foundUrl = foundUrlKey.getUrl();
+                if (!att.matches(foundUrl)) {
+                    throw new LaunchException("The resources " + usedUrls.get(foundUrlKey) + " do not match the location in Application-Library-Allowable-Codebase Attribute " + att + ". Blocking the application from running.");
+                } else {
+                    LOG.debug("The resources from {} do  match the location in Application-Library-Allowable-Codebase Attribute {}. Continuing.", foundUrl, att);
                 }
             }
         }
@@ -446,7 +439,7 @@ public class ManifestAttributesChecker {
         if (i <= 8 || i >= s.length()) {
             return documentBase;
         }
-        s = s.substring(0, i+1);
+        s = s.substring(0, i + 1);
         try {
             documentBase = new URL(s);
         } catch (MalformedURLException ex) {

@@ -592,4 +592,14 @@ public class UrlUtils {
 
         return s;
     }
+
+    public static boolean equalUrls(URL url1, URL url2) {
+        if (url1 == url2) {
+            return true;
+        }
+        if (url1 == null || url2 == null) {
+            return  false;
+        }
+        return new UrlKey(url1).equals(new UrlKey(url2));
+    }
 }

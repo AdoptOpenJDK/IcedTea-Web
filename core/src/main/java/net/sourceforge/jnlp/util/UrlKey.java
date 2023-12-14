@@ -7,18 +7,24 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class UrlKey {
- private String protocol;
- private String host;
- private String file;
- private int port;
- private String ref;
+    private final URL url;
+    private final String protocol;
+    private final String host;
+    private final String file;
+    private final int port;
+    private final String ref;
 
     public UrlKey(final URL url) {
+        this.url = url;
         this.protocol = url.getProtocol() != null ? url.getProtocol().toLowerCase(Locale.ENGLISH) : null;
         this.host = url.getHost();
         this.port = url.getPort();
         this.file = url.getFile();
         this.ref = url.getRef();
+    }
+
+    public URL getUrl() {
+        return url;
     }
 
     @Override
@@ -27,7 +33,7 @@ public class UrlKey {
             return false;
         }
         UrlKey other = ((UrlKey) obj);
-        return  Objects.equals(protocol, other.protocol) &&
+        return Objects.equals(protocol, other.protocol) &&
                 Objects.equals(host, other.host) &&
                 samePort(port, other.port) &&
                 Objects.equals(file, other.file) &&
@@ -39,7 +45,7 @@ public class UrlKey {
             return true;
         }
         final int defaultPort = getDefaultPort();
-        return  (port == defaultPort || port == -1) && (other == defaultPort || other == -1);
+        return (port == defaultPort || port == -1) && (other == defaultPort || other == -1);
     }
 
     private int getDefaultPort() {

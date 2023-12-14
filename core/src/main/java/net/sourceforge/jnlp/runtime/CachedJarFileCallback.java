@@ -40,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.JarFile;
+import net.sourceforge.jnlp.util.UrlKey;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.jar.URLJarFile;
 import sun.net.www.protocol.jar.URLJarFileCallBack;
@@ -73,24 +74,24 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
     }
 
     /* our managed cache */
-    private final Map<String, URL> mapping;
+    private final Map<UrlKey, URL> mapping;
 
     private CachedJarFileCallback() {
-        mapping = new ConcurrentHashMap<String, URL>();
+        mapping = new ConcurrentHashMap<>();
     }
 
     public void addMapping(URL remoteUrl, URL localUrl) {
         LOG.debug("CachedJarFileCallback.addMapping : {} -> {} ", remoteUrl, localUrl);
-        mapping.put(remoteUrl.toString(), localUrl);
+        mapping.put(new UrlKey(remoteUrl), localUrl);
     }
 
     @Override
     public java.util.jar.JarFile retrieve(URL url) throws IOException {
-        URL localUrl = mapping.get(url.toString());
+        URL localUrl = mapping.get(new UrlKey(url));
         if (localUrl == null) {
             if (url.getRef() != null) {
                 url = new URL(url.toString().substring(0, url.toString().lastIndexOf(url.getRef()) - 1));
-                localUrl = mapping.get(url.toString());
+                localUrl = mapping.get(new UrlKey(url));
             }
         }
 
