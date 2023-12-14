@@ -13,6 +13,7 @@ public class UrlKeyTest extends TestCase {
         URL url1 = new URL("http://www.example.com:80/index.html?a=b#3");
         List<URL> urlList = Arrays.asList(
                 new URL("http://www.example.com/index.html?a=b#3"),
+                new URL("http://www.Example.Com/index.html?a=b#3"),
                 new URL("Http://www.example.com/index.html?a=b#3"),
                 new URL("http://www.example.com:80/index.html?a=b#3"));
 
@@ -29,7 +30,7 @@ public class UrlKeyTest extends TestCase {
     public void testNotEqualsHttp() throws Exception {
         URL url1 = new URL("http://www.example.com:80/index.html?a=b#3");
         List<URL> urlList = Arrays.asList(
-                new URL("http://www.Example.com:80/index.html?a=b#3"),
+                new URL("http://www.example.org:80/index.html?a=b#3"),
                 new URL("http://www.example.com:80/index2.html?a=b#3"),
                 new URL("http://www.example.com:80/index.html#3"),
                 new URL("https://www.example.com:80/index.html?a=b#3"),

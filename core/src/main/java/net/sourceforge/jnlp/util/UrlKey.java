@@ -17,7 +17,7 @@ public class UrlKey {
     public UrlKey(final URL url) {
         this.url = url;
         this.protocol = url.getProtocol() != null ? url.getProtocol().toLowerCase(Locale.ENGLISH) : null;
-        this.host = url.getHost();
+        this.host = url.getHost() != null ? url.getHost().toLowerCase(Locale.ENGLISH) : null;
         this.port = url.getPort();
         this.file = url.getFile();
         this.ref = url.getRef();
