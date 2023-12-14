@@ -66,7 +66,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 @Ignore
 public class SecurityDialogsTest extends NoStdOutErrTest {
@@ -312,9 +312,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //Assert.assertEquals(r.ea, r5);
         NamePassword r6 = SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
         Assert.assertEquals(r.np, r6);
-        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
+        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new ArrayList<>());
         Assert.assertEquals(r.b, r7);
-        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new ArrayList<>());
         Assert.assertEquals(r.b, r8);
         boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         Assert.assertEquals(r.b, r9);
@@ -336,9 +336,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         //Assert.assertEquals(r.ea, r5);
         NamePassword r6 = SecurityDialogs.showAuthenticationPrompt(null, 123456, null, null);
         Assert.assertEquals(null, r6);
-        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
+        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new ArrayList<>());
         Assert.assertEquals(false, r7);
-        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new ArrayList<>());
         Assert.assertEquals(false, r8);
         boolean r9 = SecurityDialogs.showMissingPermissionsAttributeDialogue(crtJnlpF());
         Assert.assertEquals(false, r9);
@@ -441,7 +441,7 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
         }
         try {
             metcounter++;
-            SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+            SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new ArrayList<>());
         } catch (NullPointerException ex) {
             npecounter++;
         }
@@ -628,9 +628,9 @@ public class SecurityDialogsTest extends NoStdOutErrTest {
             + ".* \\Q" + urlstr + "\\E ";
 
     private void runRememeberableClasses(ExpectedResults r) throws MalformedURLException {
-        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new HashSet<URL>());
+        boolean r7 = SecurityDialogs.showMissingALACAttributePanel(crtJnlpF(), null, new ArrayList<>());
         Assert.assertEquals(r.b, r7);
-        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new HashSet<URL>());
+        boolean r8 = SecurityDialogs.showMatchingALACAttributePanel(crtJnlpF(), url, new ArrayList<>());
         Assert.assertEquals(r.b, r8);
         boolean r9 = testUnsignedBehaviour();
         Assert.assertEquals(r.b, r9);

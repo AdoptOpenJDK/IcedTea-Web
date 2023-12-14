@@ -332,12 +332,12 @@ public class ManifestAttributesChecker {
         final URL codebase = file.getCodeBase();
 
         //cases
-        final Map<UrlKey, Set<URL>> usedUrls = new HashMap<>();
+        final Map<UrlKey, Set<UrlKey>> usedUrls = new HashMap<>();
         final URL sourceLocation = file.getSourceLocation();
         final ResourcesDesc[] resourcesDescs = file.getResourcesDescs();
         if ((sourceLocation != null) && !FILE_PROTOCOL.equals(sourceLocation.getProtocol())) {
             final URL urlWithoutFileName = UrlUtils.removeFileName(sourceLocation);
-            usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(sourceLocation);
+            usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(new UrlKey(sourceLocation));
         }
         for (ResourcesDesc resourcesDesc : resourcesDescs) {
             ExtensionDesc[] ex = resourcesDesc.getExtensions();
@@ -345,7 +345,7 @@ public class ManifestAttributesChecker {
                 for (ExtensionDesc extensionDesc : ex) {
                     if (extensionDesc != null) {
                         final URL urlWithoutFileName = UrlUtils.removeFileName(extensionDesc.getLocation());
-                        usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(extensionDesc.getLocation());
+                        usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(new UrlKey(extensionDesc.getLocation()));
                     }
                 }
             }
@@ -354,7 +354,7 @@ public class ManifestAttributesChecker {
                 for (JARDesc jarDesc : jars) {
                     if (jarDesc != null) {
                         final URL urlWithoutFileName = UrlUtils.removeFileName(jarDesc.getLocation());
-                        usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(jarDesc.getLocation());
+                        usedUrls.computeIfAbsent(new UrlKey(urlWithoutFileName), url -> new HashSet<>()).add(new UrlKey(jarDesc.getLocation()));
                     }
                 }
             }
@@ -366,7 +366,7 @@ public class ManifestAttributesChecker {
             LOG.debug("The application is not using any url resources, skipping Application-Library-Allowable-Codebase Attribute check.");
             return;
         }
-        final Set<URL> notOkUrls = new HashSet<>();
+        final Set<UrlKey> notOkUrls = new HashSet<>();
         final boolean skipResourcesFromFileSystem = Boolean.parseBoolean(JNLPRuntime.getConfiguration().getProperty(ConfigurationConstants.KEY_ASSUME_FILE_STEM_IN_CODEBASE));
         for (UrlKey urlKey : usedUrls.keySet()) {
             final URL u = urlKey.getUrl();
@@ -375,7 +375,7 @@ public class ManifestAttributesChecker {
             } else if (skipResourcesFromFileSystem && FILE_PROTOCOL.equals(u.getProtocol())) {
                 LOG.debug("OK - '{}' is from file system", u);
             } else {
-                notOkUrls.add(u);
+                notOkUrls.add(urlKey);
                 LOG.warn("Warning! '{}' is NOT from codebase '{}'.", u, codebase);
             }
         }
@@ -393,9 +393,11 @@ public class ManifestAttributesChecker {
             att = null;
         }
 
-        final Set<URL> notOkResources = notOkUrls.stream()
-                .flatMap(notOk -> usedUrls.get(new UrlKey(notOk)).stream())
-                .collect(Collectors.toSet());
+        final List<URL> notOkResources = notOkUrls.stream()
+                .flatMap(notOk -> usedUrls.get(notOk).stream())
+                .collect(Collectors.toSet()).stream()
+                .map(UrlKey::getUrl)
+                .collect(Collectors.toList());
 
         notOkResources.forEach(url -> LOG.warn("The resource '{}' is not from codebase '{}'", url, codebase));
 
