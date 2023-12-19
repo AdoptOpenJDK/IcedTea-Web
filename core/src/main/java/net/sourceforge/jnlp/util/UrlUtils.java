@@ -60,6 +60,7 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -226,7 +227,7 @@ public class UrlUtils {
      * @param remoteUrls list of urls
      * @return String containing html item list of those urls
      */
-    public static String setOfUrlsToHtmlList(final Collection<URL> remoteUrls) {
+    public static String setOfUrlsToHtmlList(final List<URL> remoteUrls) {
         return setOfUrlsToHtmlList(remoteUrls, 4);
     }
 
@@ -591,5 +592,15 @@ public class UrlUtils {
         }
 
         return s;
+    }
+
+    public static boolean equalUrls(URL url1, URL url2) {
+        if (url1 == url2) {
+            return true;
+        }
+        if (url1 == null || url2 == null) {
+            return  false;
+        }
+        return new UrlKey(url1).equals(new UrlKey(url2));
     }
 }

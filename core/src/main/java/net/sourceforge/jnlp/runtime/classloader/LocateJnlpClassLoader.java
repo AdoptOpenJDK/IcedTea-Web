@@ -38,6 +38,7 @@ import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ResourcesDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.version.VersionString;
 import net.sourceforge.jnlp.JNLPFile;
+import net.sourceforge.jnlp.util.UrlUtils;
 
 import java.net.URL;
 
@@ -60,7 +61,7 @@ class LocateJnlpClassLoader {
 
         if (urlToJnlpFile == null) {
             urlToJnlpFile = rootClassLoader.getJNLPFile().getFileLocation();
-        } else if (file.getFileLocation().toString().equals(urlToJnlpFile.toString())) {
+        } else if (UrlUtils.equalUrls(file.getFileLocation(), urlToJnlpFile)) {
             return rootClassLoader;
         }
 
@@ -90,8 +91,7 @@ class LocateJnlpClassLoader {
             ResourcesDesc resources = loader.getJNLPFile().getResources();
 
             for (JARDesc eachJar : resources.getJARs()) {
-                if (eachJar.getLocation() != null &&
-                        ref.toString().equals(eachJar.getLocation().toString()) &&
+                if (UrlUtils.equalUrls(ref, eachJar.getLocation()) &&
                         (resourceVersion == null || resourceVersion.equals(eachJar.getVersion())))
                     return loader;
             }

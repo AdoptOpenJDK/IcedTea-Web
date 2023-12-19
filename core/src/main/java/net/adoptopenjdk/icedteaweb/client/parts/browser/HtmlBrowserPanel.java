@@ -178,7 +178,7 @@ public class HtmlBrowserPanel extends JPanel {
             if (url != null) {
                 if (where.isEmpty()) {
                     where.add(0, url);
-                } else if (!where.get(0).toString().equals(url.toString())) {
+                } else if (!UrlUtils.equalUrls(where.get(0), url)) {
                     where.add(0, url);
                 }
             }

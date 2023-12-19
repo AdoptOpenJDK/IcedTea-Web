@@ -67,8 +67,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * http://docs.oracle.com/javase/7/docs/technotes/guides/jweb/security/manifest.html#app_library
@@ -151,7 +151,7 @@ public class MissingALACAttributePanel extends SecurityDialogPanel implements  R
     }
 
     public static void main(String[] args) throws MalformedURLException {
-        Set<URL> s = new HashSet<>();
+        List<URL> s = new ArrayList<>();
         s.add(new URL("http:/blah.com/blah"));
         s.add(new URL("http:/blah.com/blah/blah"));
         MissingALACAttributePanel w = new MissingALACAttributePanel(null, "HelloWorld", "http://nbblah.url", UrlUtils.setOfUrlsToHtmlList(s));
