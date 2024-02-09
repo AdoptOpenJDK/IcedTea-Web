@@ -50,6 +50,31 @@ public class JNLPFileFactory {
     }
 
     /**
+     * Generate unique key from file URL
+     * @param location
+     */
+    private String createUniqueKey(final URL location) {
+        return Calendar.getInstance().getTimeInMillis() + "-" + ((int) (Math.random() * Integer.MAX_VALUE)) + "-" + location;
+    }
+
+    /**
+     * Create a JNLPFile from a URL and parent URLm a version and checking for
+     * updates using the specified policy.
+     *
+     * @param location the location of the JNLP file
+     * @param version  the version of the JNLP file
+     * @throws IOException    if an IO exception occurred
+     * @throws ParseException if the JNLP file was invalid
+     */
+    public JNLPFile create(final URL location, final VersionString version) throws IOException, ParseException {
+        return create(location,
+                      createUniqueKey(location),
+                      version,
+                      new ParserSettings(),
+                      JNLPRuntime.getDefaultUpdatePolicy());
+    }
+
+    /**
      * Create a JNLPFile from a URL checking for updates using the
      * default policy.
      *
@@ -59,7 +84,7 @@ public class JNLPFileFactory {
      * @throws ParseException if the JNLP file was invalid
      */
     public JNLPFile create(final URL location, final ParserSettings settings) throws IOException, ParseException {
-        final String uniqueKey = Calendar.getInstance().getTimeInMillis() + "-" + ((int) (Math.random() * Integer.MAX_VALUE)) + "-" + location;
+        final String uniqueKey = createUniqueKey(location);
         return create(location, uniqueKey, null, settings, JNLPRuntime.getDefaultUpdatePolicy());
     }
 
