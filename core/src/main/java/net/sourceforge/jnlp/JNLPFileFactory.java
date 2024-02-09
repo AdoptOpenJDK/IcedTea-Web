@@ -58,8 +58,8 @@ public class JNLPFileFactory {
     }
 
     /**
-     * Create a JNLPFile from a URL and parent URLm a version and checking for
-     * updates using the specified policy.
+     * Create a JNLPFile from a URL and version and checking for
+     * updates using the default policy.
      *
      * @param location the location of the JNLP file
      * @param version  the version of the JNLP file
