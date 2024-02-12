@@ -238,13 +238,13 @@ class CacheImpl {
                 .findFirst();
     }
 
+    /**
+     * Return all valid cache entries with this URL, regardless of whether they have a version or not. They are not sorted.
+     * @param resourceHref
+     * @return
+     */
     List<CacheIndexEntry> getAllEntriesInCache(final URL resourceHref) {
         final List<CacheIndexEntry> all = new ArrayList<>(cacheIndex.getSynchronized(idx -> idx.findAllEntries(resourceHref)));
-
-        if (all.size() > 1) {
-            final Comparator<CacheIndexEntry> versionComparator = comparing(CacheIndexEntry::getVersion);
-            all.sort(versionComparator);
-        }
 
         return all.stream()
                 .filter(entry -> getInfoFile(entry).isCached())
