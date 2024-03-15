@@ -53,6 +53,7 @@ public class ApplicationInstance {
 
     private static final String DEPLOYMENT_SYSPROP = "deployment.javaws";
     private static final String DEPLOYMENT_SYSPROP_VALUE = "IcedTea-Web";
+    public static final String IGNORE_JNLP_RESOURCE_PROPERTIES = "ignoreJnlpResourceProperties";
 
     // todo: should attempt to unload the environment variables
     // installed by the application.
@@ -134,6 +135,17 @@ public class ApplicationInstance {
      * Install the environment variables.
      */
     private void installEnvironment() {
+        setSystemPropertiesFromJnlp();
+
+        // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible
+        // for the started application to detect the execution context.
+        System.setProperty(DEPLOYMENT_SYSPROP, DEPLOYMENT_SYSPROP_VALUE);
+    }
+
+    private void setSystemPropertiesFromJnlp() {
+        if ("true".equalsIgnoreCase(System.getenv(IGNORE_JNLP_RESOURCE_PROPERTIES)))  {
+            return;
+        }
         final List<PropertyDesc> props = collectPropertiesFromJnlpHierarchy(new ArrayList<>(), file);
 
         if (!(props.size() == 0)) {
@@ -146,19 +158,15 @@ public class ApplicationInstance {
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
                 for (PropertyDesc propDesc : props) {
-                    LOG.debug("Setting Property {}", propDesc.getKey());
+                    LOG.debug("Setting System Property {} with value {}", propDesc.getKey(), propDesc.getValue());
                     System.setProperty(propDesc.getKey(), propDesc.getValue());
                 }
                 return null;
             };
 
-            LOG.info("about to set system properties");
+            LOG.info("About to set system properties");
             AccessController.doPrivileged(setPropertiesAction, acc);
         }
-
-        // The "deployment.javaws" flag is always set to "IcedTea-Web" to make it possible
-        // for the started application to detect the execution context.
-        System.setProperty(DEPLOYMENT_SYSPROP, DEPLOYMENT_SYSPROP_VALUE);
     }
 
     /**
@@ -305,5 +313,4 @@ public class ApplicationInstance {
         }
         return props;
     }
-
 }

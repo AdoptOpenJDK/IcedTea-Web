@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -374,7 +375,7 @@ public class JvmUtils {
      * Defined in itw-modularjdk.args. Required for running ITW with jdk 9 or higher
      */
     static Map<String, Set<String>> getPredefinedJavaModulesVMArgumentsMap() {
-        return new HashMap<String, Set<String>>() {{
+        return new LinkedHashMap<String, Set<String>>() {{
             put("--add-reads=java.base", moduleArgs("ALL-UNNAMED", "java.desktop"));
             put("--add-reads=java.desktop", moduleArgs("ALL-UNNAMED", "java.naming"));
             put("--add-reads=java.naming", moduleArgs("ALL-UNNAMED", "java.desktop"));
