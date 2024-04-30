@@ -43,6 +43,7 @@ import net.adoptopenjdk.icedteaweb.xmlparser.ParseException;
 import net.adoptopenjdk.icedteaweb.xmlparser.XMLParser;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlNode;
 import net.adoptopenjdk.icedteaweb.xmlparser.XmlParserFactory;
+import net.sourceforge.jnlp.runtime.ApplicationInstance;
 import net.sourceforge.jnlp.runtime.JNLPRuntime;
 import net.sourceforge.jnlp.util.UrlUtils;
 import sun.net.www.protocol.http.HttpURLConnection;
@@ -259,7 +260,8 @@ public class JNLPFile {
         parse(input, location, null);
 
         final String httpAgent = getResources().getPropertiesMap().get(HTTP_AGENT);
-        if (! StringUtils.isBlank(httpAgent)) {
+        // Do not set http.agent in stage 2 as it can be set from  the vmarg to the jvm
+        if (! StringUtils.isBlank(httpAgent) && !"true".equalsIgnoreCase(System.getenv(ApplicationInstance.IGNORE_JNLP_RESOURCE_PROPERTIES))) {
             System.setProperty(HTTP_AGENT, httpAgent);
             if (!HttpURLConnection.userAgent.contains(httpAgent)) {
                 LOG.warn("Cannot set HTTP User-Agent as a connection has been opened before reading the JNLP file");
