@@ -132,11 +132,7 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     }
 
     private Resource tryDownloading(final URL downloadFrom) throws IOException {
-        try {
-            final int httpsRequestInterval = getTimeValue(ConfigurationConstants.KEY_HTTPCONNECTION_REQUEST_INTERVAL);
-            Thread.sleep(httpsRequestInterval);
-        } catch (InterruptedException ie) {
-        }
+        ensureRequestInterval();
         DownloadDetails downloadDetails = null;
         try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
             downloadDetails = getDownloadDetails(connection);
@@ -160,6 +156,16 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
             }
             LOG.debug("Exception while downloading resource {} from {} - message: {} cause: {} ", resource, downloadFrom, ex.getMessage(), ex.getCause());
             throw ex;
+        }
+    }
+
+    private void ensureRequestInterval() {
+        final int httpsRequestInterval = getTimeValue(ConfigurationConstants.KEY_HTTPCONNECTION_REQUEST_INTERVAL);
+        if (httpsRequestInterval > 0) {
+            try {
+                Thread.sleep(httpsRequestInterval);
+            } catch (InterruptedException ignored) {
+            }
         }
     }
 
