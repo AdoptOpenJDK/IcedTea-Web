@@ -132,6 +132,11 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     }
 
     private Resource tryDownloading(final URL downloadFrom) throws IOException {
+        try {
+            final int httpsRequestInterval = getTimeValue(ConfigurationConstants.KEY_HTTPCONNECTION_REQUEST_INTERVAL);
+            Thread.sleep(httpsRequestInterval);
+        } catch (InterruptedException ie) {
+        }
         DownloadDetails downloadDetails = null;
         try (final CloseableConnection connection = getDownloadConnection(downloadFrom)) {
             downloadDetails = getDownloadDetails(connection);
@@ -161,20 +166,20 @@ abstract class BaseResourceDownloader implements ResourceDownloader {
     private CloseableConnection getDownloadConnection(final URL location) throws IOException {
         final Map<String, String> requestProperties = new HashMap<>();
         requestProperties.put(ACCEPT_ENCODING_HEADER, PACK_200_OR_GZIP);
-        return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties, getTimeoutValue(ConfigurationConstants.KEY_HTTPCONNECTION_CONNECT_TIMEOUT), getTimeoutValue(ConfigurationConstants.KEY_HTTPCONNECTION_READ_TIMEOUT));
+        return ConnectionFactory.openConnection(location, HttpMethod.GET, requestProperties, getTimeValue(ConfigurationConstants.KEY_HTTPCONNECTION_CONNECT_TIMEOUT), getTimeValue(ConfigurationConstants.KEY_HTTPCONNECTION_READ_TIMEOUT));
     }
 
-    private int getTimeoutValue(final String key) {
-        int timeout = 0;
+    private int getTimeValue(final String key) {
+        int timeValue = 0;
         final String value = JNLPRuntime.getConfiguration().getProperty(key);
         if (value != null && value.trim().length() != 0) {
             try {
-                timeout = Integer.valueOf(value);
+                timeValue = Integer.valueOf(value);
             } catch (NumberFormatException e) {
                 LOG.error("Could not parse {} with value '{}' - reason {}", key, value, e.getMessage());
             }
         }
-        return timeout;
+        return timeValue;
     }
 
     private long tryDownloading(final DownloadDetails downloadDetails) throws IOException {
