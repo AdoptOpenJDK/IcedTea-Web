@@ -305,4 +305,5 @@ public interface ConfigurationConstants {
      */
     String KEY_HTTPCONNECTION_CONNECT_TIMEOUT = "deployment.connection.connectTimeout";
     String KEY_HTTPCONNECTION_READ_TIMEOUT = "deployment.connection.readTimeout";
+    String KEY_HTTPCONNECTION_REQUEST_INTERVAL = "deployment.connection.request.interval";
 }

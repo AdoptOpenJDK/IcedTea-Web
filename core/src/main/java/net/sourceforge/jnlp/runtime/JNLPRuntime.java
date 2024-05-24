@@ -674,6 +674,22 @@ public class JNLPRuntime {
     }
 
     /**
+     * Returns the Security Dialog Message Handler.
+     * @return SecurityDialogMessageHandler
+     */
+    public static SecurityDialogMessageHandler getSecurityDialogMessageHandler() {
+        return securityDialogMessageHandler;
+    }
+
+    /**
+     * Sets the Security Dialog Message Handler.
+     * @param securityDialogMessageHandler handler for Security Dialog messages
+     */
+    public static void setSecurityDialogMessageHandler(final SecurityDialogMessageHandler securityDialogMessageHandler) {
+        JNLPRuntime.securityDialogMessageHandler = securityDialogMessageHandler;
+    }
+
+    /**
      * Sets the default download indicator.
      *
      * @param indicator where to show progress
