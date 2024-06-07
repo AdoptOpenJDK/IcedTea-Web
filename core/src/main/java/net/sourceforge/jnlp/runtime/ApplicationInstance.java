@@ -17,6 +17,7 @@
 package net.sourceforge.jnlp.runtime;
 
 import net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants;
+import net.adoptopenjdk.icedteaweb.StringUtils;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
@@ -39,7 +40,11 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 /**
  * Represents a running instance of an application described in a
  * JNLPFile. This class provides a way to track the application's
@@ -54,7 +59,16 @@ public class ApplicationInstance {
 
     private static final String DEPLOYMENT_SYSPROP = "deployment.javaws";
     private static final String DEPLOYMENT_SYSPROP_VALUE = "IcedTea-Web";
-    public static final String IGNORE_HTTP_AGENT_PROPERTY = "ignoreHttpAgentProperty";
+    public static final String BLACKLIST_FOR_JNLP_PROPERTIES = "blacklistForJnlpProperties";
+    public static final String BLACKLISTED_PROPERTIES_SEPARATOR = "=";
+
+    public static Set<String> getBlackListedJnlpProperties() {
+        final String blackListedProprtiesString = System.getenv(BLACKLIST_FOR_JNLP_PROPERTIES);
+        if (StringUtils.isBlank(blackListedProprtiesString)) {
+            return Collections.emptySet();
+        }
+        return new HashSet<>(Arrays.asList(blackListedProprtiesString.split(BLACKLISTED_PROPERTIES_SEPARATOR)));
+    }
 
     // todo: should attempt to unload the environment variables
     // installed by the application.
@@ -155,10 +169,9 @@ public class ApplicationInstance {
             final AccessControlContext acc = new AccessControlContext(new ProtectionDomain[] { pd });
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
+                final Set<String> blackListedJnlpProperties = getBlackListedJnlpProperties();
                 for (PropertyDesc propDesc : props) {
-                    if (!propDesc.getKey().equals(JavaSystemPropertiesConstants.HTTP_AGENT)) {
-                        setSystemProperty(propDesc);
-                    } else if (!"true".equalsIgnoreCase(System.getenv(ApplicationInstance.IGNORE_HTTP_AGENT_PROPERTY))) {
+                    if (!blackListedJnlpProperties.contains(propDesc.getKey())) {
                         setSystemProperty(propDesc);
                     }
                 }
