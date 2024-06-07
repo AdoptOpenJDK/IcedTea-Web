@@ -54,7 +54,7 @@ public class ApplicationInstance {
 
     private static final String DEPLOYMENT_SYSPROP = "deployment.javaws";
     private static final String DEPLOYMENT_SYSPROP_VALUE = "IcedTea-Web";
-    public static final String IGNORE_JNLP_RESOURCE_PROPERTIES = "ignoreJnlpResourceProperties";
+    public static final String IGNORE_HTTP_AGENT_PROPERTY = "ignoreHttpAgentProperty";
 
     // todo: should attempt to unload the environment variables
     // installed by the application.
@@ -158,7 +158,7 @@ public class ApplicationInstance {
                 for (PropertyDesc propDesc : props) {
                     if (!propDesc.getKey().equals(JavaSystemPropertiesConstants.HTTP_AGENT)) {
                         setSystemProperty(propDesc);
-                    } else if (!"true".equalsIgnoreCase(System.getenv(ApplicationInstance.IGNORE_JNLP_RESOURCE_PROPERTIES))) {
+                    } else if (!"true".equalsIgnoreCase(System.getenv(ApplicationInstance.IGNORE_HTTP_AGENT_PROPERTY))) {
                         setSystemProperty(propDesc);
                     }
                 }
