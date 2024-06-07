@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.runtime;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.ExtensionDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.PropertyDesc;
 import net.adoptopenjdk.icedteaweb.jnlp.element.security.SecurityDesc;
@@ -53,7 +54,7 @@ public class ApplicationInstance {
 
     private static final String DEPLOYMENT_SYSPROP = "deployment.javaws";
     private static final String DEPLOYMENT_SYSPROP_VALUE = "IcedTea-Web";
-    public static final String IGNORE_JNLP_RESOURCE_PROPERTIES = "ignoreJnlpResourceProperties";
+    public static final String IGNORE_HTTP_AGENT_PROPERTY = "ignoreHttpAgentProperty";
 
     // todo: should attempt to unload the environment variables
     // installed by the application.
@@ -143,9 +144,6 @@ public class ApplicationInstance {
     }
 
     private void setSystemPropertiesFromJnlp() {
-        if ("true".equalsIgnoreCase(System.getenv(IGNORE_JNLP_RESOURCE_PROPERTIES)))  {
-            return;
-        }
         final List<PropertyDesc> props = collectPropertiesFromJnlpHierarchy(new ArrayList<>(), file);
 
         if (!(props.size() == 0)) {
@@ -158,8 +156,11 @@ public class ApplicationInstance {
 
             final PrivilegedAction<Object> setPropertiesAction = () -> {
                 for (PropertyDesc propDesc : props) {
-                    LOG.debug("Setting System Property {} with value {}", propDesc.getKey(), propDesc.getValue());
-                    System.setProperty(propDesc.getKey(), propDesc.getValue());
+                    if (!propDesc.getKey().equals(JavaSystemPropertiesConstants.HTTP_AGENT)) {
+                        setSystemProperty(propDesc);
+                    } else if (!"true".equalsIgnoreCase(System.getenv(ApplicationInstance.IGNORE_HTTP_AGENT_PROPERTY))) {
+                        setSystemProperty(propDesc);
+                    }
                 }
                 return null;
             };
@@ -167,6 +168,11 @@ public class ApplicationInstance {
             LOG.info("About to set system properties");
             AccessController.doPrivileged(setPropertiesAction, acc);
         }
+    }
+
+    private void setSystemProperty(PropertyDesc propDesc) {
+        LOG.debug("Setting System Property {} with value {}", propDesc.getKey(), propDesc.getValue());
+        System.setProperty(propDesc.getKey(), propDesc.getValue());
     }
 
     /**

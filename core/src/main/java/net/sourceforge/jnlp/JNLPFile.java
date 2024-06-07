@@ -261,7 +261,7 @@ public class JNLPFile {
 
         final String httpAgent = getResources().getPropertiesMap().get(HTTP_AGENT);
         // Do not set http.agent in stage 2 as it can be set from  the vmarg to the jvm
-        if (! StringUtils.isBlank(httpAgent) && !"true".equalsIgnoreCase(System.getenv(ApplicationInstance.IGNORE_JNLP_RESOURCE_PROPERTIES))) {
+        if (! StringUtils.isBlank(httpAgent) && !"true".equalsIgnoreCase(System.getenv(ApplicationInstance.IGNORE_HTTP_AGENT_PROPERTY))) {
             System.setProperty(HTTP_AGENT, httpAgent);
             if (!HttpURLConnection.userAgent.contains(httpAgent)) {
                 LOG.warn("Cannot set HTTP User-Agent as a connection has been opened before reading the JNLP file");
