@@ -89,7 +89,7 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             sl.setIconLocation(iconLocation.get());
         }
         final String path = getDesktopLnkPath();
-        LOG.debug("Desktop Link Path : {}", path);
+        LOG.debug("Desktop Entry  Link Path : {}", path);
         sl.saveTo(path);
         // write shortcut path to list
         manageShortcutList(path);
@@ -144,11 +144,14 @@ public class WindowsDesktopEntry implements GenericDesktopEntry {
             ul.setIconLocation(iconLocation.get());
         }
         final String link = getShortcutFileName();
-        sl.saveTo(path + "/" + link);
-        ul.saveTo(path + "/Uninstall " + link);
+        final String menuLinkpath = path + "/" + link;
+        LOG.debug("Menu Entry Link Path : {}", menuLinkpath);
+        sl.saveTo(menuLinkpath);
+        final String uninstallLinkPath = path + "/Uninstall " + link;
+        ul.saveTo(uninstallLinkPath);
         // write shortcuts to list
-        manageShortcutList(path + "/" + link);
-        manageShortcutList(path + "/Uninstall " + link);
+        manageShortcutList(menuLinkpath);
+        manageShortcutList(uninstallLinkPath);
     }
 
     private void manageShortcutList(String path) throws IOException {
