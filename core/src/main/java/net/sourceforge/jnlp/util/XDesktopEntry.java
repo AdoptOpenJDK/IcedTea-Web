@@ -234,7 +234,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
         try {
             File f = getLinuxMenuIconFile();
             FileUtils.saveFileUtf8(getContent(true, info), f);
-            LOG.info("Menu item created: {}", f.getAbsolutePath());
+            LOG.info("Installing Menu Launcher : Menu item created: {}", f.getAbsolutePath());
         } catch (FileNotFoundException e) {
             LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
         } catch (IOException e) {
@@ -262,7 +262,7 @@ public class XDesktopEntry implements GenericDesktopEntry {
 
             String[] execString = new String[] { "xdg-desktop-icon", "install", "--novendor",
                     shortcutFile.getCanonicalPath() };
-            LOG.debug("Executing: " + Arrays.toString(execString));
+            LOG.debug("Installing Desktop Launcher : Executing: " + Arrays.toString(execString));
             ProcessBuilder pb = new ProcessBuilder(execString);
             pb.inheritIO();
             Process installer = pb.start();
