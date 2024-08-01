@@ -165,10 +165,10 @@ public final class DeploymentConfiguration {
      *
      * @throws ConfigurationException if it encounters a fatal error.
      */
-    public void load(File... propFile) throws ConfigurationException {
+    public void load() throws ConfigurationException {
         LOG.debug("Start DeploymentConfiguration.load()");
         try {
-            load(true, propFile);
+            load(true);
         } catch (final MalformedURLException ex) {
             throw new ConfigurationException(ex.toString());
         } finally {
@@ -184,11 +184,12 @@ public final class DeploymentConfiguration {
      * resorting to the default values
      * @throws ConfigurationException if it encounters a fatal error.
      */
-    public void load(final boolean fixIssues, File... propFile ) throws ConfigurationException, MalformedURLException {
+    public void load(final boolean fixIssues) throws ConfigurationException, MalformedURLException {
+        final String owsUserPropertiesFilePath = System.getProperty("owsUserPropertiesFilePath");
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            if (propFile.length > 0) {
-                sm.checkRead(clean(propFile[0].getAbsolutePath()));
+            if (owsUserPropertiesFilePath != null) {
+                sm.checkRead(owsUserPropertiesFilePath);
             } else {
                 sm.checkRead(userDeploymentFileDescriptor.getFullPath());
             }
@@ -208,7 +209,7 @@ public final class DeploymentConfiguration {
         /*
          * Third, read the user's subdirResult deployment.properties file or the custom config properties
          */
-        userPropertiesFile = propFile.length > 0 ? propFile[0] : userDeploymentFileDescriptor.getFile();
+        userPropertiesFile = owsUserPropertiesFilePath != null ? new File(owsUserPropertiesFilePath) : userDeploymentFileDescriptor.getFile();
         final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
         final Map<String, Setting> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
         userComments = loadComments(userPropertiesUrl);
