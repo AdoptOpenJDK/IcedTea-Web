@@ -459,7 +459,13 @@ public class JNLPRuntime {
         static {
             DeploymentConfiguration config = new DeploymentConfiguration();
             try {
-                config.load();
+                final String owsUserPropertiesFilename = System.getProperty("owsUserPropertiesFilename");
+                if (owsUserPropertiesFilename != null) {
+                    LOG.debug("Loading config from file {} ", owsUserPropertiesFilename);
+                    config.load(new File(owsUserPropertiesFilename));
+                } else {
+                    config.load();
+                }
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
                 LOG.info("Fatal error while reading the configuration, continuing with empty. Please fix");

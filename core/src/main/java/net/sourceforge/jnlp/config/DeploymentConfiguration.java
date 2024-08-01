@@ -165,10 +165,10 @@ public final class DeploymentConfiguration {
      *
      * @throws ConfigurationException if it encounters a fatal error.
      */
-    public void load() throws ConfigurationException {
+    public void load(File... propFile) throws ConfigurationException {
         LOG.debug("Start DeploymentConfiguration.load()");
         try {
-            load(true);
+            load(true, propFile);
         } catch (final MalformedURLException ex) {
             throw new ConfigurationException(ex.toString());
         } finally {
@@ -184,10 +184,14 @@ public final class DeploymentConfiguration {
      * resorting to the default values
      * @throws ConfigurationException if it encounters a fatal error.
      */
-    public void load(final boolean fixIssues) throws ConfigurationException, MalformedURLException {
+    public void load(final boolean fixIssues, File... propFile ) throws ConfigurationException, MalformedURLException {
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkRead(userDeploymentFileDescriptor.getFullPath());
+            if (propFile.length > 0) {
+                sm.checkRead(clean(propFile[0].getAbsolutePath()));
+            } else {
+                sm.checkRead(userDeploymentFileDescriptor.getFullPath());
+            }
         }
 
         final Map<String, Setting> properties = Defaults.getDefaults();
@@ -202,9 +206,9 @@ public final class DeploymentConfiguration {
         }
 
         /*
-         * Third, read the user's subdirResult deployment.properties file
+         * Third, read the user's subdirResult deployment.properties file or the custom config properties
          */
-        userPropertiesFile = userDeploymentFileDescriptor.getFile();
+        userPropertiesFile = propFile.length > 0 ? propFile[0] : userDeploymentFileDescriptor.getFile();
         final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
         final Map<String, Setting> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
         userComments = loadComments(userPropertiesUrl);
@@ -696,5 +700,12 @@ public final class DeploymentConfiguration {
                 ConfigurationConstants.ALWAYS_ASK,
                 ConfigurationConstants.KEY_BROWSER_PATH
         );
+    }
+
+    private static String clean(String s) {
+        while (s.contains(File.separator + File.separator)) {
+            s = s.replace(File.separator + File.separator, File.separator);
+        }
+        return s;
     }
 }
