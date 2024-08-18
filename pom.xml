@@ -56,12 +56,7 @@
         <module>launchers</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>jcenter</id>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
-    </repositories>
+
 
     <build>
         <plugins>
