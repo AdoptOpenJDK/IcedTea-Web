@@ -35,11 +35,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,6 +63,7 @@ public final class DeploymentConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeploymentConfiguration.class);
     public static final String LOCKED_POSTFIX = ".locked";
+    public static final String LOCAL_DEPLOYMENT_PROPERTIES_FILE_PATH = "localDeploymentPropertiesFilePath";
 
     private String userComments;
 
@@ -185,11 +184,11 @@ public final class DeploymentConfiguration {
      * @throws ConfigurationException if it encounters a fatal error.
      */
     public void load(final boolean fixIssues) throws ConfigurationException, MalformedURLException {
-        final String owsUserPropertiesFilePath = System.getProperty("owsUserPropertiesFilePath");
+        final String localDeploymentPropertiesFilePath = System.getProperty(LOCAL_DEPLOYMENT_PROPERTIES_FILE_PATH);
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            if (owsUserPropertiesFilePath != null) {
-                sm.checkRead(owsUserPropertiesFilePath);
+            if (localDeploymentPropertiesFilePath != null) {
+                sm.checkRead(localDeploymentPropertiesFilePath);
             } else {
                 sm.checkRead(userDeploymentFileDescriptor.getFullPath());
             }
@@ -209,7 +208,7 @@ public final class DeploymentConfiguration {
         /*
          * Third, read the user's subdirResult deployment.properties file or the custom config properties
          */
-        userPropertiesFile = owsUserPropertiesFilePath != null ? new File(owsUserPropertiesFilePath) : userDeploymentFileDescriptor.getFile();
+        userPropertiesFile = localDeploymentPropertiesFilePath != null ? new File(localDeploymentPropertiesFilePath) : userDeploymentFileDescriptor.getFile();
         final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
         final Map<String, Setting> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
         userComments = loadComments(userPropertiesUrl);
