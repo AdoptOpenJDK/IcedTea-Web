@@ -93,10 +93,11 @@ do
     sed -i.bak -r 's/  /\&ensp;\&ensp;/g' "./$FILE" && rm "./$FILE.bak" # Double-spaces into HTML whitespace for format preservation
     sed -i.bak -r 's/</\&lt;/g' "./$FILE" && rm "./$FILE.bak" # "<" -> "&lt;"
     sed -i.bak -r 's/>/\&gt;/g' "./$FILE" && rm "./$FILE.bak" # ">" -> "&gt;"
-    sed -i.bak -r 's_(\&lt;)?(https?://[^ ]*)(\&gt;| |$)_\1<a href="\2">\2</a>\3_i' "./$FILE" && rm "./$FILE.bak" # Create hyperlinks from http(s) URLs
+    sed -i.bak -r -e 's_(\&lt;)?(https?://[^ ]*)(\&gt;| )_\1<a href="\2">\2</a>\3_i' \
+      -e '/<a href=/! s_(\&lt;)?(https?://[^ ]*)($)_\1<a href="\2">\2</a>\3_i' "./$FILE" && rm "./$FILE.bak" # Create hyperlinks from http(s) URLs
     sed -i.bak -r 's/\&lt;(.*@.*)\&gt;/\&lt;<a href="mailto:\1\?subject=IcedTea-Web">\1<\/a>\&gt;/i' "./$FILE" && rm "./$FILE.bak" # Create mailto links from email addresses formatted as <email@example.com>
     sed -i.bak -r 's/$/<br>/' "./$FILE" && rm "./$FILE.bak" # "\n" -> "<br>"
-    sed -i.bak '1i <head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>' "./$FILE" && rm "./$FILE.bak"
+    sed -i.bak $'1i\\\n<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>\n' "./$FILE" && rm "./$FILE.bak"
 
     mv "$FILE" "$FILE.html"
     print_debug "$FILE.html finished."
@@ -105,9 +106,9 @@ done
 print_debug "Done sed subs. Starting in-place additions"
 
 # Centre the column of author names in the Authors file
-sed -i.bak '5i <center>' AUTHORS.html && rm AUTHORS.html.bak
+sed -i.bak $'5i\\\n<center>\n' AUTHORS.html && rm AUTHORS.html.bak
 # Insert jamIcon above author names
-sed -i.bak '6i <br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>' AUTHORS.html && rm AUTHORS.html.bak
+sed -i.bak $'6i\\\n<br><img src="jamIcon.jpg" alt="Jam Icon" width="87" height="84"><br><br>\n' AUTHORS.html && rm AUTHORS.html.bak
 echo "</center>" >> AUTHORS.html
 
 if [ -n "${REPO_URL}" ]; then
