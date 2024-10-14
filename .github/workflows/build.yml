@@ -13,6 +13,10 @@ on:
   pull_request:
     branches:
       - 1.8
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
 jobs:
   release:
     if: github.event.inputs.release == 'True'
@@ -39,9 +43,15 @@ jobs:
     runs-on: ubuntu-latest
     container: centos:7
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: icedtea-web
+
+      - name: Fix mirrors to use vault.centos.org
+        run: |
+          sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+          sed -i s/^#.*baseurl=http/baseurl=https/g /etc/yum.repos.d/*.repo
+          sed -i s/^mirrorlist=http/#mirrorlist=https/g /etc/yum.repos.d/*.repo
 
       - name: Install Dependencies
         run: |
@@ -49,7 +59,7 @@ jobs:
           gmp-devel java-1.8.0-openjdk-devel libcurl-devel make mpfr-devel perl unzip which zip
           curl -o tagsoup.jar "https://repo1.maven.org/maven2/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar"
           sha256sum tagsoup.jar | awk '$1!="ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04"{exit 1}'
-          curl -o rhino.zip "https://mediacdn.prod.productdelivery.prod.webservices.mozgcp.net/pub/js/rhino1_6R7.zip"
+          curl -o rhino.zip "https://ftp.mozilla.org/pub/js/rhino1_6R7.zip"
           sha256sum rhino.zip | awk '$1!="c94c6de3a29b3acbc4eee732e688f75a5d94bd02c9878be4ceb4d3cd220f3866"{exit 1}'
           unzip -j rhino.zip "*/js.jar"
 
@@ -114,7 +124,7 @@ jobs:
             sha256sum "$zip" > "$zip.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: icedtea-web_build_x86-64_linux
           path: |
@@ -149,9 +159,15 @@ jobs:
     runs-on: ubuntu-latest
     container: centos:7
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: icedtea-web
+
+      - name: Fix mirrors to use vault.centos.org
+        run: |
+          sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+          sed -i s/^#.*baseurl=http/baseurl=https/g /etc/yum.repos.d/*.repo
+          sed -i s/^mirrorlist=http/#mirrorlist=https/g /etc/yum.repos.d/*.repo
 
       - name: Install Dependencies
         run: |
@@ -161,7 +177,7 @@ jobs:
           sha256sum tagsoup.jar | awk '$1!="ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04"{exit 1}'
           curl -o mslinks.jar "https://repo1.maven.org/maven2/com/github/vatbub/mslinks/1.0.5/mslinks-1.0.5.jar"
           sha256sum mslinks.jar | awk '$1!="e14d756f81b310b75baeb5baf219d25592b6a8635eb215c4059f17493b0cea5c"{exit 1}'
-          curl -o rhino.zip "https://mediacdn.prod.productdelivery.prod.webservices.mozgcp.net/pub/js/rhino1_6R7.zip"
+          curl -o rhino.zip "https://ftp.mozilla.org/pub/js/rhino1_6R7.zip"
           sha256sum rhino.zip | awk '$1!="c94c6de3a29b3acbc4eee732e688f75a5d94bd02c9878be4ceb4d3cd220f3866"{exit 1}'
           unzip -j rhino.zip "*/js.jar"
 
@@ -216,7 +232,7 @@ jobs:
             sha256sum "$zip_rename" > "$zip_rename.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: icedtea-web_build_x86-64_portable
           path: |
@@ -250,16 +266,16 @@ jobs:
     name: macOS
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: icedtea-web
 
       - name: Install Dependencies
         run: |
-          brew install autoconf automake coreutils freetype gnu-sed rust
+          brew install autoconf automake coreutils gnu-sed rust
           curl -o tagsoup.jar "https://repo1.maven.org/maven2/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar"
           sha256sum tagsoup.jar | awk '$1!="ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04"{exit 1}'
-          curl -o rhino.zip "https://mediacdn.prod.productdelivery.prod.webservices.mozgcp.net/pub/js/rhino1_6R7.zip"
+          curl -o rhino.zip "https://ftp.mozilla.org/pub/js/rhino1_6R7.zip"
           sha256sum rhino.zip | awk '$1!="c94c6de3a29b3acbc4eee732e688f75a5d94bd02c9878be4ceb4d3cd220f3866"{exit 1}'
           unzip -j rhino.zip "*/js.jar"
 
@@ -267,7 +283,7 @@ jobs:
         run: |
           export ICEDTEAWEB_INSTALL="/icedtea-web-image"
           export PATH="/usr/local/opt/gnu-sed/libexec/gnubin/:/usr/local/opt/coreutils/bin/:$PATH"
-          export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
+          export JAVA_HOME=$(/usr/libexec/java_home -v 11)
           export TAGSOUP="${PWD}/tagsoup.jar"
           export RHINO="${PWD}/js.jar"
           export ACLOCAL_PATH="/usr/local/share/aclocal"
@@ -277,7 +293,7 @@ jobs:
           echo "Invoking autogen.sh"
           ./autogen.sh
           echo "Incoking IcedTea-Web configure"
-          ./configure --disable-native-plugin --prefix="${ICEDTEAWEB_INSTALL}" --with-itw-libs=BUNDLED --with-rhino="${RHINO}" --with-tagsoup="${TAGSOUP}" --with-jdk-home="${JAVA_HOME}" --with-jre-home="${JAVA_HOME}/jre"
+          ./configure --disable-native-plugin --disable-pluginjar --prefix="${ICEDTEAWEB_INSTALL}" --with-itw-libs=BUNDLED --with-rhino="${RHINO}" --with-tagsoup="${TAGSOUP}" --with-jdk-home="${JAVA_HOME}" --with-jre-home="${JAVA_HOME}"
           echo "Build IcedTea-Web"
           make DESTDIR="${WORKSPACE}"
           
@@ -292,7 +308,7 @@ jobs:
             sha256sum "$zip" > "$zip.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: icedtea-web_build_x86-64_macos
           path: |
@@ -328,7 +344,7 @@ jobs:
     steps:
       - name: Restore cygwin packages from cache
         id: cygwin
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: C:\cygwin_packages
           key: cygwin-packages-${{ runner.os }}-v1
@@ -361,7 +377,7 @@ jobs:
         shell: bash
         run: mkdir $HOME && git config --system core.autocrlf false && git config --system --add safe.directory '*'
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           set-safe-directory: false
 
@@ -391,7 +407,7 @@ jobs:
             exit 1
           }
           # Retrieve Rhino
-          Invoke-WebRequest -UseBasicParsing 'https://ftp.mozilla.org/pub/mozilla.org/js/rhino1_6R7.zip' -OutFile 'rhino1_6R7.zip'
+          Invoke-WebRequest -UseBasicParsing 'https://ftp.mozilla.org/pub/js/rhino1_6R7.zip' -OutFile 'rhino1_6R7.zip'
           $checksum = (Get-FileHash -Algorithm SHA256 'rhino1_6R7.zip' | Select-Object -ExpandProperty Hash) 
           If ($checksum -ne "C94C6DE3A29B3ACBC4EEE732E688F75A5D94BD02C9878BE4CEB4D3CD220F3866") {
             Write-Host "Checksums did not match!"
@@ -413,14 +429,14 @@ jobs:
         run: |
           fsutil behavior set disable8dot3 0
           cmd /c dir /x "C:\Program Files (x86)"
-          fsutil file setshortname "C:\Program Files (x86)\WiX Toolset v3.11" "WIXTOO~1.14"
+          fsutil file setshortname "C:\Program Files (x86)\WiX Toolset v3.14" "WIXTOO~1.14"
         shell: cmd
 
       - name: Build
         run: bash .github/workflows/windows_build.sh
         shell: cmd
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: icedtea-web_build_x86-64_win
           path: |
