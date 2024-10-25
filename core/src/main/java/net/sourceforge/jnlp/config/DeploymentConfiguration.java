@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
@@ -65,6 +66,7 @@ public final class DeploymentConfiguration {
     public static final String LOCKED_POSTFIX = ".locked";
     public static final String LOCAL_DEPLOYMENT_PROPERTIES_FILE_PATH = "localDeploymentPropertiesFilePath";
 
+    public static final String USER_HOME_DIR_TOKEN = "#USER_HOME_DIR#";
     private String userComments;
 
     private ConfigurationException loadingException = null;
@@ -213,6 +215,8 @@ public final class DeploymentConfiguration {
         final Map<String, Setting> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
         userComments = loadComments(userPropertiesUrl);
         mergeMaps(properties, userProperties);
+
+        processPropertiesWithHomeDirToken(properties);
 
         if (fixIssues) {
             checkAndFixConfiguration(properties);
@@ -367,10 +371,23 @@ public final class DeploymentConfiguration {
                     try {
                         checker.validate(setting.getValue());
                     } catch (final IllegalArgumentException e) {
-                        LOG.error("Property '{}' has incorrect value \"{}\". Possible values {}.", key, setting.getValue(), checker.getPossibleValues(), e);
+                        LOG.error("Property '{}' has incorrect value \"{}\". Possible values {}. Setting default {}", key, setting.getValue(), checker.getPossibleValues(), setting.getDefaultValue(), e);
                         setting.setValue(setting.getDefaultValue());
                     }
                 }
+            }
+        }
+    }
+
+    private void processPropertiesWithHomeDirToken(final Map<String, Setting> properties) {
+        for (final Map.Entry<String, Setting> entry : properties.entrySet()) {
+            final String key = entry.getKey();
+            final Setting setting = entry.getValue();
+            final String propertyValue = setting.getValue();
+            if (propertyValue != null && propertyValue.contains(USER_HOME_DIR_TOKEN)) {
+                final String newValue = propertyValue.replace(USER_HOME_DIR_TOKEN, JavaSystemProperties.getUserHome());
+                setting.setValue(newValue);
+                LOG.debug("Replaced USER_HOME_DIR_TOKEN in key {} value {} default {}", key, setting.getValue(), setting.getDefaultValue());
             }
         }
     }
