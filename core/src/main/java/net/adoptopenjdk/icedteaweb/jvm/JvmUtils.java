@@ -187,7 +187,11 @@ public class JvmUtils {
                 "-XX:+ScavengeBeforeFullGC",
                 "-XX:-ScavengeBeforeFullGC",
                 "-XX:+UseParallelScavenge",
-                "-XX:-UseParallelScavenge"
+                "-XX:-UseParallelScavenge",
+                "-XX:+UseParNewGC",
+                "-XX:+PrintFlagsFinal",
+                "-XX:+PrintCommandLineFlags",
+                "-XX:+PrintGCDateStamps"
         };
     }
 
@@ -197,6 +201,7 @@ public class JvmUtils {
      * <p>
      * Based on
      * https://docs.oracle.com/javase/8/docs/technotes/guides/javaws/developersguide/syntax.html#secure-property
+     * https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html
      */
     private static String[] getValidStartingVMArguments() {
         return new String[]{
@@ -217,6 +222,7 @@ public class JvmUtils {
                 "-XX:MinHeapFreeRatio", /* heap free percentage (default 40) */
                 "-XX:UseSerialGC", /* use serial garbage collection */
                 "-XX:-UseSerialGC",
+                "-XX:+UseSerialGC",
                 "-XX:ThreadStackSize", /* thread stack size (in KB) */
                 "-XX:MaxInlineSize", /* set max num of bytecodes to inline */
                 "-XX:ReservedCodeCacheSize", /* Reserved code cache size (bytes) */
@@ -239,7 +245,10 @@ public class JvmUtils {
                 "-XX:GCTimeLimit",
                 "-XX:GCHeapFreeLimit",
                 "-XX:+UseParNewGC",
-                "-XX:+CMSParallelRemarkEnabled"
+                "-XX:+CMSParallelRemarkEnabled",
+                "-XX:+UseZGC",
+                "-XX:+ZGenerational",
+                "-XX:HeapDumpPath"
         };
     }
 
@@ -286,6 +295,7 @@ public class JvmUtils {
                 "http.maxRedirects",
                 "http.auth.digest.validateProxy",
                 "http.auth.digest.validateServer",
+                "user.timezone",
                 // https://news.kynosarges.org/2019/03/24/swing-high-dpi-properties/
                 "sun.java2d.uiScale.enabled",
                 "sun.java2d.win.uiScaleX",
