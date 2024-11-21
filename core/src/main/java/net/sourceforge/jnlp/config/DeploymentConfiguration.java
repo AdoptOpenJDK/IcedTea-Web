@@ -16,6 +16,7 @@
 
 package net.sourceforge.jnlp.config;
 
+import net.adoptopenjdk.icedteaweb.JavaSystemProperties;
 import net.adoptopenjdk.icedteaweb.config.validators.ValueValidator;
 import net.adoptopenjdk.icedteaweb.http.CloseableConnection;
 import net.adoptopenjdk.icedteaweb.http.ConnectionFactory;
@@ -35,11 +36,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,7 +64,9 @@ public final class DeploymentConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeploymentConfiguration.class);
     public static final String LOCKED_POSTFIX = ".locked";
+    public static final String LOCAL_DEPLOYMENT_PROPERTIES_FILE_PATH = "localDeploymentPropertiesFilePath";
 
+    public static final String USER_HOME_DIR_TOKEN = "#USER_HOME_DIR#";
     private String userComments;
 
     private ConfigurationException loadingException = null;
@@ -185,9 +186,14 @@ public final class DeploymentConfiguration {
      * @throws ConfigurationException if it encounters a fatal error.
      */
     public void load(final boolean fixIssues) throws ConfigurationException, MalformedURLException {
+        final String localDeploymentPropertiesFilePath = System.getProperty(LOCAL_DEPLOYMENT_PROPERTIES_FILE_PATH);
         final SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkRead(userDeploymentFileDescriptor.getFullPath());
+            if (localDeploymentPropertiesFilePath != null) {
+                sm.checkRead(localDeploymentPropertiesFilePath);
+            } else {
+                sm.checkRead(userDeploymentFileDescriptor.getFullPath());
+            }
         }
 
         final Map<String, Setting> properties = Defaults.getDefaults();
@@ -202,13 +208,15 @@ public final class DeploymentConfiguration {
         }
 
         /*
-         * Third, read the user's subdirResult deployment.properties file
+         * Third, read the user's subdirResult deployment.properties file or the custom config properties
          */
-        userPropertiesFile = userDeploymentFileDescriptor.getFile();
+        userPropertiesFile = localDeploymentPropertiesFilePath != null ? new File(localDeploymentPropertiesFilePath) : userDeploymentFileDescriptor.getFile();
         final URL userPropertiesUrl = userPropertiesFile.toURI().toURL();
         final Map<String, Setting> userProperties = loadProperties(ConfigType.USER, userPropertiesUrl, false);
         userComments = loadComments(userPropertiesUrl);
         mergeMaps(properties, userProperties);
+
+        processPropertiesWithHomeDirToken(properties);
 
         if (fixIssues) {
             checkAndFixConfiguration(properties);
@@ -363,10 +371,23 @@ public final class DeploymentConfiguration {
                     try {
                         checker.validate(setting.getValue());
                     } catch (final IllegalArgumentException e) {
-                        LOG.error("Property '{}' has incorrect value \"{}\". Possible values {}.", key, setting.getValue(), checker.getPossibleValues(), e);
+                        LOG.error("Property '{}' has incorrect value \"{}\". Possible values {}. Setting default {}", key, setting.getValue(), checker.getPossibleValues(), setting.getDefaultValue(), e);
                         setting.setValue(setting.getDefaultValue());
                     }
                 }
+            }
+        }
+    }
+
+    private void processPropertiesWithHomeDirToken(final Map<String, Setting> properties) {
+        for (final Map.Entry<String, Setting> entry : properties.entrySet()) {
+            final String key = entry.getKey();
+            final Setting setting = entry.getValue();
+            final String propertyValue = setting.getValue();
+            if (propertyValue != null && propertyValue.contains(USER_HOME_DIR_TOKEN)) {
+                final String newValue = propertyValue.replace(USER_HOME_DIR_TOKEN, JavaSystemProperties.getUserHome());
+                setting.setValue(newValue);
+                LOG.debug("Replaced USER_HOME_DIR_TOKEN in key {} value {} default {}", key, setting.getValue(), setting.getDefaultValue());
             }
         }
     }
