@@ -239,7 +239,10 @@ public class JvmUtils {
                 "-XX:GCTimeLimit",
                 "-XX:GCHeapFreeLimit",
                 "-XX:+UseParNewGC",
-                "-XX:+CMSParallelRemarkEnabled"
+                "-XX:+CMSParallelRemarkEnabled",
+                "-XX:InitialRAMPercentage", /* The initial heap size as percentage of total memory, conflicts with Xms */
+                "-XX:MinRAMPercentage", /* Sets the max heap size of RAM as a percentage before looking at other heuristics like MaxRAMPercentage. This is primarily useful for low memory environments (<100m) */
+                "-XX:MaxRAMPercentage", /* Sets the max heap size of RAM as a percentage */
         };
     }
 
