@@ -248,7 +248,10 @@ public class JvmUtils {
                 "-XX:+CMSParallelRemarkEnabled",
                 "-XX:+UseZGC",
                 "-XX:+ZGenerational",
-                "-XX:HeapDumpPath"
+                "-XX:HeapDumpPath",
+                "-XX:InitialRAMPercentage", /* The initial heap size as percentage of total memory, conflicts with Xms */
+                "-XX:MinRAMPercentage", /* Sets the max heap size of RAM as a percentage before looking at other heuristics like MaxRAMPercentage. This is primarily useful for low memory environments (<100m) */
+                "-XX:MaxRAMPercentage", /* Sets the max heap size of RAM as a percentage */
         };
     }
 
