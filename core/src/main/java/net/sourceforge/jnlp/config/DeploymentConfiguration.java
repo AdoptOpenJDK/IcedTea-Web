@@ -718,11 +718,4 @@ public final class DeploymentConfiguration {
                 ConfigurationConstants.KEY_BROWSER_PATH
         );
     }
-
-    private static String clean(String s) {
-        while (s.contains(File.separator + File.separator)) {
-            s = s.replace(File.separator + File.separator, File.separator);
-        }
-        return s;
-    }
 }
