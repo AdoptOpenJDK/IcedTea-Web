@@ -46,6 +46,9 @@ import javax.jnlp.BasicService;
 import javax.swing.UIManager;
 import java.io.File;
 import java.net.URL;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.CookieHandler;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -111,6 +114,24 @@ public final class Boot implements PrivilegedAction<Integer> {
         int status = -42;
         try {
             EnvironmentPrinter.logEnvironment(args);
+            
+            // Enabling java.net built-in support of HTTP cookies.
+            // HTTP cookies will be stored in-memory until the java process dies.
+            // CookiePolicy.ACCEPT_ALL is necessary to manage the cookies associated
+            // to a parent domain of the requested url domain.
+            //
+            // Example:
+            // if an HTTP response on "https://prefix.domain.extension/app/jws-store/some-package.jar" contains:
+            // - 1 cookie set on "prefix.domain-name.extension" domain
+            // - 1 cookie set on "*.domain-name.extension" domain
+            // CookiePolicy.ACCEPT_ALL ensures that both cookie will be send back in the next HTTP queries
+            // sent to the "prefix.domain-name.extension" domain, whereas CookiePolicy.ACCEPT_ORIGINAL_SERVER will filter
+            // the cookie set on "*.domain-name.extension" domain.
+            
+            CookieManager cookieManager = new CookieManager();
+            cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+            CookieHandler.setDefault(cookieManager);
+            
             status = mainWithReturnCode(args);
         } finally {
             if (status != 0) {
