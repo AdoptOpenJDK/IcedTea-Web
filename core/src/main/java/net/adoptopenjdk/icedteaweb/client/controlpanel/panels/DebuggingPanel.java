@@ -166,6 +166,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                 (Translator.R("DPEnableFileHint", LogConfig.getLogConfig().getIcedteaLogDir())),
                 (Translator.R("DPEnableLegacyFileLogHint")),
                 (Translator.R("DPEnableClientAppFileLoggingHint")),
+                (Translator.R("DPEnableClientAppConsoleLoggingHint")),
                 (Translator.R("DPEnableStdsHint")),
                 (Translator.R("DPEnableSyslogHint"))
         };
