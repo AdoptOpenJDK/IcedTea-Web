@@ -53,6 +53,7 @@ public class LogConfig {
     private final boolean enableHeaders;
     private boolean logToFile;
     private final boolean logClientAppToFile;
+    private final boolean logClientAppToConsole;
     private boolean logToStreams;
     private boolean logToSysLog;
     private final boolean legacyLogaAsedFileLog;
@@ -69,7 +70,8 @@ public class LogConfig {
         logToSysLog = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG));
         legacyLogaAsedFileLog = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG));
         logClientAppToFile = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE));
-
+        logClientAppToConsole = Boolean.parseBoolean(config.getProperty(ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOCONSOLE));
+        
         // Get log directory, create it if it doesn't exist. If unable to create and doesn't exist, don't log.
         icedteaLogDir = PathsAndFiles.LOG_DIR.getFullPath();
         if (icedteaLogDir != null) {
@@ -108,6 +110,10 @@ public class LogConfig {
 
     public boolean isDebugEnable() {
         return debugEnabled;
+    }
+
+    public boolean isLogClientAppToConsole() {
+        return logClientAppToConsole;
     }
 
     public boolean isLogToFile() {

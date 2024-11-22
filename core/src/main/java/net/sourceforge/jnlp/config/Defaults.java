@@ -385,6 +385,11 @@ public class Defaults {
                     ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOCONSOLE,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
                     String.valueOf(false),
                     ValidatorFactory.createBooleanValidator()

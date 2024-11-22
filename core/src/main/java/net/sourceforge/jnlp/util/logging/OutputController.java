@@ -115,7 +115,10 @@ public class OutputController implements BasicOutputController {
 
         if (LogConfig.getLogConfig().isLogToConsole() && javaConsoleInitialized) {
             //filtering is done in console during runtime
-            JavaConsole.getConsole().addMessage(message);
+            // log OWS/ITW output to console and App output only if the config property is set
+            if (message.getHeader().isClientApp == false || LogConfig.getLogConfig().isLogClientAppToConsole()) {
+                JavaConsole.getConsole().addMessage(message);
+            }
         }
 
         if (message.getHeader().isClientApp) {
