@@ -350,7 +350,7 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE,
-                    ConfigurationConstants.CONSOLE_HIDE,
+                    ConfigurationConstants.CONSOLE_DISABLE,
                     ValidatorFactory.createStringValidator(new String[]{
                             ConfigurationConstants.CONSOLE_DISABLE,
                             ConfigurationConstants.CONSOLE_HIDE,

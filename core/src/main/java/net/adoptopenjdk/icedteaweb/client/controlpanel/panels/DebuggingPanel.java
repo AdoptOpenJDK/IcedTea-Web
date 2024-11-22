@@ -62,6 +62,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
             ConfigurationConstants.KEY_ENABLE_LOGGING_TOFILE,
             ConfigurationConstants.KEY_ENABLE_LEGACY_LOGBASEDFILELOG,
             ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
+            ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOCONSOLE,
             ConfigurationConstants.KEY_ENABLE_LOGGING_TOSTREAMS,
             ConfigurationConstants.KEY_ENABLE_LOGGING_TOSYSTEMLOG
 
@@ -145,6 +146,7 @@ public class DebuggingPanel extends NamedBorderPanel implements ItemListener {
                 new JCheckBox(Translator.R("DPEnableFile")),
                 new JCheckBox(Translator.R("DPEnableLegacyFileLog")),
                 new JCheckBox(Translator.R("DPEnableClientAppFileLogging")),
+                new JCheckBox(Translator.R("DPEnableClientAppConsoleLogging")),
                 new JCheckBox(Translator.R("DPEnableStds")),
                 new JCheckBox(Translator.R("DPEnableSyslog"))
         };
