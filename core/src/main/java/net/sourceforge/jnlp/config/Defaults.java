@@ -350,7 +350,7 @@ public class Defaults {
              */
             Setting.createDefault(
                     ConfigurationConstants.KEY_CONSOLE_STARTUP_MODE,
-                    ConfigurationConstants.CONSOLE_HIDE,
+                    ConfigurationConstants.CONSOLE_DISABLE,
                     ValidatorFactory.createStringValidator(new String[]{
                             ConfigurationConstants.CONSOLE_DISABLE,
                             ConfigurationConstants.CONSOLE_HIDE,
@@ -382,6 +382,11 @@ public class Defaults {
             Setting.createDefault(
                     ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOFILE,
                     String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_ENABLE_APPLICATION_LOGGING_TOCONSOLE,
+                    String.valueOf(false),
                     ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(

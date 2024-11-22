@@ -200,6 +200,8 @@ public interface ConfigurationConstants {
 
     String KEY_ENABLE_APPLICATION_LOGGING_TOFILE = "deployment.log.file.clientapp"; //also client app will log to its separate file
 
+    String KEY_ENABLE_APPLICATION_LOGGING_TOCONSOLE = "deployment.log.console.clientapp";
+
     String KEY_ENABLE_LEGACY_LOGBASEDFILELOG = "deployment.log.file.legacylog";
 
     String KEY_ENABLE_LOGGING_TOSTREAMS = "deployment.log.stdstreams";
@@ -306,4 +308,5 @@ public interface ConfigurationConstants {
     String KEY_HTTPCONNECTION_CONNECT_TIMEOUT = "deployment.connection.connectTimeout";
     String KEY_HTTPCONNECTION_READ_TIMEOUT = "deployment.connection.readTimeout";
     String KEY_HTTPCONNECTION_REQUEST_INTERVAL = "deployment.connection.request.interval";
+
 }
