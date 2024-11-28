@@ -57,8 +57,8 @@ import net.sourceforge.jnlp.util.logging.OutputController;
  * 
  * This map does not allow null keys but does allow null values.
  *
- * @param K The key type
- * @param V The Object type
+ * @param <K> The key type
+ * @param <V> The Object type
  */
 public class TimedHashMap<K, V> implements Map<K, V> {
 
