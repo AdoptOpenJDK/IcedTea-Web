@@ -44,6 +44,7 @@ import static net.adoptopenjdk.icedteaweb.jnlp.version.VersionModifier.PLUS;
  */
 class SimpleRange {
 
+    private static final String REGEXP_MODIFIER_END = REGEXP_MODIFIER + "$";
     private final VersionId versionId;
     private final VersionModifier modifier;
 
@@ -109,7 +110,7 @@ class SimpleRange {
     }
 
     private static VersionId extractVersionId(final String simpleRange) {
-        final String exactId = simpleRange.replaceAll(REGEXP_MODIFIER + "$", "");
+        final String exactId = simpleRange.replaceAll(REGEXP_MODIFIER_END, "");
         return VersionId.fromString(exactId);
     }
 
