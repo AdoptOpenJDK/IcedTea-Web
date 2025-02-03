@@ -23,16 +23,19 @@ import net.sourceforge.jnlp.runtime.JNLPRuntime;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclEntryFlag;
 import java.nio.file.attribute.AclEntryPermission;
 import java.nio.file.attribute.AclEntryType;
 import java.nio.file.attribute.AclFileAttributeView;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.Boolean.parseBoolean;
@@ -49,6 +52,8 @@ public final class RestrictedFileUtils {
     private static final Logger LOG = LoggerFactory.getLogger(RestrictedFileUtils.class);
 
     private static final List<String> WIN_ROOT_PRINCIPALS = Arrays.asList("NT AUTHORITY\\SYSTEM", "BUILTIN\\Administrators");
+    private static final List<String> WIN_PRINCIPAL_SIDS = Arrays.asList("S-1-5-18" /*NT AUTHORITY\SYSTEM*/, "S-1-5-32-544" /*BUILTIN\Administrators*/, "S-1-5-11" /*NT AUTHORITY\Authenticated Users*/);
+    public static final String NT_AUTHENTICATED_USER_SID = "S-1-5-11";
 
     /**
      * Creates a new directory with minimum permissions. The directory is not
@@ -125,7 +130,8 @@ public final class RestrictedFileUtils {
                 String owner = view.getOwner().getName();
                 for (AclEntry ae : view.getAcl()) {
                     String principalName = ae.principal().getName();
-                    if (WIN_ROOT_PRINCIPALS.contains(principalName) || owner.equals(principalName)) {
+                    if (WIN_ROOT_PRINCIPALS.contains(principalName) || owner.equals(principalName) || principalInWinSIDS(ae.principal())) {
+                        LOG.debug("Allowing permissions on restricted file {} for principal {} : {} ", tempFile.getAbsolutePath(), principalName, getSIDForPrincipal(ae.principal()));
                         list.add(AclEntry.newBuilder()
                                 .setType(AclEntryType.ALLOW)
                                 .setPrincipal(ae.principal())
@@ -187,6 +193,24 @@ public final class RestrictedFileUtils {
             if (!file.createNewFile()) {
                 throw new IOException("Cannot create file {} " + file);
             }
+        }
+    }
+
+    public static boolean principalInWinSIDS(Principal principal) {
+        return getSIDForPrincipal(principal)
+                .map(WIN_PRINCIPAL_SIDS::contains)
+                .orElse(false);
+    }
+
+    public static Optional<String> getSIDForPrincipal(Principal principal) {
+        try {
+            Class<?> clazz = principal.getClass().getSuperclass();
+            Method method = clazz.getDeclaredMethod("sidString");
+            method.setAccessible(true);
+            return Optional.ofNullable((String) method.invoke(principal));
+        } catch (Exception e) {
+            LOG.debug("No SID for {}", principal.getName());
+            return Optional.empty();
         }
     }
 }

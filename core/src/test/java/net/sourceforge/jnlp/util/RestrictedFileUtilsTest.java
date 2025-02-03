@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.attribute.AclEntry;
 import java.nio.file.attribute.AclFileAttributeView;
 
+import static net.sourceforge.jnlp.util.RestrictedFileUtils.getSIDForPrincipal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -32,7 +33,7 @@ public class RestrictedFileUtilsTest {
         boolean hasOwner = false;
         AclFileAttributeView view = Files.getFileAttributeView(testfile.toPath(), AclFileAttributeView.class);
         for (AclEntry ae : view.getAcl()) {
-            if (view.getOwner().getName().equals(ae.principal().getName())) {
+            if (view.getOwner().getName().equals(ae.principal().getName()) || getSIDForPrincipal(ae.principal()).orElse("").equals(RestrictedFileUtils.NT_AUTHENTICATED_USER_SID)) {
                 assertFalse("Duplicate owner entry", hasOwner);
                 hasOwner = true;
                 assertEquals("Owner must have all permissions", 14, ae.permissions().size());
