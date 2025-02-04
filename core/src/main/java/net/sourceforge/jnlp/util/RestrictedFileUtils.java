@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.Boolean.parseBoolean;
@@ -51,9 +50,9 @@ public final class RestrictedFileUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestrictedFileUtils.class);
 
-    private static final List<String> WIN_ROOT_PRINCIPALS = Arrays.asList("NT AUTHORITY\\SYSTEM", "BUILTIN\\Administrators");
-    private static final List<String> WIN_PRINCIPAL_SIDS = Arrays.asList("S-1-5-18" /*NT AUTHORITY\SYSTEM*/, "S-1-5-32-544" /*BUILTIN\Administrators*/, "S-1-5-11" /*NT AUTHORITY\Authenticated Users*/);
-    public static final String NT_AUTHENTICATED_USER_SID = "S-1-5-11";
+    private static final List<String> WIN_PRINCIPAL_SIDS = Arrays.asList(
+            "S-1-5-18" /*NT AUTHORITY\SYSTEM*/,
+            "S-1-5-32-544" /*BUILTIN\Administrators*/);
 
     /**
      * Creates a new directory with minimum permissions. The directory is not
@@ -127,10 +126,9 @@ public final class RestrictedFileUtils {
                 // filter ACL's leaving only root and owner
                 AclFileAttributeView view = Files.getFileAttributeView(tempFile.toPath(), AclFileAttributeView.class);
                 List<AclEntry> list = new ArrayList<>();
-                String owner = view.getOwner().getName();
                 for (AclEntry ae : view.getAcl()) {
                     String principalName = ae.principal().getName();
-                    if (WIN_ROOT_PRINCIPALS.contains(principalName) || owner.equals(principalName) || principalInWinSIDS(ae.principal())) {
+                    if (principalInWinSIDS(ae.principal())) {
                         LOG.debug("Allowing permissions on restricted file {} for principal {} : {} ", tempFile.getAbsolutePath(), principalName, getSIDForPrincipal(ae.principal()));
                         list.add(AclEntry.newBuilder()
                                 .setType(AclEntryType.ALLOW)
@@ -140,7 +138,14 @@ public final class RestrictedFileUtils {
                                 .build());
                     }
                 }
-
+                // Add permissions for the owner
+                LOG.debug("Allowing permissions on restricted file {} for principal {} : {} ", tempFile.getAbsolutePath(), view.getOwner().getName(), getSIDForPrincipal(view.getOwner()));
+                list.add(AclEntry.newBuilder()
+                        .setType(AclEntryType.ALLOW)
+                        .setPrincipal(view.getOwner())
+                        .setPermissions(permissions)
+                        .setFlags(flags)
+                        .build());
                 // apply ACL
                 view.setAcl(list);
             } else {
@@ -202,13 +207,26 @@ public final class RestrictedFileUtils {
 
     public static String getSIDForPrincipal(Principal principal) {
         try {
-            Class<?> clazz = principal.getClass().getSuperclass();
-            Method method = clazz.getDeclaredMethod("sidString");
-            method.setAccessible(true);
-            return (String) method.invoke(principal);
+            Method method = findMethod(principal.getClass(), "sidString");
+            if (method != null) {
+                method.setAccessible(true);
+                return (String) method.invoke(principal);
+            }
         } catch (Exception e) {
             LOG.debug("No SID for {}", principal.getName());
-            return "";
         }
+        return "";
+    }
+
+    private static Method findMethod(Class<?> clazz, String methodName) {
+        while (clazz != null) {
+            try {
+                Method method = clazz.getDeclaredMethod(methodName);
+                return method;
+            } catch (NoSuchMethodException e) {
+                clazz = clazz.getSuperclass();
+            }
+        }
+        return null;
     }
 }
