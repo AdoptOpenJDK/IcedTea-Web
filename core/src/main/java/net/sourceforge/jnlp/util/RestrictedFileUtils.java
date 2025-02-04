@@ -127,9 +127,8 @@ public final class RestrictedFileUtils {
                 AclFileAttributeView view = Files.getFileAttributeView(tempFile.toPath(), AclFileAttributeView.class);
                 List<AclEntry> list = new ArrayList<>();
                 for (AclEntry ae : view.getAcl()) {
-                    String principalName = ae.principal().getName();
                     if (principalInWinSIDS(ae.principal())) {
-                        LOG.debug("Allowing permissions on restricted file {} for principal {} : {} ", tempFile.getAbsolutePath(), principalName, getSIDForPrincipal(ae.principal()));
+                        LOG.debug("Allowing permissions on restricted file {} for principal {} : {} ", tempFile.getAbsolutePath(), ae.principal().getName(), getSIDForPrincipal(ae.principal()));
                         list.add(AclEntry.newBuilder()
                                 .setType(AclEntryType.ALLOW)
                                 .setPrincipal(ae.principal())
