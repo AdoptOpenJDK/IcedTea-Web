@@ -264,8 +264,8 @@ public class JNLPRuntime {
         security = new JNLPSecurityManager(); // side effect: create JWindow
 
         doMainAppContextHacks();
-
-        if (securityEnabled && forkingStrategy.mayRunManagedApplication()) {
+        final boolean securityManagerEnabled = Boolean.parseBoolean(getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_MANAGER_ENABLED));
+        if (securityManagerEnabled && securityEnabled && forkingStrategy.mayRunManagedApplication()) {
             Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
             System.setSecurityManager(security);
         }
