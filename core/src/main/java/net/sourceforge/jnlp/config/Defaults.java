@@ -216,6 +216,11 @@ public class Defaults {
                     ValidatorFactory.createBooleanValidator()
             ),
             Setting.createDefault(
+                    ConfigurationConstants.KEY_SECURITY_MANAGER_ENABLED,
+                    String.valueOf(true),
+                    ValidatorFactory.createBooleanValidator()
+            ),
+            Setting.createDefault(
                     ConfigurationConstants.KEY_SECURITY_TRUSTED_POLICY,
                     null,
                     ValidatorFactory.createFilePathValidator()
