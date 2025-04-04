@@ -257,9 +257,7 @@ public class JNLPRuntime {
 
         ServiceManager.setServiceManagerStub(new XServiceManagerStub()); // ignored if we're running under Web Start
 
-        LOG.debug("Start get JavaPolicy");
         policy = new JNLPPolicy();
-        LOG.debug("Finished get JavaPolicy");
 
         security = new JNLPSecurityManager(); // side effect: create JWindow
 
@@ -291,10 +289,8 @@ public class JNLPRuntime {
 
         // plug in a custom authenticator and proxy selector
         Authenticator.setDefault(new JNLPAuthenticator());
-        LOG.debug("Start Proxy Selector");
         ProxySelector proxySelector = getExtensionPoint().createProxySelector(getConfiguration());
         ProxySelector.setDefault(proxySelector);
-        LOG.debug("Finished Proxy Selector");
 
         // Restrict access to netx classes
         Security.setProperty("package.access",

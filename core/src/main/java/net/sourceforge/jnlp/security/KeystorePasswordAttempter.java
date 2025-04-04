@@ -137,7 +137,6 @@ class KeystorePasswordAttempter {
         for (int i = 0; i < localPasses.size(); i++) {
             final SavedPassword pass = localPasses.get(i);
             try {
-                LOG.debug("unlockKeyStore: Operating Keystore {}", keyStorePath);
                 //we expect, that any keystore is loaded before read.
                 //so we are writing by correct password
                 //if no successful password was provided during reading, then finish(firstEx); will save us from overwrite
@@ -145,7 +144,6 @@ class KeystorePasswordAttempter {
                 //ok we were successful
                 //save the loading password for storing purposes (and another reading too)
                 if (operation.f != null) {
-                    LOG.debug("unlockKeyStore: Store successful pass for file {}",  keyStorePath);
                     successfulPerKeystore.put(keyStorePath, pass);
                 }
                 return result;

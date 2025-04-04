@@ -317,11 +317,9 @@ public class LockableFile {
                 return;
             }
 
-            logger.debug("Trying to create lock file {}", lockFile.getPath());
             while (file.exists() && !tryLock()) {
                 try {
                     Thread.sleep(500);
-                    logger.debug("Trying to create lock file {}", lockFile.getPath());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -344,7 +342,6 @@ public class LockableFile {
                 logger.debug("Could not create lock file {}", lockFile.getPath());
                 return false;
             }
-            logger.debug("Created lock file {}", lockFile.getPath());
             lockFile.deleteOnExit();
             return true;
         }

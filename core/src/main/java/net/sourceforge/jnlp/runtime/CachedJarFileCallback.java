@@ -87,6 +87,14 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
 
     @Override
     public java.util.jar.JarFile retrieve(URL url) throws IOException {
+        LOG.debug("***************************** CachedJarFileCallback.retrieve called for URL {}", url.toString());
+        try {
+            throw new Exception("CachedJarFileCallback.retrieve stacktrace:");
+        } catch (Exception e) {
+            LOG.debug("**********************************");
+            e.printStackTrace();
+            LOG.debug("**********************************");
+        }
         URL localUrl = mapping.get(new UrlKey(url));
         if (localUrl == null) {
             if (url.getRef() != null) {
@@ -107,6 +115,7 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
         if (UrlUtils.isLocalFile(localUrl)) {
             // if it is known to us, just return the cached file
             java.util.jar.JarFile returnFile = new JarFile(UrlUtils.decodeUrlQuietly(localUrl).getPath()).getNative();
+            LOG.debug("**************** CachedJarFileCallback.retrieve : localUrl {}  filename {}", localUrl.toString(), returnFile.getName());
 
             try {
                 // Blank out the class-path because:
@@ -132,6 +141,7 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
      * This method is a copy of URLJarFile.retrieve() without the callback check.
      */
     private  java.util.jar.JarFile cacheJarFile(URL url) throws IOException {
+        LOG.debug("*********************** CachedJarFileCallback.cacheJarFile downloading from : {}", url);
         java.util.jar.JarFile result = null;
 
         final int BUF_SIZE = 2048;
