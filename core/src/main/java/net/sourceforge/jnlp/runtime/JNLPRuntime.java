@@ -41,7 +41,6 @@ import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.RestrictedFileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.net.www.protocol.jar.URLJarFile;
 
 import javax.jnlp.ServiceManager;
 import javax.naming.ConfigurationException;
@@ -299,8 +298,6 @@ public class JNLPRuntime {
         // Restrict access to netx classes
         Security.setProperty("package.access",
                              Security.getProperty("package.access")+",net.sourceforge.jnlp");
-
-        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
 
         initialized = true;
         LOG.debug("End JNLPRuntime.initialize()");
