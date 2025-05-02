@@ -903,7 +903,7 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	LANG_BACKUP=$$LANG ; \
 	echo "<html><head><title>$(PLUGIN_VERSION)</title></head>" > "$$HTML_DOCS_INDEX" ; \
 	echo "<body><h3>$(PLUGIN_VERSION) docs:</h3>"  >> "$$HTML_DOCS_INDEX" ; \
-	for LANG_ID in en_US.UTF-8 cs_CZ.UTF-8 pl_PL.UTF-8 de_DE.UTF-8 ;  do \
+	for LANG_ID in en_US.UTF-8 ;  do \
 	  ID=`echo "$$LANG_ID" | head -c 2` ; \
 	  ENCOD=`echo "$$LANG_ID" | tail -c 6` ; \
 	  export LANG=$$LANG_ID; \
