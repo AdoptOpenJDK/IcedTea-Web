@@ -680,9 +680,6 @@ public class CacheUtil {
 
         StringBuilder path = new StringBuilder();
 
-        path.append(subdir);
-        path.append(File.separatorChar);
-
         path.append(location.getProtocol());
         path.append(File.separatorChar);
         path.append(location.getHost());
@@ -707,7 +704,7 @@ public class CacheUtil {
                  * So without mercy, hash it
                  */
                 String hexed = hex(new File(locationPath).getName(), locationPath);
-                return new File(path.toString(), hexed.toString());
+                return new File(subdir, path.append(File.separatorChar).append(hexed).toString());
             } catch (NoSuchAlgorithmException ex) {
                 // should not occur, cite from javadoc:
                 // every java implementation should support
@@ -720,7 +717,7 @@ public class CacheUtil {
                 path.append(".").append(location.getQuery());
             }
 
-            File candidate = new File(FileUtils.sanitizePath(path.toString()));
+            File candidate = new File(subdir, FileUtils.sanitizePath(path.toString()));
             try {
                 if (candidate.getName().length() > 255) {
                     /**
