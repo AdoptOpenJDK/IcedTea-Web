@@ -271,6 +271,7 @@ public final class Boot implements PrivilegedAction<Integer> {
 
         if (optionParser.hasOption(CommandLineOptions.NOSEC)) {
             JNLPRuntime.setSecurityEnabled(false);
+            LOG.debug("-nosecurity specified on cmdline hence isSecurityEnabled = {}", JNLPRuntime.isSecurityEnabled());
         }
         if (optionParser.hasOption(CommandLineOptions.OFFLINE)) {
             JNLPRuntime.setOfflineForced(true);
