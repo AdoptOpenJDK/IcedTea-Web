@@ -61,6 +61,7 @@ public class HttpUtils {
         try {
             consumeAndCloseConnection(c);
         } catch (final IOException ex) {
+            LOG.debug("Exception while connecting to {}.\n Check if the URL and the Proxy, if specified, are correct.", c.getURL().toString());
             LOG.debug("Following exception should be harmless, but may help in finding root cause.", ex);
         }
     }

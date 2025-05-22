@@ -125,6 +125,9 @@ public class JNLPFileFactory {
             final ResourceTracker tracker = new ResourceTracker(false, DownloadOptions.NONE, policy); // no prefetch
             tracker.addResource(location, version);
             final File f = tracker.getCacheFile(location);
+            if (f == null) {
+                throw new IOException("Error fetching file from  " + location);
+            }
             return new FileInputStream(f);
         } catch (IOException ex) {
             throw ex;
