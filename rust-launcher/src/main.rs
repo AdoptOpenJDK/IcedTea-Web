@@ -172,6 +172,7 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     all_args.push(cp);
     all_args.push(bin_name);
     all_args.push(bin_location);
+    all_args.push(String::from("-Djava.security.manager"));
     all_args.push(hardcoded_paths::get_main().to_string());
 
     include_not_dashJs(&original_args, &mut all_args);

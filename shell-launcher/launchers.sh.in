@@ -188,6 +188,9 @@ k=$((k+1))
 COMMAND[k]="-Dicedtea-web.bin.location=${BINARY_LOCATION}"
 k=$((k+1))
 
+COMMAND[k]="-Djava.security.manager"
+k=$((k+1))
+
 COMMAND[k]="${CLASSNAME}"
 k=$((k+1))
 j=0
