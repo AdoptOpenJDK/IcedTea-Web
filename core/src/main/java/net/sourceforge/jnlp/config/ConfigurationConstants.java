@@ -113,6 +113,8 @@ public interface ConfigurationConstants {
 
     String KEY_SECURITY_JSSE_HOSTMISMATCH_WARNING = "deployment.security.jsse.hostmismatch.warning";
 
+    String KEY_NOSECURITY ="deployment.nosecurity";  // same as -nosecurity cmd line arg
+
     /**
      * Boolean. Only show security prompts to user if true
      */

@@ -250,6 +250,11 @@ public class Defaults {
                     String.valueOf(false),
                     ValidatorFactory.createBooleanValidator()
             ),
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_NOSECURITY,
+                    String.valueOf(false),
+                    ValidatorFactory.createBooleanValidator()
+            ),
 
             /*
              * networking

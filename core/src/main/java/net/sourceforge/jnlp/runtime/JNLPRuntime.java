@@ -265,7 +265,12 @@ public class JNLPRuntime {
 
         doMainAppContextHacks();
 
-        if (securityEnabled && forkingStrategy.mayRunManagedApplication()) {
+        final boolean deploymentNosecurity = Boolean.parseBoolean(getConfiguration().getProperty(ConfigurationConstants.KEY_NOSECURITY));
+        final boolean cmdlineNosecurity = !isSecurityEnabled();
+        // Set SecurityEnable to FALSE if either -nosecurity on cmdline or deployment property nosecurity is true
+        setSecurityEnabled(!(deploymentNosecurity || cmdlineNosecurity));
+        LOG.debug("SecurityEnabled = {} cmdLine nosecurity = {} deployment nosecurity = {}", isSecurityEnabled(), cmdlineNosecurity, deploymentNosecurity);
+        if (isSecurityEnabled() && forkingStrategy.mayRunManagedApplication()) {
             Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
             System.setSecurityManager(security);
         }
