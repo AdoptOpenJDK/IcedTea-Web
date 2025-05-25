@@ -191,7 +191,10 @@ public class JvmUtils {
                 "-XX:+UseParNewGC",
                 "-XX:+PrintFlagsFinal",
                 "-XX:+PrintCommandLineFlags",
-                "-XX:+PrintGCDateStamps"
+                "-XX:+PrintGCDateStamps",
+                "-XX:G1NewSizePercent",
+                "-XX:G1ReservePercent",
+                "-XX:+UseEpsilonGC"
         };
     }
 
@@ -252,6 +255,7 @@ public class JvmUtils {
                 "-XX:InitialRAMPercentage", /* The initial heap size as percentage of total memory, conflicts with Xms */
                 "-XX:MinRAMPercentage", /* Sets the max heap size of RAM as a percentage before looking at other heuristics like MaxRAMPercentage. This is primarily useful for low memory environments (<100m) */
                 "-XX:MaxRAMPercentage", /* Sets the max heap size of RAM as a percentage */
+                "-XX:G1HeapRegionSize"
         };
     }
 
@@ -306,7 +310,8 @@ public class JvmUtils {
                 "sun.java2d.uiScale",
                 "prism.allowhidpi", // for JavaFX
                 "sun.net.client.defaultConnectTimeout",
-                "sun.net.client.defaultReadTimeout"
+                "sun.net.client.defaultReadTimeout",
+                "jdk.jar.maxSignatureFileSize"
         };
     }
 
