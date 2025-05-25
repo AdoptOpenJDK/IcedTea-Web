@@ -128,7 +128,6 @@ public final class RestrictedFileUtils {
                 List<AclEntry> list = new ArrayList<>();
                 for (AclEntry ae : view.getAcl()) {
                     if (principalInWinSIDS(ae.principal())) {
-                        LOG.debug("Allowing permissions on restricted file {} for principal {} : {} ", tempFile.getAbsolutePath(), ae.principal().getName(), getSIDForPrincipal(ae.principal()));
                         list.add(AclEntry.newBuilder()
                                 .setType(AclEntryType.ALLOW)
                                 .setPrincipal(ae.principal())
@@ -138,7 +137,6 @@ public final class RestrictedFileUtils {
                     }
                 }
                 // Add permissions for the owner
-                LOG.debug("Allowing permissions on restricted file {} for principal {} : {} ", tempFile.getAbsolutePath(), view.getOwner().getName(), getSIDForPrincipal(view.getOwner()));
                 list.add(AclEntry.newBuilder()
                         .setType(AclEntryType.ALLOW)
                         .setPrincipal(view.getOwner())

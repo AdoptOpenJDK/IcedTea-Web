@@ -230,7 +230,7 @@ public class JNLPPolicy extends Policy {
      * @return a policy based on the configuration set by the user
      */
     private Policy getPolicyFromUrl(String policyLocation) {
-        LOG.debug("Begin getPolicyFromUrl({})", policyLocation);
+        LOG.debug("getPolicyFromUrl({})", policyLocation);
         Policy policy = null;
         if (policyLocation != null) {
             try {
@@ -241,14 +241,11 @@ public class JNLPPolicy extends Policy {
                 } else {
                     policyUri = new URI(policyLocation.replace("\\", "/"));
                 }
-                LOG.debug("Start Policy.getInstance({})", policyUri.toString());
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
-                LOG.debug("End Policy.getInstance({})", policyUri.toString());
             } catch (Exception e) {
                 LOG.error("Error while loading the policy from URL " + policyLocation, e);
             }
         }
-        LOG.debug("End getPolicyFromUrl()");
         return policy;
     }
 
