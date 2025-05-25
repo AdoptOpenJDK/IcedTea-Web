@@ -86,6 +86,7 @@ public class BasicExceptionDialog {
 
         final JOptionPane optionPane = new JOptionPane(mainPanel, JOptionPane.ERROR_MESSAGE);
         final JDialog errorDialog = optionPane.createDialog(R("Error"));
+        errorDialog.setAlwaysOnTop(true);
         errorDialog.setName("BasicExceptionDialog");
         SwingUtils.info(errorDialog);
         errorDialog.setIconImages(ImageResources.INSTANCE.getApplicationImages());
