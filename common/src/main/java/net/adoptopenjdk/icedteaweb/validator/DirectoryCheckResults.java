@@ -27,14 +27,14 @@ public class DirectoryCheckResults {
      * @return sum of passed checks, 0-3 per result
      */
     public int getPasses() {
-        return results.stream().mapToInt(r -> r.getPasses()).sum();
+        return results.stream().mapToInt(result -> result.getPasses()).sum();
     }
 
     /**
      * @return sum of failed checks, 0-3 per results
      */
     public int getFailures() {
-        return results.stream().mapToInt(r -> r.getFailures()).sum();
+        return results.stream().mapToInt(result -> result.getFailures()).sum();
     }
 
     /**
@@ -60,9 +60,9 @@ public class DirectoryCheckResults {
 
     private static String resultsToString(final List<DirectoryCheckResult> results) {
         final StringBuilder sb = new StringBuilder();
-        for (final DirectoryCheckResult r : results) {
-            if (r.getFailures() > 0) {
-                sb.append(r.getMessage());
+        for (final DirectoryCheckResult result : results) {
+            if (result.getFailures() > 0) {
+                sb.append(result.getMessage());
             }
         }
         return sb.toString();
