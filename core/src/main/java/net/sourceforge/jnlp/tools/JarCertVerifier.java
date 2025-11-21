@@ -46,7 +46,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.security.CodeSigner;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Timestamp;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
@@ -461,6 +464,14 @@ public class JarCertVerifier implements CertVerifier {
                 }
             }
         }
+        for (final KeyStore caKeyStore : caKeyStores) {
+            try {
+                validateCertpathWhenRootCANotInChain(certPath, caKeyStore);
+                return true;
+            } catch (Exception ignore) {
+            }
+        }
+        LOG.warn("Unable to validate root ca cert in TSA certpath.");
         return false;
     }
 
@@ -509,27 +520,10 @@ public class JarCertVerifier implements CertVerifier {
 
             for (final KeyStore caKeyStore : caKeyStores) {
                 try {
-                    final Set<TrustAnchor> anchors = new HashSet<>();
-
-                    for (Enumeration<String> e = caKeyStore.aliases(); e.hasMoreElements(); ) {
-                        final String alias = e.nextElement();
-                        final Certificate c = caKeyStore.getCertificate(alias);
-                        if (c instanceof X509Certificate) {
-                            X509Certificate xc = (X509Certificate) c;
-                            anchors.add(new TrustAnchor(xc, null));
-                        }
-                    }
-
-                    final PKIXParameters params = new PKIXParameters(anchors);
-                    params.setRevocationEnabled(false); // disable CRL/OCSP for this presence/anchoring check
-
-
-                    final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
-                    validator.validate(certPath, params);
+                    validateCertpathWhenRootCANotInChain(certPath, caKeyStore);
                     info.setRootInCacerts();
                     return;
                 } catch (Exception ignore) {
-                    LOG.warn("Unable to validate root ca cert.");
                 }
             }
         } catch (Exception e) {
@@ -541,7 +535,28 @@ public class JarCertVerifier implements CertVerifier {
         }
 
         // Otherwise a parent cert was not found to be trusted.
+        LOG.warn("Unable to validate root ca cert.");
         info.setUntrusted();
+    }
+
+    private static void validateCertpathWhenRootCANotInChain(CertPath certPath, KeyStore caKeyStore) throws KeyStoreException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertPathValidatorException {
+        final Set<TrustAnchor> anchors = new HashSet<>();
+
+        for (Enumeration<String> e = caKeyStore.aliases(); e.hasMoreElements(); ) {
+            final String alias = e.nextElement();
+            final Certificate c = caKeyStore.getCertificate(alias);
+            if (c instanceof X509Certificate) {
+                X509Certificate xc = (X509Certificate) c;
+                anchors.add(new TrustAnchor(xc, null));
+            }
+        }
+
+        final PKIXParameters params = new PKIXParameters(anchors);
+        params.setRevocationEnabled(false); // disable CRL/OCSP for this presence/anchoring check
+
+
+        final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+        validator.validate(certPath, params);
     }
 
     public void setCurrentlyUsedCertPath(final CertPath certPath) {
