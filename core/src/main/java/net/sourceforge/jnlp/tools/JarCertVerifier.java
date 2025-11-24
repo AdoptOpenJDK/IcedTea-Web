@@ -46,10 +46,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.security.CodeSigner;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Timestamp;
 import java.security.cert.CertPath;
+import java.security.cert.CertPathValidator;
+import java.security.cert.CertPathValidatorException;
 import java.security.cert.Certificate;
+import java.security.cert.PKIXParameters;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -58,9 +65,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
 import java.util.zip.ZipException;
@@ -399,7 +408,7 @@ public class JarCertVerifier implements CertVerifier {
                         }
                         if (now.isAfter(tsaNotAfter) && now.isAfter(notAfter)) {
                             certInfo.setHasExpiredCert();
-                        }  else if (expiresSoon.isAfter(tsaNotAfter)) {
+                        } else if (expiresSoon.isAfter(tsaNotAfter)) {
                             certInfo.setHasExpiringCert();
                         }
 
@@ -455,6 +464,14 @@ public class JarCertVerifier implements CertVerifier {
                 }
             }
         }
+        for (final KeyStore caKeyStore : caKeyStores) {
+            try {
+                validateCertpathWhenRootCANotInChain(certPath, caKeyStore);
+                return true;
+            } catch (Exception ignore) {
+            }
+        }
+        LOG.warn("Unable to validate root ca cert in TSA certpath.");
         return false;
     }
 
@@ -500,6 +517,15 @@ public class JarCertVerifier implements CertVerifier {
                     }
                 }
             }
+
+            for (final KeyStore caKeyStore : caKeyStores) {
+                try {
+                    validateCertpathWhenRootCANotInChain(certPath, caKeyStore);
+                    info.setRootInCacerts();
+                    return;
+                } catch (Exception ignore) {
+                }
+            }
         } catch (Exception e) {
             // TODO: Warn user about not being able to
             // look through their cacerts/trusted.certs
@@ -509,7 +535,28 @@ public class JarCertVerifier implements CertVerifier {
         }
 
         // Otherwise a parent cert was not found to be trusted.
+        LOG.warn("Unable to validate root ca cert.");
         info.setUntrusted();
+    }
+
+    private static void validateCertpathWhenRootCANotInChain(CertPath certPath, KeyStore caKeyStore) throws KeyStoreException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, CertPathValidatorException {
+        final Set<TrustAnchor> anchors = new HashSet<>();
+
+        for (Enumeration<String> e = caKeyStore.aliases(); e.hasMoreElements(); ) {
+            final String alias = e.nextElement();
+            final Certificate c = caKeyStore.getCertificate(alias);
+            if (c instanceof X509Certificate) {
+                X509Certificate xc = (X509Certificate) c;
+                anchors.add(new TrustAnchor(xc, null));
+            }
+        }
+
+        final PKIXParameters params = new PKIXParameters(anchors);
+        params.setRevocationEnabled(false); // disable CRL/OCSP for this presence/anchoring check
+
+
+        final CertPathValidator validator = CertPathValidator.getInstance("PKIX");
+        validator.validate(certPath, params);
     }
 
     public void setCurrentlyUsedCertPath(final CertPath certPath) {
@@ -561,11 +608,11 @@ public class JarCertVerifier implements CertVerifier {
         }
         return name.startsWith(META_INF) && (
                 name.endsWith(".MF") ||
-                name.endsWith(".SF") ||
-                name.endsWith(".DSA") ||
-                name.endsWith(".RSA") ||
-                name.endsWith(".EC") ||
-                SIG.matcher(name).matches()
+                        name.endsWith(".SF") ||
+                        name.endsWith(".DSA") ||
+                        name.endsWith(".RSA") ||
+                        name.endsWith(".EC") ||
+                        SIG.matcher(name).matches()
         );
     }
 
