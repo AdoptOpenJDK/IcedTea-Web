@@ -1,0 +1,54 @@
+  ***  icedtea-web 2.0.0-SNAPSHOT  ***  
+NAME
+    icedtea-web-plugin - long ago allowed to run applets in your favorite browser. It no longer exists
+
+SYNOPSIS
+icedtea-web-plugin is working in your browser, once your browser knows about this files.
+    The IcedTeaPlugin.so must be placed, or linked inside specific directories. See http://icedtea.classpath.org/wiki/IcedTea-Web#Plugin
+    Mozilla compatible browsers like Firefox, Midori, Epiphany, Chrome or Chromium use:
+    %HOME\.mozilla/plugins      - Location of plugin library for user's purposes on Mozilla compliant browser.
+    \\usr\lib64\mozilla\plugins - Location of plugin library for global purposes  on Mozilla compliant browser, 64-bit systems.
+    \\usr\lib\mozilla\plugins   - Location of plugin library for global purposes  on Mozilla compliant browser, 32-bit systems.
+    Opera family browsers like Opera use:
+    \\usr\lib64\opera\plugins   - Location of plugin library for global purposes  on opera compliant browser, 64-bit systems.
+    \\usr\lib\opera\plugins     - Location of plugin library for global purposes  on opera compliant browser, 32-bit systems.
+    All third-party trademarks are the property of their respective owners
+
+
+
+
+
+FILES
+    %HOME\.mozilla/plugins\IcedTeaPlugin.so               - Location of plugin library for user's purposes on Mozilla compliant browser.
+    %XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache - Additional information about items in cache
+    %XDG_CONFIG_HOME\icedtea-web\generated_jnlps          - Location where jnlp files generated from html pages for javaws applications desktop/menu launchers
+    icons are stored
+    \/usr/lib/mozilla/plugins/\IcedTeaPlugin.so           - Location of plugin library for global purposes  on Mozilla compliant browser, 32-bit systems.
+    \/usr/lib/opera/plugins/\IcedTeaPlugin.so             - Location of plugin library for global purposes  on opera compliant browser, 32-bit systems.
+    \/usr/lib64/mozilla/plugins/\IcedTeaPlugin.so         - Location of plugin library for global purposes  on Mozilla compliant browser, 64-bit systems.
+    \/usr/lib64/opera/plugins/\IcedTeaPlugin.so           - Location of plugin library for global purposes  on opera compliant browser, 64-bit systems.
+    Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.
+
+BUGS
+    There aren't any known bugs. If you come across one, please file it at:
+    http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+    https://github.com/AdoptOpenJDK/icedtea-web/issues
+    
+    Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the
+    console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.
+
+AUTHOR
+    https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+
+SEE ALSO
+    * icedtea-web
+    * javaws
+    * icedtea-web-plugin
+    * itweb-settings
+    * policyeditor
+    * policytool
+    * java
+    
+    https://github.com/AdoptOpenJDK/icedtea-web
+    https://github.com/AdoptOpenJDK/icedtea-web.git
+

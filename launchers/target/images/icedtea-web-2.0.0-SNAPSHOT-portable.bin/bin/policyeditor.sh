@@ -1,0 +1,253 @@
+#!/bin/bash
+
+set -e
+set -u
+set -o pipefail
+
+if echo "'$*'" | grep -e "-verbose" ; then
+  set -x
+fi
+
+NASHORN=lib/ext/nashorn.jar
+JRE=C:Program FilesAmazon Correttojdk1.8.0_472
+LAUNCHER_FLAGS=-Xms8m
+MAIN_CLASS=net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor
+SPLASH_PNG=C:/Users/Julian/IdeaProjects/IcedTea-Web/launchers/target/libs/javaws_splash.png
+RUN_ARGS_LOCATION=C:/Users/Julian/IdeaProjects/IcedTea-Web/launchers/target/libs/itw-modularjdk.args
+ITW_LIBS=BUNDLED
+
+# individual parts of bootclasspath
+readonly JAVAWS_SRC=C:/Users/Julian/IdeaProjects/IcedTea-Web/launchers/target/libs/javaws.jar
+readonly TAGSOUP_SRC=
+readonly RHINO_SRC=
+readonly IPADDRESS_SRC=
+# windows only: (cywin usage?); need to declare it anyway
+readonly MSLINKS_SRC=
+
+if [ "x$ITW_LIBS" == "xEMBEDDED" ] ; then
+ echo "ITW_LIBS=EMBEDDED not (yet?) supported in shell launchers. Use native ones"
+ exit 1
+fi
+
+if [ -z ${ITW_NATIVEDEBUG_SUSPEND+x} ]; then
+      ITW_NATIVEDEBUG_SUSPEND="n"
+fi
+
+if [ -z "${ITW_NATIVEDEBUG_PORT+x}" ]; then
+    ITW_NATIVEDEBUG_PORT=9009
+fi
+
+## resolve folder of this script, following all symlinks:
+## http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SCRIPT_SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SCRIPT_SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+  SCRIPT_SOURCE="$(readlink "$SCRIPT_SOURCE")"
+  # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ $SCRIPT_SOURCE != /* ]] && SCRIPT_SOURCE="$SCRIPT_DIR/$SCRIPT_SOURCE"
+done
+readonly SCRIPT_DIR="$( cd -P "$( dirname "$SCRIPT_SOURCE" )" && pwd )"
+readonly PORTABLE_ITW_HOME=`dirname "$SCRIPT_DIR"`
+BINARY_LOCATION="$SCRIPT_DIR/`basename $SCRIPT_SOURCE`"
+
+
+## resolve custom JRE:
+set +ue
+CONFIG_HOME=$XDG_CONFIG_HOME
+if [ "x$CONFIG_HOME" = "x" ] ; then
+  CONFIG_HOME=~/.config
+fi;
+PROPERTY_NAME=deployment.jre.dir
+CUSTOM_JRE_REGEX="^$PROPERTY_NAME *= *"
+CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" $CONFIG_HOME/icedtea-web/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+#now check in legacy one
+if [ "x$CUSTOM_JRE" = "x" ] ; then
+  CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" ~/.icedtea/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+fi;
+#now check in global one
+if [ "x$CUSTOM_JRE" = "x" ] ; then
+  CUSTOM_JRE=`grep "$CUSTOM_JRE_REGEX" /etc/.java/.deploy/deployment.properties 2>/dev/null |  sed "s/$CUSTOM_JRE_REGEX//g"`
+fi;
+if [ ! "x$JAVA_HOME" = "x" ] ; then
+  echo "Warning! JAVA_HOME of $JAVA_HOME in play!"
+  CUSTOM_JRE=$JAVA_HOME
+fi
+#check in $path
+if [ "x$CUSTOM_JRE" = "x" ] ; then
+  while IFS=: read -d: -r path_entry; do
+    if [ -e "${path_entry}/java" ] ; then
+     CUSTOM_JRE=$(dirname $(dirname $(readlink -f "$path_entry/java")))
+    fi;
+  done <<< "${PATH}"
+
+  if [ "x$CUSTOM_JRE" != "x" ] ; then
+    echo "Warning! Using JAVA as read from the \$PATH variable!"
+  fi;
+fi;
+
+set -ue
+
+# Support portable ITW:
+# note, that this is temporary, experimental solution, moreover for 1.7 and will likely change since 1.8
+# by this, sh launchers can be again a bit more portable then win ones, thats why we moved to native ones since 1.8
+# still this is very dummy
+function locallib() {
+  echo "$ITW_HOME/libs/`basename \"$1\"`"
+}
+
+set +u
+if [ "x$ITW_LIBS" == "xBUNDLED" -o ! "x$ITW_HOME" = "x" ] ; then
+  if [ "x$ITW_HOME" = "x" ] ; then
+    ITW_HOME=$PORTABLE_ITW_HOME
+  fi
+  set -u
+  readonly BINARY_LOCATION="$ITW_HOME/bin/`basename \"$BINARY_LOCATION\"`"
+  readonly SPLASH_PNG="`locallib \"$SPLASH_PNG\"`"
+  readonly RUN_ARGS_LOCATION="`locallib \"$RUN_ARGS_LOCATION\"`"
+  readonly JAVAWS_JAR="`locallib  \"$JAVAWS_SRC\"`"
+  #in fat jar with dependencies
+  readonly RHINO_JAR=""
+  readonly TAGSOUP_JAR=""
+  readonly MSLINKS_JAR=""
+  readonly IPADDRESS_JAR=""
+  echo "warning, using portable itw from $ITW_HOME"
+else
+  readonly JAVAWS_JAR="$JAVAWS_SRC"
+  #not in fat jar without dependencies
+  readonly RHINO_JAR="$RHINO_SRC"
+  readonly TAGSOUP_JAR="$TAGSOUP_SRC"
+  readonly MSLINKS_JAR="$MSLINKS_SRC"
+  readonly IPADDRESS_JAR="$IPADDRESS_SRC"
+fi
+set -u
+LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$JAVAWS_JAR:$TAGSOUP_JAR:$RHINO_JAR:$MSLINKS_JAR:$IPADDRESS_JAR"
+
+# Fix classpaths for custom JRE:
+if [ "x$CUSTOM_JRE" != "x" ] ; then
+  if [ -e "$CUSTOM_JRE" -a -e "$CUSTOM_JRE/bin/java" ] ; then
+    JAVA=$CUSTOM_JRE/bin/java
+    CP=$CUSTOM_JRE/lib/rt.jar:$CUSTOM_JRE/lib/ext/jfxrt.jar
+    LAUNCHER_BOOTCLASSPATH=$LAUNCHER_BOOTCLASSPATH:$CUSTOM_JRE/$NASHORN
+  else
+    echo "Your custom JRE $CUSTOM_JRE read from deployment.properties under key $PROPERTY_NAME as $CUSTOM_JRE is not valid. Using default ($JRE, $CP) in attempt to start. Please fix this."
+  fi
+else
+  JAVA=$JRE/bin/java
+  CP=$JRE/lib/rt.jar:$JRE/lib/ext/jfxrt.jar
+  LAUNCHER_BOOTCLASSPATH="$LAUNCHER_BOOTCLASSPATH:$JRE/$NASHORN"
+fi;
+
+
+# Support Modular JDK (jigsaw):
+MODULAR_JDK="NO"
+fullversion=`${JAVA} -version 2>&1`
+version=`echo $fullversion | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f1`
+if [ "$version" -eq "1" ]; then
+  version=`echo $fullversion | head -n 1 | cut -d'-' -f1 | cut -d'"' -f2 | cut -d'.' -f2`
+fi
+if [ "$version" -ge "9" ]; then
+  MODULAR_JDK="YES"
+fi
+
+
+# Build Java command line:
+JAVA_ARGS=( )
+ARGS=( )
+COMMAND=()
+NATIVE_DEBUG_TOGGLE=
+NATIVE_DEBUG_CONFIG=
+
+i=0
+j=0
+
+# Filter script args:
+SPLASH="false"
+set +u
+if [ "x$ICEDTEA_WEB_SPLASH" = "x" ] ; then
+  SPLASH="true"
+fi;
+set -u
+while [ "$#" -gt "0" ]; do
+  case "$1" in
+    -J*)
+      JAVA_ARGS[$i]="${1##-J}"
+      i=$((i+1))
+      ;;
+    -nativeDebug)
+      ;&
+    --nativeDebug)
+      NATIVE_DEBUG_TOGGLE=-Xdebug
+      NATIVE_DEBUG_CONFIG=-Xrunjdwp:transport=dt_socket,server=y,suspend=$ITW_NATIVEDEBUG_SUSPEND,address=$ITW_NATIVEDEBUG_PORT
+      ;;
+    *)
+      ARGS[$j]="$1"
+      j=$((j+1))
+      if [[ "$1" =~ ^[-]*headless ]] ; then   
+        SPLASH="false"
+      fi
+      if [[ "$1" =~ ^[-]*Xnosplash ]] ; then   
+        SPLASH="false"
+      fi
+      ;;
+  esac
+  shift
+done
+
+# TODO: inline args without using COMMAND[array] to unify linux/windows scripts
+k=0
+COMMAND[k]="${JAVA}"
+k=$((k+1))
+if [ "$SPLASH" = "true" ] ; then
+  COMMAND[k]="-splash:${SPLASH_PNG}"
+  k=$((k+1))
+fi;
+COMMAND[k]="${LAUNCHER_BOOTCLASSPATH}"
+k=$((k+1))
+COMMAND[k]="${LAUNCHER_FLAGS}"
+k=$((k+1))
+
+if [ "x$MODULAR_JDK" == "xYES" ] ; then
+  # add JDK9+ arg file:
+  COMMAND[k]="@$RUN_ARGS_LOCATION"
+  k=$((k+1))
+fi
+
+
+i=0
+while [ "$i" -lt "${#JAVA_ARGS[@]}" ]; do
+  COMMAND[k]="${JAVA_ARGS[$i]}"
+  i=$((i+1))
+  k=$((k+1))
+done
+
+COMMAND[k]="-classpath"
+k=$((k+1))
+COMMAND[k]="${CP}"
+k=$((k+1))
+
+COMMAND[k]="-Dicedtea-web.bin.name=`basename $SCRIPT_SOURCE`"
+k=$((k+1))
+COMMAND[k]="-Dicedtea-web.bin.location=${BINARY_LOCATION}"
+k=$((k+1))
+
+if [ -n "$NATIVE_DEBUG_TOGGLE" -a -n "$NATIVE_DEBUG_CONFIG" ] ; then
+  COMMAND[k]=${NATIVE_DEBUG_TOGGLE}
+  k=$((k+1))
+  COMMAND[k]=${NATIVE_DEBUG_CONFIG}
+  k=$((k+1))
+fi
+
+COMMAND[k]="${MAIN_CLASS}"
+k=$((k+1))
+j=0
+
+while [ "$j" -lt "${#ARGS[@]}" ]; do
+    COMMAND[k]="${ARGS[$j]}"
+    j=$((j+1))
+    k=$((k+1))
+done
+
+exec -a "`basename $SCRIPT_SOURCE`" "${COMMAND[@]}"
+
+exit $?
+

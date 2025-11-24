@@ -1,0 +1,130 @@
+.TH policyeditor 1 "24 Nov 2025" "icedtea-web 2.0.0-SNAPSHOT"
+
+.SH NAME
+
+
+.PP
+policyeditor - view and modify security policy settings for 
+.B javaws 
+and the 
+.B browser plugin
+
+.SH SYNOPSIS
+
+
+.PP
+
+.B  policyeditor 
+.br
+.B policyeditor [-file] 
+policy_file
+.SH DESCRIPTION
+
+
+.PP
+
+.B policyeditor 
+is a GUI application with small command line support to view and edit applet security policy settings used by the IcedTea-Web implementation of
+.B  javaws 
+and the 
+.B  browser plugin. 
+It is intended as a simpler, easier to use, and more accessible alternative to the standard 
+.B  JDK Policy Tool. 
+Administrators and power users who need fine grained control over policy files should probably use Policy Tool instead of PolicyEditor.
+.br
+
+.br
+If executed without any arguments, no file is opened, and saving the file will result in a prompt on where to save it. Otherwise, if a file path is given as a command line argument, then that file path will be opened and parsed as policy file.
+
+.SH Missing Resource: manCommandLineOptions_en
+
+
+.PP
+.TP 12
+\-codebase url
+Specifies an applet codebase URL. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Exactly one argument expected)
+.TP 12
+\-defaultfile 
+Specifies that the default user-level policy file should be opened. This is the file which is normally used by IcedTea-Web to make decisions about custom policies and permissions for applets at runtime, unless configured otherwise.(No argument expected)
+.TP 12
+\-file policy_file
+Specifies a policy file path to open. If exactly one argument is given, and it is not this flag, it is interpreted as a file path to open, as if this flag was given first. This flag exists mostly for compatibility with Policy Tool.(Exactly one argument expected)
+.TP 12
+\-help 
+Prints out information about supported command and basic usage.(No argument expected)
+.TP 12
+\-principals class_name principal_name
+Specifies class name/principal name pairs (space-separated) for the policy entry identifier. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Expected even number of arguments with param=value as valid argument)
+.TP 12
+\-signedby certificate_alias
+Specifies a certificate alias for a certificate stored in the keystore. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Exactly one argument expected)
+.TP 12
+\-verbose 
+Enable verbose output.(No argument expected)
+
+.SH EXAMPLES
+
+
+.PP
+.TP 12
+policyeditor
+Show the GUI editor with no file opened.
+.TP 12
+policyeditor -file %XDG_CONFIG_HOME\icedtea-web\security\java.policy
+Show GUI and open the default policy file.
+
+.SH FILES
+
+
+.PP
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache
+Additional information about items in cache
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\java.policy
+Contains granted permissions for selected unsigned apps. Controlled by 
+.B deployment.user.security.policy
+
+
+.PP
+Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.
+.SH BUGS
+
+
+.PP
+There aren't any known bugs. If you come across one, please file it at:
+.br
+http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+.br
+https://github.com/AdoptOpenJDK/icedtea-web/issues
+.br
+
+.br
+Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.
+.br
+
+.SH AUTHOR
+
+
+.PP
+https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+.br
+
+.SH SEE ALSO
+
+
+.PP
+.BR icedtea-web (1)
+.BR javaws (1)
+.BR icedtea-web-plugin (1)
+.BR itweb-settings (1)
+.BR policyeditor (1)
+.BR policytool (1)
+.BR java (1)
+
+.br
+https://github.com/AdoptOpenJDK/icedtea-web
+.br
+https://github.com/AdoptOpenJDK/icedtea-web.git
+.br
+

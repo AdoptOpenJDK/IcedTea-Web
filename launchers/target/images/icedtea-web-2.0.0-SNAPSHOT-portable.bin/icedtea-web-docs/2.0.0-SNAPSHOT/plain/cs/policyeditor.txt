@@ -1,0 +1,68 @@
+  ***  icedtea-web 2.0.0-SNAPSHOT  ***  
+NÁZEV
+    policyeditor - zobrazení a úpravy nastavení bezpečnostních zásad pro javaws a zásuvný modul prohlížeče
+
+ANOTACE
+    policyeditor
+    policyeditor [-file] policy_file
+
+POPIS
+    policyeditor je grafická aplikace s omezenou podporou příkazové řádky sloužící ke zobrazení a úpravě nastavení bezpečnostních zásad apletů používaná
+    implementací rozhraní javaws používanou aplikací IcedTea-Web a zásuvným modulem prohlížeče. Jedná se o jednodušší, snáze použitelnou a přístupnější
+    alternativu ke standardnímu nástroji JDK Policy Tool. Správci a zkušení uživatelé, kteří potřebují dokonalou kontrolu nad soubory se zásadami by měli
+    raději použít nástroj Policy Tool než nástroj PolicyEditor.
+    
+    Pokud je příkaz spuštěn bez dalších argumentů, neotevře se žádný soubor. Při následném uložení souboru budete dotázání, kam se má soubor uložit. V opačném
+    případě pokud je cesta k souboru zadána jako argument v příkazové řádce, zadaná cesta bude použita jako soubor se zásadami.
+
+
+Chybějící zdroj: manCommandLineOptions_cs
+    -codebase url                         - Udává adresu URL základny kódu (codebase) apletu. Lze použít společně s volbami ostatních selektorů k výběru
+    existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se přesně jeden argument.)
+    -defaultfile                          - Deklaruje, že má být otevřen výchozí soubor se zásadami na úrovni uživatele. To je soubor, který je aplikací
+    IcedTea-Web obvykle používán k rozhodování o vlastních zásadách a oprávněních pro aplety (pokud neexistuje jiná konfigurace).(Neočekává se žádný argument.)
+    -file policy_file                     - Udává cestu k souboru se zásadami, který se má otevřít. Pokud je zadán přesně jeden argument, a nejedná se o tento
+    příznak, je interpretován jako cesta k souboru, který se má otevřít, jako kdyby byl tento příznak zadán první. Tento příznak existuje hlavně z důvodu
+    kompatibility s nástrojem Policy Tool.(Očekává se přesně jeden argument.)
+    -help                                 - Vypíše informace o podporovaných příkazech a základním použití.(Neočekává se žádný argument.)
+    -principals class_name principal_name - Udává název třídy / název objektu Principal (oddělené mezerou) pro identifikátor zásady. Lze použít společně s
+    volbami ostatních selektorů k výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se sudý počet
+    argumentů ve formátu parametr=hodnota.)
+    -signedby certificate_alias           - Udává zástupný název pro certifikát uložený v uložišti klíčů. Lze použít společně s volbami ostatních selektorů k
+    výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se přesně jeden argument.)
+    -verbose                              - Zapne podrobný výstup.(Neočekává se žádný argument.)
+
+PŘÍKLADY
+    policyeditor                                                         - Zobrazí grafický editor bez otevřeného souboru se zásadami.
+    policyeditor -file %XDG_CONFIG_HOME\icedtea-web\security\java.policy - Zobrazí grafické rozhraní a otevře výchozí soubor se zásadami.
+
+SOUBORY
+    %XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache - Další informace o položkách ve vyrovnávací paměti.
+    %XDG_CONFIG_HOME\icedtea-web\security\java.policy     - Obsahuje oprávnění udělená vybraným nepodepsaným aplikacím. Ovládáno pomocí
+    deployment.user.security.policy
+    Kde parametry $XDG_CONFIG_DIR, $XDG_CACHE_DIR a $XDG_RUNTIME_DIR jsou nastaveny na ~/.config, ~/.cache a /tmp nebo /var/tmp (pokud nejsou uživatelem
+    nastaveny jinak).
+
+CHYBY
+    Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:
+    http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+    https://github.com/AdoptOpenJDK/icedtea-web/issues
+    
+    Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu
+    „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.
+
+AUTOR
+    https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+
+VIZ TÉŽ
+    * icedtea-web
+    * javaws
+    * icedtea-web-plugin
+    * itweb-settings
+    * policyeditor
+    * policytool
+    * java
+    
+    https://github.com/AdoptOpenJDK/icedtea-web
+    https://github.com/AdoptOpenJDK/icedtea-web.git
+

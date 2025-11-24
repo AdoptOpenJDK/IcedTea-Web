@@ -1,0 +1,451 @@
+.TH itweb-settings 1 "24 Nov 2025" "icedtea-web 2.0.0-SNAPSHOT"
+
+.SH NAME
+
+
+.PP
+itweb-settings - view and modify settings for 
+.B javaws 
+and the 
+.B browser plugin
+
+.SH ÜBERSICHT
+
+
+.PP
+
+.B itweb-settings 
+.br
+.B itweb-settings 
+command arguments
+.SH BESCHREIBUNG
+
+
+.PP
+
+.B itweb-settings 
+is a command line and a GUI program to modify and edit settings used by the IcedTea-Web implementation of
+.B  javaws 
+and the 
+.B browser plugin
+.
+.br
+
+.br
+If executed without any arguments, it starts up a GUI. Otherwise, it tries to do what is specified in the argument.
+.br
+
+.br
+The command-line allows quickly searching, making a copy of and modifying specific settings without having to hunt through a UI.
+.SH BESCHREIBUNG
+
+
+.PP
+.TP 12
+\-check 
+Überprüft alle Einstellungen auf Gültigkeit der Werte.(Kein Parameter erwartet)
+.TP 12
+\-get name
+Zeigt den Wert der angegebenen Einstellungen an.(Ein oder mehrere Parameter erwartet)
+.TP 12
+\-headless 
+Deaktiviert Herunterladefenster und andere Benutzeroberflächen.(Kein Parameter erwartet)
+.TP 12
+\-help 
+Gibt Informationen über unterstützte Befehle und grundlegende Verwendung aus. Wird ein Befehl als Parameter angegeben, dann wird eine detaillierte Beschreibung des Befehls ausgegeben.(Kein Parameter erwartet)
+.TP 12
+\-info name
+Zeigt zusätzliche Informationen über die angegebenen Einstellungen an, inklusive einer Beschreibung des aktuellen Werts, der zulässigen Werte sowie des Ursprungs der Einstellung.(Ein oder mehrere Parameter erwartet)
+.TP 12
+\-list 
+Zeigt eine Liste aller IcedTea-Web Einstellungen und deren aktuelle Werte an.(Kein Parameter erwartet)
+.TP 12
+\-reset name
+Setzt die angegebenen Einstellungen auf ihren ursprünglichen Wert zurück.(Ein oder mehrere Parameter erwartet)
+.TP 12
+\-reset all
+Setzt alle Einstellungen auf ihre ursprünglichen Werte zurück.(Kein Parameter erwartet)
+.TP 12
+\-set name value
+Setzt die Einstellungen auf den neuen angegebenen Wert, vorausgesetzt der Wert ist zulässig.(Eine gerade Anzahl von Parametern mit „Parameter=Wert“ als gültigen Parameter erwartet)
+.TP 12
+\-verbose 
+Ausführliche Ausgabe aktivieren.(Kein Parameter erwartet)
+
+
+.SH BEISPIELE
+
+
+.PP
+.TP 12
+itweb-settings
+Show the GUI editor
+.TP 12
+itweb-settings  -reset deployment.proxy.type
+ Resets the value of `deployment.proxy.type` setting.
+
+.br
+
+.PP
+
+.B Known properties (key and default value):
+
+.br
+
+.PP
+.TP 12
+deployment.assumeFileSystemInCodebase
+false (Possible: sind true oder false)
+.TP 12
+deployment.browser.path
+null (Possible: Set path to browser or any command launching url. If not set, default browser is used. If default browser is not available, you will be be prompted to provide URL consumer. Eg: firefox, or (windows) rundll32 url.dll,FileProtocolHandler , microsoft-edge, (mac) safari, xdg-open (linux) like commands. In headless mode you can use wget, curl or lynx. It can be also javaws itself to launch other jnlp. You can set yor custom browser via deployment.browser.path property. $BROWSER environment variable is serving same purpose. You can use keyword INTERNAL-HTML to launch internal browser. But be warned, it is terrible. Use ALWAYS-ASK to enforce prompt each time instead of using defaults.)
+.TP 12
+deployment.cache.jarcompression
+0 (Possible: liegen im Bereich von 0 bis 10 (inklusive))
+.TP 12
+deployment.cache.max.size
+\-1 (Possible: liegen im Bereich von -1 bis 2.147.483.647 (inklusive))
+.TP 12
+deployment.cache.parallelDownloadCount
+6 (Possible: liegen im Bereich von 1 bis 24 (inklusive))
+.TP 12
+deployment.connection.connectTimeout
+10000 (Possible: liegen im Bereich von 0 bis 2.147.483.647 (inklusive))
+.TP 12
+deployment.connection.readTimeout
+10000 (Possible: liegen im Bereich von 0 bis 2.147.483.647 (inklusive))
+.TP 12
+deployment.console.startup.mode
+DISABLE (Possible: [DISABLE, HIDE, SHOW, SHOW_PLUGIN_ONLY, SHOW_JAVAWS_ONLY])
+.TP 12
+deployment.headless.ignore
+false (Possible: sind true oder false)
+.TP 12
+deployment.https.noenforce
+false (Possible: sind true oder false)
+.TP 12
+deployment.javapi.cache.enabled
+false (Possible: sind true oder false)
+.TP 12
+deployment.javaws.associations
+2 (Possible: liegen im Bereich von 0 bis 3 (inklusive))
+.TP 12
+deployment.javaws.autodownload
+false (Possible: sind true oder false)
+.TP 12
+deployment.javaws.installURL
+null (Possible: sind jede gültige URL (z.B. http://icedtea.classpath.org/hg/))
+.TP 12
+deployment.javaws.shortcut
+ASK_IF_HINTED (Possible: [ALWAYS, ALWAYS_IF_HINTED, ASK_USER, ASK_IF_HINTED, NEVER])
+.TP 12
+deployment.javaws.update.timeout
+500 (Possible: liegen im Bereich von 0 bis 10.000 (inklusive))
+.TP 12
+deployment.jnlpclassloader.strict
+true (Possible: sind true oder false)
+.TP 12
+deployment.jre.dir
+null
+.TP 12
+deployment.jvm.arguments.whitelist
+null
+.TP 12
+deployment.launcher.rust.bootcp.add
+null (Possible: Rust native launchers only! CP and XBootCP properties are space separated members of bootcp/cp to be removed or added. eg `...cp.add=/usr/java/rhino.jar /usr/java/scary.jar` will add those two jars to cp.  Eg: `...bootcp.remove=rhino.jar tagsoup.jar` will remove those two jars no meter of path. Removal is done first.)
+.TP 12
+deployment.launcher.rust.bootcp.remove
+ (Possible: Rust native launchers only! CP and XBootCP properties are space separated members of bootcp/cp to be removed or added. eg `...cp.add=/usr/java/rhino.jar /usr/java/scary.jar` will add those two jars to cp.  Eg: `...bootcp.remove=rhino.jar tagsoup.jar` will remove those two jars no meter of path. Removal is done first.)
+.TP 12
+deployment.launcher.rust.cp.add
+ (Possible: Rust native launchers only! CP and XBootCP properties are space separated members of bootcp/cp to be removed or added. eg `...cp.add=/usr/java/rhino.jar /usr/java/scary.jar` will add those two jars to cp.  Eg: `...bootcp.remove=rhino.jar tagsoup.jar` will remove those two jars no meter of path. Removal is done first.)
+.TP 12
+deployment.launcher.rust.cp.remove
+ (Possible: Rust native launchers only! CP and XBootCP properties are space separated members of bootcp/cp to be removed or added. eg `...cp.add=/usr/java/rhino.jar /usr/java/scary.jar` will add those two jars to cp.  Eg: `...bootcp.remove=rhino.jar tagsoup.jar` will remove those two jars no meter of path. Removal is done first.)
+.TP 12
+deployment.log
+false (Possible: sind true oder false)
+.TP 12
+deployment.log.console.clientapp
+false (Possible: sind true oder false)
+.TP 12
+deployment.log.file
+false (Possible: sind true oder false)
+.TP 12
+deployment.log.file.clientapp
+true (Possible: sind true oder false)
+.TP 12
+deployment.log.file.legacylog
+false (Possible: sind true oder false)
+.TP 12
+deployment.log.headers
+false (Possible: sind true oder false)
+.TP 12
+deployment.log.jnlpFileContent
+false (Possible: sind true oder false)
+.TP 12
+deployment.log.stdstreams
+true (Possible: sind true oder false)
+.TP 12
+deployment.log.system
+true (Possible: sind true oder false)
+.TP 12
+deployment.manifest.attributes.check
+ALL (Possible: (Values that can be used alone only): [ALL, NONE] (Values that can be used in combination separated by the delimiter "," with no space expected ): [ALAC, CODEBASE, ENTRYPOINT, PERMISSIONS, TRUSTED])
+.TP 12
+deployment.nosecurity
+false (Possible: sind true oder false)
+.TP 12
+deployment.plugin.jvm.arguments
+null
+.TP 12
+deployment.proxy.auto.config.url
+null (Possible: sind jede gültige URL (z.B. http://icedtea.classpath.org/hg/))
+.TP 12
+deployment.proxy.bypass.list
+null
+.TP 12
+deployment.proxy.bypass.local
+false (Possible: sind true oder false)
+.TP 12
+deployment.proxy.ftp.host
+null
+.TP 12
+deployment.proxy.ftp.port
+null (Possible: liegen im Bereich von 0 bis 65.535 (inklusive))
+.TP 12
+deployment.proxy.http.host
+null
+.TP 12
+deployment.proxy.http.port
+null (Possible: liegen im Bereich von 0 bis 65.535 (inklusive))
+.TP 12
+deployment.proxy.https.host
+null
+.TP 12
+deployment.proxy.https.port
+null (Possible: liegen im Bereich von 0 bis 65.535 (inklusive))
+.TP 12
+deployment.proxy.override.hosts
+null
+.TP 12
+deployment.proxy.same
+false (Possible: sind true oder false)
+.TP 12
+deployment.proxy.socks.host
+null
+.TP 12
+deployment.proxy.socks.port
+null (Possible: liegen im Bereich von 0 bis 65.535 (inklusive))
+.TP 12
+deployment.proxy.type
+4 (Possible: liegen im Bereich von -1 bis 4 (inklusive))
+.TP 12
+deployment.security.askgrantdialog.notinca
+true (Possible: sind true oder false)
+.TP 12
+deployment.security.askgrantdialog.show
+true (Possible: sind true oder false)
+.TP 12
+deployment.security.expired.warning
+true (Possible: sind true oder false)
+.TP 12
+deployment.security.itw.disablerestrictedfiles
+false (Possible: sind true oder false)
+.TP 12
+deployment.security.itw.ignorecertissues
+false (Possible: sind true oder false)
+.TP 12
+deployment.security.jsse.hostmismatch.warning
+true (Possible: sind true oder false)
+.TP 12
+deployment.security.level
+null (Possible: DENY_ALL DENY_UNSIGNED ASK_UNSIGNED ALLOW_UNSIGNED)
+.TP 12
+deployment.security.notinca.warning
+true (Possible: sind true oder false)
+.TP 12
+deployment.security.sandbox.awtwarningwindow
+true (Possible: sind true oder false)
+.TP 12
+deployment.security.sandbox.jnlp.enhanced
+true (Possible: sind true oder false)
+.TP 12
+deployment.security.trusted.policy
+null (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.security.whitelist
+null
+.TP 12
+deployment.small.size.override.height
+600 (Possible: liegen im Bereich von -9.999 bis 9.999 (inklusive))
+.TP 12
+deployment.small.size.override.width
+800 (Possible: liegen im Bereich von -9.999 bis 9.999 (inklusive))
+.TP 12
+deployment.small.size.threshold
+10 (Possible: liegen im Bereich von 0 bis 1.000 (inklusive))
+.TP 12
+deployment.system.cachedir
+null (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.system.config
+null (Possible: sind jede gültige URL (z.B. http://icedtea.classpath.org/hg/))
+.TP 12
+deployment.system.config.mandatory
+false (Possible: sind true oder false)
+.TP 12
+deployment.system.security.cacerts
+%JAVA_HOME\lib\security\cacerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.system.security.jssecacerts
+%JAVA_HOME\lib\security\jssecacerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.system.security.policy
+null (Possible: sind jede gültige URL (z.B. http://icedtea.classpath.org/hg/))
+.TP 12
+deployment.system.security.trusted.certs
+%JAVA_HOME\lib\security\trusted.certs (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.system.security.trusted.clientautcerts
+%JAVA_HOME\lib\security\trusted.clientcerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.system.security.trusted.jssecerts
+%JAVA_HOME\lib\security\trusted.jssecerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.cachedir
+%XDG_CACHE_HOME\icedtea-web\cache (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.locksdir
+%TMP\%USER\netx\locks (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.logdir
+%XDG_CONFIG_HOME\icedtea-web\log (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.pcachedir
+%XDG_CACHE_HOME\icedtea-web\pcache (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.runningfile
+%TMP\%USER\netx\locks\netx_running (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.security.policy
+%XDG_CONFIG_HOME\icedtea-web\security\java.policy (Possible: sind jede gültige URL (z.B. http://icedtea.classpath.org/hg/))
+.TP 12
+deployment.user.security.policy.check
+true (Possible: sind true oder false)
+.TP 12
+deployment.user.security.trusted.cacerts
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.cacerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.security.trusted.certs
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.certs (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.security.trusted.clientauthcerts
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.clientcerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.security.trusted.jssecacerts
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecacerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.security.trusted.jssecerts
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecerts (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+.TP 12
+deployment.user.tmp
+%XDG_CACHE_HOME\icedtea-web\tmp (Possible: sind ein absoluter Pfad zu einer Datei oder einem Verzeichnis)
+
+.SH DATEIEN
+
+
+.PP
+.TP 12
+%JAVA_HOME\lib\deployment.config
+JVM-global deployment properties file. May be affected by deployment.jre.dir.
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache
+Contains cached runtime entries. Gesteuert durch 
+.B deployment.user.cachedir
+
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache
+Additional information about items in cache
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\pcache
+Contains saved application data. Gesteuert durch 
+.B deployment.user.pcachedir
+
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\tmp
+Contains temporary runtime files. Gesteuert durch 
+.B deployment.user.tmp
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\.appletTrustSettings
+File responsible for various actions on applets and apps based on their codebase based on users actions.
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\deployment.properties
+Users main deployment properties file.
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\generated_jnlps
+Location where jnlp files generated from html pages for javaws applications desktop/menu launchers icons are stored
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\icons
+Location where icons of javaws applications desktop/menu launchers icons are stored
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\log
+contains file-log files (if enabled), itw-cplugin-date_time.log for native part of plugin, itw-javantx-date_time.log for everything else. Gesteuert durch 
+.B deployment.user.logdir
+
+.TP 12
+%XDG_DATA_HOME\applications\javaws
+Subdirectory in users menus space, for placing custom menu shortcuts.
+.TP 12
+{%WINDIR\Sun\Java or \etc\.java}\deployment\.appletTrustSettings
+File responsible for various actions on applets and apps based on their codebase based on admins actions.
+.TP 12
+{%WINDIR\Sun\Java or \etc\.java}\deployment\deployment.config
+Global deployment config file.
+.TP 12
+{%WINDIR\Sun\Java or \etc\.java}\deployment\itw-deployment.config
+Global deployment config file.
+
+.PP
+Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.
+.SH FEHLER
+
+
+.PP
+There aren't any known bugs. If you come across one, please file it at:
+.br
+http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+.br
+https://github.com/AdoptOpenJDK/icedtea-web/issues
+.br
+
+.br
+Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.
+.br
+
+.SH AUTOR
+
+
+.PP
+https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+.br
+
+.SH SIEHE AUCH
+
+
+.PP
+.BR icedtea-web (1)
+.BR javaws (1)
+.BR icedtea-web-plugin (1)
+.BR itweb-settings (1)
+.BR policyeditor (1)
+.BR policytool (1)
+.BR java (1)
+
+.br
+https://github.com/AdoptOpenJDK/icedtea-web
+.br
+https://github.com/AdoptOpenJDK/icedtea-web.git
+.br
+

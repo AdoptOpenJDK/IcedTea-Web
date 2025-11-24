@@ -1,0 +1,300 @@
+.TH javaws 1 "24 lis 2025" "icedtea-web 2.0.0-SNAPSHOT"
+
+.SH NAME
+
+
+.PP
+javaws - a Web Start client
+.SH SYNOPSIS
+
+
+.PP
+
+.B  javaws 
+javaws [-opcje-uruchomienia] <plik jnlp>
+.br
+.B javaws 
+javaws [-opcje-sterowania]
+.SH DESCRIPTION
+
+
+.PP
+
+.B javaws 
+is an implementation of a JNLP client. It uses a JNLP file to securely run a remote application or an applet. This implementation of 
+.B javaws 
+is from the IcedTea project and is based on the NetX project.
+.br
+
+.br
+A JNLP file is an xml file that describes how to securely run a remote application or an applet.
+
+.SH Brak zasobu: manCommandLineOptions_pl
+
+
+.PP
+When specifying options, the name of the jnlp file can be after the command, the -jnlp option, an option with no arguments, or after an argument with an option that takes one argument. A html file that launches a jnlp can be specified after the -html option.
+.br
+The jnlp-file can either be a url or a local path.
+.br
+The JNLP file should only be specified once, whether as a main argument, after -jnlp or through an html file.
+.PP
+
+.B Control options:
+
+.br
+.TP 12
+\-about 
+Pokazuje aplikację przykładową(No argument expected)
+.TP 12
+\-help 
+Wyświetl ten komunikat i zakończ(No argument expected)
+.TP 12
+\-license 
+Wyświetl licencję GPL i zakończ(No argument expected)
+.TP 12
+\-viewer 
+Pokazuje podgląd zaufanych certyfikatów(No argument expected)
+.TP 12
+\-Xcacheids 
+List available IDs in cache, which you can use to delete individual applications.(Expected none or one argument)
+.TP 12
+\-Xclearcache 
+Wyczyść pamięć podręczną aplikacji JNLP(Expected none or one argument)
+
+.PP
+
+.B Run options:
+
+.br
+.TP 12
+\-allowredirect 
+Idzie za przekierowaniami HTTP(No argument expected)
+.TP 12
+\-arg arg
+Do wiesza argument aplikacji przed wystartowaniem(Expected one or more arguments)
+.TP 12
+\-browser 
+Launch embedded browser. Use in great need only!(Expected one or more arguments)
+.TP 12
+\-headless 
+Wyłącza okno pobierania i inne interfejsy graficzne(No argument expected)
+.TP 12
+\-jnlp 
+Lokalizacja pliku JNLP do wystartowania (URL lub plik)(Exactly one argument expected)
+.TP 12
+\-nosecurity 
+Wyłącza bezpieczne środowisko uruchomieniowe(No argument expected)
+.TP 12
+\-noupdate 
+Wyłącza sprawdzanie dostępności aktualizacji(No argument expected)
+.TP 12
+\-param name=value
+Do wiesza parametr applet-u przed wystartowaniem(Expected one or more arguments)
+.TP 12
+\-property name=value
+Ustawia właściwość systemową przed wystartowaniem(Expected one or more arguments)
+.TP 12
+\-strict 
+Włącza ścisłe sprawdzanie format pliku JNLP(No argument expected)
+.TP 12
+\-update seconds
+Sprawdź dostępność aktualizacji(Exactly one argument expected)
+.TP 12
+\-verbose 
+Włącz rozmowne komunikaty(No argument expected)
+.TP 12
+\-version 
+Wyświetl wersję IcedTea-Web i zakończ(No argument expected)
+.TP 12
+\-Xignoreheaders 
+Pomijaj weryfikację nagłówków plików jar(No argument expected)
+.TP 12
+\-xml 
+Stosuje ścisły analizator składniowy XML do analizy pliku JNLP(No argument expected)
+.TP 12
+\-Xnofork 
+Nie twórz następnej JVM(No argument expected)
+.TP 12
+\-Xnosplash 
+Do not show splash screen. (No argument expected)
+.TP 12
+\-Xoffline 
+Prevent ITW network connection. Only cache will be used. Application can still connect.(No argument expected)
+.TP 12
+\-Xtrustnone 
+Instead of asking user, will answer all questions with no.(No argument expected)
+
+.SH EXAMPLES
+
+
+.PP
+.TP 12
+javaws -about
+Shows basic help and about informations.
+.TP 12
+javaws -about -headless
+Shows basic help and about informations in terminal only.
+.TP 12
+javaws  -Xnofork -Xignoreheaders -allowredirect -Xoffline http://mypage.web/dangerous.jnlp
+Will start dangerous.jnlp application, originally from mypage.web, without downloading it, without headers check and in forced single VM.
+
+.SH FILES
+
+
+.PP
+.TP 12
+%JAVA_HOME\lib\deployment.config
+JVM-global deployment properties file. May be affected by deployment.jre.dir.
+.TP 12
+%JAVA_HOME\lib\security\cacerts
+Contains  various system JVM-wide stored certificates. Controlled by 
+.B deployment.system.security.cacerts
+
+.TP 12
+%JAVA_HOME\lib\security\jssecacerts
+Contains  various system JVM-wide stored certificates. Controlled by 
+.B deployment.system.security.jssecacerts
+
+.TP 12
+%JAVA_HOME\lib\security\trusted.certs
+Contains  various system JVM-wide stored certificates. Controlled by 
+.B deployment.system.security.trusted.certs
+
+.TP 12
+%JAVA_HOME\lib\security\trusted.clientcerts
+Contains  various system JVM-wide stored certificates. Controlled by 
+.B deployment.system.security.trusted.clientautcerts
+
+.TP 12
+%JAVA_HOME\lib\security\trusted.jssecerts
+Contains  various system JVM-wide stored certificates. Controlled by 
+.B deployment.system.security.trusted.jssecerts
+
+.TP 12
+%TMP\%USER\netx\locks
+Location of netx locks. Controlled by 
+.B deployment.user.locksdir
+
+.TP 12
+%TMP\%USER\netx\locks\netx_running
+Location of netx main lock. Controlled by 
+.B deployment.user.runningfile
+
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache
+Contains cached runtime entries. Controlled by 
+.B deployment.user.cachedir
+
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache
+Additional information about items in cache
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\pcache
+Contains saved application data. Controlled by 
+.B deployment.user.pcachedir
+
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\tmp
+Contains temporary runtime files. Controlled by 
+.B deployment.user.tmp
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\.appletTrustSettings
+File responsible for various actions on applets and apps based on their codebase based on users actions.
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\deployment.properties
+Users main deployment properties file.
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\icons
+Location where icons of javaws applications desktop/menu launchers icons are stored
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\log
+contains file-log files (if enabled), itw-cplugin-date_time.log for native part of plugin, itw-javantx-date_time.log for everything else. Controlled by 
+.B deployment.user.logdir
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\java.policy
+Contains granted permissions for selected unsigned apps. Controlled by 
+.B deployment.user.security.policy
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.cacerts
+Contains  various users stored certificates. Controlled by 
+.B deployment.user.security.trusted.cacerts
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.certs
+Contains  various users stored certificates. Controlled by 
+.B deployment.user.security.trusted.certs
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.clientcerts
+Contains  various users stored certificates. Controlled by 
+.B deployment.user.security.trusted.clientauthcerts
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecacerts
+Contains  various users stored certificates. Controlled by 
+.B deployment.user.security.trusted.jssecacerts
+
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecerts
+Contains  various users stored certificates. Controlled by 
+.B deployment.user.security.trusted.jssecerts
+
+.TP 12
+%XDG_DATA_HOME\applications\javaws
+Subdirectory in users menus space, for placing custom menu shortcuts.
+.TP 12
+{%WINDIR\Sun\Java or \etc\.java}\deployment\.appletTrustSettings
+File responsible for various actions on applets and apps based on their codebase based on admins actions.
+.TP 12
+{%WINDIR\Sun\Java or \etc\.java}\deployment\deployment.config
+Global deployment config file.
+.TP 12
+{%WINDIR\Sun\Java or \etc\.java}\deployment\itw-deployment.config
+Global deployment config file.
+
+.PP
+Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.
+.SH BUGS
+
+
+.PP
+There aren't any known bugs. If you come across one, please file it at:
+.br
+http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+.br
+https://github.com/AdoptOpenJDK/icedtea-web/issues
+.br
+
+.br
+Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.
+.br
+
+.SH AUTHOR
+
+
+.PP
+https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+.br
+
+.SH SEE ALSO
+
+
+.PP
+.BR icedtea-web (1)
+.BR javaws (1)
+.BR icedtea-web-plugin (1)
+.BR itweb-settings (1)
+.BR policyeditor (1)
+.BR policytool (1)
+.BR java (1)
+
+.br
+https://github.com/AdoptOpenJDK/icedtea-web
+.br
+https://github.com/AdoptOpenJDK/icedtea-web.git
+.br
+

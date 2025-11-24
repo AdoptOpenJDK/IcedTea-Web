@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>javaws: 2.0.0-SNAPSHOT</title>    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+  </head>
+  <body>
+    <H5  align="right">javaws: 2.0.0-SNAPSHOT, 11/24/25 11:33 AM</H5>
+<center><img src="itw_logo.png" alt="IcedTea-Web Logo" width="413" height="240"/></center><BR/>
+
+<H4>Context</H4><li><a href="#AUTHOR">AUTHOR</a></li><li><a href="#BUGS">BUGS</a></li><li><a href="#CommandLineOptions">Missing Resource: manCommandLineOptions_en</a></li><li><a href="#DESCRIPTION">DESCRIPTION</a></li><li><a href="#EXAMPLES">EXAMPLES</a></li><li><a href="#FILES">FILES</a></li><li><a href="#NAME">NAME</a></li><li><a href="#SEE_ALSO">SEE ALSO</a></li><li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+ <a name="NAME"/><H3>NAME</H3>
+<p><blockquote>javaws - a Web Start client</blockquote></p>
+ <a name="SYNOPSIS"/><H3>SYNOPSIS</H3>
+<p><blockquote><B> javaws </B>[-run-options] jnlp file<BR/>
+<B>javaws </B>[-control-options]</blockquote></p>
+ <a name="DESCRIPTION"/><H3>DESCRIPTION</H3>
+<p><blockquote><B>javaws </B>is an implementation of a JNLP client. It uses a JNLP file to securely run a remote application or an applet. This implementation of <B>javaws </B>is from the IcedTea project and is based on the NetX project.<BR/>
+<BR/>
+A JNLP file is an xml file that describes how to securely run a remote application or an applet.</blockquote></p>
+
+ <a name="CommandLineOptions"/><H3>Missing Resource: manCommandLineOptions_en</H3>
+<p><blockquote>When specifying options, the name of the jnlp file can be after the command, the -jnlp option, an option with no arguments, or after an argument with an option that takes one argument. A html file that launches a jnlp can be specified after the -html option.<BR/>
+The jnlp-file can either be a url or a local path.<BR/>
+The JNLP file should only be specified once, whether as a main argument, after -jnlp or through an html file.</blockquote></p><p><blockquote><B>Control options:</B><BR/>
+<li><b>-about  </b> - Shows a sample application.(No argument expected)</li><li><b>-help  </b> - Prints out information about supported command and basic usage.(No argument expected)</li><li><b>-license  </b> - Display the GPL license and exit.(No argument expected)</li><li><b>-viewer  </b> - Shows the trusted certificate viewer.(No argument expected)</li><li><b>-Xcacheids  </b> - List available IDs in cache, which you can use to delete individual applications.(Expected none or one argument)</li><li><b>-Xclearcache  </b> - Clean the JNLP application cache. If you pass argument, only specified application is deleted.(Expected none or one argument)</li></blockquote></p><p><blockquote><B>Run options:</B><BR/>
+<li><b>-allowredirect  </b> - Follows HTTP redirects.(No argument expected)</li><li><b>-arg arg </b> - Adds an application argument before launching.(Expected one or more arguments)</li><li><b>-browser  </b> - Launch embedded browser. Use in great need only!(Expected one or more arguments)</li><li><b>-headless  </b> - Disables download window, other UIs.(No argument expected)</li><li><b>-jnlp  </b> - Location of JNLP file to launch (url or file).(Exactly one argument expected)</li><li><b>-nosecurity  </b> - Disables the secure runtime environment. You need also  deployment.security.itw.ignorecertissues to workaround corrupted signatures(No argument expected)</li><li><b>-noupdate  </b> - Disables checking for updates.(No argument expected)</li><li><b>-param name=value </b> - Adds an applet parameter before launching.(Expected one or more arguments)</li><li><b>-property name=value </b> - Sets a system property before launching.(Expected one or more arguments)</li><li><b>-strict  </b> - Enables strict checking of JNLP file format.(No argument expected)</li><li><b>-update seconds </b> - Check for updates.(Exactly one argument expected)</li><li><b>-verbose  </b> - Enable verbose output.(No argument expected)</li><li><b>-version  </b> - Print the IcedTea-Web version and exit.(No argument expected)</li><li><b>-Xignoreheaders  </b> - Skip jar header verification.(No argument expected)</li><li><b>-xml  </b> - Uses a strict XML parser to parse the JNLP file.(No argument expected)</li><li><b>-Xnofork  </b> - Do not create another JVM.(No argument expected)</li><li><b>-Xnosplash  </b> - Do not show splash screen. (No argument expected)</li><li><b>-Xoffline  </b> - Prevent ITW network connection. Only cache will be used. Application can still connect.(No argument expected)</li><li><b>-Xtrustnone  </b> - Instead of asking user, will answer all questions with no.(No argument expected)</li></blockquote></p>
+ <a name="EXAMPLES"/><H3>EXAMPLES</H3>
+<p><blockquote><li><b>javaws -about </b> - Shows basic help and about informations.</li><li><b>javaws -about -headless </b> - Shows basic help and about informations in terminal only.</li><li><b>javaws  -Xnofork -Xignoreheaders -allowredirect -Xoffline http://mypage.web/dangerous.jnlp </b> - Will start dangerous.jnlp application, originally from mypage.web, without downloading it, without headers check and in forced single VM.</li></blockquote></p>
+ <a name="FILES"/><H3>FILES</H3>
+<p><blockquote><li><b>%JAVA_HOME\lib\deployment.config </b> - JVM-global deployment properties file. May be affected by deployment.jre.dir.</li><li><b>%JAVA_HOME\lib\security\cacerts </b> - Contains  various system JVM-wide stored certificates. Controlled by <B>deployment.system.security.cacerts</B></li><li><b>%JAVA_HOME\lib\security\jssecacerts </b> - Contains  various system JVM-wide stored certificates. Controlled by <B>deployment.system.security.jssecacerts</B></li><li><b>%JAVA_HOME\lib\security\trusted.certs </b> - Contains  various system JVM-wide stored certificates. Controlled by <B>deployment.system.security.trusted.certs</B></li><li><b>%JAVA_HOME\lib\security\trusted.clientcerts </b> - Contains  various system JVM-wide stored certificates. Controlled by <B>deployment.system.security.trusted.clientautcerts</B></li><li><b>%JAVA_HOME\lib\security\trusted.jssecerts </b> - Contains  various system JVM-wide stored certificates. Controlled by <B>deployment.system.security.trusted.jssecerts</B></li><li><b>%TMP\%USER\netx\locks </b> - Location of netx locks. Controlled by <B>deployment.user.locksdir</B></li><li><b>%TMP\%USER\netx\locks\netx_running </b> - Location of netx main lock. Controlled by <B>deployment.user.runningfile</B></li><li><b>%XDG_CACHE_HOME\icedtea-web\cache </b> - Contains cached runtime entries. Controlled by <B>deployment.user.cachedir</B></li><li><b>%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache </b> - Additional information about items in cache</li><li><b>%XDG_CACHE_HOME\icedtea-web\pcache </b> - Contains saved application data. Controlled by <B>deployment.user.pcachedir</B></li><li><b>%XDG_CACHE_HOME\icedtea-web\tmp </b> - Contains temporary runtime files. Controlled by <B>deployment.user.tmp</B></li><li><b>%XDG_CONFIG_HOME\icedtea-web\.appletTrustSettings </b> - File responsible for various actions on applets and apps based on their codebase based on users actions.</li><li><b>%XDG_CONFIG_HOME\icedtea-web\deployment.properties </b> - Users main deployment properties file.</li><li><b>%XDG_CONFIG_HOME\icedtea-web\icons </b> - Location where icons of javaws applications desktop/menu launchers icons are stored</li><li><b>%XDG_CONFIG_HOME\icedtea-web\log </b> - contains file-log files (if enabled), itw-cplugin-date_time.log for native part of plugin, itw-javantx-date_time.log for everything else. Controlled by <B>deployment.user.logdir</B></li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\java.policy </b> - Contains granted permissions for selected unsigned apps. Controlled by <B>deployment.user.security.policy</B></li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\trusted.cacerts </b> - Contains  various users stored certificates. Controlled by <B>deployment.user.security.trusted.cacerts</B></li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\trusted.certs </b> - Contains  various users stored certificates. Controlled by <B>deployment.user.security.trusted.certs</B></li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\trusted.clientcerts </b> - Contains  various users stored certificates. Controlled by <B>deployment.user.security.trusted.clientauthcerts</B></li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecacerts </b> - Contains  various users stored certificates. Controlled by <B>deployment.user.security.trusted.jssecacerts</B></li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecerts </b> - Contains  various users stored certificates. Controlled by <B>deployment.user.security.trusted.jssecerts</B></li><li><b>%XDG_DATA_HOME\applications\javaws </b> - Subdirectory in users menus space, for placing custom menu shortcuts.</li><li><b>{%WINDIR\Sun\Java or \etc\.java}\deployment\.appletTrustSettings </b> - File responsible for various actions on applets and apps based on their codebase based on admins actions.</li><li><b>{%WINDIR\Sun\Java or \etc\.java}\deployment\deployment.config </b> - Global deployment config file.</li><li><b>{%WINDIR\Sun\Java or \etc\.java}\deployment\itw-deployment.config </b> - Global deployment config file.</li></blockquote></p><p><blockquote>Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.</blockquote></p>
+ <a name="BUGS"/><H3>BUGS</H3>
+<p><blockquote>There aren't any known bugs. If you come across one, please file it at:<BR/>
+<a href="http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs">http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web/issues">https://github.com/AdoptOpenJDK/icedtea-web/issues</a><BR/>
+<BR/>
+Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.<BR/>
+</blockquote></p>
+ <a name="AUTHOR"/><H3>AUTHOR</H3>
+<p><blockquote><a href="https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors">https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors</a><BR/>
+</blockquote></p>
+ <a name="SEE_ALSO"/><H3>SEE ALSO</H3>
+<p><blockquote><li><a href="icedtea-web.html">icedtea-web</a></li>
+<li><a href="javaws.html">javaws</a></li>
+<li><a href="icedtea-web-plugin.html">icedtea-web-plugin</a></li>
+<li><a href="itweb-settings.html">itweb-settings</a></li>
+<li><a href="policyeditor.html">policyeditor</a></li>
+<li><a href="policytool.html">policytool</a></li>
+<li><a href="java.html">java</a></li>
+<BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web">https://github.com/AdoptOpenJDK/icedtea-web</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web.git">https://github.com/AdoptOpenJDK/icedtea-web.git</a><BR/>
+</blockquote></p>
+  </body>
+</html>

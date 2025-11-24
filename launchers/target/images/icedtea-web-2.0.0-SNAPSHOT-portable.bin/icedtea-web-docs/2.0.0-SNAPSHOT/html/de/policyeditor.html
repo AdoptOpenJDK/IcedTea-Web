@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>policyeditor: 2.0.0-SNAPSHOT</title>    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+  </head>
+  <body>
+    <H5  align="right">policyeditor: 2.0.0-SNAPSHOT, 24.11.25 11:33</H5>
+<center><img src="itw_logo.png" alt="IcedTea-Web Logo" width="413" height="240"/></center><BR/>
+
+<H4>Context</H4><li><a href="#AUTHOR">AUTOR</a></li><li><a href="#BUGS">FEHLER</a></li><li><a href="#CommandLineOptions">Fehlende Ressource: manCommandLineOptions_de</a></li><li><a href="#DESCRIPTION">BESCHREIBUNG</a></li><li><a href="#EXAMPLES">BEISPIELE</a></li><li><a href="#FILES">DATEIEN</a></li><li><a href="#NAME">NAME</a></li><li><a href="#SEE_ALSO">SIEHE AUCH</a></li><li><a href="#SYNOPSIS">ÜBERSICHT</a></li>
+ <a name="NAME"/><H3>NAME</H3>
+<p><blockquote>policyeditor  — Einstellungen der Sicherheitsrichtlinie für<B> javaws </B>und das<B> Browser Plug-in </B>anzeigen und bearbeiten</blockquote></p>
+ <a name="SYNOPSIS"/><H3>ÜBERSICHT</H3>
+<p><blockquote><B> policyeditor </B><BR/>
+<B>policyeditor [-file] </B>Richtliniendatei</blockquote></p>
+ <a name="DESCRIPTION"/><H3>BESCHREIBUNG</H3>
+<p><blockquote><B>policyeditor </B>ist eine Anwendung mit grafischer Benutzeroberfläche sowie ein wenig Kommandozeilenunterstützung. Die Anwendung ermöglicht die Anzeige und Bearbeitung von Sicherheitsrichtlinieneinstellungen für Applets, die durch die Implementierungen von<B> javaws </B> und des<B> Browser Plug-ins </B> in IcedTea-Web verwendet werden. Sie ist als eine vereinfachte und leichter zu nutzende Alternative zum<B> JDK Policy Tool </B>gedacht. Administratoren und fortgeschrittene Benutzer, die eine fein granulare Kontrolle über Richtliniendateien brauchen, sollten das<B> policytool </B> statt des<B> PolicyEditor </B> verwenden.<BR/>
+<BR/>
+Werden keine Parameter bei der Ausführung angegeben, so wird keine Datei geöffnet, und eine Aufforderung zur Angabe des Speicherortes erscheint. Wird ansonsten ein Dateipfad als Parameter an der Kommandozeile angegeben, so wird der Dateipfad geöffnet und als eine Richtliniendatei verarbeitet.</blockquote></p>
+
+ <a name="CommandLineOptions"/><H3>Fehlende Ressource: manCommandLineOptions_de</H3>
+<p><blockquote><li><b>-codebase url </b> - Gibt die Codebasis-URL eines Applets an. Falls die angegebene Codebasis in der Richtliniendatei bereits existiert, wird diese im geöffneten Editor markiert. Falls die Codebasis neu ist, wird diese zur Richtliniendatei hinzugefügt und im geöffneten Editor markiert. An die Option „-codebase“ können auch mehrere, durch Leerzeichen getrennte URLs übergeben werden. In diesem Fall werden alle Codebasen zur Richtliniendatei hinzugefügt und die letzte im geöffneten Editor markiert. Ausschließlich die erste in der Kommandozeile vorkommende Option „-codebase“ wird verarbeitet.(Genau ein Parameter erwartet)</li><li><b>-defaultfile  </b> - Specifies that the default user-level policy file should be opened. This is the file which is normally used by IcedTea-Web to make decisions about custom policies and permissions for applets at runtime, unless configured otherwise.(Kein Parameter erwartet)</li><li><b>-file policy_file </b> - Gibt den Pfad der zu öffnenden Richtliniendatei an. Falls genau ein Parameter übergeben wird, der nicht diese Option ist, wird er als ein zu öffnender Dateipfad interpretiert, so als ob diese Option als erste angegeben werden wäre. Diese Option ist hauptsächlich aus Kompatibilitätsgründen zum Richtlinieneditor <B> policytool </B> verfügbar, wird aber auch zum Öffnen einer Richtliniendatei sowie mit der Option „-codebase“ verwendet.(Genau ein Parameter erwartet)</li><li><b>-help  </b> - Gibt Informationen über unterstützte Befehle und grundlegende Verwendung aus.(Kein Parameter erwartet)</li><li><b>-principals class_name principal_name </b> - Specifies class name/principal name pairs (space-separated) for the policy entry identifier. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Eine gerade Anzahl von Parametern mit „Parameter=Wert“ als gültigen Parameter erwartet)</li><li><b>-signedby certificate_alias </b> - Specifies a certificate alias for a certificate stored in the keystore. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Genau ein Parameter erwartet)</li><li><b>-verbose  </b> - Ausführliche Ausgabe aktivieren.(Kein Parameter erwartet)</li></blockquote></p>
+ <a name="EXAMPLES"/><H3>BEISPIELE</H3>
+<p><blockquote><li><b>policyeditor </b> - Zeigt den GUI-Editor ohne eine geöffnete Datei an.</li><li><b>policyeditor -file %XDG_CONFIG_HOME\icedtea-web\security\java.policy </b> - Zeigt den GUI-Editor mit der geöffneten Standardrichtliniendatei an.</li></blockquote></p>
+ <a name="FILES"/><H3>DATEIEN</H3>
+<p><blockquote><li><b>%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache </b> - Additional information about items in cache</li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\java.policy </b> - Contains granted permissions for selected unsigned apps. Gesteuert durch <B>deployment.user.security.policy</B></li></blockquote></p><p><blockquote>Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.</blockquote></p>
+ <a name="BUGS"/><H3>FEHLER</H3>
+<p><blockquote>There aren't any known bugs. If you come across one, please file it at:<BR/>
+<a href="http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs">http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web/issues">https://github.com/AdoptOpenJDK/icedtea-web/issues</a><BR/>
+<BR/>
+Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.<BR/>
+</blockquote></p>
+ <a name="AUTHOR"/><H3>AUTOR</H3>
+<p><blockquote><a href="https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors">https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors</a><BR/>
+</blockquote></p>
+ <a name="SEE_ALSO"/><H3>SIEHE AUCH</H3>
+<p><blockquote><li><a href="icedtea-web.html">icedtea-web</a></li>
+<li><a href="javaws.html">javaws</a></li>
+<li><a href="icedtea-web-plugin.html">icedtea-web-plugin</a></li>
+<li><a href="itweb-settings.html">itweb-settings</a></li>
+<li><a href="policyeditor.html">policyeditor</a></li>
+<li><a href="policytool.html">policytool</a></li>
+<li><a href="java.html">java</a></li>
+<BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web">https://github.com/AdoptOpenJDK/icedtea-web</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web.git">https://github.com/AdoptOpenJDK/icedtea-web.git</a><BR/>
+</blockquote></p>
+  </body>
+</html>

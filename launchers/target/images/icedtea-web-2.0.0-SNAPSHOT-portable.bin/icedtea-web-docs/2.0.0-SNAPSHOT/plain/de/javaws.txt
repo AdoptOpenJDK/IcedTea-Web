@@ -1,0 +1,121 @@
+  ***  icedtea-web 2.0.0-SNAPSHOT  ***  
+NAME
+    javaws  — ein Web Start Client
+
+ÜBERSICHT
+    javaws javaws [-Ausführungsoptionen] <JNLP-Datei>
+    javaws javaws [-Steuerungsoptionen]
+
+BESCHREIBUNG
+    javaws ist eine Implementierung eines JNLP-Klients. Sie verwendet eine JNLP-Datei um eine Anwendung oder ein Applet sicher auszuführen. Diese
+    Implementierung von javaws  basiert auf dem NetX Projekt und wird durch das IcedTea Projekt vertrieben.
+    
+    Eine JNLP-Datei ist eine XML-Datei mit einer Beschreibung zur sicheren Ausführung einer Anwendung oder eines Applets.
+
+
+Fehlende Ressource: manCommandLineOptions_de
+    Bei der Angabe von Optionen muss der Name der JNLP-Datei als letzter Parameter an javaws übergeben werden. Alle Optionen müssen ihm vorausgehen.
+    Die JNLP-Datei kann entweder eine URL oder ein lokaler Pfad sein.
+    The JNLP file should only be specified once, whether as a main argument, after -jnlp or through an html file.
+    Steuerungsoptionen:
+    -about               - Zeigt eine Beispielanwendung.(Kein Parameter erwartet)
+    -help                - Gibt Informationen über unterstützte Befehle und grundlegende Verwendung aus.(Kein Parameter erwartet)
+    -license             - Die GPL Lizenz zeigen und beenden.(Kein Parameter erwartet)
+    -viewer              - Zeigt die Ansicht der vertrauenswürdigen Zertifikate.(Kein Parameter erwartet)
+    -Xcacheids           - List available IDs in cache, which you can use to delete individual applications.(Expected none or one argument)
+    -Xclearcache         - Den JNLP-Anwendungszwischenspeicher säubern.(Expected none or one argument)
+    Ausführungsoptionen:
+    -allowredirect       - Folgt HTTP-Umlenkungen.(Kein Parameter erwartet)
+    -arg arg             - Fügt einen Anwendungsparameter vor dem Start hinzu.(Ein oder mehrere Parameter erwartet)
+    -browser             - Launch embedded browser. Use in great need only!(Ein oder mehrere Parameter erwartet)
+    -headless            - Deaktiviert Herunterladefenster und andere Benutzeroberflächen.(Kein Parameter erwartet)
+    -jnlp                - Ort der zu startenden JNLP-Datei (URL oder Datei).(Genau ein Parameter erwartet)
+    -nosecurity          - Deaktiviert die sichere Laufzeitumgebung.(Kein Parameter erwartet)
+    -noupdate            - Deaktiviert die Prüfung nach Aktualisierungen.(Kein Parameter erwartet)
+    -param name=value    - Fügt einen Appletparameter vor dem Start hinzu.(Ein oder mehrere Parameter erwartet)
+    -property name=value - Setzt eine Systemeigenschaft vor dem Start.(Ein oder mehrere Parameter erwartet)
+    -strict              - Aktiviert die strikte Prüfung des JNLP-Dateiformats.(Kein Parameter erwartet)
+    -update seconds      - Prüfe auf Aktualisierungen.(Genau ein Parameter erwartet)
+    -verbose             - Ausführliche Ausgabe aktivieren.(Kein Parameter erwartet)
+    -version             - Version von IcedTea-Web ausgeben und beenden.(Kein Parameter erwartet)
+    -Xignoreheaders      - Die Prüfung der Metadaten von JAR-Dateien auslassen.(Kein Parameter erwartet)
+    -xml                 - Verwendet einen strikten XML-Parser für die JNLP-Datei.(Kein Parameter erwartet)
+    -Xnofork             - Keine weitere JVM erstellen.(Kein Parameter erwartet)
+    -Xnosplash           - Zeigt kein SplashScreen an. (Kein Parameter erwartet)
+    -Xoffline            - Deaktiviert den Netzwerkzugriff von IcedTea-Web. Ausschließlich der Zwischenspeicher wird verwendet. Anwendungen können weiterhin
+    auf das Netzwerk zugreifen.(Kein Parameter erwartet)
+    -Xtrustnone          - Alle Benutzeraufforderungen werden mit „Nein“ beantwortet.(Kein Parameter erwartet)
+
+BEISPIELE
+    javaws -about                                                                              - Zeigt grundlegende Hilfehinweise und Versionsinformationen an.
+    javaws -about -headless                                                                    - Zeigt grundlegende Hilfehinweise und Versionsinformationen
+    ausschließlich im Terminal an.
+    javaws  -Xnofork -Xignoreheaders -allowredirect -Xoffline http://mypage.web/dangerous.jnlp - Startet die Anwendung „dangerous.jnlp“, ursprünglich aus
+    „mypage.web“, ohne sie herunterzuladen, ohne die Metadaten von JAR-Dateien zu prüfen sowie zwingend in einer einzigen VM.
+
+DATEIEN
+    %JAVA_HOME\lib\deployment.config                                  - JVM-global deployment properties file. May be affected by deployment.jre.dir.
+    %JAVA_HOME\lib\security\cacerts                                   - Contains  various system JVM-wide stored certificates. Gesteuert durch
+    deployment.system.security.cacerts
+    %JAVA_HOME\lib\security\jssecacerts                               - Contains  various system JVM-wide stored certificates. Gesteuert durch
+    deployment.system.security.jssecacerts
+    %JAVA_HOME\lib\security\trusted.certs                             - Contains  various system JVM-wide stored certificates. Gesteuert durch
+    deployment.system.security.trusted.certs
+    %JAVA_HOME\lib\security\trusted.clientcerts                       - Contains  various system JVM-wide stored certificates. Gesteuert durch
+    deployment.system.security.trusted.clientautcerts
+    %JAVA_HOME\lib\security\trusted.jssecerts                         - Contains  various system JVM-wide stored certificates. Gesteuert durch
+    deployment.system.security.trusted.jssecerts
+    %TMP\%USER\netx\locks                                             - Location of netx locks. Gesteuert durch deployment.user.locksdir
+    %TMP\%USER\netx\locks\netx_running                                - Location of netx main lock. Gesteuert durch deployment.user.runningfile
+    %XDG_CACHE_HOME\icedtea-web\cache                                 - Contains cached runtime entries. Gesteuert durch deployment.user.cachedir
+    %XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache             - Additional information about items in cache
+    %XDG_CACHE_HOME\icedtea-web\pcache                                - Contains saved application data. Gesteuert durch deployment.user.pcachedir
+    %XDG_CACHE_HOME\icedtea-web\tmp                                   - Contains temporary runtime files. Gesteuert durch deployment.user.tmp
+    %XDG_CONFIG_HOME\icedtea-web\.appletTrustSettings                 - File responsible for various actions on applets and apps based on their codebase based
+    on users actions.
+    %XDG_CONFIG_HOME\icedtea-web\deployment.properties                - Users main deployment properties file.
+    %XDG_CONFIG_HOME\icedtea-web\icons                                - Location where icons of javaws applications desktop/menu launchers icons are stored
+    %XDG_CONFIG_HOME\icedtea-web\log                                  - contains file-log files (if enabled), itw-cplugin-date_time.log for native part of
+    plugin, itw-javantx-date_time.log for everything else. Gesteuert durch deployment.user.logdir
+    %XDG_CONFIG_HOME\icedtea-web\security\java.policy                 - Contains granted permissions for selected unsigned apps. Gesteuert durch
+    deployment.user.security.policy
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.cacerts             - Contains  various users stored certificates. Gesteuert durch
+    deployment.user.security.trusted.cacerts
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.certs               - Contains  various users stored certificates. Gesteuert durch
+    deployment.user.security.trusted.certs
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.clientcerts         - Contains  various users stored certificates. Gesteuert durch
+    deployment.user.security.trusted.clientauthcerts
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecacerts         - Contains  various users stored certificates. Gesteuert durch
+    deployment.user.security.trusted.jssecacerts
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecerts           - Contains  various users stored certificates. Gesteuert durch
+    deployment.user.security.trusted.jssecerts
+    %XDG_DATA_HOME\applications\javaws                                - Subdirectory in users menus space, for placing custom menu shortcuts.
+    {%WINDIR\Sun\Java or \etc\.java}\deployment\.appletTrustSettings  - File responsible for various actions on applets and apps based on their codebase based
+    on admins actions.
+    {%WINDIR\Sun\Java or \etc\.java}\deployment\deployment.config     - Global deployment config file.
+    {%WINDIR\Sun\Java or \etc\.java}\deployment\itw-deployment.config - Global deployment config file.
+    Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.
+
+FEHLER
+    There aren't any known bugs. If you come across one, please file it at:
+    http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+    https://github.com/AdoptOpenJDK/icedtea-web/issues
+    
+    Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the
+    console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.
+
+AUTOR
+    https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+
+SIEHE AUCH
+    * icedtea-web
+    * javaws
+    * icedtea-web-plugin
+    * itweb-settings
+    * policyeditor
+    * policytool
+    * java
+    
+    https://github.com/AdoptOpenJDK/icedtea-web
+    https://github.com/AdoptOpenJDK/icedtea-web.git
+

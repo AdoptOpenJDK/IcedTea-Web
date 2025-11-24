@@ -9,3 +9,4 @@
 
 launchers/build.log
 launchers/rust-launcher/Cargo.lock
+!launchers/target/images/**

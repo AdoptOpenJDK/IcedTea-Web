@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>icedtea-web-plugin: 2.0.0-SNAPSHOT</title>    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+  </head>
+  <body>
+    <H5  align="right">icedtea-web-plugin: 2.0.0-SNAPSHOT, 24.11.25 11:33</H5>
+<center><img src="itw_logo.png" alt="IcedTea-Web Logo" width="413" height="240"/></center><BR/>
+
+<H4>Context</H4><li><a href="#AUTHOR">AUTOR</a></li><li><a href="#BUGS">CHYBY</a></li><li><a href="#FILES">SOUBORY</a></li><li><a href="#NAME">NÁZEV</a></li><li><a href="#SEE_ALSO">VIZ TÉŽ</a></li><li><a href="#SYNOPSIS">ANOTACE</a></li>
+ <a name="NAME"/><H3>NÁZEV</H3>
+<p><blockquote>icedtea-web-plugin - umožnění spouštění <B>apletů Java</B> ve vašem oblíbeném <B>prohlížeči</B></blockquote></p>
+ <a name="SYNOPSIS"/><H3>ANOTACE</H3>
+<B>icedtea-web-plugin </B>funguje ve vašem prohlížeči (pokud ho do něj nainstalujete).<BR/>
+<p><blockquote>Soubor IcedTeaPlugin.so musí být umístěn v patřičných adresářích (nebo na něj z těchto adresářů musí vést odkaz). Viz <a href="http://icedtea.classpath.org/wiki/IcedTea-Web#Plugin">http://icedtea.classpath.org/wiki/IcedTea-Web#Plugin</a><BR/>
+<B> Prohlížeče kompatibilní s prohlížečem Mozilla</B>, jako například Firefox, Midori, Epiphany, Chrome nebo Chromium používají:<BR/>
+<li><b>%HOME\.mozilla/plugins </b> - Umístění knihovny zásuvného modulu na úrovni uživatele pro použití s prohlížeči založenými na projektu Mozilla.</li><li><b>\\usr\lib64\mozilla\plugins </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 64bitové systémy.</li><li><b>\\usr\lib\mozilla\plugins </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 32bitové systémy.</li></blockquote></p><p><blockquote><B> Prohlížeče od firmy Opera</B>, jako například Opera používají:<BR/>
+<li><b>\\usr\lib64\opera\plugins </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 64bitové systémy.</li><li><b>\\usr\lib\opera\plugins </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 32bitové systémy.</li></blockquote></p><p><blockquote>Všechny ochranné známky třetích stran jsou vlastnictvím jejich příslušných vlastníků.</blockquote></p>
+
+
+
+
+ <a name="FILES"/><H3>SOUBORY</H3>
+<p><blockquote><li><b>%HOME\.mozilla/plugins\IcedTeaPlugin.so </b> - Umístění knihovny zásuvného modulu na úrovni uživatele pro použití s prohlížeči založenými na projektu Mozilla.</li><li><b>%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache </b> - Další informace o položkách ve vyrovnávací paměti.</li><li><b>%XDG_CONFIG_HOME\icedtea-web\generated_jnlps </b> - Umístění, kde jsou uchovávány soubory jnlp generované ze stránek html pro aplikace javaws v případě spouštění pomocí zástupce na ploše / v místní nabídce.</li><li><b>\/usr/lib/mozilla/plugins/\IcedTeaPlugin.so </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 32bitové systémy.</li><li><b>\/usr/lib/opera/plugins/\IcedTeaPlugin.so </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 32bitové systémy.</li><li><b>\/usr/lib64/mozilla/plugins/\IcedTeaPlugin.so </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 64bitové systémy.</li><li><b>\/usr/lib64/opera/plugins/\IcedTeaPlugin.so </b> - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 64bitové systémy.</li></blockquote></p><p><blockquote>Kde parametry $XDG_CONFIG_DIR, $XDG_CACHE_DIR a $XDG_RUNTIME_DIR jsou nastaveny na ~/.config, ~/.cache a /tmp nebo /var/tmp (pokud nejsou uživatelem nastaveny jinak).</blockquote></p>
+ <a name="BUGS"/><H3>CHYBY</H3>
+<p><blockquote>Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:<BR/>
+<a href="http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs">http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web/issues">https://github.com/AdoptOpenJDK/icedtea-web/issues</a><BR/>
+<BR/>
+Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.<BR/>
+</blockquote></p>
+ <a name="AUTHOR"/><H3>AUTOR</H3>
+<p><blockquote><a href="https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors">https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors</a><BR/>
+</blockquote></p>
+ <a name="SEE_ALSO"/><H3>VIZ TÉŽ</H3>
+<p><blockquote><li><a href="icedtea-web.html">icedtea-web</a></li>
+<li><a href="javaws.html">javaws</a></li>
+<li><a href="icedtea-web-plugin.html">icedtea-web-plugin</a></li>
+<li><a href="itweb-settings.html">itweb-settings</a></li>
+<li><a href="policyeditor.html">policyeditor</a></li>
+<li><a href="policytool.html">policytool</a></li>
+<li><a href="java.html">java</a></li>
+<BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web">https://github.com/AdoptOpenJDK/icedtea-web</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web.git">https://github.com/AdoptOpenJDK/icedtea-web.git</a><BR/>
+</blockquote></p>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+.TH icedtea-web 1 "24 XI 2025" "icedtea-web 2.0.0-SNAPSHOT"
+
+.SH NÁZEV
+
+
+.PP
+
+.B icedtea-web 
+poskytuje svobodný zásuvný modul pro webový prohlížeč, který spouští aplety napsané v programovacím jazyce Java, a implementaci technologie Java Web Start, původně založené na projektu NetX.
+.br
+
+.br
+NetX umožňuje pro aplety a aplikace Java jejich stahování po síti, zapisování do vyrovnávací paměti a (ve výchozím stavu) spouštění v bezpečném izolovaném prostoru (sandbox). Následná spuštění apletu automaticky stáhnou nejnovější verzi. Nastavení aktualizací a zabezpečení lze nastavit (mimo jiné) pomocí příkazu itw-settings.
+.br
+icedtea-web také obsahuje zásuvný modul, který zapne aplety Java (http://www.java.com/en/download/testjava.jsp) ve webových prohlížečích.
+.br
+.TP 12
+
+Jména a e-mailové adresy přispěvatelů do projektu naleznete v souboru AUTHORS v kořenovém adresáři aplikace IcedTea-Web.
+.TP 12
+
+Kompletní licenční ujednání GPLv2 tohoto projektu naleznete v souboru COPYING v kořenovém adresáři aplikace IcedTea-Web.
+.TP 12
+
+Novinky o vydáních aplikací tohoto projektu naleznete v souboru NEWS v kořenovém adresáři aplikace IcedTea-Web.
+
+.br
+
+.br
+
+
+.SH POPIS
+
+
+.PP
+
+.B Hlavní vlastnosti NetX: 
+
+.br
+
+.PP
+.TP 12
+Modulární
+Můžete snadno dodávat aplikacím možnosti protokolu JNLP.
+.TP 12
+Šetří paměť
+Můžete spouštět programy ve sdílených prostředích JVM.
+.TP 12
+Rychlý start
+Urychlení startu aplikací spouštěním z vyrovnávací paměti.
+.TP 12
+Zabezpečení
+Všechny aplikace můžete spouštět v izolovaném prostoru a protokolovat jejich aktivity.
+.TP 12
+Automatické aktualizace
+Aplikace se můžou automaticky aktualizovat bez speciálního kódu.
+.TP 12
+Nasazení po síti
+Nasazujte aplikace přes internet, nikoliv pomocí instalátorů.
+.TP 12
+Otevřený zdrojový kód
+GNU Lesser General Public License.
+
+.br
+
+.br
+
+.PP
+Více informací naleznete na wiki projektu IcedTea (http://icedtea.classpath.org/wiki/Main_Page) nebo přímo na domovských stránkách IcedTea-Web – domovská stránka (http://icedtea.classpath.org/wiki/IcedTea-Web).
+.br
+Pomoc při řešení běžných potíží s aplikací IcedTea-Web najdete zde (http://icedtea.classpath.org/wiki/IcedTea-Web#Common_Issues).
+.br
+
+
+
+.PP
+
+.B Přispívání do projektu:  
+
+.br
+
+.PP
+Rychlá úvodní příručka (http://icedtea.classpath.org/wiki/DeveloperQuickStart) projektu IcedTea je dostupná na wiki.
+.PP
+Pokyny ke stylu zápisu kódu (http://icedtea.classpath.org/wiki/IcedTea-Web#Code_style) a instrukce pro nastavení vývojového prostředí Eclipse (http://icedtea.classpath.org/wiki/IcedTea-Web/DevelopingWithEclipse) pro IcedTea-Web jsou taktéž dostupné. Opravy doprovázejte testy jednotlivých částí (unit tests) a testy vnitřní integrace (http://icedtea.classpath.org/wiki/Reproducers), než je zašlete do mailing listu (http://mail.openjdk.java.net/mailman/listinfo/distro-pkg-dev).
+
+
+.SH CHYBY
+
+
+.PP
+Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:
+.br
+http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+.br
+https://github.com/AdoptOpenJDK/icedtea-web/issues
+.br
+
+.br
+Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.
+.br
+
+.SH AUTOR
+
+
+.PP
+https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+.br
+
+.SH VIZ TÉŽ
+
+
+.PP
+.BR icedtea-web (1)
+.BR javaws (1)
+.BR icedtea-web-plugin (1)
+.BR itweb-settings (1)
+.BR policyeditor (1)
+.BR policytool (1)
+.BR java (1)
+
+.br
+https://github.com/AdoptOpenJDK/icedtea-web
+.br
+https://github.com/AdoptOpenJDK/icedtea-web.git
+.br
+

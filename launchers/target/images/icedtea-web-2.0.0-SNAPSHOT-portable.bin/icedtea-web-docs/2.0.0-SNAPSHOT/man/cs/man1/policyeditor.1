@@ -1,0 +1,130 @@
+.TH policyeditor 1 "24 XI 2025" "icedtea-web 2.0.0-SNAPSHOT"
+
+.SH NÁZEV
+
+
+.PP
+policyeditor - zobrazení a úpravy nastavení bezpečnostních zásad pro 
+.B javaws
+ a 
+.B zásuvný modul prohlížeče
+
+.SH ANOTACE
+
+
+.PP
+
+.B  policyeditor 
+.br
+.B policyeditor [-file] 
+policy_file
+.SH POPIS
+
+
+.PP
+
+.B policyeditor 
+je grafická aplikace s omezenou podporou příkazové řádky sloužící ke zobrazení a úpravě nastavení bezpečnostních zásad apletů používaná implementací rozhraní 
+.B javaws
+ používanou aplikací IcedTea-Web a 
+.B zásuvným modulem prohlížeče. 
+Jedná se o jednodušší, snáze použitelnou a přístupnější alternativu ke standardnímu nástroji 
+.B JDK Policy Tool. 
+Správci a zkušení uživatelé, kteří potřebují dokonalou kontrolu nad soubory se zásadami by měli raději použít nástroj Policy Tool než nástroj PolicyEditor.
+.br
+
+.br
+Pokud je příkaz spuštěn bez dalších argumentů, neotevře se žádný soubor. Při následném uložení souboru budete dotázání, kam se má soubor uložit. V opačném případě pokud je cesta k souboru zadána jako argument v příkazové řádce, zadaná cesta bude použita jako soubor se zásadami.
+
+.SH Chybějící zdroj: manCommandLineOptions_cs
+
+
+.PP
+.TP 12
+\-codebase url
+Udává adresu URL základny kódu (codebase) apletu. Lze použít společně s volbami ostatních selektorů k výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se přesně jeden argument.)
+.TP 12
+\-defaultfile 
+Deklaruje, že má být otevřen výchozí soubor se zásadami na úrovni uživatele. To je soubor, který je aplikací IcedTea-Web obvykle používán k rozhodování o vlastních zásadách a oprávněních pro aplety (pokud neexistuje jiná konfigurace).(Neočekává se žádný argument.)
+.TP 12
+\-file policy_file
+Udává cestu k souboru se zásadami, který se má otevřít. Pokud je zadán přesně jeden argument, a nejedná se o tento příznak, je interpretován jako cesta k souboru, který se má otevřít, jako kdyby byl tento příznak zadán první. Tento příznak existuje hlavně z důvodu kompatibility s nástrojem Policy Tool.(Očekává se přesně jeden argument.)
+.TP 12
+\-help 
+Vypíše informace o podporovaných příkazech a základním použití.(Neočekává se žádný argument.)
+.TP 12
+\-principals class_name principal_name
+Udává název třídy / název objektu Principal (oddělené mezerou) pro identifikátor zásady. Lze použít společně s volbami ostatních selektorů k výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se sudý počet argumentů ve formátu parametr=hodnota.)
+.TP 12
+\-signedby certificate_alias
+Udává zástupný název pro certifikát uložený v uložišti klíčů. Lze použít společně s volbami ostatních selektorů k výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se přesně jeden argument.)
+.TP 12
+\-verbose 
+Zapne podrobný výstup.(Neočekává se žádný argument.)
+
+.SH PŘÍKLADY
+
+
+.PP
+.TP 12
+policyeditor
+Zobrazí grafický editor bez otevřeného souboru se zásadami.
+.TP 12
+policyeditor -file %XDG_CONFIG_HOME\icedtea-web\security\java.policy
+Zobrazí grafické rozhraní a otevře výchozí soubor se zásadami.
+
+.SH SOUBORY
+
+
+.PP
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache
+Další informace o položkách ve vyrovnávací paměti.
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\java.policy
+Obsahuje oprávnění udělená vybraným nepodepsaným aplikacím. Ovládáno pomocí 
+.B deployment.user.security.policy
+
+
+.PP
+Kde parametry $XDG_CONFIG_DIR, $XDG_CACHE_DIR a $XDG_RUNTIME_DIR jsou nastaveny na ~/.config, ~/.cache a /tmp nebo /var/tmp (pokud nejsou uživatelem nastaveny jinak).
+.SH CHYBY
+
+
+.PP
+Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:
+.br
+http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+.br
+https://github.com/AdoptOpenJDK/icedtea-web/issues
+.br
+
+.br
+Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.
+.br
+
+.SH AUTOR
+
+
+.PP
+https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+.br
+
+.SH VIZ TÉŽ
+
+
+.PP
+.BR icedtea-web (1)
+.BR javaws (1)
+.BR icedtea-web-plugin (1)
+.BR itweb-settings (1)
+.BR policyeditor (1)
+.BR policytool (1)
+.BR java (1)
+
+.br
+https://github.com/AdoptOpenJDK/icedtea-web
+.br
+https://github.com/AdoptOpenJDK/icedtea-web.git
+.br
+

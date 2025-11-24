@@ -1,0 +1,121 @@
+.TH icedtea-web-plugin 1 "24 XI 2025" "icedtea-web 2.0.0-SNAPSHOT"
+
+.SH NÁZEV
+
+
+.PP
+icedtea-web-plugin - umožnění spouštění 
+.B apletů Java
+ ve vašem oblíbeném 
+.B prohlížeči
+
+.SH ANOTACE
+
+
+.B icedtea-web-plugin 
+funguje ve vašem prohlížeči (pokud ho do něj nainstalujete).
+.br
+
+.PP
+Soubor IcedTeaPlugin.so musí být umístěn v patřičných adresářích (nebo na něj z těchto adresářů musí vést odkaz). Viz http://icedtea.classpath.org/wiki/IcedTea-Web#Plugin
+.br
+
+.B  Prohlížeče kompatibilní s prohlížečem Mozilla
+, jako například Firefox, Midori, Epiphany, Chrome nebo Chromium používají:
+.br
+.TP 12
+%HOME\.mozilla/plugins
+Umístění knihovny zásuvného modulu na úrovni uživatele pro použití s prohlížeči založenými na projektu Mozilla.
+.TP 12
+\\usr\lib64\mozilla\plugins
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 64bitové systémy.
+.TP 12
+\\usr\lib\mozilla\plugins
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 32bitové systémy.
+
+.PP
+
+.B  Prohlížeče od firmy Opera
+, jako například Opera používají:
+.br
+.TP 12
+\\usr\lib64\opera\plugins
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 64bitové systémy.
+.TP 12
+\\usr\lib\opera\plugins
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 32bitové systémy.
+
+.PP
+Všechny ochranné známky třetích stran jsou vlastnictvím jejich příslušných vlastníků.
+
+
+
+
+.SH SOUBORY
+
+
+.PP
+.TP 12
+%HOME\.mozilla/plugins\IcedTeaPlugin.so
+Umístění knihovny zásuvného modulu na úrovni uživatele pro použití s prohlížeči založenými na projektu Mozilla.
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache
+Další informace o položkách ve vyrovnávací paměti.
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\generated_jnlps
+Umístění, kde jsou uchovávány soubory jnlp generované ze stránek html pro aplikace javaws v případě spouštění pomocí zástupce na ploše / v místní nabídce.
+.TP 12
+\/usr/lib/mozilla/plugins/\IcedTeaPlugin.so
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 32bitové systémy.
+.TP 12
+\/usr/lib/opera/plugins/\IcedTeaPlugin.so
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 32bitové systémy.
+.TP 12
+\/usr/lib64/mozilla/plugins/\IcedTeaPlugin.so
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 64bitové systémy.
+.TP 12
+\/usr/lib64/opera/plugins/\IcedTeaPlugin.so
+Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 64bitové systémy.
+
+.PP
+Kde parametry $XDG_CONFIG_DIR, $XDG_CACHE_DIR a $XDG_RUNTIME_DIR jsou nastaveny na ~/.config, ~/.cache a /tmp nebo /var/tmp (pokud nejsou uživatelem nastaveny jinak).
+.SH CHYBY
+
+
+.PP
+Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:
+.br
+http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+.br
+https://github.com/AdoptOpenJDK/icedtea-web/issues
+.br
+
+.br
+Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.
+.br
+
+.SH AUTOR
+
+
+.PP
+https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+.br
+
+.SH VIZ TÉŽ
+
+
+.PP
+.BR icedtea-web (1)
+.BR javaws (1)
+.BR icedtea-web-plugin (1)
+.BR itweb-settings (1)
+.BR policyeditor (1)
+.BR policytool (1)
+.BR java (1)
+
+.br
+https://github.com/AdoptOpenJDK/icedtea-web
+.br
+https://github.com/AdoptOpenJDK/icedtea-web.git
+.br
+

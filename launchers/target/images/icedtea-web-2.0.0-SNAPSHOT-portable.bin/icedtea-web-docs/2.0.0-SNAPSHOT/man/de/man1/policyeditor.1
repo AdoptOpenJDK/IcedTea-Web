@@ -1,0 +1,136 @@
+.TH policyeditor 1 "24 Nov 2025" "icedtea-web 2.0.0-SNAPSHOT"
+
+.SH NAME
+
+
+.PP
+policyeditor  — Einstellungen der Sicherheitsrichtlinie für
+.B  javaws 
+und das
+.B  Browser Plug-in 
+anzeigen und bearbeiten
+.SH ÜBERSICHT
+
+
+.PP
+
+.B  policyeditor 
+.br
+.B policyeditor [-file] 
+Richtliniendatei
+.SH BESCHREIBUNG
+
+
+.PP
+
+.B policyeditor 
+ist eine Anwendung mit grafischer Benutzeroberfläche sowie ein wenig Kommandozeilenunterstützung. Die Anwendung ermöglicht die Anzeige und Bearbeitung von Sicherheitsrichtlinieneinstellungen für Applets, die durch die Implementierungen von
+.B  javaws 
+ und des
+.B  Browser Plug-ins 
+ in IcedTea-Web verwendet werden. Sie ist als eine vereinfachte und leichter zu nutzende Alternative zum
+.B  JDK Policy Tool 
+gedacht. Administratoren und fortgeschrittene Benutzer, die eine fein granulare Kontrolle über Richtliniendateien brauchen, sollten das
+.B  policytool 
+ statt des
+.B  PolicyEditor 
+ verwenden.
+.br
+
+.br
+Werden keine Parameter bei der Ausführung angegeben, so wird keine Datei geöffnet, und eine Aufforderung zur Angabe des Speicherortes erscheint. Wird ansonsten ein Dateipfad als Parameter an der Kommandozeile angegeben, so wird der Dateipfad geöffnet und als eine Richtliniendatei verarbeitet.
+
+.SH Fehlende Ressource: manCommandLineOptions_de
+
+
+.PP
+.TP 12
+\-codebase url
+Gibt die Codebasis-URL eines Applets an. Falls die angegebene Codebasis in der Richtliniendatei bereits existiert, wird diese im geöffneten Editor markiert. Falls die Codebasis neu ist, wird diese zur Richtliniendatei hinzugefügt und im geöffneten Editor markiert. An die Option „-codebase“ können auch mehrere, durch Leerzeichen getrennte URLs übergeben werden. In diesem Fall werden alle Codebasen zur Richtliniendatei hinzugefügt und die letzte im geöffneten Editor markiert. Ausschließlich die erste in der Kommandozeile vorkommende Option „-codebase“ wird verarbeitet.(Genau ein Parameter erwartet)
+.TP 12
+\-defaultfile 
+Specifies that the default user-level policy file should be opened. This is the file which is normally used by IcedTea-Web to make decisions about custom policies and permissions for applets at runtime, unless configured otherwise.(Kein Parameter erwartet)
+.TP 12
+\-file policy_file
+Gibt den Pfad der zu öffnenden Richtliniendatei an. Falls genau ein Parameter übergeben wird, der nicht diese Option ist, wird er als ein zu öffnender Dateipfad interpretiert, so als ob diese Option als erste angegeben werden wäre. Diese Option ist hauptsächlich aus Kompatibilitätsgründen zum Richtlinieneditor 
+.B  policytool 
+ verfügbar, wird aber auch zum Öffnen einer Richtliniendatei sowie mit der Option „-codebase“ verwendet.(Genau ein Parameter erwartet)
+.TP 12
+\-help 
+Gibt Informationen über unterstützte Befehle und grundlegende Verwendung aus.(Kein Parameter erwartet)
+.TP 12
+\-principals class_name principal_name
+Specifies class name/principal name pairs (space-separated) for the policy entry identifier. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Eine gerade Anzahl von Parametern mit „Parameter=Wert“ als gültigen Parameter erwartet)
+.TP 12
+\-signedby certificate_alias
+Specifies a certificate alias for a certificate stored in the keystore. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Genau ein Parameter erwartet)
+.TP 12
+\-verbose 
+Ausführliche Ausgabe aktivieren.(Kein Parameter erwartet)
+
+.SH BEISPIELE
+
+
+.PP
+.TP 12
+policyeditor
+Zeigt den GUI-Editor ohne eine geöffnete Datei an.
+.TP 12
+policyeditor -file %XDG_CONFIG_HOME\icedtea-web\security\java.policy
+Zeigt den GUI-Editor mit der geöffneten Standardrichtliniendatei an.
+
+.SH DATEIEN
+
+
+.PP
+.TP 12
+%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache
+Additional information about items in cache
+.TP 12
+%XDG_CONFIG_HOME\icedtea-web\security\java.policy
+Contains granted permissions for selected unsigned apps. Gesteuert durch 
+.B deployment.user.security.policy
+
+
+.PP
+Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.
+.SH FEHLER
+
+
+.PP
+There aren't any known bugs. If you come across one, please file it at:
+.br
+http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+.br
+https://github.com/AdoptOpenJDK/icedtea-web/issues
+.br
+
+.br
+Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.
+.br
+
+.SH AUTOR
+
+
+.PP
+https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+.br
+
+.SH SIEHE AUCH
+
+
+.PP
+.BR icedtea-web (1)
+.BR javaws (1)
+.BR icedtea-web-plugin (1)
+.BR itweb-settings (1)
+.BR policyeditor (1)
+.BR policytool (1)
+.BR java (1)
+
+.br
+https://github.com/AdoptOpenJDK/icedtea-web
+.br
+https://github.com/AdoptOpenJDK/icedtea-web.git
+.br
+

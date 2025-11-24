@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>policyeditor: 2.0.0-SNAPSHOT</title>    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+  </head>
+  <body>
+    <H5  align="right">policyeditor: 2.0.0-SNAPSHOT, 11/24/25 11:33 AM</H5>
+<center><img src="itw_logo.png" alt="IcedTea-Web Logo" width="413" height="240"/></center><BR/>
+
+<H4>Context</H4><li><a href="#AUTHOR">AUTHOR</a></li><li><a href="#BUGS">BUGS</a></li><li><a href="#CommandLineOptions">Missing Resource: manCommandLineOptions_en</a></li><li><a href="#DESCRIPTION">DESCRIPTION</a></li><li><a href="#EXAMPLES">EXAMPLES</a></li><li><a href="#FILES">FILES</a></li><li><a href="#NAME">NAME</a></li><li><a href="#SEE_ALSO">SEE ALSO</a></li><li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+ <a name="NAME"/><H3>NAME</H3>
+<p><blockquote>policyeditor - view and modify security policy settings for <B>javaws </B>and the <B>browser plugin</B></blockquote></p>
+ <a name="SYNOPSIS"/><H3>SYNOPSIS</H3>
+<p><blockquote><B> policyeditor </B><BR/>
+<B>policyeditor [-file] </B>policy_file</blockquote></p>
+ <a name="DESCRIPTION"/><H3>DESCRIPTION</H3>
+<p><blockquote><B>policyeditor </B>is a GUI application with small command line support to view and edit applet security policy settings used by the IcedTea-Web implementation of<B> javaws </B>and the <B> browser plugin. </B>It is intended as a simpler, easier to use, and more accessible alternative to the standard <B> JDK Policy Tool. </B>Administrators and power users who need fine grained control over policy files should probably use Policy Tool instead of PolicyEditor.<BR/>
+<BR/>
+If executed without any arguments, no file is opened, and saving the file will result in a prompt on where to save it. Otherwise, if a file path is given as a command line argument, then that file path will be opened and parsed as policy file.</blockquote></p>
+
+ <a name="CommandLineOptions"/><H3>Missing Resource: manCommandLineOptions_en</H3>
+<p><blockquote><li><b>-codebase url </b> - Specifies an applet codebase URL. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Exactly one argument expected)</li><li><b>-defaultfile  </b> - Specifies that the default user-level policy file should be opened. This is the file which is normally used by IcedTea-Web to make decisions about custom policies and permissions for applets at runtime, unless configured otherwise.(No argument expected)</li><li><b>-file policy_file </b> - Specifies a policy file path to open. If exactly one argument is given, and it is not this flag, it is interpreted as a file path to open, as if this flag was given first. This flag exists mostly for compatibility with Policy Tool.(Exactly one argument expected)</li><li><b>-help  </b> - Prints out information about supported command and basic usage.(No argument expected)</li><li><b>-principals class_name principal_name </b> - Specifies class name/principal name pairs (space-separated) for the policy entry identifier. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Expected even number of arguments with param=value as valid argument)</li><li><b>-signedby certificate_alias </b> - Specifies a certificate alias for a certificate stored in the keystore. This can be used with the other selector options to select a policy entry upon opening the editor; if no such identifier exists then it will be created and then selected.(Exactly one argument expected)</li><li><b>-verbose  </b> - Enable verbose output.(No argument expected)</li></blockquote></p>
+ <a name="EXAMPLES"/><H3>EXAMPLES</H3>
+<p><blockquote><li><b>policyeditor </b> - Show the GUI editor with no file opened.</li><li><b>policyeditor -file %XDG_CONFIG_HOME\icedtea-web\security\java.policy </b> - Show GUI and open the default policy file.</li></blockquote></p>
+ <a name="FILES"/><H3>FILES</H3>
+<p><blockquote><li><b>%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache </b> - Additional information about items in cache</li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\java.policy </b> - Contains granted permissions for selected unsigned apps. Controlled by <B>deployment.user.security.policy</B></li></blockquote></p><p><blockquote>Where $XDG_CONFIG_DIR, $XDG_CACHE_DIR and $XDG_RUNTIME_DIR are  set  as ~/.config, ~/.cache and /tmp or /var/tmp if not set.</blockquote></p>
+ <a name="BUGS"/><H3>BUGS</H3>
+<p><blockquote>There aren't any known bugs. If you come across one, please file it at:<BR/>
+<a href="http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs">http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web/issues">https://github.com/AdoptOpenJDK/icedtea-web/issues</a><BR/>
+<BR/>
+Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.<BR/>
+</blockquote></p>
+ <a name="AUTHOR"/><H3>AUTHOR</H3>
+<p><blockquote><a href="https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors">https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors</a><BR/>
+</blockquote></p>
+ <a name="SEE_ALSO"/><H3>SEE ALSO</H3>
+<p><blockquote><li><a href="icedtea-web.html">icedtea-web</a></li>
+<li><a href="javaws.html">javaws</a></li>
+<li><a href="icedtea-web-plugin.html">icedtea-web-plugin</a></li>
+<li><a href="itweb-settings.html">itweb-settings</a></li>
+<li><a href="policyeditor.html">policyeditor</a></li>
+<li><a href="policytool.html">policytool</a></li>
+<li><a href="java.html">java</a></li>
+<BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web">https://github.com/AdoptOpenJDK/icedtea-web</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web.git">https://github.com/AdoptOpenJDK/icedtea-web.git</a><BR/>
+</blockquote></p>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>policyeditor: 2.0.0-SNAPSHOT</title>    <meta http-equiv="content-type" content="application/xhtml+xml; charset=UTF-8" />
+  </head>
+  <body>
+    <H5  align="right">policyeditor: 2.0.0-SNAPSHOT, 24.11.25 11:33</H5>
+<center><img src="itw_logo.png" alt="IcedTea-Web Logo" width="413" height="240"/></center><BR/>
+
+<H4>Context</H4><li><a href="#AUTHOR">AUTOR</a></li><li><a href="#BUGS">CHYBY</a></li><li><a href="#CommandLineOptions">Chybějící zdroj: manCommandLineOptions_cs</a></li><li><a href="#DESCRIPTION">POPIS</a></li><li><a href="#EXAMPLES">PŘÍKLADY</a></li><li><a href="#FILES">SOUBORY</a></li><li><a href="#NAME">NÁZEV</a></li><li><a href="#SEE_ALSO">VIZ TÉŽ</a></li><li><a href="#SYNOPSIS">ANOTACE</a></li>
+ <a name="NAME"/><H3>NÁZEV</H3>
+<p><blockquote>policyeditor - zobrazení a úpravy nastavení bezpečnostních zásad pro <B>javaws</B> a <B>zásuvný modul prohlížeče</B></blockquote></p>
+ <a name="SYNOPSIS"/><H3>ANOTACE</H3>
+<p><blockquote><B> policyeditor </B><BR/>
+<B>policyeditor [-file] </B>policy_file</blockquote></p>
+ <a name="DESCRIPTION"/><H3>POPIS</H3>
+<p><blockquote><B>policyeditor </B>je grafická aplikace s omezenou podporou příkazové řádky sloužící ke zobrazení a úpravě nastavení bezpečnostních zásad apletů používaná implementací rozhraní <B>javaws</B> používanou aplikací IcedTea-Web a <B>zásuvným modulem prohlížeče. </B>Jedná se o jednodušší, snáze použitelnou a přístupnější alternativu ke standardnímu nástroji <B>JDK Policy Tool. </B>Správci a zkušení uživatelé, kteří potřebují dokonalou kontrolu nad soubory se zásadami by měli raději použít nástroj Policy Tool než nástroj PolicyEditor.<BR/>
+<BR/>
+Pokud je příkaz spuštěn bez dalších argumentů, neotevře se žádný soubor. Při následném uložení souboru budete dotázání, kam se má soubor uložit. V opačném případě pokud je cesta k souboru zadána jako argument v příkazové řádce, zadaná cesta bude použita jako soubor se zásadami.</blockquote></p>
+
+ <a name="CommandLineOptions"/><H3>Chybějící zdroj: manCommandLineOptions_cs</H3>
+<p><blockquote><li><b>-codebase url </b> - Udává adresu URL základny kódu (codebase) apletu. Lze použít společně s volbami ostatních selektorů k výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se přesně jeden argument.)</li><li><b>-defaultfile  </b> - Deklaruje, že má být otevřen výchozí soubor se zásadami na úrovni uživatele. To je soubor, který je aplikací IcedTea-Web obvykle používán k rozhodování o vlastních zásadách a oprávněních pro aplety (pokud neexistuje jiná konfigurace).(Neočekává se žádný argument.)</li><li><b>-file policy_file </b> - Udává cestu k souboru se zásadami, který se má otevřít. Pokud je zadán přesně jeden argument, a nejedná se o tento příznak, je interpretován jako cesta k souboru, který se má otevřít, jako kdyby byl tento příznak zadán první. Tento příznak existuje hlavně z důvodu kompatibility s nástrojem Policy Tool.(Očekává se přesně jeden argument.)</li><li><b>-help  </b> - Vypíše informace o podporovaných příkazech a základním použití.(Neočekává se žádný argument.)</li><li><b>-principals class_name principal_name </b> - Udává název třídy / název objektu Principal (oddělené mezerou) pro identifikátor zásady. Lze použít společně s volbami ostatních selektorů k výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se sudý počet argumentů ve formátu parametr=hodnota.)</li><li><b>-signedby certificate_alias </b> - Udává zástupný název pro certifikát uložený v uložišti klíčů. Lze použít společně s volbami ostatních selektorů k výběru existující zásady při otevření editoru. Pokud žádná neexistuje, bude vytvořena a vybrána.(Očekává se přesně jeden argument.)</li><li><b>-verbose  </b> - Zapne podrobný výstup.(Neočekává se žádný argument.)</li></blockquote></p>
+ <a name="EXAMPLES"/><H3>PŘÍKLADY</H3>
+<p><blockquote><li><b>policyeditor </b> - Zobrazí grafický editor bez otevřeného souboru se zásadami.</li><li><b>policyeditor -file %XDG_CONFIG_HOME\icedtea-web\security\java.policy </b> - Zobrazí grafické rozhraní a otevře výchozí soubor se zásadami.</li></blockquote></p>
+ <a name="FILES"/><H3>SOUBORY</H3>
+<p><blockquote><li><b>%XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache </b> - Další informace o položkách ve vyrovnávací paměti.</li><li><b>%XDG_CONFIG_HOME\icedtea-web\security\java.policy </b> - Obsahuje oprávnění udělená vybraným nepodepsaným aplikacím. Ovládáno pomocí <B>deployment.user.security.policy</B></li></blockquote></p><p><blockquote>Kde parametry $XDG_CONFIG_DIR, $XDG_CACHE_DIR a $XDG_RUNTIME_DIR jsou nastaveny na ~/.config, ~/.cache a /tmp nebo /var/tmp (pokud nejsou uživatelem nastaveny jinak).</blockquote></p>
+ <a name="BUGS"/><H3>CHYBY</H3>
+<p><blockquote>Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:<BR/>
+<a href="http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs">http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web/issues">https://github.com/AdoptOpenJDK/icedtea-web/issues</a><BR/>
+<BR/>
+Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.<BR/>
+</blockquote></p>
+ <a name="AUTHOR"/><H3>AUTOR</H3>
+<p><blockquote><a href="https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors">https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors</a><BR/>
+</blockquote></p>
+ <a name="SEE_ALSO"/><H3>VIZ TÉŽ</H3>
+<p><blockquote><li><a href="icedtea-web.html">icedtea-web</a></li>
+<li><a href="javaws.html">javaws</a></li>
+<li><a href="icedtea-web-plugin.html">icedtea-web-plugin</a></li>
+<li><a href="itweb-settings.html">itweb-settings</a></li>
+<li><a href="policyeditor.html">policyeditor</a></li>
+<li><a href="policytool.html">policytool</a></li>
+<li><a href="java.html">java</a></li>
+<BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web">https://github.com/AdoptOpenJDK/icedtea-web</a><BR/>
+<a href="https://github.com/AdoptOpenJDK/icedtea-web.git">https://github.com/AdoptOpenJDK/icedtea-web.git</a><BR/>
+</blockquote></p>
+  </body>
+</html>

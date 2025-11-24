@@ -1,0 +1,27 @@
+# -------------------------------------
+# IcedTea-Web jigsaw run args (jdk9+)
+# -------------------------------------
+
+--add-reads=java.base=ALL-UNNAMED,java.desktop
+--add-reads=java.desktop=ALL-UNNAMED,java.naming
+--add-reads=java.naming=ALL-UNNAMED,java.desktop
+
+--add-exports=java.desktop/sun.awt=ALL-UNNAMED,java.desktop
+--add-exports=java.desktop/javax.jnlp=ALL-UNNAMED,java.desktop
+
+--add-exports=java.base/com.sun.net.ssl.internal.ssl=ALL-UNNAMED,java.desktop
+--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED,java.desktop
+--add-exports=java.base/sun.security.action=ALL-UNNAMED,java.desktop
+--add-exports=java.base/sun.security.provider=ALL-UNNAMED,java.desktop
+--add-exports=java.base/sun.security.util=ALL-UNNAMED,java.desktop
+--add-exports=java.base/sun.security.validator=ALL-UNNAMED,java.desktop
+--add-exports=java.base/sun.security.x509=ALL-UNNAMED,java.desktop
+--add-exports=java.base/jdk.internal.util.jar=ALL-UNNAMED,java.desktop
+--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED,java.desktop
+
+--add-exports=java.desktop/sun.awt.X11=ALL-UNNAMED,java.desktop
+--add-exports=java.desktop/sun.applet=ALL-UNNAMED,java.desktop
+--add-exports=java.desktop/sun.applet=ALL-UNNAMED,jdk.jsobject
+
+--add-exports=java.naming/com.sun.jndi.toolkit.url=ALL-UNNAMED,java.desktop
+

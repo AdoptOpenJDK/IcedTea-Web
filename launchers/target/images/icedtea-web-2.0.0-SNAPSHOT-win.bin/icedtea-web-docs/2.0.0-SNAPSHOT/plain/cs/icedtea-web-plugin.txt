@@ -1,0 +1,63 @@
+  ***  icedtea-web 2.0.0-SNAPSHOT  ***  
+NÁZEV
+    icedtea-web-plugin - umožnění spouštění apletů Java ve vašem oblíbeném prohlížeči
+
+ANOTACE
+icedtea-web-plugin funguje ve vašem prohlížeči (pokud ho do něj nainstalujete).
+    Soubor IcedTeaPlugin.so musí být umístěn v patřičných adresářích (nebo na něj z těchto adresářů musí vést odkaz). Viz
+    http://icedtea.classpath.org/wiki/IcedTea-Web#Plugin
+    Prohlížeče kompatibilní s prohlížečem Mozilla, jako například Firefox, Midori, Epiphany, Chrome nebo Chromium používají:
+    %HOME\.mozilla/plugins      - Umístění knihovny zásuvného modulu na úrovni uživatele pro použití s prohlížeči založenými na projektu Mozilla.
+    \\usr\lib64\mozilla\plugins - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 64bitové
+    systémy.
+    \\usr\lib\mozilla\plugins   - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na projektu Mozilla, 32bitové
+    systémy.
+    Prohlížeče od firmy Opera, jako například Opera používají:
+    \\usr\lib64\opera\plugins   - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 64bitové systémy.
+    \\usr\lib\opera\plugins     - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera, 32bitové systémy.
+    Všechny ochranné známky třetích stran jsou vlastnictvím jejich příslušných vlastníků.
+
+
+
+
+
+SOUBORY
+    %HOME\.mozilla/plugins\IcedTeaPlugin.so               - Umístění knihovny zásuvného modulu na úrovni uživatele pro použití s prohlížeči založenými na
+    projektu Mozilla.
+    %XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache - Další informace o položkách ve vyrovnávací paměti.
+    %XDG_CONFIG_HOME\icedtea-web\generated_jnlps          - Umístění, kde jsou uchovávány soubory jnlp generované ze stránek html pro aplikace javaws v případě
+    spouštění pomocí zástupce na ploše / v místní nabídce.
+    \/usr/lib/mozilla/plugins/\IcedTeaPlugin.so           - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na
+    projektu Mozilla, 32bitové systémy.
+    \/usr/lib/opera/plugins/\IcedTeaPlugin.so             - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera,
+    32bitové systémy.
+    \/usr/lib64/mozilla/plugins/\IcedTeaPlugin.so         - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči založenými na
+    projektu Mozilla, 64bitové systémy.
+    \/usr/lib64/opera/plugins/\IcedTeaPlugin.so           - Umístění knihovny zásuvného modulu na globální úrovni pro použití s prohlížeči od firmy Opera,
+    64bitové systémy.
+    Kde parametry $XDG_CONFIG_DIR, $XDG_CACHE_DIR a $XDG_RUNTIME_DIR jsou nastaveny na ~/.config, ~/.cache a /tmp nebo /var/tmp (pokud nejsou uživatelem
+    nastaveny jinak).
+
+CHYBY
+    Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:
+    http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+    https://github.com/AdoptOpenJDK/icedtea-web/issues
+    
+    Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu
+    „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.
+
+AUTOR
+    https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+
+VIZ TÉŽ
+    * icedtea-web
+    * javaws
+    * icedtea-web-plugin
+    * itweb-settings
+    * policyeditor
+    * policytool
+    * java
+    
+    https://github.com/AdoptOpenJDK/icedtea-web
+    https://github.com/AdoptOpenJDK/icedtea-web.git
+

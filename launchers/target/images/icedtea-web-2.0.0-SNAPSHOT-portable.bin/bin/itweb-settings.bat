@@ -1,0 +1,229 @@
+@echo off
+echo.%* | find /I "-verbose">nul && ( @echo on ) || ( @echo off )
+setLocal EnableDelayedExpansion
+
+rem use JAVAWS_J_OPTIONS to pass java arguments, instead of -J opts for this script. This will be fixed in next releases
+rem use ITW_HOME to set location where ITW can be found. From there all binaries and jars and other resources are found
+rem use JAVA_HOME to set path to JRE
+rem any redistribution/installer can replace INST_ITW_HOME and INST_JAVA_HOME to create better defaults
+rem if not set, following defaults are used
+set "INST_ITW_HOME="
+set "INST_JAVA_HOME="
+
+rem Warning for linux users: when you put VAR="value" also quotes are stored in VAR!
+rem maybe set "VAR=value" is working better?
+rem Warning for if blocks: variables using %my_var% do not work (interpreter), use !my_var! with ENABLEDELAYEDEXPANSION instead
+rem convention to use for temporary variables use '_' prefix
+
+set "NASHORN=lib/ext/nashorn.jar"
+set "JRE=C:Program FilesAmazon Correttojdk1.8.0_472"
+set "LAUNCHER_FLAGS=-Xms8m"
+set "MAIN_CLASS=net.adoptopenjdk.icedteaweb.client.commandline.CommandLine"
+set "SPLASH_LOCATION=C:/Users/Julian/IdeaProjects/IcedTea-Web/launchers/target/libs/javaws_splash.png"
+set "RUN_ARGS_LOCATION=C:/Users/Julian/IdeaProjects/IcedTea-Web/launchers/target/libs/itw-modularjdk.args"
+set "ITW_LIBS=BUNDLED"
+
+rem individual parts of bootclasspath for more easy processing
+set "JAVAWS_SRC=C:/Users/Julian/IdeaProjects/IcedTea-Web/launchers/target/libs/javaws.jar"
+
+set "TAGSOUP_SRC="
+set "RHINO_SRC="
+set "MSLINKS_SRC="
+set "IPADDRESS_SRC="
+
+
+rem resolve folder of this script:
+if "%ITW_HOME%" == "" (
+  set "_BAD_SLASH_SCRIPT_DIR=%~dp0"
+  set "_SCRIPT_DIR=!_BAD_SLASH_SCRIPT_DIR:\=/!"
+  set "ITW_HOME=!_SCRIPT_DIR!../"
+  for /F %%i in ("!ITW_HOME!") do set "ITW_HOME=%%~fi"
+  if "!ITW_HOME:~-1!"=="\" set "ITW_HOME=!ITW_HOME:~0,-1!"
+  set "_BAD_SLASH_SCRIPT_DIR=" & set "_SCRIPT_DIR="
+)
+
+set "PROGRAM_NAME=%~n0%~x0"
+
+rem resolve custom JRE:
+set "CUSTOM_JRE="
+if not "%JAVA_HOME%" == "" (
+  "%JAVA_HOME%/bin/java.exe" -version > nul 2>&1
+  if errorlevel 0 if not errorlevel 1 (
+    set "CUSTOM_JRE=%JAVA_HOME%"
+  ) else (
+    echo "Your custom JRE [%JAVA_HOME%] read from JAVA_HOME is not valid. Please fix this."
+  )
+)
+if "%CUSTOM_JRE%" == "" (
+  set "_PATH_JAVA_HOME="
+  for %%a in ("%PATH:;=";"%") do (
+    if exist "%%~a/java.exe" (
+      for %%b in ("%%~a") do set "_PATH_JAVA_HOME=%%~dpb"
+    )
+  )
+  "!_PATH_JAVA_HOME!/bin/java.exe" -version >nul 2>&1
+    if errorlevel 0 if not errorlevel 1 (
+      set CUSTOM_JRE=!_PATH_JAVA_HOME!
+    ) else (
+      echo Your JRE [!_PATH_JAVA_HOME!] read from the PATH environment variable is not valid. Please fix this.
+    )
+    set "_PATH_JAVA_HOME="
+)
+if "%CUSTOM_JRE%" == "" (
+  rem the following is for testing-only and not intended to be robust
+  rem will not work from 32-bit firefox
+  for /f "tokens=*" %%a in ('%windir%\System32\reg query "HKLM\SOFTWARE\JavaSoft\Java Development Kit"') do set "_version_key=%%a"
+  set "_version=!_version_key:~58!"
+  for /f "tokens=*" %%a in ('%windir%\System32\reg query "HKLM\SOFTWARE\JavaSoft\Java Development Kit\!_version!" /v JavaHome') do set "_jh_key=%%a"
+  set "_BAD_SLASH_JAVA_HOME=!_jh_key:~22!"
+  set "_REG_JAVA_HOME=!_BAD_SLASH_JAVA_HOME:\=/!"
+  "!_REG_JAVA_HOME!/bin/java.exe" -version > nul 2>&1
+  if errorlevel 0 if not errorlevel 1 (
+    set "CUSTOM_JRE=!_REG_JAVA_HOME!"
+  ) else (
+    echo "Your custom JRE [!_REG_JAVA_HOME!] read from Registry HKLM\SOFTWARE\JavaSoft\Java Development Kit is not valid. Please fix this."
+  )
+  set "_version_key=" & set "_version=" & set "_jh_key=" & set "_BAD_SLASH_JAVA_HOME=" & set "_REG_JAVA_HOME="
+)
+if "%CUSTOM_JRE%" == "" (
+  if not "%INST_JAVA_HOME%" == "" (
+    "%INST_JAVA_HOME%/bin/java.exe" -version > nul 2>&1
+    if errorlevel 0 if not errorlevel 1 (
+      set "CUSTOM_JRE=%INST_JAVA_HOME%"
+    ) else (
+      echo "Your custom JRE [%INST_JAVA_HOME%] read from INST_JAVA_HOME is not valid. Please fix this."
+    )
+  )
+)  
+
+
+if "%ITW_LIBS%" == "BUNDLED" (
+  for /F %%i in ("!PROGRAM_NAME!") do set "BINARY_LOCATION=!ITW_HOME!/bin/%%~ni%%~xi"
+  for /F %%i in ("!SPLASH_PNG!") do set "SPLASH_LOCATION=!ITW_HOME!/libs/%%~ni%%~xi"
+  for /F %%i in ("!RUN_ARGS_LOCATION!") do set "RUN_ARGS_LOCATION=!ITW_HOME!/libs/%%~ni%%~xi"
+
+  for /F %%i in ("!JAVAWS_SRC!") do set "JAVAWS_JAR=!ITW_HOME!/libs/%%~ni%%~xi"
+
+  set "RHINO_JAR="
+  set "TAGSOUP_JAR="
+  set "MSLINKS_JAR="
+  set "IPADDRESS_JAR="
+) else (
+  set "JAVAWS_JAR=!JAVAWS_SRC!"
+
+  set "RHINO_JAR=!RHINO_SRC!"
+  set "TAGSOUP_JAR=!TAGSOUP_SRC!"
+  set "MSLINKS_JAR=!MSLINKS_SRC!"
+  set "IPADDRESS_JAR=!IPADDRESS_SRC!"
+)
+set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%JAVAWS_JAR%;%RHINO_JAR%;%TAGSOUP_JAR%;%MSLINKS_JAR%;%IPADDRESS_JAR%"
+
+
+rem Fix classpaths for custom JRE:
+if not "%CUSTOM_JRE%" == "" (
+  set "JAVA=%CUSTOM_JRE%/bin/java"
+  set "CP=%CUSTOM_JRE%/lib/rt.jar;%CUSTOM_JRE%/lib/ext/jfxrt.jar"
+  set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%CUSTOM_JRE%/%NASHORN%"
+) else (
+  set "JAVA=%JRE%/bin/java"
+  set "CP=%JRE%/lib/rt.jar;%JRE%/lib/ext/jfxrt.jar"
+  set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%JRE%/%NASHORN%"
+)
+
+
+rem Support Modular JDK (jigsaw):
+set "MODULAR_JDK=NO"
+
+rem Parse Java Version
+set "fullversion="
+rem capture stderr with 2^>^&1 1^>con:
+for /f "tokens=*" %%a in ('"%JAVA%" -version 2^>^&1 1^>con:') do (
+  set "_versionLine=%%a"
+  echo !_versionLine!
+  if "!fullversion!" == "" (
+    set "_unquoted=!_versionLine:"=@!"
+    for /f "tokens=2,3 delims=@.-" %%b in ("!_unquoted!") do (
+      set "fullversion=%%b"
+      rem get second digit for "1.x.y"
+      if !fullversion! EQU 1 (
+        set "fullversion=%%c"
+      )
+    )                                  
+  )
+)
+if %fullversion% GEQ 9 (
+  set "MODULAR_JDK=YES"
+)
+set "_versionLine=" & set "_unquoted=" & set "fullversion="
+
+set "MODULAR_ARGS="
+if "%MODULAR_JDK%" == "YES" (
+  rem warning extra escaping
+  set "MODULAR_ARGS=--patch-module "java.desktop=%NETX_JAR%;%PLUGIN_JAR%""
+  rem jsobject must be patched separately from plugin
+  rem otherwise netscape pkg would be shared by two modules, which is forbiden
+  rem plugin jar may not be built
+  if not "%JSOBJECT_JAR%" == "" (
+    set "MODULAR_ARGS=!MODULAR_ARGS! --patch-module "jdk.jsobject=%JSOBJECT_JAR%""
+  )
+  rem add JDK9+ arg file:
+  set "MODULAR_ARGS=!MODULAR_ARGS! "@%RUN_ARGS_LOCATION%""
+)
+
+
+rem Filter script args:
+set "SPLASH=false"
+if "%ICEDTEA_WEB_SPLASH%" == "" (
+  set "SPLASH=true"
+)
+
+if not defined ITW_NATIVEDEBUG_SUSPEND (
+  set "ITW_NATIVEDEBUG_SUSPEND=n"
+)
+if not defined ITW_NATIVEDEBUG_PORT (
+  set "ITW_NATIVEDEBUG_PORT=9009"
+)
+
+set "JAVA_ARGS="
+set "ARGS="
+set NATIVE_DEBUG=
+
+for %%a IN (%*) do (
+  set "_arg=%%a"
+  set "_beg=!_arg:~0,2!"
+
+  if "!_beg!" == "-J" (
+    set "JAVA_ARGS=!JAVA_ARGS! !_arg:~2!"
+  ) else (
+    if "!_arg:~0,1!" == "-" if "!_arg:~-11!" == "nativeDebug" (
+      set "NATIVE_DEBUG=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=!ITW_NATIVEDEBUG_SUSPEND!,address=!ITW_NATIVEDEBUG_PORT!"
+    ) else (
+      set "ARGS=!ARGS! !_arg!"
+      if "!_arg:~0,1!" == "-" if not "x!_arg:headless=!" == "x!_arg!" (
+        set "SPLASH=false"
+      )
+      if "!_arg:~0,1!" == "-" if not "x!_arg:Xnosplash=!" == "x!_arg!" (
+        set "SPLASH=false"
+      )
+    )
+  )
+)
+set "_arg=" & set "_beg="
+
+
+rem Build Java command line:
+
+if "%SPLASH%" == "true" (
+  set "SPLASH="-splash:%SPLASH_LOCATION%""
+) else (
+  set "SPLASH="
+)
+
+"%JAVA%" %SPLASH% "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %MODULAR_ARGS% %JAVAWS_J_OPTIONS% %JAVA_ARGS% -classpath "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" %NATIVE_DEBUG% "%MAIN_CLASS%" %ARGS%
+
+SET "errno=%ERRORLEVEL%"
+
+echo Please press any key to close this window/get back prompt
+pause > nul
+EXIT /B %errno%
+

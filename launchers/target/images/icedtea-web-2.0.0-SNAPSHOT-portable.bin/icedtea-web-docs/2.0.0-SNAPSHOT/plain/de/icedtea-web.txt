@@ -1,0 +1,61 @@
+  ***  icedtea-web 2.0.0-SNAPSHOT  ***  
+NAME
+    Mit icedtea-web  wird ein Browser Plug-in als freie Software angeboten, mit dem Applets ausgeführt werden können, sowie eine Implementierung von „Web
+    Start“, ursprünglich auf dem NetX-Projekt basierend.
+    
+    NetX ermöglicht das Herunterladen, die Zwischenspeicherung und die Ausführung von Applets und Anwendungen in einer sicheren Sandkastenumgebung
+    (Standardeinstellung). Bei nachfolgenden Starts eines Applets wird die jeweils neueste Version automatisch heruntergeladen. Mit dem Befehl „itw-settings“
+    können unter anderem Aktualisierungs- sowie Sicherheitseinstellungen gesetzt werden.
+    „icedtea-web“ enthält ebenfalls ein Plug-in für „Applets aktivieren (http://www.java.com/en/download/testjava.jsp)“ in Webbrowsern.
+    - Die Namen sowie E-Mail Adressen der an diesem Projekt Mitwirkenden wurden in der im Stammverzeichnis von IcedTea-Web befindenden Datei AUTHORS hinterlegt.
+    - Eine vollständige Ausfertigung der GPLv2 Lizenz dieses Projekts wurde in der im Stammverzeichnis von IcedTea-Web befindenden Datei COPYING hinterlegt.
+    - Neuigkeiten über die Veröffentlichungen dieses Projekts können der im Stammverzeichnis von IcedTea-Web befindenden Datei NEWS entnommen werden.
+
+
+BESCHREIBUNG
+    Merkmale von NetX:
+    Modularität                          - Einfaches Hinzufügen von JNLP-Merkmalen zu einer Anwendung.
+    Reduzierter Arbeitsspeicherverbrauch - Starten von Programmen in einer gemeinsamen JVM
+    Schnellstart                         - Anwendungen aus einem Zwischenspeicher für schnelles Starten ausführen
+    Sicherheit                           - Eine beliebige Anwendung in einer Sandkastenumgebung ausführen oder deren Tätigkeit protokollieren
+    Automatische Aktualisierung          - Anwendungen ohne zusätzlichen Code automatisch aktualisieren
+    Bereitstellung im Netzwerk           - Ohne Installer im Internet bereitstellen
+    Quelloffenheit                       - GNU Lesser General Public License
+
+    Um weitere Informationen einzuholen, können das IcedTea-Projektwiki (http://icedtea.classpath.org/wiki/Main_Page) oder insbesondere die
+    IcedTea-Web-Hauptseite (http://icedtea.classpath.org/wiki/IcedTea-Web) besucht werden.
+    Hilfe zu allgemeinen Problemen mit IcedTea-Web ist hier (http://icedtea.classpath.org/wiki/IcedTea-Web#Common_Issues) zu finden.
+
+
+    Beiträge:
+    Eine Schnellstart (http://icedtea.classpath.org/wiki/DeveloperQuickStart)anleitung für das IcedTea Projekt ist im Wiki verfügbar.
+    Codestil (http://icedtea.classpath.org/wiki/IcedTea-Web#Code_style)-Richtlinien und Instruktionen zu Eclipse-Einstellungen
+    (http://icedtea.classpath.org/wiki/IcedTea-Web/DevelopingWithEclipse) für IcedTea-Web sind ebenfalls verfügbar. Patches sollten Modultests und
+    Reproduzierer (http://icedtea.classpath.org/wiki/Reproducers) beiliegen bevor sie an die Mailingliste
+    (http://mail.openjdk.java.net/mailman/listinfo/distro-pkg-dev) gesendet werden.
+
+
+
+FEHLER
+    There aren't any known bugs. If you come across one, please file it at:
+    http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+    https://github.com/AdoptOpenJDK/icedtea-web/issues
+    
+    Please run in debug (-verbose switch or itw-settings setting or ICEDTEAPLUGIN_DEBUG variable set to true) mode and include that output (best is from the
+    console) with URL to jnlp or html file (or the jnlp/html file or  application itself) when filling out the bug report.
+
+AUTOR
+    https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+
+SIEHE AUCH
+    * icedtea-web
+    * javaws
+    * icedtea-web-plugin
+    * itweb-settings
+    * policyeditor
+    * policytool
+    * java
+    
+    https://github.com/AdoptOpenJDK/icedtea-web
+    https://github.com/AdoptOpenJDK/icedtea-web.git
+

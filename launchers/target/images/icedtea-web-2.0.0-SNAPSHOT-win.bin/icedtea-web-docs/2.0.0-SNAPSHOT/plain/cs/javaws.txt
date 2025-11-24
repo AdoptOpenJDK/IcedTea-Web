@@ -1,0 +1,128 @@
+  ***  icedtea-web 2.0.0-SNAPSHOT  ***  
+NÁZEV
+    javaws - klient aplikace Java Web Start
+
+ANOTACE
+    javaws [-volby-spuštění] soubor jnlp
+    javaws [-volby-ovládání]
+
+POPIS
+    javaws je implementací klienta protokolu JNLP. Používá soubor JNLP (Java Network Launch Protocol) k bezpečnému spouštění vzdálených aplikací a apletů Java.
+    Tato implementace javaws  je vytvářena v rámci projektu IcedTea a je založena na projektu NetX.
+    
+    Soubor JNLP je v jazyce xml a popisuje, jak bezpečně spouštět vzdálené aplikace a aplety Java.
+
+
+Chybějící zdroj: manCommandLineOptions_cs
+    Při zadávání voleb může být soubor JNLP zadán v příkazu za volbou -jnlp, nebo jako samostatná volba bez dalších argumentů. Soubor HTML, který spouští
+    soubor JNLP lze uvést za argumentem -html.
+    Soubor JNLP lze specifikovat buď pomocí adresy URL nebo pomocí cesty k místnímu souboru.
+    Soubor JNLP by měl být specifikován pouze jednou – buď jako hlavní argument za volbou -jnlp, nebo v rámci souboru HTML.
+    Ovládací možnosti:
+    -about               - Ukáže vzorovou aplikaci.(Neočekává se žádný argument.)
+    -help                - Vypíše informace o podporovaných příkazech a základním použití.(Neočekává se žádný argument.)
+    -license             - Zobrazí licenci GPL a ukončí aplikaci.(Neočekává se žádný argument.)
+    -viewer              - Zobrazí prohlížeč důvěryhodných certifikátů.(Neočekává se žádný argument.)
+    -Xcacheids           - Zobrazí seznam dostupných identifikátorů ve vyrovnávací paměti, které lze použít ke smazání konkrétních aplikací.(Očekává se žádný
+    nebo jeden argument.)
+    -Xclearcache         - Vyčistí vyrovnávací paměť aplikace JNLP. Pokud zadáte argument, smaže se pouze určená aplikace.(Očekává se žádný nebo jeden
+    argument.)
+    Možnosti spouštění:
+    -allowredirect       - Následuje přesměrování HTTP.(Neočekává se žádný argument.)
+    -arg arg             - Přidá před spuštěním parametr aplikace.(Očekává se jeden nebo více argumentů.)
+    -browser             - Spusťte integrovaný prohlížeč. Použijte ho jen ve stavu nouze!(Očekává se jeden nebo více argumentů.)
+    -headless            - Vypne veškeré grafické prvky uživ. rozhraní IcedTea-Web.(Neočekává se žádný argument.)
+    -jnlp                - Umístění souboru JNLP ke spuštění (URL nebo soubor)(Očekává se přesně jeden argument.)
+    -nosecurity          - Vypne zabezpečené běhové prostředí. K obejití poškozených podpisů budete také potřebovat nastavení vlastnosti
+    deployment.security.itw.ignorecertissues.(Neočekává se žádný argument.)
+    -noupdate            - Vypne kontrolu aktualizací.(Neočekává se žádný argument.)
+    -param name=value    - Přidá před spuštěním parametr apletu.(Očekává se jeden nebo více argumentů.)
+    -property name=value - Před spuštěním nastaví systémovou vlastnost.(Očekává se jeden nebo více argumentů.)
+    -strict              - Zapne striktní kontrolu souborového formátu JNLP.(Neočekává se žádný argument.)
+    -update seconds      - Zkontroluje aktualizace.(Očekává se přesně jeden argument.)
+    -verbose             - Zapne podrobný výstup.(Neočekává se žádný argument.)
+    -version             - Vypíše verzi aplikace IcedTea-Web a ukončí aplikaci.(Neočekává se žádný argument.)
+    -Xignoreheaders      - Vynechá ověřování hlavičky souboru JAR.(Neočekává se žádný argument.)
+    -xml                 - Použije pro analýzu souboru JNLP striktní XML parser.(Neočekává se žádný argument.)
+    -Xnofork             - Zakáže vytváření jiných prostředí JVM.(Neočekává se žádný argument.)
+    -Xnosplash           - Do not show splash screen. (Neočekává se žádný argument.)
+    -Xoffline            - Zabrání ITW v připojení k síti. Bude použita pouze vyrovnávací paměť. Aplikace se stále může připojit.(Neočekává se žádný argument.)
+    -Xtrustnone          - Místo dotázání se uživatele bude předpokládat zápornou odpověď na všechny dotazy.(Neočekává se žádný argument.)
+
+PŘÍKLADY
+    javaws -about                                                                              - Zobrazí základní nápovědu a informace o aplikaci.
+    javaws -about -headless                                                                    - Zobrazí základní nápovědu a informace o aplikaci pouze v
+    terminálu.
+    javaws  -Xnofork -Xignoreheaders -allowredirect -Xoffline http://mypage.web/dangerous.jnlp - Spustí aplikaci dangerous.jnlp přímo z umístění mypage.web,
+    aniž by aplikace byla stažena, bez kontroly hlaviček a ve vynuceném virtuálním prostředí.
+
+SOUBORY
+    %JAVA_HOME\lib\deployment.config                                  - Globální soubor deployment.properties. Může být ovlivněn deployment.jre.dir.
+    %JAVA_HOME\lib\security\cacerts                                   - Obsahuje různé systémové certifikáty uložené globálně v rámci prostředí Java. Ovládáno
+    pomocí deployment.system.security.cacerts
+    %JAVA_HOME\lib\security\jssecacerts                               - Obsahuje různé systémové certifikáty uložené globálně v rámci prostředí Java. Ovládáno
+    pomocí deployment.system.security.jssecacerts
+    %JAVA_HOME\lib\security\trusted.certs                             - Obsahuje různé systémové certifikáty uložené globálně v rámci prostředí Java. Ovládáno
+    pomocí deployment.system.security.trusted.certs
+    %JAVA_HOME\lib\security\trusted.clientcerts                       - Obsahuje různé systémové certifikáty uložené globálně v rámci prostředí Java. Ovládáno
+    pomocí deployment.system.security.trusted.clientautcerts
+    %JAVA_HOME\lib\security\trusted.jssecerts                         - Obsahuje různé systémové certifikáty uložené globálně v rámci prostředí Java. Ovládáno
+    pomocí deployment.system.security.trusted.jssecerts
+    %TMP\%USER\netx\locks                                             - Umístění zámků jednotlivých procesů netx Ovládáno pomocí deployment.user.locksdir
+    %TMP\%USER\netx\locks\netx_running                                - Umístění hlavního zámku procesu netx Ovládáno pomocí deployment.user.runningfile
+    %XDG_CACHE_HOME\icedtea-web\cache                                 - Obsahuje položky běhového prostředí uložené ve vyrovnávací paměti. Ovládáno pomocí
+    deployment.user.cachedir
+    %XDG_CACHE_HOME\icedtea-web\cache\recently_used.cache             - Další informace o položkách ve vyrovnávací paměti.
+    %XDG_CACHE_HOME\icedtea-web\pcache                                - Obsahuje uložená data aplikací. Ovládáno pomocí deployment.user.pcachedir
+    %XDG_CACHE_HOME\icedtea-web\tmp                                   - Obsahuje dočasné soubory běhového prostředí. Ovládáno pomocí deployment.user.tmp
+    %XDG_CONFIG_HOME\icedtea-web\.appletTrustSettings                 - Soubor zodpovědný chování jednotlivých apletů a aplikací na základě jejich základny
+    kódu (codebase) a uživatelských akcí.
+    %XDG_CONFIG_HOME\icedtea-web\deployment.properties                - Hlavní uživatelský soubor deployment.properties.
+    %XDG_CONFIG_HOME\icedtea-web\icons                                - Umístění, kde jsou uchovávány ikony zástupců na ploše nebo v místní nabídce k aplikacím
+    javaws.
+    %XDG_CONFIG_HOME\icedtea-web\log                                  - obsahuje soubor s protokoly (pokud je protokolování zapnuto) – soubor
+    tw-cplugin-date_time.log pro nativní zásuvný modul a soubor itw-javantx-date_time.log pro všechno ostatní. Ovládáno pomocí deployment.user.logdir
+    %XDG_CONFIG_HOME\icedtea-web\security\java.policy                 - Obsahuje oprávnění udělená vybraným nepodepsaným aplikacím. Ovládáno pomocí
+    deployment.user.security.policy
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.cacerts             - Obsahuje různé certifikáty uložené uživateli. Ovládáno pomocí
+    deployment.user.security.trusted.cacerts
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.certs               - Obsahuje různé certifikáty uložené uživateli. Ovládáno pomocí
+    deployment.user.security.trusted.certs
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.clientcerts         - Obsahuje různé certifikáty uložené uživateli. Ovládáno pomocí
+    deployment.user.security.trusted.clientauthcerts
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecacerts         - Obsahuje různé certifikáty uložené uživateli. Ovládáno pomocí
+    deployment.user.security.trusted.jssecacerts
+    %XDG_CONFIG_HOME\icedtea-web\security\trusted.jssecerts           - Obsahuje různé certifikáty uložené uživateli. Ovládáno pomocí
+    deployment.user.security.trusted.jssecerts
+    %XDG_DATA_HOME\applications\javaws                                - Podadresář v uživatelském prostoru pro nabídky, kam budou uloženi vlastní zástupci
+    zobrazující se v místní nabídce.
+    {%WINDIR\Sun\Java or \etc\.java}\deployment\.appletTrustSettings  - Soubor zodpovědný chování jednotlivých apletů a aplikací na základě jejich základny
+    kódu (codebase) a akcí správce.
+    {%WINDIR\Sun\Java or \etc\.java}\deployment\deployment.config     - Globální soubor s nastaveními deployment.properties
+    {%WINDIR\Sun\Java or \etc\.java}\deployment\itw-deployment.config - Globální soubor s nastaveními deployment.properties
+    Kde parametry $XDG_CONFIG_DIR, $XDG_CACHE_DIR a $XDG_RUNTIME_DIR jsou nastaveny na ~/.config, ~/.cache a /tmp nebo /var/tmp (pokud nejsou uživatelem
+    nastaveny jinak).
+
+CHYBY
+    Neevidujeme žádné známé chyby. Pokud na nějakou narazíte, zadejte prosím hlášení o chybě:
+    http://icedtea.classpath.org/wiki/IcedTea-Web#Filing_bugs
+    https://github.com/AdoptOpenJDK/icedtea-web/issues
+    
+    Spusťte aplikaci v režimu ladění (s použitím přepínače nebo nastavení v itw-settings „-verbose“, nebo nastavení proměnné ICEDTEAPLUGIN_DEBUG na hodnotu
+    „true“) a přidejte výstup (nejlépe z konzole java) s adresou URL souboru JNLP nebo HTML (nebo přímo samotný soubor JNLP/HTML) do hlášení o chybě.
+
+AUTOR
+    https://github.com/AdoptOpenJDK/icedtea-web/graphs/contributors
+
+VIZ TÉŽ
+    * icedtea-web
+    * javaws
+    * icedtea-web-plugin
+    * itweb-settings
+    * policyeditor
+    * policytool
+    * java
+    
+    https://github.com/AdoptOpenJDK/icedtea-web
+    https://github.com/AdoptOpenJDK/icedtea-web.git
+
