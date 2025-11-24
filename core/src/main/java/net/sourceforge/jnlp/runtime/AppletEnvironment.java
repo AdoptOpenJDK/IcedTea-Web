@@ -108,7 +108,8 @@ public class AppletEnvironment implements AppletContext, AppletStub {
         this(file, appletInstance, null);
 
         Frame frame = new Frame(file.getApplet().getName() + " - Applet");
-        frame.setResizable(false);
+        //JD2M - se pone en true para permitir ajustar la ventana
+        frame.setResizable(true);
 
         appletInstance.addWindow(frame);
         // may not need this once security manager can close windows
