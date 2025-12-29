@@ -61,7 +61,7 @@ public class SunMiscLauncher {
             return new ImageIcon(cl.getResource(resource));
         } catch (final Exception e) {
             LOG.debug("sun.misc.Launcher not found. Looks like app is running jdk9 or higher");
-            return new ImageIcon(ClassLoader.getSystemClassLoader().getParent().getResource(resource));
+            return new ImageIcon(ClassLoader.getSystemClassLoader().getResource(resource));
         }
     }
 }
