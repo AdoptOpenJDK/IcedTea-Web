@@ -597,6 +597,12 @@ public class Defaults {
                     ConfigurationConstants.KEY_HTTPCONNECTION_READ_TIMEOUT,
                     String.valueOf(10000),
                     ValidatorFactory.createRangedIntegerValidator(0, Integer.MAX_VALUE)
+            ),
+
+            Setting.createDefault(
+                    ConfigurationConstants.KEY_HTTPCONNECTION_REQUEST_INTERVAL,
+                    String.valueOf(0),
+                    ValidatorFactory.createRangedIntegerValidator(0, Integer.MAX_VALUE)
             )
     );
 
