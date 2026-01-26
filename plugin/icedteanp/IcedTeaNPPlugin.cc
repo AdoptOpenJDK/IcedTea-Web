@@ -631,7 +631,7 @@ NPError start_jvm_if_needed()
   in_from_appletviewer = g_io_channel_new_file (in_pipe_name,
                                                       "r", &channel_error);
   // Setting encoding to binary so plugin does not crash when reading line in plugin_in_pipe_callback() for newer GLib versions
-  g_io_channel_set_encoding (in_from_appletviewer, NULL, NULL);
+  g_io_channel_set_encoding (in_from_appletviewer, NULL, &channel_error);
 
   if (!in_from_appletviewer)
     {
