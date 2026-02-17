@@ -58,7 +58,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import sun.net.www.protocol.jar.URLJarFile;
+//import sun.net.www.protocol.jar.URLJarFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -555,7 +555,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.setSecurityEnabled(false);
         JNLPRuntime.setDebug(true);
         getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
-        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
+        //URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
 
         final ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         try {
@@ -569,7 +569,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             JNLPRuntime.setSecurityEnabled(securityBackup);
             JNLPRuntime.setDebug(verbose);
             getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
-            URLJarFile.setCallBack(null);
+            //URLJarFile.setCallBack(null);
             as.stop();
 
             clearCache();

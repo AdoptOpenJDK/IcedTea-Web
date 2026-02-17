@@ -1253,7 +1253,7 @@ public class JNLPClassLoader extends URLClassLoader {
                                     URL fileURL = new URL("file://" + extractedJarLocation);
                                     // there is no remote URL for this, so lets fake one
                                     URL fakeRemote = new URL(jar.getLocation().toString() + "!" + je.getName());
-                                    CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
+                                    //CachedJarFileCallback.getInstance().addMapping(fakeRemote, fileURL);
                                     addURL(fakeRemote);
 
                                     jarLocationSecurityMap.put(new UrlKey(fakeRemote), jarSecurity);
@@ -1268,12 +1268,17 @@ public class JNLPClassLoader extends URLClassLoader {
                     }
                 }
 
-                addURL(jar.getLocation());
+                //addURL(jar.getLocation());
+                if (localFile != null) {
+                    addURL(localFile.toURI().toURL());
+                } else {
+                    addURL(jar.getLocation());
+                }
 
                 // there is currently no mechanism to cache files per
                 // instance.. so only index cached files
                 if (localFile != null) {
-                    CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURI().toURL());
+                    //CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), localFile.toURI().toURL());
 
                     try (JarFile jarFile = new JarFile(localFile.getAbsolutePath())) {
                         JarIndexAccess index = JarIndexAccess.getJarIndex(jarFile.getNative());
@@ -1282,7 +1287,7 @@ public class JNLPClassLoader extends URLClassLoader {
                         }
                     }
                 } else {
-                    CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
+                    //CachedJarFileCallback.getInstance().addMapping(jar.getLocation(), jar.getLocation());
                 }
 
                 LOG.debug("Activate jar: {}", location);
@@ -1573,8 +1578,14 @@ public class JNLPClassLoader extends URLClassLoader {
                 return null;
             });
 
-            addURL(remoteURL);
-            CachedJarFileCallback.getInstance().addMapping(remoteURL, cachedUrl);
+            //addURL(remoteURL);
+            //CachedJarFileCallback.getInstance().addMapping(remoteURL, cachedUrl);
+            File localFile = tracker.getCacheFile(remoteURL);
+            if (localFile != null) {
+                addURL(remoteURL.toURI().toURL());
+            } else {
+                addURL(remoteURL);
+            }
 
         } catch (Exception e) {
             // Do nothing. This code is called by loadClass which cannot
