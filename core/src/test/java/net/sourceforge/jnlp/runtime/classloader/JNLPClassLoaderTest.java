@@ -84,7 +84,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 @NotThreadSafe
 @Ignore
@@ -555,7 +554,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.setSecurityEnabled(false);
         JNLPRuntime.setDebug(true);
         getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
-        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
 
         final ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         try {
@@ -569,7 +567,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             JNLPRuntime.setSecurityEnabled(securityBackup);
             JNLPRuntime.setDebug(verbose);
             getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
-            URLJarFile.setCallBack(null);
             as.stop();
 
             clearCache();
