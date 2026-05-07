@@ -25,6 +25,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.security.SecurityDialogM
 import net.adoptopenjdk.icedteaweb.client.parts.downloadindicator.DownloadIndicator;
 import net.adoptopenjdk.icedteaweb.extensionpoint.ExtensionPoint;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.jnlp.version.VersionId;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.resources.UpdatePolicy;
@@ -41,7 +42,7 @@ import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.RestrictedFileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.net.www.protocol.jar.URLJarFile;
+//import sun.net.www.protocol.jar.URLJarFile;
 
 import javax.jnlp.ServiceManager;
 import javax.naming.ConfigurationException;
@@ -257,10 +258,20 @@ public class JNLPRuntime {
 
         ServiceManager.setServiceManagerStub(new XServiceManagerStub()); // ignored if we're running under Web Start
 
-        policy = new JNLPPolicy();
-
-        security = new JNLPSecurityManager(); // side effect: create JWindow
-
+        // if running < Java 24 we create the security manager and the policy
+        final VersionId jvmVersion = VersionId.fromString(JavaSystemProperties.getJavaVersion());
+        boolean isSecurityManagerEnabled = true;
+        if (jvmVersion.compareTo(VersionId.fromString("24")) < 0) {
+        		LOG.info("Running on java version < 24. Create the policy and set the security manager.");
+	        policy = new JNLPPolicy();
+	
+	        security = new JNLPSecurityManager(); // side effect: create JWindow
+        }
+        else {
+        		LOG.info("Running on java version 24 or higher. Do not create the policy and set the security manager.");
+        		isSecurityManagerEnabled = false;
+        }
+        
         doMainAppContextHacks();
 
         final boolean deploymentNosecurity = Boolean.parseBoolean(getConfiguration().getProperty(ConfigurationConstants.KEY_NOSECURITY));
@@ -268,8 +279,9 @@ public class JNLPRuntime {
         // Set SecurityEnable to FALSE if either -nosecurity on cmdline or deployment property nosecurity is true
         setSecurityEnabled(!(deploymentNosecurity || cmdlineNosecurity));
         LOG.debug("SecurityEnabled = {} cmdLine nosecurity = {} deployment nosecurity = {}", isSecurityEnabled(), cmdlineNosecurity, deploymentNosecurity);
-        if (isSecurityEnabled() && forkingStrategy.mayRunManagedApplication()) {
+        if (isSecurityManagerEnabled && isSecurityEnabled() && forkingStrategy.mayRunManagedApplication()) {
             Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
+            
             System.setSecurityManager(security);
         }
 
@@ -301,7 +313,7 @@ public class JNLPRuntime {
         Security.setProperty("package.access",
                              Security.getProperty("package.access")+",net.sourceforge.jnlp");
 
-        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
+        //URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
 
         initialized = true;
         LOG.debug("End JNLPRuntime.initialize()");
@@ -309,7 +321,9 @@ public class JNLPRuntime {
 
     public static void reloadPolicy() {
         LOG.debug("Start JNLPRuntime.reloadPolicy()");
-        policy.refresh();
+        if (policy != null) {
+        		policy.refresh();
+        }
         LOG.debug("End JNLPRuntime.reloadPolicy()");
     }
 
@@ -464,7 +478,7 @@ public class JNLPRuntime {
                 config.copyTo(System.getProperties());
             } catch (ConfigurationException ex) {
                 LOG.info("Fatal error while reading the configuration, continuing with empty. Please fix");
-                //mark this exceptionas we can die on it later
+                //mark this exceptions we can die on it later
                 config.setLoadingException(ex);
                 //to be sure - we MUST die - http://docs.oracle.com/javase/6/docs/technotes/guides/deployment/deployment-guide/properties.html
             } catch (Exception t) {
@@ -579,7 +593,7 @@ public class JNLPRuntime {
      */
     public static SecurityDialogMessageHandler getSecurityDialogHandler() {
         SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
+        if (sm != null) { // null under java 25
             sm.checkPermission(new AllPermission());
         }
         return securityDialogMessageHandler;
@@ -594,7 +608,9 @@ public class JNLPRuntime {
      */
     public static void setExitClass(Class<?> exitClass) {
         checkExitClass();
-        security.setExitClass(exitClass);
+        if (security != null) {
+            security.setExitClass(exitClass);
+        }
     }
 
     /**
@@ -603,7 +619,9 @@ public class JNLPRuntime {
      * Once disabled, exit cannot be re-enabled for the duration of the JVM instance
      */
     public static void disableExit() {
-        security.disableExit();
+        if (security != null) {
+            security.disableExit();
+        }
     }
 
     /**
@@ -611,7 +629,10 @@ public class JNLPRuntime {
      * determined.
      */
     public static ApplicationInstance getApplication() {
-        return security.getApplication();
+        if (security != null) {
+            return security.getApplication();
+        }
+        return null;
     }
 
     /**
@@ -739,7 +760,7 @@ public class JNLPRuntime {
      * the exit class and the runtime has been initialized.
      */
     private static void checkExitClass() {
-        if (securityEnabled && initialized)
+        if (security != null && securityEnabled && initialized)
             if (!security.isExitClass())
                 throw new IllegalStateException("Caller is not the exit class");
     }
@@ -789,8 +810,9 @@ public class JNLPRuntime {
     public static void setInitialArguments(List<String> args) {
         checkInitialized();
         SecurityManager securityManager = System.getSecurityManager();
-        if (securityManager != null)
+        if (securityManager != null) {
             securityManager.checkPermission(new AllPermission());
+        }
         initialArguments = args;
     }
 
