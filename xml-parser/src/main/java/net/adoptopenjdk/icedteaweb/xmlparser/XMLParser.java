@@ -71,6 +71,8 @@ public class XMLParser {
             final String processedXml = preprocessXml(sanitizedXml);
             final InputSource xmlInputStream = new InputSource(new StringReader(processedXml));
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            dbFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            dbFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(xmlInputStream);
             return new XmlNodeImpl(doc.getDocumentElement());

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jnlp [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+<jnlp spec="1.0+" codebase="http://localhost/">
+    <information>
+        <title>XXE Test &xxe;</title>
+        <vendor>IcedTea</vendor>
+    </information>
+    <resources>
+        <java version="1.8+"/>
+    </resources>
+    <application-desc main-class="Main"/>
+</jnlp>
