@@ -41,6 +41,7 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.security.SecureRandom;
 import java.util.Random;
 
 public class TextWithWaterLevel extends TextOutlineRenderer {
@@ -48,7 +49,7 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
     private Color waterColor;
     private Color bgColor;
     private int percentageOfWater;
-    private Random sea = new Random();
+    private SecureRandom sea = new SecureRandom();
     //set to null before getBackground if waving is needed
     //or create new TWL ;)
     private Polygon cachedPolygon;

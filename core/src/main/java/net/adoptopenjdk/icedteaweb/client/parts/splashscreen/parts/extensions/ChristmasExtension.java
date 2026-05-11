@@ -38,6 +38,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplash
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -62,7 +63,7 @@ public class ChristmasExtension implements SplashExtension {
     ChristmasExtension() {
         this(0, 0);
     }
-    private static final Random seed = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
     private static final int average_star_width = 10; //stars will be 5-15
     private final int average_fall_speed = 4; //2-6
     private final int average_rotation_speed = 2; //1-3
@@ -84,13 +85,13 @@ public class ChristmasExtension implements SplashExtension {
 
         public Star() {
             createRadiuses();
-            haveEight = seed.nextBoolean();
-            this.centerX = seed.nextInt(w + 1);
-            this.centerY = seed.nextInt(h + 1);
-            this.fallSpeed = average_fall_speed / 2 + seed.nextInt(average_fall_speed / 2);
-            this.orientation = seed.nextBoolean();
-            this.direction = -(average_rotation_speed / 2 + seed.nextInt(average_rotation_speed / 2));
-            if (seed.nextInt(4) == 0) {
+            haveEight = RANDOM.nextBoolean();
+            this.centerX = RANDOM.nextInt(w + 1);
+            this.centerY = RANDOM.nextInt(h + 1);
+            this.fallSpeed = average_fall_speed / 2 + RANDOM.nextInt(average_fall_speed / 2);
+            this.orientation = RANDOM.nextBoolean();
+            this.direction = -(average_rotation_speed / 2 + RANDOM.nextInt(average_rotation_speed / 2));
+            if (RANDOM.nextInt(4) == 0) {
                 originalColor[0] = Color.yellow.getRed();
                 originalColor[1] = Color.yellow.getGreen();
                 originalColor[2] = Color.yellow.getBlue();
@@ -145,13 +146,13 @@ public class ChristmasExtension implements SplashExtension {
             }
             if (centerY > h + radiusX * 2 || centerY > h + radiusY * 2) {
                 createRadiuses();
-                this.centerX = seed.nextInt(w + 1);
+                this.centerX = RANDOM.nextInt(w + 1);
                 this.centerY = -radiusY * 2;
             }
         }
 
         private int createRadius() {
-            return average_star_width / 2 + seed.nextInt(average_star_width);
+            return average_star_width / 2 + RANDOM.nextInt(average_star_width);
         }
 
         private Polygon createPolygon() {
@@ -193,7 +194,7 @@ public class ChristmasExtension implements SplashExtension {
         private void createRadiuses() {
             this.radiusX = createRadius();
             this.radiusY = radiusX;
-            switch (seed.nextInt(3)) {
+            switch (RANDOM.nextInt(3)) {
                 case (0):
                     radiusX = radiusX + (2 * radiusX) / 3;
                     break;

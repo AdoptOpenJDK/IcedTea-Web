@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -28,7 +29,7 @@ public class NativeLibraryStorage {
 
     private static final Logger LOG = LoggerFactory.getLogger(NativeLibraryStorage.class);
 
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
     public static final String NATIVE_LIB_EXT_DYLIB = ".dylib";
     public static final String NATIVE_LIB_EXT_JNILIB = ".jnilib";
     static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", NATIVE_LIB_EXT_DYLIB, NATIVE_LIB_EXT_JNILIB, ".framework", ".dll"};
