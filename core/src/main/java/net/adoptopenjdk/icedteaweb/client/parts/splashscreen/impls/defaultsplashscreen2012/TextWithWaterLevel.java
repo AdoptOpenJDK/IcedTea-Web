@@ -49,7 +49,7 @@ public class TextWithWaterLevel extends TextOutlineRenderer {
     private Color waterColor;
     private Color bgColor;
     private int percentageOfWater;
-    private SecureRandom sea = new SecureRandom();
+    private Random sea = new SecureRandom();
     //set to null before getBackground if waving is needed
     //or create new TWL ;)
     private Polygon cachedPolygon;

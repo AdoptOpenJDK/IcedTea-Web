@@ -19,7 +19,6 @@ public class XXETest {
         XmlNode title = information.getChildren("title").get(0);
 
         String titleValue = title.getNodeValue();
-     //   Assert.assertFalse("XXE entity should not be resolved and contain sensitive data", titleValue.contains("root:x"));
         Assert.assertEquals("XXE Test ", titleValue);
     }
 }

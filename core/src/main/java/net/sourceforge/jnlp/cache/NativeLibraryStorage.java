@@ -29,7 +29,7 @@ public class NativeLibraryStorage {
 
     private static final Logger LOG = LoggerFactory.getLogger(NativeLibraryStorage.class);
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final Random RANDOM = new SecureRandom();
     public static final String NATIVE_LIB_EXT_DYLIB = ".dylib";
     public static final String NATIVE_LIB_EXT_JNILIB = ".jnilib";
     static final String[] NATIVE_LIBRARY_EXTENSIONS = {".so", NATIVE_LIB_EXT_DYLIB, NATIVE_LIB_EXT_JNILIB, ".framework", ".dll"};

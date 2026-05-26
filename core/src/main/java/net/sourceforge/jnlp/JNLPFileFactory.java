@@ -36,13 +36,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.Calendar;
+import java.util.Random;
 
 public class JNLPFileFactory {
 
-    private SecureRandom secureRandom;
+    private Random random;
 
     public JNLPFileFactory() {
-        this.secureRandom = new SecureRandom();
+        this.random = new SecureRandom();
     }
 
     /**
@@ -61,7 +62,7 @@ public class JNLPFileFactory {
      * @param location
      */
     private String createUniqueKey(final URL location) {
-        return Calendar.getInstance().getTimeInMillis() + "-" + secureRandom.nextInt(Integer.MAX_VALUE) + "-" + location;
+        return Calendar.getInstance().getTimeInMillis() + "-" + random.nextInt(Integer.MAX_VALUE) + "-" + location;
     }
 
     /**
