@@ -38,6 +38,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.splashscreen.impls.defaultsplash
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -62,7 +63,7 @@ public class ChristmasExtension implements SplashExtension {
     ChristmasExtension() {
         this(0, 0);
     }
-    private static final Random seed = new Random();
+    private static final Random seed = new SecureRandom();
     private static final int average_star_width = 10; //stars will be 5-15
     private final int average_fall_speed = 4; //2-6
     private final int average_rotation_speed = 2; //1-3

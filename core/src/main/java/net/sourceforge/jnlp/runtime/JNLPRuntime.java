@@ -279,7 +279,7 @@ public class JNLPRuntime {
         // wire in custom authenticator for SSL connections
         try {
             SSLSocketFactory sslSocketFactory;
-            SSLContext context = SSLContext.getInstance("SSL");
+            SSLContext context = SSLContext.getInstance("TLS");
             KeyStore ks = KeyStores.getKeyStore(KeyStores.Level.USER, KeyStores.Type.CLIENT_CERTS).getKs();
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             SecurityUtil.initKeyManagerFactory(kmf, ks);
