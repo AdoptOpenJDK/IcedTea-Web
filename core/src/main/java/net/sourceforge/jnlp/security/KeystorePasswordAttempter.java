@@ -43,6 +43,7 @@ import net.sourceforge.jnlp.util.logging.OutputController;
 import javax.net.ssl.KeyManagerFactory;
 import javax.swing.JOptionPane;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -106,6 +107,10 @@ class KeystorePasswordAttempter {
             this.f = f;
         }
 
+        public KeyStore getKeyStore() {
+            return ks;
+        }
+
         abstract Key operateKeystore(char[] pass) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException;
 
         abstract String getId();
@@ -124,7 +129,6 @@ class KeystorePasswordAttempter {
     Key unlockKeystore(KeystoreOperation operation) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException, IOException, CertificateException {
         final String keyStorePath = operation.f != null ? operation.f.getCanonicalPath() : "Unknown";
         final SavedPassword successfulKey = successfulPerKeystore.get(keyStorePath);
-        LOG.debug("unlockKeyStore: For file {}, found successful pass = {} ",   keyStorePath, successfulKey != null);
 
         Exception firstEx = null;
         String messages = "";
@@ -140,12 +144,28 @@ class KeystorePasswordAttempter {
                 //we expect, that any keystore is loaded before read.
                 //so we are writing by correct password
                 //if no successful password was provided during reading, then finish(firstEx); will save us from overwrite
-                final Key result = operation.operateKeystore(pass.pass);
-                //ok we were successful
-                //save the loading password for storing purposes (and another reading too)
-                if (operation.f != null) {
-                    successfulPerKeystore.put(keyStorePath, pass);
+                final Key result;
+                if (operation.getId().contains("load keystore")) {
+                    result = operation.operateKeystore(null);
+                } else {
+                    if (successfulKey == null || successfulKey.pass == null) {
+                        // Verify the candidate password against the on-disk file before storing.
+                        // ks.store() accepts any password silently; load() is the only check.
+                        if (operation.f != null && operation.f.exists()) {
+                            KeyStore verification = KeyStore.getInstance(operation.getKeyStore().getType());
+                            try (FileInputStream fis = new FileInputStream(operation.f)) {
+                                verification.load(fis, pass.pass); // throws IOException if password is wrong
+                            }
+                        }
+                    }
+                    result = operation.operateKeystore(pass.pass);
+                    //ok we were successful
+                    //save the loading password for storing purposes (and another reading too)
+                    if (operation.f != null) {
+                        successfulPerKeystore.put(keyStorePath, pass);
+                    }
                 }
+
                 return result;
             } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | IOException | CertificateException ex) {
                 if (firstEx == null) {
