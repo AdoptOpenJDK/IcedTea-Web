@@ -124,7 +124,7 @@ jobs:
             sha256sum "$zip" > "$zip.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: icedtea-web_build_x86-64_linux
           path: |
@@ -232,7 +232,7 @@ jobs:
             sha256sum "$zip_rename" > "$zip_rename.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: icedtea-web_build_x86-64_portable
           path: |
@@ -308,7 +308,7 @@ jobs:
             sha256sum "$zip" > "$zip.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: icedtea-web_build_x86-64_macos
           path: |
@@ -436,7 +436,7 @@ jobs:
         run: bash .github/workflows/windows_build.sh
         shell: cmd
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: icedtea-web_build_x86-64_win
           path: |
