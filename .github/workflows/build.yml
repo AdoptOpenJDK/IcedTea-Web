@@ -40,10 +40,10 @@ jobs:
     if: always()
     needs: release
     name: Linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     container: centos:7
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
         with:
           path: icedtea-web
 
@@ -159,7 +159,7 @@ jobs:
     runs-on: ubuntu-22.04
     container: centos:7
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
         with:
           path: icedtea-web
 
@@ -266,7 +266,7 @@ jobs:
     name: macOS
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
         with:
           path: icedtea-web
 
@@ -377,7 +377,7 @@ jobs:
         shell: bash
         run: mkdir $HOME && git config --system core.autocrlf false && git config --system --add safe.directory '*'
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v3
         with:
           set-safe-directory: false
 
