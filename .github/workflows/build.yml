@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     container: centos:7
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           path: icedtea-web
 
@@ -159,7 +159,7 @@ jobs:
     runs-on: ubuntu-latest
     container: centos:7
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           path: icedtea-web
 
@@ -266,7 +266,7 @@ jobs:
     name: macOS
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           path: icedtea-web
 
@@ -377,7 +377,7 @@ jobs:
         shell: bash
         run: mkdir $HOME && git config --system core.autocrlf false && git config --system --add safe.directory '*'
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           set-safe-directory: false
 
