@@ -55,15 +55,21 @@ public class ProcessUtils {
         while (!pTerminated) {
             try {
                 process.waitFor();
-            } catch (final InterruptedException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
-            }
-            try {
-                process.exitValue();
                 pTerminated = true;
-            } catch (final IllegalThreadStateException e) {
-                LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+            } catch (final InterruptedException e) {
+                logInterruptedException(e);
             }
         }
     }
+
+    /**
+     * Logs the given InterruptedException to the error log using the default error message.
+     *
+     * @param e the InterruptedException object that occurred and will be logged
+     * @return This method does not have a return value as it logs the InterruptedException.
+     */
+    private static void logInterruptedException(InterruptedException e) {
+        LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, e);
+    }
+
 }
