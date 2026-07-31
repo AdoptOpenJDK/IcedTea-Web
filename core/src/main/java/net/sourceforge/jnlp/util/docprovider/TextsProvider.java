@@ -163,8 +163,9 @@ public abstract class TextsProvider {
     protected String getFiles(List<InfrastructureFileDescriptor> files) {
         StringBuilder sb = new StringBuilder();
         Set<Map.Entry<String, Setting>> defs = Defaults.getDefaults().entrySet();
-        files.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
-        for (InfrastructureFileDescriptor f : files) {
+        List<InfrastructureFileDescriptor> sortedFiles = new ArrayList<>(files);
+        sortedFiles.sort((o1, o2) -> o1.toString().compareTo(o2.toString()));
+        for (InfrastructureFileDescriptor f : sortedFiles) {
             String path = expandVariables ? f.getFullPath() : f.toString();
             String modified = "";
             String fGetFullPath = removeFileProtocol(f.getFullPath());
