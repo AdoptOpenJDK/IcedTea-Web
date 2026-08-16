@@ -13,10 +13,6 @@ on:
   pull_request:
     branches:
       - 1.8
-
-env:
-  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
-
 jobs:
   release:
     if: github.event.inputs.release == 'True'
@@ -41,9 +37,9 @@ jobs:
     needs: release
     name: Linux
     runs-on: ubuntu-latest
-    container: centos:7
+    container: centos:8
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           path: icedtea-web
 
@@ -55,7 +51,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          yum -y install autoconf bind-utils bzip2 cpio elfutils-libelf-devel gcc gcc-c++ glibc glibc-common glibc-devel \
+          yum -y install autoconf bc bind-utils bzip2 elfutils-libelf-devel gcc gcc-c++ glibc-devel \
           gmp-devel java-1.8.0-openjdk-devel libcurl-devel make mpfr-devel perl unzip which zip
           curl -o tagsoup.jar "https://repo1.maven.org/maven2/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar"
           sha256sum tagsoup.jar | awk '$1!="ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04"{exit 1}'
@@ -82,14 +78,14 @@ jobs:
 
       - name: Compile automake
         run: |
-          curl -o automake-1.13.1.tar.gz "https://ftp.gnu.org/gnu/automake/automake-1.13.1.tar.gz"
-          sha256sum automake-1.13.1.tar.gz | awk '$1!="51bc10031847e9965c4f2c16a0a66552309ce28ea82b1afa8cef736643ebaa27"{exit 1}'
-          tar -zxf automake-1.13.1.tar.gz 
-          cd automake-1.13.1
+          curl -o automake-1.15.1.tar.gz "https://ftp.gnu.org/gnu/automake/automake-1.15.1.tar.gz"
+          sha256sum automake-1.15.1.tar.gz | awk '$1!="988e32527abe052307d21c8ca000aa238b914df363a617e38f4fb89f5abf6260"{exit 1}'
+          tar -zxf automake-1.15.1.tar.gz 
+          cd automake-1.15.1
           bash configure
           make && make install
           rm -rf /usr/local/bin/automake
-          ln -s /usr/local/bin/automake-1.13 /usr/local/bin/automake
+          ln -s /usr/local/bin/automake-1.15 /usr/local/bin/automake
 
       - name: Build
         run: |
@@ -124,7 +120,7 @@ jobs:
             sha256sum "$zip" > "$zip.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: icedtea-web_build_x86-64_linux
           path: |
@@ -157,9 +153,9 @@ jobs:
     needs: release
     name: Portable
     runs-on: ubuntu-latest
-    container: centos:7
+    container: centos:8
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           path: icedtea-web
 
@@ -171,7 +167,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          yum -y install autoconf bind-utils bzip2 cpio elfutils-libelf-devel gcc gcc-c++ glibc glibc-common glibc-devel \
+          yum -y install autoconf bc bind-utils bzip2 elfutils-libelf-devel gcc gcc-c++ glibc-devel \
           gmp-devel java-1.8.0-openjdk-devel libcurl-devel make mpfr-devel perl unzip which zip
           curl -o tagsoup.jar "https://repo1.maven.org/maven2/org/ccil/cowan/tagsoup/tagsoup/1.2.1/tagsoup-1.2.1.jar"
           sha256sum tagsoup.jar | awk '$1!="ac97f7b4b1d8e9337edfa0e34044f8d0efe7223f6ad8f3a85d54cc1018ea2e04"{exit 1}'
@@ -192,14 +188,14 @@ jobs:
 
       - name: Compile automake
         run: |
-          curl -o automake-1.13.1.tar.gz "https://ftp.gnu.org/gnu/automake/automake-1.13.1.tar.gz"
-          sha256sum automake-1.13.1.tar.gz | awk '$1!="51bc10031847e9965c4f2c16a0a66552309ce28ea82b1afa8cef736643ebaa27"{exit 1}'
-          tar -zxf automake-1.13.1.tar.gz 
-          cd automake-1.13.1
+          curl -o automake-1.15.1.tar.gz "https://ftp.gnu.org/gnu/automake/automake-1.15.1.tar.gz"
+          sha256sum automake-1.15.1.tar.gz | awk '$1!="988e32527abe052307d21c8ca000aa238b914df363a617e38f4fb89f5abf6260"{exit 1}'
+          tar -zxf automake-1.15.1.tar.gz 
+          cd automake-1.15.1
           bash configure
           make && make install
           rm -rf /usr/local/bin/automake
-          ln -s /usr/local/bin/automake-1.13 /usr/local/bin/automake
+          ln -s /usr/local/bin/automake-1.15 /usr/local/bin/automake
 
       - name: Build
         run: |
@@ -232,7 +228,7 @@ jobs:
             sha256sum "$zip_rename" > "$zip_rename.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: icedtea-web_build_x86-64_portable
           path: |
@@ -266,7 +262,7 @@ jobs:
     name: macOS
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           path: icedtea-web
 
@@ -308,7 +304,7 @@ jobs:
             sha256sum "$zip" > "$zip.sha256.txt"
           done
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: icedtea-web_build_x86-64_macos
           path: |
@@ -344,7 +340,7 @@ jobs:
     steps:
       - name: Restore cygwin packages from cache
         id: cygwin
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: C:\cygwin_packages
           key: cygwin-packages-${{ runner.os }}-v1
@@ -368,7 +364,7 @@ jobs:
       - name: Check Cygwin sig
         run: |
           gpg --keyid-format=long --with-fingerprint --verify 'C:\temp\cygwin.exe.sig' 'C:\temp\cygwin.exe'
-          Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,cpio,curl,gcc,git,gnupg,grep,libtool,make,mingw64-x86_64-gcc-core,perl,pkg-config,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
+          Start-Process -Wait -FilePath 'C:\temp\cygwin.exe' -ArgumentList '--packages autoconf,automake,bc,cpio,curl,gcc,git,gnupg,grep,libtool,make,mingw64-x86_64-gcc-core,perl,pkg-config,unzip,wget,zip --quiet-mode --download --local-install --delete-orphans --site https://mirrors.kernel.org/sourceware/cygwin/ --local-package-dir C:\cygwin_packages --root C:\cygwin64'
 
       - name: Set PATH
         run: echo "C:\cygwin64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -377,7 +373,7 @@ jobs:
         shell: bash
         run: mkdir $HOME && git config --system core.autocrlf false && git config --system --add safe.directory '*'
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           set-safe-directory: false
 
@@ -436,7 +432,7 @@ jobs:
         run: bash .github/workflows/windows_build.sh
         shell: cmd
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v6
         with:
           name: icedtea-web_build_x86-64_win
           path: |

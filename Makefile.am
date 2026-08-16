@@ -547,8 +547,8 @@ $(WIN_INSTALLER_DIR)/itw-installer.json: clean-win-installer
 
 win-installer: win-only-image $(WIN_INSTALLER_DIR)/itw-installer.json
 	"$(JAVA)" -jar "$(WIXGEN_JAR)" "$(DESTDIR)$(prefix)" -c $(WIN_INSTALLER_DIR)/itw-installer.json -o $(WIN_INSTALLER_DIR)/itw-installer.wxs
-	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/candle.exe /nologo itw-installer.wxs
-	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/light.exe /nologo -sval -ext WixUIExtension itw-installer.wixobj
+	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/candle.exe -nologo itw-installer.wxs
+	cd $(WIN_INSTALLER_DIR) && "$(WIX_TOOLSET_DIR)"/light.exe -nologo -sval -ext WixUIExtension itw-installer.wixobj
 	cd $(WIN_INSTALLER_DIR) && mv itw-installer.msi $(distdir).msi
 endif
 
@@ -898,30 +898,29 @@ stamps/generate-docs.stamp: stamps/netx.stamp
 	mkdir "$$PLAIN_DOCS_TARGET_DIR" ; \
 	mkdir "$$MAN_DOCS_TARGET_DIR" ; \
 	HTML_DOCS_INDEX="$$HTML_DOCS_TARGET_DIR/index.html" ; \
-	TP_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR) net.sourceforge.jnlp.util.docprovider.TextsProvider" ; \
+	TP_COMMAND="$(SYSTEM_JRE_DIR)/bin/java -cp $(NETX_DIR)" ; \
+	TP_MAIN="net.sourceforge.jnlp.util.docprovider.TextsProvider" ; \
 	TP_TAIL="false $(FULL_VERSION)" ; \
-	LANG_BACKUP=$$LANG ; \
 	echo "<html><head><title>$(PLUGIN_VERSION)</title></head>" > "$$HTML_DOCS_INDEX" ; \
 	echo "<body><h3>$(PLUGIN_VERSION) docs:</h3>"  >> "$$HTML_DOCS_INDEX" ; \
 	for LANG_ID in en_US.UTF-8 cs_CZ.UTF-8 pl_PL.UTF-8 de_DE.UTF-8 ;  do \
 	  ID=`echo "$$LANG_ID" | head -c 2` ; \
+	  CNTRY=`echo "$$LANG_ID" | cut -c 4-5` ; \
 	  ENCOD=`echo "$$LANG_ID" | tail -c 6` ; \
-	  export LANG=$$LANG_ID; \
 	  mkdir "$$HTML_DOCS_TARGET_DIR/$$ID" ; \
 	  echo "<li><a href='$$ID/icedtea-web.html'>$$LANG_ID</a></li>"  >> "$$HTML_DOCS_INDEX" ; \
-	  $$TP_COMMAND html "$$HTML_DOCS_TARGET_DIR/$$ID" $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
+	  $$TP_COMMAND -Duser.language=$$ID -Duser.country=$$CNTRY $$TP_MAIN html "$$HTML_DOCS_TARGET_DIR/$$ID" $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
 	  mkdir "$$PLAIN_DOCS_TARGET_DIR/$$ID" ; \
-	  $$TP_COMMAND plain "$$PLAIN_DOCS_TARGET_DIR/$$ID" 160 $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
+	  $$TP_COMMAND -Duser.language=$$ID -Duser.country=$$CNTRY $$TP_MAIN plain "$$PLAIN_DOCS_TARGET_DIR/$$ID" 160 $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
 	  if [ $$ID = "en" ] ; then \
 	    MAN_DESC="$$MAN_DOCS_TARGET_DIR/man1" ; \
 	  else \
 	    MAN_DESC="$$MAN_DOCS_TARGET_DIR/$$ID/man1" ; \
 	  fi ; \
 	  mkdir -p "$$MAN_DESC" ; \
-	  $$TP_COMMAND man $$ENCOD "$$MAN_DESC" $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
-	  $$TP_COMMAND htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$$ID.html" $$TP_TAIL; \
+	  $$TP_COMMAND -Duser.language=$$ID -Duser.country=$$CNTRY $$TP_MAIN man $$ENCOD "$$MAN_DESC" $$TP_TAIL "-authorFile=$$AUTHORS_FILE_TARGET" ; \
+	  $$TP_COMMAND -Duser.language=$$ID -Duser.country=$$CNTRY $$TP_MAIN htmlIntro "$(NETX_DIR)/net/sourceforge/jnlp/resources/about_$$ID.html" $$TP_TAIL; \
 	done ; \
-	export LANG=$$LANG_BACKUP ; \
 	echo "</body></html>"  >> $$HTML_DOCS_INDEX ; \
 	touch $@
 
@@ -1441,7 +1440,7 @@ netx-dist-tests-remove-cert-from-public:
 	keystoredir=`dirname $$PUBLIC_KEYSTORE`; \
 	[ ! -d $$keystoredir ] && mkdir -p $$keystoredir; \
 	for which in "$${types[@]}" ; do \
-	  $(SYSTEM_JDK_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS) ; \
+	  $(SYSTEM_JDK_DIR)/bin/keytool -delete -alias $(TEST_CERT_ALIAS)_$$which -keystore $$PUBLIC_KEYSTORE -storepass $(PUBLIC_KEYSTORE_PASS); true; \
 	done ;
 	-rm -rf stamps/netx-dist-tests-import-cert-to-public
 
