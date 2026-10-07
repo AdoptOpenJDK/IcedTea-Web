@@ -37,14 +37,9 @@ import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.CertificateUtils;
 import net.sourceforge.jnlp.security.KeyStores;
 import net.sourceforge.jnlp.util.JarFile;
-import sun.security.util.DerInputStream;
-import sun.security.util.DerValue;
-import sun.security.x509.NetscapeCertTypeExtension;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.security.CodeSigner;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
@@ -74,7 +69,6 @@ import java.util.jar.JarEntry;
 import java.util.regex.Pattern;
 import java.util.zip.ZipException;
 
-import static java.lang.Boolean.TRUE;
 import static java.time.temporal.ChronoUnit.MONTHS;
 
 /**
@@ -648,35 +642,24 @@ public class JarCertVerifier implements CertVerifier {
             // shouldn't happen
         }
 
-        try {
-            // OID_NETSCAPE_CERT_TYPE
-            final byte[] netscapeEx = userCert.getExtensionValue("2.16.840.1.113730.1.1");
-            if (netscapeEx != null) {
-                final DerInputStream in = new DerInputStream(netscapeEx);
-                final byte[] raw = in.getOctetString();
-                final byte[] encoded = new DerValue(raw).getUnalignedBitString().toByteArray();
-
-                final NetscapeCertTypeExtension extn = new NetscapeCertTypeExtension(encoded);
-
-                if (!hasObjectSigningExtension(extn)) {
-                    certs.get(certPath).setBadNetscapeCertType();
-                }
-            }
-        } catch (IOException e) {
-            //
+        // OID_NETSCAPE_CERT_TYPE
+        final byte[] netscapeEx = userCert.getExtensionValue("2.16.840.1.113730.1.1");
+        if (netscapeEx != null && !hasObjectSigningBit(netscapeEx)) {
+            certs.get(certPath).setBadNetscapeCertType();
         }
     }
 
-    private static boolean hasObjectSigningExtension(NetscapeCertTypeExtension extn) throws IOException {
-        // method return type of "NetscapeCertTypeExtension.get()" has changed from Boolean to boolean with Java 21
-        try {
-            final Method getMethod = NetscapeCertTypeExtension.class.getDeclaredMethod("get", String.class);
-            final Object result = getMethod.invoke(extn, NetscapeCertTypeExtension.OBJECT_SIGNING);
-            return result == TRUE;
-        } catch (Exception e) {
-            LOG.error("Failed to get object_signing from extension", e);
-            return false;
-        }
+    /**
+     * @param netscapeEx DER value of the Netscape cert type extension: OCTET STRING { BIT STRING }
+     * @return whether bit 3 (object signing) is set; false if malformed
+     */
+    static boolean hasObjectSigningBit(final byte[] netscapeEx) {
+        // lengths are always short form here: a few bits at most
+        return netscapeEx.length >= 6
+                && netscapeEx[0] == 0x04  // OCTET STRING
+                && netscapeEx[2] == 0x03  // BIT STRING
+                && netscapeEx[3] >= 2     // unused-bits byte + at least one content byte
+                && (netscapeEx[5] & 0x10) != 0;
     }
 
     /**

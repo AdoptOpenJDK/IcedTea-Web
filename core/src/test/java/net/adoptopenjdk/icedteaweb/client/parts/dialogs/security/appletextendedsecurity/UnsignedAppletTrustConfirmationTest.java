@@ -53,6 +53,7 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.UrlUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -97,15 +98,21 @@ public class UnsignedAppletTrustConfirmationTest {
     };
     
     @BeforeClass
-    public static void initUrl() throws MalformedURLException {
+    public static void setUpClass() throws IOException {
+        backupAppTrust(); // first, so restoreAppTrust works even if URL setup fails
+        initUrl();
+        initUrlsX123();
+        initUrlsY12345678();
+    }
+
+    private static void initUrl() throws MalformedURLException {
         url=new URL(surl1);
         url4=new URL(url41+url42);
     }
    
    private static File backup;
 
-    @BeforeClass
-    public static void backupAppTrust() throws IOException{
+    private static void backupAppTrust() throws IOException{
         PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().createNewFile();
         backup = File.createTempFile("appletExtendedSecurity", "itwUnittest");
         backup.deleteOnExit();
@@ -204,8 +211,7 @@ public class UnsignedAppletTrustConfirmationTest {
     private static URL urlY7;
     private static URL urlY8;
     
-    @BeforeClass
-    public static void initUrlsX123() throws MalformedURLException, IOException {
+    private static void initUrlsX123() throws MalformedURLException, IOException {
         urlX1 = new URL("http://&#10;does&#32;not&#32;matter&#32;is&#32;ok");
         try {
             urlX2 = new URL("http://\ndoes not matter is harmful");
@@ -217,12 +223,15 @@ public class UnsignedAppletTrustConfirmationTest {
         }
     }
 
-    @BeforeClass
-    public static void initUrlsY12345678() throws MalformedURLException, IOException {
-        urlY1 = new URL("http://som\\EeUrl.cz/aa");
-        urlY2 = new URL("http://some\\QUrl.cz/aa");
-        urlY3 = new URL("http://so\\QmeU\\Erl.cz/aa");
-        urlY4 = new URL("http://so\\EmeU\\Qrl.cz/aa");
+    private static void initUrlsY12345678() throws MalformedURLException, IOException {
+        try {
+            urlY1 = new URL("http://som\\EeUrl.cz/aa");
+            urlY2 = new URL("http://some\\QUrl.cz/aa");
+            urlY3 = new URL("http://so\\QmeU\\Erl.cz/aa");
+            urlY4 = new URL("http://so\\EmeU\\Qrl.cz/aa");
+        } catch (MalformedURLException ex) { // backslash in host rejected by newer JDKs
+            ServerAccess.logException(ex);
+        }
 
         urlY5 = new URL("http://someUrl.cz/aa\\Ebb/cc");
         urlY6 = new URL("http://someUrl.cz/aa\\Qbb/cc");
@@ -232,6 +241,7 @@ public class UnsignedAppletTrustConfirmationTest {
 
     @Test
     public void updateAppletActionTestYQN1234saveAndLoadFine() throws Exception {
+        Assume.assumeNotNull(urlY1);
         PathsAndFiles.APPLET_TRUST_SETTINGS_USER.getFile().delete(); //clean file to examine later
         UnsignedAppletTrustConfirmation.updateAppletAction(
                 new DummyJnlpWithTitleAndUrlsWithOverwrite(urlY1),

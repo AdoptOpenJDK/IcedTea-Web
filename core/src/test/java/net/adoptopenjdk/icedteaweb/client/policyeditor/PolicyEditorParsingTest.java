@@ -36,7 +36,6 @@ import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import org.junit.Before;
 import org.junit.Test;
-import sun.security.provider.PolicyParser;
 
 import java.io.File;
 import java.util.Collection;

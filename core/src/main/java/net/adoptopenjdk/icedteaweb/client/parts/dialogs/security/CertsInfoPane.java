@@ -40,7 +40,6 @@ import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.DialogResult;
 import net.adoptopenjdk.icedteaweb.ui.swing.dialogresults.Yes;
 import net.sourceforge.jnlp.security.CertVerifier;
 import net.sourceforge.jnlp.security.SecurityUtil;
-import sun.security.x509.CertificateValidity;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -66,7 +65,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
@@ -170,11 +168,11 @@ public class CertsInfoPane extends SecurityDialogPanel {
         String serialNumber = c.getSerialNumber().toString();
         String signatureAlg = c.getSigAlgName();
         String issuer = c.getIssuerX500Principal().toString();
-        String validity = new CertificateValidity(c.getNotBefore(),
-                            c.getNotAfter()).toString();
+        // same text as sun.security.x509.CertificateValidity
+        String validity = "Validity: [From: " + c.getNotBefore() + ",\n               To: " + c.getNotAfter() + "]";
         String subject = c.getSubjectX500Principal().toString();
 
-        String signature = jdkIndependentHexEncoder(c.getSignature());
+        String signature = hexDump(c.getSignature());
 
         String md5Hash = "";
         String sha1Hash = "";
@@ -203,32 +201,16 @@ public class CertsInfoPane extends SecurityDialogPanel {
         return cert;
     }
 
-     private String jdkIndependentHexEncoder(byte[] signature) {
-        try {
-            return jdkIndependentHexEncoderImpl(signature);
-        } catch (Exception ex) {
-            String s = "Failed to encode signature: " + ex.toString();
-            LOG.error("Failed to encode signature", ex);
-            return s;
+    /** 16 bytes per line, offset prefixed; like the JDK-internal HexDumpEncoder minus the ASCII column */
+    static String hexDump(final byte[] bytes) {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            if (i % 16 == 0) {
+                sb.append(i == 0 ? "" : "\n").append(String.format("%04X:", i));
+            }
+            sb.append(String.format(" %02X", bytes[i] & 0xFF));
         }
-    }
-
-    private String jdkIndependentHexEncoderImpl(byte[] signature) throws Exception {
-        try {
-            LOG.debug("trying jdk9's HexDumpEncoder");
-            Class clazz = Class.forName("sun.security.util.HexDumpEncoder");
-            Object encoder = clazz.newInstance();
-            Method m = clazz.getDeclaredMethod("encodeBuffer", byte[].class);
-            //convert our signature into a nice human-readable form.
-            return (String) m.invoke(encoder, signature);
-        } catch (Exception ex) {
-                LOG.debug("trying jdk8's HexDumpEncoder");
-                Class clazz = Class.forName("sun.misc.HexDumpEncoder");
-                Object encoder = clazz.newInstance();
-                Method m = clazz.getMethod("encode", byte[].class);
-                //convert our signature into a nice human-readable form.
-                return (String) m.invoke(encoder, signature);
-        }
+        return sb.toString();
     }
 
     /**

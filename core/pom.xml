@@ -49,11 +49,30 @@
             <artifactId>rhino</artifactId>
             <version>1.7.15.1</version>
         </dependency>
+        <!-- Pack200 (removed from JDK 14) -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.28.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>icedtea-web-test-extensions</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- commons-compress Pack200 packer (tests only; unpacking needs no ASM) -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>9.10.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

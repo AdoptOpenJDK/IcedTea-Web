@@ -30,7 +30,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItemInArray;
@@ -65,6 +67,24 @@ public class ParserVersionStringTest extends NoStdOutErrTest {
     @Test
     public void testJnlpFileVersion() {
         Assert.assertEquals("2.1.1-rc1", parser.getFileVersion().toString());
+    }
+
+    @Test
+    public void testInvalidJnlpFileVersionIgnoredUnlessStrict() throws ParseException {
+        final String jnlp = "<jnlp spec=\"1.0+\" version=\"v.1.1.0.7.148 1487950053221\"></jnlp>";
+        Assert.assertNull(parserFor(jnlp, new ParserSettings()).getFileVersion());
+        try {
+            parserFor(jnlp, new ParserSettings(true, true, true)).getFileVersion();
+            Assert.fail("strict parser must reject the version");
+        } catch (IllegalArgumentException expected) {
+            // ok
+        }
+    }
+
+    private static Parser parserFor(final String jnlp, final ParserSettings settings) throws ParseException {
+        final XmlNode node = XmlParserFactory.getParser(settings.getParserType())
+                .getRootNode(new ByteArrayInputStream(jnlp.getBytes(StandardCharsets.UTF_8)));
+        return new Parser(new DummyJNLPFile(), null, node, settings);
     }
 
    @Test

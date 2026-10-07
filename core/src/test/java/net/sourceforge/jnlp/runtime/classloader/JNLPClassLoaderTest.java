@@ -58,7 +58,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import sun.net.www.protocol.jar.URLJarFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -99,24 +98,16 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
     private static String askUser;
 
     @BeforeClass
-    public static void setPermissions() {
+    public static void setPermissionsAndNoDialogs() {
         level = AppletStartupSecuritySettings.getInstance().getSecurityLevel();
         getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, AppletSecurityLevel.ALLOW_UNSIGNED.toChars());
-    }
-
-    @AfterClass
-    public static void resetPermissions() {
-        getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, level.toChars());
-    }
-
-    @BeforeClass
-    public static void noDialogs() {
         askUser = getConfiguration().getProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER);
         getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, Boolean.toString(false));
     }
 
     @AfterClass
-    public static void restoreDialogs() {
+    public static void resetPermissionsAndDialogs() {
+        getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_LEVEL, level.toChars());
         getConfiguration().setProperty(ConfigurationConstants.KEY_SECURITY_PROMPT_USER, askUser);
     }
 
@@ -555,7 +546,7 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
         JNLPRuntime.setSecurityEnabled(false);
         JNLPRuntime.setDebug(true);
         getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, "NONE");
-        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
+        CachedJarFileCallback.register();
 
         final ServerLauncher as = ServerAccess.getIndependentInstance(jnlp.getParent(), port);
         try {
@@ -569,7 +560,6 @@ public class JNLPClassLoaderTest extends NoStdOutErrTest {
             JNLPRuntime.setSecurityEnabled(securityBackup);
             JNLPRuntime.setDebug(verbose);
             getConfiguration().setProperty(ConfigurationConstants.KEY_ENABLE_MANIFEST_ATTRIBUTES_CHECK, manifestAttsBackup);
-            URLJarFile.setCallBack(null);
             as.stop();
 
             clearCache();

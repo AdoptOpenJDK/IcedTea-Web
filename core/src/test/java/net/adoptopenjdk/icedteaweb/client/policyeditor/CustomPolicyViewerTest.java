@@ -36,7 +36,6 @@ package net.adoptopenjdk.icedteaweb.client.policyeditor;
 import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
-import sun.security.provider.PolicyParser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -53,7 +53,6 @@ import net.sourceforge.jnlp.util.docprovider.PolicyEditorTextsProvider;
 import net.sourceforge.jnlp.util.docprovider.TextsProvider;
 import net.sourceforge.jnlp.util.docprovider.formatters.formatters.PlainTextFormatter;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.security.provider.PolicyParser;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;

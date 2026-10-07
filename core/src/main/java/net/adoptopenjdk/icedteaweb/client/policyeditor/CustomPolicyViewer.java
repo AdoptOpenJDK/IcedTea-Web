@@ -33,7 +33,6 @@ statement from your version.
 
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
-import sun.security.provider.PolicyParser;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;

@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 
 public class JvmUtilsTest {
 
@@ -144,7 +145,7 @@ public class JvmUtilsTest {
 
         assertEquals(JvmUtils.getPredefinedJavaModulesVMArgumentsMap().size(), result.size());
         assertTrue(result.contains("--add-reads=java.base=ALL-UNNAMED,java.desktop"));
-        assertTrue(result.contains("--add-exports=java.desktop/sun.applet=ALL-UNNAMED,java.desktop,jdk.jsobject"));
+        assertTrue(result.contains("--add-exports=java.desktop/sun.awt=ALL-UNNAMED,java.desktop"));
     }
 
     @Test
@@ -275,5 +276,13 @@ public class JvmUtilsTest {
     @Test(expected = ParseException.class)
     public void parsingWrongQuotedArguments() throws ParseException {
         JvmUtils.parseArguments("  some arguments \"with   Quotes\"AndMissingSpace after quote  ");
+    }
+
+    @Test
+    public void testDropMissingModules() {
+        assumeFalse(JvmUtils.isSystemModule("no.such.mod")); // Java 8: no modules, all count as present
+        assertEquals(Arrays.asList("--add-modules=java.sql,ALL-SYSTEM", "-Xmx1g", "--add-modules", "java.sql"),
+                JvmUtils.dropMissingModules(Arrays.asList("--add-modules=java.sql,no.such.mod,ALL-SYSTEM", "-Xmx1g",
+                        "--add-modules", "java.sql,no.such.mod", "--add-modules=no.such.mod", "--add-modules", "no.such.mod")));
     }
 }

@@ -37,6 +37,7 @@ import net.sourceforge.jnlp.config.InfrastructureFileDescriptor;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import java.security.Permission;
@@ -53,15 +54,24 @@ public class KeyStoresTest {
 
     }
 
+    // JDK 24+ (or 18-23 without -Djava.security.manager=allow) refuse any SecurityManager change
+    private static void setSecurityManager(SecurityManager sm) {
+        try {
+            System.setSecurityManager(sm);
+        } catch (UnsupportedOperationException e) {
+            Assume.assumeTrue("SecurityManager not supported", sm == null);
+        }
+    }
+
     @AfterClass
     public static void removeClassLoader() {
-        System.setSecurityManager(null);
+        setSecurityManager(null);
     }
 
     @Test
     public void getKeyStoreUserLocationTest() {
         InfrastructureFileDescriptor s;
-        System.setSecurityManager(null);
+        setSecurityManager(null);
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CA_CERTS);
         Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CACERTS.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CERTS);
@@ -77,7 +87,7 @@ public class KeyStoresTest {
     @Test
     public void getKeyStoreSystemLocationTest() {
         InfrastructureFileDescriptor s;
-        System.setSecurityManager(null);
+        setSecurityManager(null);
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS);
         Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CACERT.getFile());
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CERTS);
@@ -93,7 +103,7 @@ public class KeyStoresTest {
     @Test
     public void getKeyStoreUserLocationTestSM() {
         DummySM dm = new DummySM();
-        System.setSecurityManager(dm);
+        setSecurityManager(dm);
         InfrastructureFileDescriptor s;
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.USER, KeyStores.Type.CA_CERTS);
         Assert.assertEquals(s.getFile(), PathsAndFiles.USER_CACERTS.getFile());
@@ -111,7 +121,7 @@ public class KeyStoresTest {
     @Test
     public void getKeyStoreSystemLocationTestSM() {
         DummySM dm = new DummySM();
-        System.setSecurityManager(dm);
+        setSecurityManager(dm);
         InfrastructureFileDescriptor s;
         s = KeyStores.getKeyStoreLocation(KeyStores.Level.SYSTEM, KeyStores.Type.CA_CERTS);
         Assert.assertEquals(s.getFile(), PathsAndFiles.SYS_CACERT.getFile());

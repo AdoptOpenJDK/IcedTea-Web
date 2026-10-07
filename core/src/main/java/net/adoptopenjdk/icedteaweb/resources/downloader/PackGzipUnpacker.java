@@ -16,23 +16,28 @@
 
 package net.adoptopenjdk.icedteaweb.resources.downloader;
 
+import org.apache.commons.compress.java.util.jar.Pack200;
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarOutputStream;
-import java.util.jar.Pack200;
 import java.util.zip.GZIPInputStream;
 
 /**
  * Unpacker for PACK200 and Gzip streams.
+ * Pack200 from commons-compress: java.util.jar.Pack200 was removed in JDK 14.
  */
 public class PackGzipUnpacker implements StreamUnpacker {
     @Override
     public InputStream unpack(InputStream input) throws IOException {
         final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try (final JarOutputStream outputStream = new JarOutputStream(buffer)) {
-            Pack200.newUnpacker().unpack(new GZIPInputStream(input), outputStream);
+            // not a FilterInputStream: unpacker would reflectively unwrap it, denied on JDK 17+
+            final InputStream packed = new ByteArrayInputStream(IOUtils.toByteArray(new GZIPInputStream(input)));
+            Pack200.newUnpacker().unpack(packed, outputStream);
         }
         return new ByteArrayInputStream(buffer.toByteArray());
     }

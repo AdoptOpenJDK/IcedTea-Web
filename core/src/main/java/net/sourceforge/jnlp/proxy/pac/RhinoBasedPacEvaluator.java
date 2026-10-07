@@ -56,7 +56,6 @@ import java.security.ProtectionDomain;
 import java.util.PropertyPermission;
 
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_NAME;
-import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
 
 /**
  * Represents a Proxy Auto Config file. This object can be used to evaluate the
@@ -65,6 +64,9 @@ import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
  * @see <a href="http://en.wikipedia.org/wiki/Proxy_auto-config#The_PAC_file">The PAC File</a>
  */
 public class RhinoBasedPacEvaluator implements PacEvaluator {
+
+    // values of sun.security.util.SecurityConstants
+    private static final String PROPERTY_READ_ACTION = "read";
 
     private final static Logger LOG = LoggerFactory.getLogger(RhinoBasedPacEvaluator.class);
 

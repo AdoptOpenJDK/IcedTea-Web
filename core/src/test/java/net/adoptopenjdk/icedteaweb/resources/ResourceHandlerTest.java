@@ -11,6 +11,7 @@ import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.logging.NoStdOutErrTest;
 import net.sourceforge.jnlp.util.logging.OutputController;
 import net.sourceforge.jnlp.util.logging.StdInOutErrController;
+import org.apache.commons.compress.java.util.jar.Pack200;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -28,7 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.jar.Attributes;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
-import java.util.jar.Pack200;
 import java.util.zip.GZIPOutputStream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -209,8 +209,7 @@ public class ResourceHandlerTest extends NoStdOutErrTest {
 
         final JarFile jarFile = new JarFile(jar.getAbsolutePath());
         final FileOutputStream fos = new FileOutputStream(pack);
-        final Pack200.Packer p = Pack200.newPacker();
-        p.pack(jarFile.getNative(), fos);
+        Pack200.newPacker().pack(jarFile.getNative(), fos);
         fos.close();
 
         final File packgz = new File(downloadDir, fileName + ".jar.pack.gz");

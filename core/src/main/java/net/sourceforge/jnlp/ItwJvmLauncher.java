@@ -16,6 +16,7 @@
 //
 package net.sourceforge.jnlp;
 
+import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.ProcessUtils;
 import net.adoptopenjdk.icedteaweb.launch.JvmLauncher;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
@@ -57,7 +58,7 @@ public class ItwJvmLauncher implements JvmLauncher {
         commands.add(pathToItwBinary);
 
         // use -Jargument format to pass arguments to the JVM through the launcher
-        for (String arg : vmArgs) {
+        for (String arg : JvmUtils.dropMissingModules(vmArgs)) {
             commands.add("-J" + arg);
         }
 

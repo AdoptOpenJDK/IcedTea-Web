@@ -42,6 +42,8 @@ import java.util.jar.JarEntry;
 import net.adoptopenjdk.icedteaweb.jnlp.element.resource.JARDesc;
 import net.adoptopenjdk.icedteaweb.testing.tools.CodeSignerCreator;
 import net.sourceforge.jnlp.tools.JarCertVerifier.VerifyResult;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.misc.NetscapeCertType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -526,4 +528,14 @@ public class JarCertVerifierTest {
                 jcv.getCertsList().contains(alphaSigner.getSignerCertPath()));
     }
 
+    @Test
+    public void testHasObjectSigningBit() throws Exception {
+        // extension values as found in certificates: OCTET STRING { BIT STRING }, encoded by BC
+        final byte[] objectSigning = new DEROctetString(new NetscapeCertType(NetscapeCertType.objectSigning | NetscapeCertType.sslClient)).getEncoded();
+        final byte[] sslServerOnly = new DEROctetString(new NetscapeCertType(NetscapeCertType.sslServer)).getEncoded();
+        assertTrue(JarCertVerifier.hasObjectSigningBit(objectSigning));
+        assertFalse(JarCertVerifier.hasObjectSigningBit(sslServerOnly));
+        assertFalse(JarCertVerifier.hasObjectSigningBit(new byte[]{0x04, 0x02, 0x03, 0x01}));
+        assertFalse(JarCertVerifier.hasObjectSigningBit(new byte[0]));
+    }
 }

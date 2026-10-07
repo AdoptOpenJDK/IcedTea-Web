@@ -15,6 +15,9 @@ const ITW_LIBS: Option<&'static str> = option_env!("ITW_LIBS");
 const MODULARJDK_ARGS_LOCATION: Option<&'static str> = option_env!("MODULARJDK_ARGS_LOCATION");
 const MSLINKS_JAR: Option<&'static str> = option_env!("MSLINKS_JAR");
 const IPADDRESS_JAR: Option<&'static str> = option_env!("IPADDRESS_JAR");
+const COMMONS_COMPRESS_JAR: Option<&'static str> = option_env!("COMMONS_COMPRESS_JAR");
+const COMMONS_IO_JAR: Option<&'static str> = option_env!("COMMONS_IO_JAR");
+const COMMONS_LANG3_JAR: Option<&'static str> = option_env!("COMMONS_LANG3_JAR");
 
 
 pub fn get_jre() -> &'static str {
@@ -40,6 +43,9 @@ pub fn get_rhino() -> Option<&'static str> { sanitize(RHINO_JAR) }
 pub fn get_mslinks() -> Option<&'static str> { sanitize(MSLINKS_JAR) }
 
 pub fn get_ipaddress() -> Option<&'static str> { sanitize(IPADDRESS_JAR) }
+pub fn get_commons_compress() -> Option<&'static str> { sanitize(COMMONS_COMPRESS_JAR) }
+pub fn get_commons_io() -> Option<&'static str> { sanitize(COMMONS_IO_JAR) }
+pub fn get_commons_lang3() -> Option<&'static str> { sanitize(COMMONS_LANG3_JAR) }
 
 pub fn get_argsfile() -> &'static str {
     MODULARJDK_ARGS_LOCATION.unwrap_or("MODULARJDK_ARGS_LOCATION-dev-unspecified")

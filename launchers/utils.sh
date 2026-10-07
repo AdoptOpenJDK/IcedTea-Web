@@ -23,6 +23,9 @@ function build() {
     export RHINO_JAR=$RHINO_SRC
     export MSLINKS_JAR=$MSLINKS_SRC
     export IPADDRESS_JAR=$IPADDRESS_SRC
+    export COMMONS_COMPRESS_JAR=$COMMONS_COMPRESS_SRC
+    export COMMONS_IO_JAR=$COMMONS_IO_SRC
+    export COMMONS_LANG3_JAR=$COMMONS_LANG3_SRC
   fi
   export JRE
   export ITW_LIBS
@@ -55,6 +58,9 @@ function build() {
         -e "s|[@]RHINO_JAR[@]|$RHINO_JAR|g" \
         -e "s|[@]MSLINKS_JAR[@]|$MSLINKS_JAR|g" \
         -e "s|[@]IPADDRESS_JAR[@]|$IPADDRESS_JAR|g" \
+        -e "s|[@]COMMONS_COMPRESS_JAR[@]|$COMMONS_COMPRESS_JAR|g" \
+        -e "s|[@]COMMONS_IO_JAR[@]|$COMMONS_IO_JAR|g" \
+        -e "s|[@]COMMONS_LANG3_JAR[@]|$COMMONS_LANG3_JAR|g" \
         -e "s|[@]JAVAWS_JAR[@]|$JAVAWS_JAR|g" \
         -e "s|[@]SPLASH_PNG[@]|$SPLASH_PNG|g" \
         -e "s|[@]MODULARJDK_ARGS_LOCATION[@]|$MODULARJDK_ARGS_LOCATION|g" \

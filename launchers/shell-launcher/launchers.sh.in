@@ -8,7 +8,6 @@ if echo "'$*'" | grep -e "-verbose" ; then
   set -x
 fi
 
-NASHORN=lib/ext/nashorn.jar
 JRE=@JRE@
 LAUNCHER_FLAGS=-Xms8m
 MAIN_CLASS=@MAIN_CLASS@
@@ -21,6 +20,9 @@ readonly JAVAWS_SRC=@JAVAWS_JAR@
 readonly TAGSOUP_SRC=@TAGSOUP_JAR@
 readonly RHINO_SRC=@RHINO_JAR@
 readonly IPADDRESS_SRC=@IPADDRESS_JAR@
+readonly COMMONS_COMPRESS_SRC=@COMMONS_COMPRESS_JAR@
+readonly COMMONS_IO_SRC=@COMMONS_IO_JAR@
+readonly COMMONS_LANG3_SRC=@COMMONS_LANG3_JAR@
 # windows only: (cywin usage?); need to declare it anyway
 readonly MSLINKS_SRC=@MSLINKS_JAR@
 
@@ -72,11 +74,20 @@ if [ ! "x$JAVA_HOME" = "x" ] ; then
   echo "Warning! JAVA_HOME of $JAVA_HOME in play!"
   CUSTOM_JRE=$JAVA_HOME
 fi
+# openSUSE alljava.sh sets JRE_HOME always, JAVA_HOME only with a JDK
+if [ "x$CUSTOM_JRE" = "x" -a ! "x$JRE_HOME" = "x" ] ; then
+  CUSTOM_JRE=$JRE_HOME
+fi
 #check in $path
 if [ "x$CUSTOM_JRE" = "x" ] ; then
   while IFS=: read -d: -r path_entry; do
     if [ -e "${path_entry}/java" ] ; then
-     CUSTOM_JRE=$(dirname $(dirname $(readlink -f "$path_entry/java")))
+     JAVA_BIN=$(readlink -f "$path_entry/java")
+     # openSUSE libalternatives: java -> alts, ask alts for the real binary
+     if [ "$(basename "$JAVA_BIN")" == "alts" ] ; then
+       JAVA_BIN=$(readlink -f "$(alts -t java)")
+     fi
+     CUSTOM_JRE=$(dirname $(dirname "$JAVA_BIN"))
     fi;
   done <<< "${PATH}"
 
@@ -110,6 +121,9 @@ if [ "x$ITW_LIBS" == "xBUNDLED" -o ! "x$ITW_HOME" = "x" ] ; then
   readonly TAGSOUP_JAR=""
   readonly MSLINKS_JAR=""
   readonly IPADDRESS_JAR=""
+  readonly COMMONS_COMPRESS_JAR=""
+  readonly COMMONS_IO_JAR=""
+  readonly COMMONS_LANG3_JAR=""
   echo "warning, using portable itw from $ITW_HOME"
 else
   readonly JAVAWS_JAR="$JAVAWS_SRC"
@@ -118,23 +132,22 @@ else
   readonly TAGSOUP_JAR="$TAGSOUP_SRC"
   readonly MSLINKS_JAR="$MSLINKS_SRC"
   readonly IPADDRESS_JAR="$IPADDRESS_SRC"
+  readonly COMMONS_COMPRESS_JAR="$COMMONS_COMPRESS_SRC"
+  readonly COMMONS_IO_JAR="$COMMONS_IO_SRC"
+  readonly COMMONS_LANG3_JAR="$COMMONS_LANG3_SRC"
 fi
 set -u
-LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$JAVAWS_JAR:$TAGSOUP_JAR:$RHINO_JAR:$MSLINKS_JAR:$IPADDRESS_JAR"
+LAUNCHER_BOOTCLASSPATH="-Xbootclasspath/a:$JAVAWS_JAR:$TAGSOUP_JAR:$RHINO_JAR:$MSLINKS_JAR:$IPADDRESS_JAR:$COMMONS_COMPRESS_JAR:$COMMONS_IO_JAR:$COMMONS_LANG3_JAR"
 
-# Fix classpaths for custom JRE:
+# Select java (custom JRE or default):
 if [ "x$CUSTOM_JRE" != "x" ] ; then
   if [ -e "$CUSTOM_JRE" -a -e "$CUSTOM_JRE/bin/java" ] ; then
     JAVA=$CUSTOM_JRE/bin/java
-    CP=$CUSTOM_JRE/lib/rt.jar:$CUSTOM_JRE/lib/ext/jfxrt.jar
-    LAUNCHER_BOOTCLASSPATH=$LAUNCHER_BOOTCLASSPATH:$CUSTOM_JRE/$NASHORN
   else
-    echo "Your custom JRE $CUSTOM_JRE read from deployment.properties under key $PROPERTY_NAME as $CUSTOM_JRE is not valid. Using default ($JRE, $CP) in attempt to start. Please fix this."
+    echo "Your custom JRE $CUSTOM_JRE read from deployment.properties under key $PROPERTY_NAME as $CUSTOM_JRE is not valid. Using default ($JRE) in attempt to start. Please fix this."
   fi
 else
   JAVA=$JRE/bin/java
-  CP=$JRE/lib/rt.jar:$JRE/lib/ext/jfxrt.jar
-  LAUNCHER_BOOTCLASSPATH="$LAUNCHER_BOOTCLASSPATH:$JRE/$NASHORN"
 fi;
 
 
@@ -211,6 +224,11 @@ if [ "x$MODULAR_JDK" == "xYES" ] ; then
   COMMAND[k]="@$RUN_ARGS_LOCATION"
   k=$((k+1))
 fi
+# JDK 18-23 refuse System.setSecurityManager unless allowed at startup; 9-11 and 24+ do not start with it
+if [ "$version" -ge "18" -a "$version" -le "23" ] ; then
+  COMMAND[k]="-Djava.security.manager=allow"
+  k=$((k+1))
+fi
 
 
 i=0
@@ -222,7 +240,7 @@ done
 
 COMMAND[k]="-classpath"
 k=$((k+1))
-COMMAND[k]="${CP}"
+COMMAND[k]=""
 k=$((k+1))
 
 COMMAND[k]="-Dicedtea-web.bin.name=`basename $SCRIPT_SOURCE`"

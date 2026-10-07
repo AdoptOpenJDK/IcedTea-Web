@@ -146,37 +146,23 @@ fn filter_in_key(key: &str, os: &os_access::Os, vec: &mut Vec<std::path::PathBuf
     filter_in_val(val, vec)
 }
 
-//TODO what to do with rt.jar, nashorn and javafx.jar with jdk11 and up?
-fn get_bootcp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<std::path::PathBuf> {
+fn get_bootcp_members(os: &os_access::Os) -> Vec<std::path::PathBuf> {
     let mut cp_parts = Vec::new();
     cp_parts.push(resolve_jar(hardcoded_paths::get_javaws(), os));
     append_if_exists(hardcoded_paths::get_rhino(), os, &mut cp_parts);
     append_if_exists(hardcoded_paths::get_tagsoup(), os, &mut cp_parts);
     append_if_exists(hardcoded_paths::get_mslinks(), os, &mut cp_parts);
     append_if_exists(hardcoded_paths::get_ipaddress(), os, &mut cp_parts);
-    let mut nashorn_jar = jre_path.clone();
-    nashorn_jar.push("lib");
-    nashorn_jar.push("ext");
-    nashorn_jar.push("nashorn.jar");
-    cp_parts.push(nashorn_jar);
+    append_if_exists(hardcoded_paths::get_commons_compress(), os, &mut cp_parts);
+    append_if_exists(hardcoded_paths::get_commons_io(), os, &mut cp_parts);
+    append_if_exists(hardcoded_paths::get_commons_lang3(), os, &mut cp_parts);
     filter_out_key("deployment.launcher.rust.bootcp.remove", os, &mut cp_parts, );
     filter_in_key("deployment.launcher.rust.bootcp.add", os, &mut cp_parts);
     cp_parts
 }
 
-//can this be buggy? Shouldnt jfxrt.jar be in boot classapth? Copied from shell launchers...
-//see eg: http://mail.openjdk.java.net/pipermail/distro-pkg-dev/2018-November/040492.html
-fn get_cp_members(jre_path: &std::path::PathBuf, os: &os_access::Os) -> Vec<std::path::PathBuf> {
+fn get_cp_members(os: &os_access::Os) -> Vec<std::path::PathBuf> {
     let mut cp_parts = Vec::new();
-    let mut rt_jar = jre_path.clone();
-    rt_jar.push("lib");
-    rt_jar.push("rt.jar");
-    cp_parts.push(rt_jar);
-    let mut jfxrt_jar = jre_path.clone();
-    jfxrt_jar.push("lib");
-    jfxrt_jar.push("ext");
-    jfxrt_jar.push("jfxrt.jar");
-    cp_parts.push(jfxrt_jar);
     filter_out_key("deployment.launcher.rust.cp.remove", os, &mut cp_parts, );
     filter_in_key("deployment.launcher.rust.cp.add", os, &mut cp_parts);
     cp_parts
@@ -193,13 +179,13 @@ fn compose_class_path(members: Vec<std::path::PathBuf>, os: &os_access::Os) -> S
     result
 }
 
-pub fn get_classpath(jre_path: &std::path::PathBuf, os: &os_access::Os) -> String {
-    compose_class_path(get_cp_members(jre_path, os), os)
+pub fn get_classpath(os: &os_access::Os) -> String {
+    compose_class_path(get_cp_members(os), os)
 }
 
-pub fn get_bootclasspath(jre_path: &std::path::PathBuf, os: &os_access::Os) -> String {
+pub fn get_bootclasspath(os: &os_access::Os) -> String {
     let mut result = String::from("-Xbootclasspath/a:");
-    result.push_str(&compose_class_path(get_bootcp_members(jre_path, os), os));
+    result.push_str(&compose_class_path(get_bootcp_members(os), os));
     result
 }
 

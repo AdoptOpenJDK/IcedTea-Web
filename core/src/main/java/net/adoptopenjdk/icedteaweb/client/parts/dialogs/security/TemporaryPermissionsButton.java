@@ -36,12 +36,12 @@ package net.adoptopenjdk.icedteaweb.client.parts.dialogs.security;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditorPermissions;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyIdentifier;
+import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyParser;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.JNLPFile;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import net.sourceforge.jnlp.runtime.classloader.SecurityDelegate;
-import sun.security.provider.PolicyParser;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;

@@ -34,7 +34,6 @@ statement from your version.
 package net.adoptopenjdk.icedteaweb.client.policyeditor;
 
 import org.junit.Test;
-import sun.security.provider.PolicyParser;
 
 import java.util.Collections;
 import java.util.HashSet;

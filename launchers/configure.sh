@@ -94,9 +94,11 @@ function findJar() {
 }
 
 
+# $1 jar name, $2 maven groupId:artifactId
 function getJar() {
   if [ "x$ITW_LIBS" == "xDISTRIBUTION" ] ; then
-    findJar "$SYSTEM_JARS"  "$1"
+    # javapackages-tools knows the canonical jar (coordinates need xmvn-resolve); plain find may hit private copies (e.g. xmvn's)
+    find-jar "$2" 2>/dev/null || find-jar "$1" 2>/dev/null || findJar "$SYSTEM_JARS"  "$1"
   else
     # Dependent jars for non distribution builds have no sense with fat javaws.jar
     echo ""
@@ -104,24 +106,39 @@ function getJar() {
 }
 
 if [ "x$RHINO_SRC" == "x" ] ; then
-  readonly RHINO_SRC=`getJar "rhino"`
+  readonly RHINO_SRC=`getJar "rhino" "org.mozilla:rhino"`
 else
   readonly RHINO_SRC=$RHINO_SRC
 fi
 if [ "x$TAGSOUP_SRC" == "x" ] ; then
-  readonly TAGSOUP_SRC=`getJar "tagsoup"`
+  readonly TAGSOUP_SRC=`getJar "tagsoup" "org.ccil.cowan.tagsoup:tagsoup"`
 else
   readonly TAGSOUP_SRC=$TAGSOUP_SRC
 fi
 if [ "x$MSLINKS_SRC" == "x" ] ; then
-  readonly MSLINKS_SRC=`getJar "mslinks"`
+  readonly MSLINKS_SRC=`getJar "mslinks" "com.github.vatbub:mslinks"`
 else
   readonly MSLINKS_SRC=$MSLINKS_SRC
 fi
 if [ "x$IPADDRESS_SRC" == "x" ] ; then
-  readonly IPADDRESS_SRC=`getJar "ipaddress"`
+  readonly IPADDRESS_SRC=`getJar "ipaddress" "com.github.seancfoley:ipaddress"`
 else
   readonly IPADDRESS_SRC=$IPADDRESS_SRC
+fi
+if [ "x$COMMONS_COMPRESS_SRC" == "x" ] ; then
+  readonly COMMONS_COMPRESS_SRC=`getJar "commons-compress" "org.apache.commons:commons-compress"`
+else
+  readonly COMMONS_COMPRESS_SRC=$COMMONS_COMPRESS_SRC
+fi
+if [ "x$COMMONS_IO_SRC" == "x" ] ; then
+  readonly COMMONS_IO_SRC=`getJar "commons-io" "commons-io:commons-io"`
+else
+  readonly COMMONS_IO_SRC=$COMMONS_IO_SRC
+fi
+if [ "x$COMMONS_LANG3_SRC" == "x" ] ; then
+  readonly COMMONS_LANG3_SRC=`getJar "commons-lang3" "org.apache.commons:commons-lang3"`
+else
+  readonly COMMONS_LANG3_SRC=$COMMONS_LANG3_SRC
 fi
 
 

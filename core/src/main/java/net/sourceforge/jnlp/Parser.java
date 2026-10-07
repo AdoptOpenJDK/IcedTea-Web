@@ -293,7 +293,19 @@ public final class Parser {
      */
     public VersionId getFileVersion() {
         final String version = getAttribute(root, JNLPFile.VERSION_ATTRIBUTE, null);
-        return (version == null) ? null : VersionId.fromString(version.trim());
+        if (version == null) {
+            return null;
+        }
+        try {
+            return VersionId.fromString(version.trim());
+        } catch (IllegalArgumentException e) {
+            if (strict) {
+                throw e;
+            }
+            // Oracle javaws took any text here (e.g. USPTO's "v.1.1.0.7.148 1487950053221"); only a cache/lock key
+            LOG.warn("Ignoring invalid jnlp version attribute: {}", e.getMessage());
+            return null;
+        }
     }
 
     /**

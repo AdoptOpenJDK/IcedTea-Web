@@ -6,14 +6,17 @@ import net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions;
 import net.sourceforge.jnlp.runtime.Boot;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions.HEADLESS;
 import static net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions.NOFORK;
+import static net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions.NOSEC;
 import static net.adoptopenjdk.icedteaweb.commandline.CommandLineOptions.VERBOSE;
 
 /**
@@ -39,10 +42,30 @@ public class ItwLauncher {
         args.add("-jnlp");
         args.add(jnlpUrl);
         additionalArgs.stream().map(CommandLineOptions::getOption).forEach(args::add);
+        if (javaMajorVersion() >= 24) {
+            // no SecurityManager: test apps are unsigned and would be refused
+            args.add(NOSEC.getOption());
+        }
         Collections.addAll(args, arguments);
 
 
-        return launchExternal(pathToJavaBinary, pathToJavawsJar, Collections.emptyList(), args);
+        return launchExternal(pathToJavaBinary, pathToJavawsJar, launcherVmArgs(), args);
+    }
+
+    private static int javaMajorVersion() {
+        final String[] parts = JavaSystemProperties.getJavaVersion().split("[^0-9]+");
+        final int major = Integer.parseInt(parts[0]);
+        return major == 1 ? Integer.parseInt(parts[1]) : major;
+    }
+
+    /**
+     * Module and SecurityManager flags the real launchers add; taken from this (surefire) JVM,
+     * which gets them from the parent pom's JDK profiles.
+     */
+    private static List<String> launcherVmArgs() {
+        return ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
+                .filter(a -> a.startsWith("--add-") || a.startsWith("-Djava.security.manager"))
+                .collect(Collectors.toList());
     }
 
     /**

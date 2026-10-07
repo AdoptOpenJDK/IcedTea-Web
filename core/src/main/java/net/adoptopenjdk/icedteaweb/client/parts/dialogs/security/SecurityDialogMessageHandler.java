@@ -224,8 +224,9 @@ public class SecurityDialogMessageHandler implements Runnable {
                     LOG.error("Probably wrong value?", eeex);
                     repeatAll = false;
                 } catch (Exception ex) {
+                    // retrying would fail the same way forever (e.g. NPE on a panel-less dialog); null response = deny
                     LOG.error(IcedTeaWebConstants.DEFAULT_ERROR_MESSAGE, ex);
-                    repeatAll = true;
+                    keepGoing = false;
                 }
             } while (keepGoing);
         } finally {

@@ -36,10 +36,10 @@ package net.sourceforge.jnlp.security;
 
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
-import sun.security.util.DerValue;
-import sun.security.util.HostnameChecker;
-import sun.security.x509.X500Name;
 
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import java.security.KeyStore;
 import java.security.cert.CertPath;
 import java.security.cert.Certificate;
@@ -137,6 +137,20 @@ public class HttpsCertVerifier implements CertVerifier {
         return details;
     }
 
+    /**
+     * @return the last (most specific) CN of the subject, or null
+     */
+    static String getMostSpecificCommonName(final X509Certificate c) throws InvalidNameException {
+        String commonName = null;
+        // getRdns() is ordered least to most specific
+        for (final Rdn rdn : new LdapName(c.getSubjectX500Principal().getName()).getRdns()) {
+            if ("CN".equalsIgnoreCase(rdn.getType()) && rdn.getValue() instanceof String) {
+                commonName = (String) rdn.getValue();
+            }
+        }
+        return commonName;
+    }
+
     private String getNamesForCert(final X509Certificate c) {
 
         final List<String> names = new ArrayList<>();
@@ -148,12 +162,9 @@ public class HttpsCertVerifier implements CertVerifier {
         final int ALTNAME_IP = 7;
 
         try {
-            final X500Name subjectName = HostnameChecker.getSubjectX500Name(c);
-            if (subjectName != null) {
-                final DerValue derValue = subjectName.findMostSpecificAttribute(X500Name.commonName_oid);
-                if (derValue != null) {
-                    names.add(derValue.getAsString());
-                }
+            final String commonName = getMostSpecificCommonName(c);
+            if (commonName != null) {
+                names.add(commonName);
             }
 
             final Collection<List<?>> subjAltNames = c.getSubjectAlternativeNames();

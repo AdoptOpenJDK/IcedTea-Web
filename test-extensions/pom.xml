@@ -16,6 +16,12 @@
     <description>This module contains common classes that are used in unit and integration tests.</description>
 
     <dependencies>
+        <!-- test certificates without JDK-internal CertAndKeyGen -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk18on</artifactId>
+            <version>1.86</version>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>icedtea-web-common</artifactId>

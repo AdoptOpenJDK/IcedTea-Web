@@ -91,8 +91,6 @@ import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_VENDO
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.VM_VERSION;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.WEBSTART_JAUTHENTICATOR;
 import static net.adoptopenjdk.icedteaweb.JavaSystemPropertiesConstants.WEBSTART_VERSION;
-import static sun.security.util.SecurityConstants.PROPERTY_READ_ACTION;
-import static sun.security.util.SecurityConstants.PROPERTY_RW_ACTION;
 
 /**
  * The security element.
@@ -101,6 +99,10 @@ import static sun.security.util.SecurityConstants.PROPERTY_RW_ACTION;
  * @version $Revision: 1.7 $
  */
 public class SecurityDesc {
+
+    // values of sun.security.util.SecurityConstants
+    private static final String PROPERTY_READ_ACTION = "read";
+    private static final String PROPERTY_RW_ACTION = "read,write";
     private final static Logger LOG = LoggerFactory.getLogger(SecurityDesc.class);
 
     public static final String SECURITY_ELEMENT = "security";

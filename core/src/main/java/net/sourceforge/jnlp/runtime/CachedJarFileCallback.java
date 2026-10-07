@@ -42,14 +42,13 @@ import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.sourceforge.jnlp.util.JarFile;
 import net.sourceforge.jnlp.util.UrlKey;
 import net.sourceforge.jnlp.util.UrlUtils;
-import sun.net.www.protocol.jar.URLJarFile;
-import sun.net.www.protocol.jar.URLJarFileCallBack;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -62,8 +61,9 @@ import java.util.jar.Attributes;
  * Invoked by URLJarFile to get a JarFile corresponding to a URL.
  *
  * Large parts of this class are based on JarFileFactory and URLJarFile.
+ * Hooked in reflectively: sun.net.www.protocol.jar.URLJarFileCallBack is gone in newer JDKs.
  */
-public final class CachedJarFileCallback implements URLJarFileCallBack {
+public final class CachedJarFileCallback {
 
     private final static Logger LOG = LoggerFactory.getLogger(CachedJarFileCallback.class);
 
@@ -85,7 +85,28 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
         mapping.put(new UrlKey(remoteUrl), localUrl);
     }
 
-    @Override
+    /**
+     * Registers this as URLJarFile callback. No-op on JDKs without URLJarFileCallBack;
+     * remote jar: URLs are then fetched by the JDK itself, bypassing the ITW cache.
+     */
+    public static void register() {
+        try {
+            final Class<?> callBackClass = Class.forName("sun.net.www.protocol.jar.URLJarFileCallBack");
+            final Object callBack = Proxy.newProxyInstance(CachedJarFileCallback.class.getClassLoader(), new Class<?>[]{callBackClass},
+                    (proxy, method, args) -> {
+                        switch (method.getName()) {
+                            case "retrieve": return INSTANCE.retrieve((URL) args[0]);
+                            case "equals": return proxy == args[0];
+                            case "hashCode": return System.identityHashCode(proxy);
+                            default: return CachedJarFileCallback.class.getName();
+                        }
+                    });
+            Class.forName("sun.net.www.protocol.jar.URLJarFile").getMethod("setCallBack", callBackClass).invoke(null, callBack);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOG.info("URLJarFile callback not available, jar: URLs will bypass the cache: {}", e.toString());
+        }
+    }
+
     public java.util.jar.JarFile retrieve(URL url) throws IOException {
         URL localUrl = mapping.get(new UrlKey(url));
         if (localUrl == null) {
@@ -157,7 +178,7 @@ public final class CachedJarFileCallback implements URLJarFileCallBack {
                                 }
                                 out.close();
                                 out = null;
-                                return new URLJarFile(tmpFile, null);
+                                return new java.util.jar.JarFile(tmpFile);
                             } catch (IOException e) {
                                 if (tmpFile != null) {
                                     tmpFile.delete();

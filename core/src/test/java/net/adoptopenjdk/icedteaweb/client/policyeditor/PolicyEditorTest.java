@@ -44,7 +44,6 @@ import net.adoptopenjdk.icedteaweb.commandline.UnevenParameterException;
 import net.sourceforge.jnlp.config.PathsAndFiles;
 import org.junit.Before;
 import org.junit.Test;
-import sun.security.provider.PolicyParser;
 
 import static net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.getCodebaseArgument;
 import static net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.getFilePathArgument;

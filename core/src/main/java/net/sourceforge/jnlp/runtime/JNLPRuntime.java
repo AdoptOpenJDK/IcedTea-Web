@@ -41,7 +41,6 @@ import net.sourceforge.jnlp.services.XServiceManagerStub;
 import net.sourceforge.jnlp.util.RestrictedFileUtils;
 import net.sourceforge.jnlp.util.logging.LogConfig;
 import net.sourceforge.jnlp.util.logging.OutputController;
-import sun.net.www.protocol.jar.URLJarFile;
 
 import javax.jnlp.ServiceManager;
 import javax.naming.ConfigurationException;
@@ -144,6 +143,9 @@ public class JNLPRuntime {
 
     /** whether the runtime uses security */
     private static boolean securityEnabled = true;
+
+    /** set when the JVM refused our SecurityManager */
+    private static boolean sandboxUnsupported = false;
 
     /** whether debug mode is on */
     private static boolean debug = false;
@@ -269,8 +271,14 @@ public class JNLPRuntime {
         setSecurityEnabled(!(deploymentNosecurity || cmdlineNosecurity));
         LOG.debug("SecurityEnabled = {} cmdLine nosecurity = {} deployment nosecurity = {}", isSecurityEnabled(), cmdlineNosecurity, deploymentNosecurity);
         if (isSecurityEnabled() && forkingStrategy.mayRunManagedApplication()) {
-            Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
-            System.setSecurityManager(security);
+            try {
+                Policy.setPolicy(policy); // do first b/c our SM blocks setPolicy
+                System.setSecurityManager(security);
+            } catch (UnsupportedOperationException e) {
+                // JDK 24+, or JDK 18-23 without -Djava.security.manager=allow
+                sandboxUnsupported = true;
+                LOG.warn("Security Manager not supported by this JVM ({}), only fully trusted applications can run", e.getMessage());
+            }
         }
 
         securityDialogMessageHandler = startSecurityThreads();
@@ -301,7 +309,7 @@ public class JNLPRuntime {
         Security.setProperty("package.access",
                              Security.getProperty("package.access")+",net.sourceforge.jnlp");
 
-        URLJarFile.setCallBack(CachedJarFileCallback.getInstance());
+        CachedJarFileCallback.register();
 
         initialized = true;
         LOG.debug("End JNLPRuntime.initialize()");
@@ -551,6 +559,14 @@ public class JNLPRuntime {
      */
     public static boolean isSecurityEnabled() {
         return securityEnabled;
+    }
+
+    /**
+     * @return true if security is enabled but the JVM cannot enforce it (no SecurityManager);
+     * restricted applications must then be refused
+     */
+    public static boolean isSandboxUnsupported() {
+        return securityEnabled && sandboxUnsupported;
     }
 
     /**

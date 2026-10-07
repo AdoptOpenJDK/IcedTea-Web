@@ -136,8 +136,8 @@ fn main() {
 }
 
 fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Vec<String>, os: &os_access::Os) -> Vec<String> {
-    let bootcp = jars_helper::get_bootclasspath(&java_dir, os);
-    let cp = jars_helper::get_classpath(&java_dir, os);
+    let bootcp = jars_helper::get_bootclasspath(os);
+    let cp = jars_helper::get_classpath(os);
     let current_name = dirs_paths_helper::current_program_name();
     let current_bin = dirs_paths_helper::current_program();
     let mut info2 = String::new();
@@ -200,8 +200,14 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
         native_debug_config = String::from("");
     }
 
-    if is_modular_jdk(os, &java_dir) {
+    let jdk = jdk_version(os, &java_dir);
+    if jdk > 8 {
+        os.log("itw-rust-debug: modular jdk");
         all_args.push(resolve_argsfile(os));
+    }
+    // JDK 18-23 refuse System.setSecurityManager unless allowed at startup; 9-11 and 24+ do not start with it
+    if jdk >= 18 && jdk <= 23 {
+        all_args.push(String::from("-Djava.security.manager=allow"));
     }
     all_args.push(bootcp);
     all_args.push(String::from("-classpath"));
@@ -219,16 +225,6 @@ fn compose_arguments(java_dir: &std::path::PathBuf, original_args: &std::vec::Ve
     all_args
 }
 
-fn is_modular_jdk(os: &os_access::Os, jre_dir: &std::path::PathBuf) -> bool {
-    if jdk_version(os, jre_dir) > 8 {
-        os.log("itw-rust-debug: modular jdk");
-        true
-    } else {
-        os.log("itw-rust-debug: non-modular jdk");
-        false
-    }
-}
-
 fn jdk_version(os: &os_access::Os, jre_dir: &std::path::PathBuf) -> i32 {
     let vec = vec!["-version".to_string()];
     //this of  course fails during tests
@@ -236,20 +232,10 @@ fn jdk_version(os: &os_access::Os, jre_dir: &std::path::PathBuf) -> i32 {
     match output_result {
         Ok(output) => {
             for line in String::from_utf8(output.stderr).expect("java version was supopsed to return output").lines() {
-                if line.contains("version")
-                    && (line.contains("\"1")
-                    || line.contains("\"2")
-                    || line.contains("\"3")) {
-                    if line.contains("\"1.7.0") || line.contains("\"1.7.1") {
-                        os.log("itw-rust-debug: detected jdk 7");
-                        return 7
-                    } else if line.contains("\"1.8.0") {
-                        os.log("itw-rust-debug: detected jdk 8");
-                        return 8
-                    } else {
-                        //currently this serves only to determine module/non modular jdk
-                        os.log("itw-rust-debug: detected jdk 9 or up");
-                        return 9
+                if line.contains("version") {
+                    if let Some(v) = parse_jdk_version(line) {
+                        os.log(&format!("itw-rust-debug: detected jdk {}", v));
+                        return v;
                     }
                 }
             }
@@ -260,6 +246,18 @@ fn jdk_version(os: &os_access::Os, jre_dir: &std::path::PathBuf) -> i32 {
             os.log("itw-rust-debug: failed to launch jdk recognition. fallback to 8");
             return 8
         }
+    }
+}
+
+// major version from e.g. `openjdk version "1.8.0_412"`, `"21.0.3" 2024-04-16`, `"25-ea"`
+fn parse_jdk_version(line: &str) -> Option<i32> {
+    let quoted = line.split('"').nth(1)?;
+    let mut parts = quoted.split(|c: char| !c.is_ascii_digit());
+    let major: i32 = parts.next()?.parse().ok()?;
+    if major == 1 {
+        parts.next()?.parse().ok()
+    } else {
+        Some(major)
     }
 }
 
@@ -540,6 +538,13 @@ pub mod tests_main {
         super::include_dashJs_values(&switches, &mut result, &tu::TestLogger::create_new());
         assert_eq!(ex, result);
     }
+
+    #[test]
+    fn parse_jdk_version_test() {
+        assert_eq!(super::parse_jdk_version("openjdk version \"1.8.0_412\""), Some(8));
+        assert_eq!(super::parse_jdk_version("openjdk version \"21.0.3\" 2024-04-16"), Some(21));
+        assert_eq!(super::parse_jdk_version("openjdk version \"25-ea\" 2025-09-16"), Some(25));
+        assert_eq!(super::parse_jdk_version("java version \"9\""), Some(9));
+        assert_eq!(super::parse_jdk_version("garbage"), None);
+    }
 }
-
-

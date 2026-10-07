@@ -40,6 +40,7 @@ import net.adoptopenjdk.icedteaweb.client.parts.dialogs.FileDialogFactory;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor;
 import net.adoptopenjdk.icedteaweb.client.policyeditor.PolicyEditor.PolicyEditorWindow;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
+import net.adoptopenjdk.icedteaweb.jvm.JvmUtils;
 import net.adoptopenjdk.icedteaweb.io.FileUtils.OpenFileResult;
 import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
@@ -90,6 +91,11 @@ public class PolicyPanel extends NamedBorderPanel {
 
         final JButton advancedEditorButton = new JButton(R("CPButAdvancedEditor"));
         advancedEditorButton.addActionListener(new LaunchPolicyToolAction(fileUrlString));
+        if (!isPolicyToolAvailable()) {
+            // policytool removed in JDK 10
+            advancedEditorButton.setEnabled(false);
+            advancedEditorButton.setToolTipText(R("CPPolicyEditorNotFound"));
+        }
 
         final String pathPart = localFilePathFromUrlString(fileUrlString);
         simpleEditorButton.setToolTipText(R("CPPolicyTooltip", FileUtils.displayablePath(pathPart, 60)));
@@ -227,6 +233,18 @@ public class PolicyPanel extends NamedBorderPanel {
         final Method main = policyTool.getMethod("main", signature);
         final String[] args = new String[] { "-file", filePath };
         main.invoke(null, (Object) args);
+    }
+
+    private static boolean isPolicyToolAvailable() {
+        if (JvmUtils.findOnPath(new String[]{"policytool", "policytool.exe"}) != null) {
+            return true;
+        }
+        try {
+            Class.forName("sun.security.tools.policytool.PolicyTool");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     /**

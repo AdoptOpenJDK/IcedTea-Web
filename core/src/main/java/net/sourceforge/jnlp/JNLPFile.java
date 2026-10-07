@@ -827,18 +827,9 @@ public class JNLPFile {
      */
     public DownloadOptions getDownloadOptions() {
         final ResourcesDesc desc = getResources();
-        final boolean usePack = parseBoolean(desc.getPropertiesMap().get("jnlp.packEnabled")) && packIsSupportedByCurrentJvm();
+        final boolean usePack = parseBoolean(desc.getPropertiesMap().get("jnlp.packEnabled"));
         final boolean useVersion = parseBoolean(desc.getPropertiesMap().get("jnlp.versionEnabled"));
         return new DownloadOptions(usePack, useVersion);
-    }
-
-    private boolean packIsSupportedByCurrentJvm() {
-        try {
-            final Class<?> c = ClassLoader.getSystemClassLoader().loadClass("java.util.jar.Pack200");
-            return  c != null;
-        } catch (Exception | Error e) {
-            return false;
-        }
     }
 
     /**

@@ -47,10 +47,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
-import static sun.security.util.SecurityConstants.FILE_READ_ACTION;
-import static sun.security.util.SecurityConstants.FILE_WRITE_ACTION;
 
 public class TemporaryPermissionsTest {
+
+    // values of sun.security.util.SecurityConstants
+    private static final String FILE_READ_ACTION = "read";
+    private static final String FILE_WRITE_ACTION = "write";
 
     @Test
     public void testGetPermission() throws Exception {

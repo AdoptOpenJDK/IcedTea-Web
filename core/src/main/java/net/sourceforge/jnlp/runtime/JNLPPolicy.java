@@ -32,6 +32,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.AllPermission;
 import java.security.CodeSource;
+import java.security.NoSuchAlgorithmException;
 import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Permissions;
@@ -242,6 +243,9 @@ public class JNLPPolicy extends Policy {
                     policyUri = new URI(policyLocation.replace("\\", "/"));
                 }
                 policy = getInstance("JavaPolicy", new URIParameter(policyUri));
+            } catch (NoSuchAlgorithmException e) {
+                // JDK 24+: no policy support, nothing to enforce it with anyway
+                LOG.debug("Policy files not supported by this JVM, ignoring {}", policyLocation);
             } catch (Exception e) {
                 LOG.error("Error while loading the policy from URL " + policyLocation, e);
             }

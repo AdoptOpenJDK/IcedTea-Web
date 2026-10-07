@@ -15,7 +15,6 @@ rem maybe set "VAR=value" is working better?
 rem Warning for if blocks: variables using %my_var% do not work (interpreter), use !my_var! with ENABLEDELAYEDEXPANSION instead
 rem convention to use for temporary variables use '_' prefix
 
-set "NASHORN=lib/ext/nashorn.jar"
 set "JRE=@JRE@"
 set "LAUNCHER_FLAGS=-Xms8m"
 set "MAIN_CLASS=@MAIN_CLASS@"
@@ -30,6 +29,9 @@ set "TAGSOUP_SRC=@TAGSOUP_JAR@"
 set "RHINO_SRC=@RHINO_JAR@"
 set "MSLINKS_SRC=@MSLINKS_JAR@"
 set "IPADDRESS_SRC=@IPADDRESS_JAR@"
+set "COMMONS_COMPRESS_SRC=@COMMONS_COMPRESS_JAR@"
+set "COMMONS_IO_SRC=@COMMONS_IO_JAR@"
+set "COMMONS_LANG3_SRC=@COMMONS_LANG3_JAR@"
 
 
 rem resolve folder of this script:
@@ -108,6 +110,9 @@ if "%ITW_LIBS%" == "BUNDLED" (
   set "TAGSOUP_JAR="
   set "MSLINKS_JAR="
   set "IPADDRESS_JAR="
+  set "COMMONS_COMPRESS_JAR="
+  set "COMMONS_IO_JAR="
+  set "COMMONS_LANG3_JAR="
 ) else (
   set "JAVAWS_JAR=!JAVAWS_SRC!"
 
@@ -115,19 +120,18 @@ if "%ITW_LIBS%" == "BUNDLED" (
   set "TAGSOUP_JAR=!TAGSOUP_SRC!"
   set "MSLINKS_JAR=!MSLINKS_SRC!"
   set "IPADDRESS_JAR=!IPADDRESS_SRC!"
+  set "COMMONS_COMPRESS_JAR=!COMMONS_COMPRESS_SRC!"
+  set "COMMONS_IO_JAR=!COMMONS_IO_SRC!"
+  set "COMMONS_LANG3_JAR=!COMMONS_LANG3_SRC!"
 )
-set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%JAVAWS_JAR%;%RHINO_JAR%;%TAGSOUP_JAR%;%MSLINKS_JAR%;%IPADDRESS_JAR%"
+set "LAUNCHER_BOOTCLASSPATH=-Xbootclasspath/a:%JAVAWS_JAR%;%RHINO_JAR%;%TAGSOUP_JAR%;%MSLINKS_JAR%;%IPADDRESS_JAR%;%COMMONS_COMPRESS_JAR%;%COMMONS_IO_JAR%;%COMMONS_LANG3_JAR%"
 
 
-rem Fix classpaths for custom JRE:
+rem Select java (custom JRE or default):
 if not "%CUSTOM_JRE%" == "" (
   set "JAVA=%CUSTOM_JRE%/bin/java"
-  set "CP=%CUSTOM_JRE%/lib/rt.jar;%CUSTOM_JRE%/lib/ext/jfxrt.jar"
-  set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%CUSTOM_JRE%/%NASHORN%"
 ) else (
   set "JAVA=%JRE%/bin/java"
-  set "CP=%JRE%/lib/rt.jar;%JRE%/lib/ext/jfxrt.jar"
-  set "LAUNCHER_BOOTCLASSPATH=%LAUNCHER_BOOTCLASSPATH%;%JRE%/%NASHORN%"
 )
 
 
@@ -154,6 +158,9 @@ for /f "tokens=*" %%a in ('"%JAVA%" -version 2^>^&1 1^>con:') do (
 if %fullversion% GEQ 9 (
   set "MODULAR_JDK=YES"
 )
+rem JDK 18-23 refuse System.setSecurityManager unless allowed at startup; 9-11 and 24+ do not start with it
+set "SM_ARGS="
+if %fullversion% GEQ 18 if %fullversion% LEQ 23 set "SM_ARGS=-Djava.security.manager=allow"
 set "_versionLine=" & set "_unquoted=" & set "fullversion="
 
 set "MODULAR_ARGS="
@@ -168,6 +175,7 @@ if "%MODULAR_JDK%" == "YES" (
   )
   rem add JDK9+ arg file:
   set "MODULAR_ARGS=!MODULAR_ARGS! "@%RUN_ARGS_LOCATION%""
+  set "MODULAR_ARGS=!MODULAR_ARGS! !SM_ARGS!"
 )
 
 
@@ -219,7 +227,7 @@ if "%SPLASH%" == "true" (
   set "SPLASH="
 )
 
-"%JAVA%" %SPLASH% "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %MODULAR_ARGS% %JAVAWS_J_OPTIONS% %JAVA_ARGS% -classpath "%CP%" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" %NATIVE_DEBUG% "%MAIN_CLASS%" %ARGS%
+"%JAVA%" %SPLASH% "%LAUNCHER_BOOTCLASSPATH%" %LAUNCHER_FLAGS% %MODULAR_ARGS% %JAVAWS_J_OPTIONS% %JAVA_ARGS% -classpath "" "-Dicedtea-web.bin.name=%PROGRAM_NAME%" "-Dicedtea-web.bin.location=%BINARY_LOCATION%" %NATIVE_DEBUG% "%MAIN_CLASS%" %ARGS%
 
 SET "errno=%ERRORLEVEL%"
 

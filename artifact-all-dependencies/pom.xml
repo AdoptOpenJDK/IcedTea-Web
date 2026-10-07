@@ -54,6 +54,10 @@
                                     <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.tagsoup</shadedPattern>
                                 </relocation>
                                 <relocation>
+                                    <pattern>org.apache.commons</pattern>
+                                    <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.apache.commons</shadedPattern>
+                                </relocation>
+                                <relocation>
                                     <pattern>mslinks</pattern>
                                     <shadedPattern>net.adoptopenjdk.icedteaweb.shaded.mslinks</shadedPattern>
                                 </relocation>

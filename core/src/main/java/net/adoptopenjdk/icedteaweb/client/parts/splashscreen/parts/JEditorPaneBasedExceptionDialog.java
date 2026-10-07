@@ -89,7 +89,7 @@ public class JEditorPaneBasedExceptionDialog extends JDialog implements Hyperlin
     // End of components declaration
     private final String message;
     private final Throwable exception;
-    private final Date shown;
+    final Date shown;
     private final String anotherInfo;
 
     /** Creates new form JEditorPaneBasedExceptionDialog */

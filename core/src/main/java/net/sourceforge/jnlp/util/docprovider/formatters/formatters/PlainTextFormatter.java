@@ -53,7 +53,7 @@ public class PlainTextFormatter extends ReplacingTextFormatter {
     
     public static String getLineSeparator() {
         return java.security.AccessController.doPrivileged(
-                new sun.security.action.GetPropertyAction(JavaSystemPropertiesConstants.LINE_SEPARATOR));
+                (java.security.PrivilegedAction<String>) () -> System.getProperty(JavaSystemPropertiesConstants.LINE_SEPARATOR));
     }
 
     private final String paragraphIndentation;

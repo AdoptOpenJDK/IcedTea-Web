@@ -38,7 +38,6 @@ import net.adoptopenjdk.icedteaweb.logging.Logger;
 import net.adoptopenjdk.icedteaweb.logging.LoggerFactory;
 import net.adoptopenjdk.icedteaweb.io.FileUtils;
 import net.sourceforge.jnlp.util.MD5SumWatcher;
-import sun.security.provider.PolicyParser;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -75,7 +74,7 @@ public class PolicyFileModel {
 
     private KeystoreInfo keystoreInfo = new KeystoreInfo(null, null, null, null);
     private MD5SumWatcher fileWatcher;
-    private PolicyParser parser = new PolicyParser(false);
+    private PolicyParser parser = new PolicyParser();
 
     PolicyFileModel(final String filepath) {
         this(new File(filepath));
@@ -107,7 +106,7 @@ public class PolicyFileModel {
      * "-file" command line flag, or if none given, comes from DeploymentConfiguration.
      */
      synchronized void openAndParsePolicyFile() throws IOException, PolicyParser.ParsingException {
-        parser = new PolicyParser(false);
+        parser = new PolicyParser();
         fileWatcher = new MD5SumWatcher(file);
         fileWatcher.update();
         clearPermissions();
@@ -149,7 +148,7 @@ public class PolicyFileModel {
      * Save the policy model into the file pointed to by the filePath field.
      */
     synchronized void savePolicyFile() throws IOException {
-        parser = new PolicyParser(false);
+        parser = new PolicyParser();
         FileLock fileLock = null;
         try {
             fileLock = FileUtils.getFileLock(file.getAbsolutePath(), false, true);

@@ -26,15 +26,39 @@
 
         <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
         <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
-        <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
+        <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+        <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
 
         <skip.javadoc>true</skip.javadoc>
+        <!-- set by jacoco prepare-agent; empty for modules without it -->
+        <argLine></argLine>
+        <!-- extra test JVM args, set by JDK profiles below -->
+        <itw.test.moduleArgs></itw.test.moduleArgs>
+        <itw.test.smArgs></itw.test.smArgs>
     </properties>
 
     <profiles>
+        <profile>
+            <id>jdk9+</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <!-- runtime exports as in the launchers, plus internals used by tests only -->
+                <itw.test.moduleArgs>@${maven.multiModuleProjectDirectory}/launchers/itw-modularjdk.args --add-opens=java.base/java.util=ALL-UNNAMED</itw.test.moduleArgs>
+            </properties>
+        </profile>
+        <profile>
+            <id>jdk18-23</id>
+            <activation>
+                <jdk>[18,24)</jdk>
+            </activation>
+            <properties>
+                <itw.test.smArgs>-Djava.security.manager=allow</itw.test.smArgs>
+            </properties>
+        </profile>
         <profile>
             <id>javaDoc</id>
             <properties>
@@ -111,7 +135,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
-                        <argLine>-Dfile.encoding=${project.build.sourceEncoding} -Duser.language=en</argLine>
+                        <argLine>@{argLine} ${itw.test.moduleArgs} ${itw.test.smArgs} -Dfile.encoding=${project.build.sourceEncoding} -Duser.language=en</argLine>
                         <environmentVariables>
                             <ICEDTEA_WEB_SPLASH>DEFAULT</ICEDTEA_WEB_SPLASH>
                         </environmentVariables>
