@@ -105,12 +105,26 @@ public final class Boot implements PrivilegedAction<Integer> {
 
     private static CommandLineOptionsParser optionParser;
 
+    private static volatile AppletInstance inProcessApplet;
+
+    /**
+     * Whether the last Boot.main invocation launched an applet in this JVM.
+     * A hosting launcher must not exit immediately after a successful local launch.
+     *
+     * @return true if a locally launched applet is still running
+     */
+    public static boolean hasRunningInProcessApplet() {
+        final AppletInstance applet = inProcessApplet;
+        return applet != null && applet.isRunning();
+    }
+
     /**
      * Launch the JNLP file specified by the command-line arguments.
      *
      * @param args launching arguments
      */
     public static void main(String[] args) {
+        inProcessApplet = null;
         int status = -42;
         try {
             EnvironmentPrinter.logEnvironment(args);
@@ -374,7 +388,10 @@ public final class Boot implements PrivilegedAction<Integer> {
         Launcher launcher = new Launcher();
         launcher.setParserSettings(getParserSettings());
         launcher.setInformationToMerge(getExtras());
-        launcher.launch(locationToUrl(location));
+        final ApplicationInstance application = launcher.launch(locationToUrl(location));
+        if (application instanceof AppletInstance) {
+            inProcessApplet = (AppletInstance) application;
+        }
     }
 
     private Map<String, List<String>> getExtras() {
