@@ -116,8 +116,21 @@ public class AppletEnvironment implements AppletContext, AppletStub {
         WindowListener closer = new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
-                appletInstance.destroy();
-                JNLPRuntime.exit(0);
+                // AWT Frame has no default close operation. Preserve the existing
+                // behaviour when the applet has not installed its own close listener.
+                if (frame.getWindowListeners().length == 1) {
+                    frame.dispose();
+                }
+            }
+
+            @Override
+            public void windowClosed(WindowEvent event) {
+                // An applet may defer closing the frame until the user confirms.
+                // Do not destroy it merely because WINDOW_CLOSING was dispatched.
+                if (appletInstance.isRunning()) {
+                    appletInstance.destroy();
+                    JNLPRuntime.exit(0);
+                }
             }
         };
         frame.addWindowListener(closer);
